@@ -28,6 +28,7 @@ namespace BasisFunctions{
 BasisFunctions::BasisFunctions(const ActionOptions&ao):
 Action(ao),
 ActionWithValue(ao),
+print_debug_info_(false),
 has_been_set(false),
 type_("Undefined"),
 norder_(0),
@@ -50,6 +51,7 @@ bf_integrals_(nbasis_,0.0)
  parse("INTERVAL_MIN",interval_min_);
  parse("INTERVAL_MAX",interval_max_);
  if(interval_min_>interval_max_){error("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
+ parseFlag("DEBUG_INFO",print_debug_info_);
 }
 
 void BasisFunctions::registerKeywords( Keywords& keys ){
@@ -58,6 +60,7 @@ void BasisFunctions::registerKeywords( Keywords& keys ){
   keys.add("compulsory","ORDER","The order of the basis functions.");
   keys.add("compulsory","INTERVAL_MIN","the minimum of the interval on which the basis functions are defined");
   keys.add("compulsory","INTERVAL_MAX","the maximum of the interval on which the basis functions are defined");
+  keys.addFlag("DEBUG_INFO",false,"print out more detailed information about the basis set, useful for debugging");
 }
 
 void BasisFunctions::setupInterval(){
@@ -69,17 +72,16 @@ void BasisFunctions::setupInterval(){
  argT_derivf_ = interval_default_range_/interval_range_;
 }
 
-double BasisFunctions::translateArgument(const double arg, bool& inside_range)
+double BasisFunctions::translateArgument(const double arg, bool& inside_interval)
 {
- inside_range=true;
- log.printf("max: %f\n",interval_mean_);
+ inside_interval=true;
  double argT = (arg-interval_mean_)*argT_derivf_;
  if(argT < interval_default_min_){
-  inside_range=false;
+  inside_interval=false;
   argT=interval_default_min_;
  }
  else if(argT > interval_default_max_){
-  inside_range=false;
+  inside_interval=false;
   argT=interval_default_max_;
  }
  return argT;
@@ -107,17 +109,24 @@ void BasisFunctions::printInfo()
  log.printf("  One-dimensional basis set\n");
  log.printf("   Type: %s\n",type_.c_str());
  if(periodic_){log.printf("   The basis functions are periodic\n");}
- log.printf("   Default interval of basis set: %f to %f\n",interval_default_min_,interval_default_max_);
- log.printf("   Defined interval of basis set: %f to %f\n",interval_min_,interval_max_);
- log.printf("   Derivative factor due to interval translation: %f\n",argT_derivf_);
  log.printf("   Order of basis set: %d\n",norder_);
  log.printf("   Number of basis functions: %d\n",nbasis_);
- log.printf("   Basis functions:\n");
+ log.printf("   Interval of basis set: %f to %f\n",interval_default_min_,interval_default_max_);
+ log.printf("   Description of basis functions:\n");
  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %10s\n",i,bf_description_[i].c_str());}
- log.printf("   --------------------------\n");
- log.printf("   Basis functions integrals:\n");
- for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %f\n",i,bf_integrals_[i]);}
- log.printf("   --------------------------\n");
+ 
+ if(print_debug_info_)
+ {
+  log.printf("  Debug information:\n");
+  log.printf("   Default interval of basis set: [%f,%f]\n",interval_default_min_,interval_default_max_);
+  log.printf("   Default interval of basis set: range=%f,  mean=%f\n",interval_default_range_,interval_default_mean_);
+  log.printf("   Defined interval of basis set: [%f,%f]\n",interval_min_,interval_max_);
+  log.printf("   Defined interval of basis set: range=%f,  mean=%f\n",interval_range_,interval_mean_);
+  log.printf("   Derivative factor due to interval translation: %f\n",argT_derivf_);
+  log.printf("   Integral of basis functions over the interval:\n");
+  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %f\n",i,bf_integrals_[i]);}
+  log.printf("   --------------------------\n");
+ }
 }
 
 }

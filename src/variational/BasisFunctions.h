@@ -43,6 +43,8 @@ class BasisFunctions :
 private:
 
 protected:
+  // print extra info about the basis set
+  bool print_debug_info_;
   // to check if the basis set has been defined
   bool has_been_set;
   // the type of the basis set
