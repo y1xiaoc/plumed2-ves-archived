@@ -50,6 +50,7 @@ numerical_bf_integrals_(false),
 bf_integrals_(nbasis_,0.0)
 {
  parse("ORDER",norder_);
+ nbasis_=norder_+1;
  parse("INTERVAL_MIN",interval_min_);
  parse("INTERVAL_MAX",interval_max_);
  if(interval_min_>interval_max_){error("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
@@ -146,14 +147,14 @@ void BasisFunctions::printInfo()
   log.printf("   Derivative factor due to interval translation: %f\n",argT_derivf_);
   log.printf("   Integral of basis functions over the interval:\n");
   if(numerical_bf_integrals_){log.printf("   Note: calculated numerically\n");}
-  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %f\n",i,bf_integrals_[i]);}
+  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %16.10f\n",i,bf_integrals_[i]);}
   log.printf("   --------------------------\n");
  }
 }
 
 void BasisFunctions::numericalBFIntegrals()
 {
- unsigned int nbins=1000;
+ unsigned int nbins=1001;
  double h=(interval_max_-interval_min_)/nbins;
  bf_integrals_.assign(nbasis_,0.0);
 
@@ -172,7 +173,7 @@ void BasisFunctions::numericalBFIntegrals()
    double v2 = getValue(x2,i,dummy_dbl,dummy_bool);
    sum = sum + (v1+v2);
   }
-  // normilzed with the "volume of the interval"
+  // norm with the "volume of the interval"
   bf_integrals_[i] = (0.5*h*sum)/interval_range_; 
  } 
 }
