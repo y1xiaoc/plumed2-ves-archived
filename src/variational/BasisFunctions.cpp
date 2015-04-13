@@ -63,15 +63,16 @@ void BasisFunctions::registerKeywords( Keywords& keys ){
 void BasisFunctions::setupInterval(){
  // if(!intervalBounded()){error("setupInterval() only works for bounded interval");}
  interval_default_range_ = interval_default_max_-interval_default_min_;
- interval_default_mean_  = 0.5*(interval_default_max_-interval_default_min_);
+ interval_default_mean_  = 0.5*(interval_default_max_+interval_default_min_);
  interval_range_ = interval_max_-interval_min_;
- interval_mean_  = 0.5*(interval_max_-interval_min_);
+ interval_mean_  = 0.5*(interval_max_+interval_min_);
  argT_derivf_ = interval_default_range_/interval_range_;
 }
 
-double BasisFunctions::translateArgument(const double arg, bool inside_range)
+double BasisFunctions::translateArgument(const double arg, bool& inside_range)
 {
  inside_range=true;
+ log.printf("max: %f\n",interval_mean_);
  double argT = (arg-interval_mean_)*argT_derivf_;
  if(argT < interval_default_min_){
   inside_range=false;

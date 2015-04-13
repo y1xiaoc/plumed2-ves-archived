@@ -74,7 +74,6 @@ protected:
   // setup various stuff
   void setupBF();
   void setupInterval();
-  void printInfo();
   virtual void setupDescription()=0;
   virtual void setupBFIntegrals()=0;
 public:
@@ -96,13 +95,14 @@ public:
   unsigned getNumberOfDerivatives();
   //
   BasisFunctions();
-  double translateArgument(const double, bool);
+  double translateArgument(const double, bool&);
   void apply();
   void calculate();
   // calculate the value for the n-th basis function
   virtual double getValue(const double, const unsigned int, double&, bool&)=0;
   // calcuate the values for all basis functions
   virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&)=0;
+  void printInfo();
 };
 
 inline
