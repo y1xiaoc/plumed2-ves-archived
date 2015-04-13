@@ -54,6 +54,7 @@ protected:
   // the total number of basis functions
   unsigned int nbasis_;
   // description of each basis function
+  std::string bf_description_prefix_; 
   std::vector<std::string> bf_description_; 
   // if the basis functions are periodic or not
   bool periodic_;
@@ -71,13 +72,16 @@ protected:
   double interval_mean_;
   // the derivative term in the chain rule coming from the translation of the interval
   double argT_derivf_;
+  // calculate numerically the integrals of the basis functions over the intervals
+  bool numerical_bf_integrals_;
   // the integrals of the basis functions over the interval on which they are defined
   std::vector <double> bf_integrals_;
   // setup various stuff
   void setupBF();
   void setupInterval();
-  virtual void setupDescription()=0;
-  virtual void setupBFIntegrals()=0;
+  void numericalBFIntegrals();
+  virtual void setupDescription();
+  virtual void setupBFIntegrals();
 public:
   static void registerKeywords(Keywords&);
   BasisFunctions(const ActionOptions&ao);

@@ -27,8 +27,8 @@ namespace PLMD{
 namespace BasisFunctions{
 
 class FourierBF : public BasisFunctions{
- void setupDescription();
- void setupBFIntegrals();
+ virtual void setupDescription();
+ virtual void setupBFIntegrals();
 public:
  FourierBF(const ActionOptions&);
  double getValue(const double, const unsigned int, double&, bool&);
@@ -96,12 +96,9 @@ void FourierBF::setupDescription()
   bf_description_[i]="cos("+is+"*s)";
   bf_description_[i+norder_]="sin("+is+"*s)";
  }
-}
+ }
 
-void FourierBF::setupBFIntegrals()
-{
- bf_integrals_.assign(nbasis_,0.0);
-}
+void FourierBF::setupBFIntegrals(){bf_integrals_.assign(nbasis_,0.0);}
 
 
 }

@@ -33,6 +33,7 @@ has_been_set(false),
 type_("Undefined"),
 norder_(0),
 nbasis_(1),
+bf_description_prefix_("f"),
 bf_description_(nbasis_,"1"),
 periodic_(false),
 interval_bounded_(true),
@@ -45,6 +46,7 @@ interval_max_(0.0),
 interval_range_(0.0),
 interval_mean_(0.0),
 argT_derivf_(1.0),
+numerical_bf_integrals_(false),
 bf_integrals_(nbasis_,0.0)
 {
  parse("ORDER",norder_);
@@ -52,6 +54,7 @@ bf_integrals_(nbasis_,0.0)
  parse("INTERVAL_MAX",interval_max_);
  if(interval_min_>interval_max_){error("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
  parseFlag("DEBUG_INFO",print_debug_info_);
+ parseFlag("NUMERICAL_BF_INTEGRALS",numerical_bf_integrals_);
 }
 
 void BasisFunctions::registerKeywords( Keywords& keys ){
@@ -61,6 +64,7 @@ void BasisFunctions::registerKeywords( Keywords& keys ){
   keys.add("compulsory","INTERVAL_MIN","the minimum of the interval on which the basis functions are defined");
   keys.add("compulsory","INTERVAL_MAX","the maximum of the interval on which the basis functions are defined");
   keys.addFlag("DEBUG_INFO",false,"print out more detailed information about the basis set, useful for debugging");
+  keys.addFlag("NUMERICAL_BF_INTEGRALS",false,"calculate basis function integral over the interval numerically");
 }
 
 void BasisFunctions::setupInterval(){
@@ -91,13 +95,30 @@ void BasisFunctions::apply(){}
 
 void BasisFunctions::calculate(){}
 
+void BasisFunctions::setupDescription()
+{
+ bf_description_.resize(nbasis_);
+ for(unsigned int i=0; i < nbasis_;i++)
+ {
+  std::string is; Tools::convert(i,is);
+  bf_description_[i]=bf_description_prefix_+is+"(s)";
+ }
+}
+
+void BasisFunctions::setupBFIntegrals()
+{
+ numerical_bf_integrals_=true;
+ numericalBFIntegrals();
+}
+
 void BasisFunctions::setupBF()
 {
  if(interval_default_min_>interval_default_max_){error("setupBF: default intervals are not correctly set");}
  setupInterval();
  setupDescription();
  if(bf_description_.size()==1){error("setupBF: the description of the basis functions is not correct.");}
- setupBFIntegrals();
+ if(!numerical_bf_integrals_){setupBFIntegrals();}
+ else{numericalBFIntegrals();}
  if(bf_integrals_.size()==1){error("setupBF: the integrals of the basis functions is not correct.");}
  if(type_=="Undefined"){error("setupBF: the type of the basis function is not defined.");}
  has_been_set=true;
@@ -124,10 +145,38 @@ void BasisFunctions::printInfo()
   log.printf("   Defined interval of basis set: range=%f,  mean=%f\n",interval_range_,interval_mean_);
   log.printf("   Derivative factor due to interval translation: %f\n",argT_derivf_);
   log.printf("   Integral of basis functions over the interval:\n");
+  if(numerical_bf_integrals_){log.printf("   Note: calculated numerically\n");}
   for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %f\n",i,bf_integrals_[i]);}
   log.printf("   --------------------------\n");
  }
 }
+
+void BasisFunctions::numericalBFIntegrals()
+{
+ unsigned int nbins=1000;
+ double h=(interval_max_-interval_min_)/nbins;
+ bf_integrals_.assign(nbasis_,0.0);
+
+ bool dummy_bool=true;
+ double dummy_dbl=0.0;
+ bf_integrals_[0]=0.0;
+ for(unsigned int i=1; i < nbasis_;i++)
+ {
+  // Trapezoidal rule on a uniform grid with Nbins+1 grid points
+  double sum=0.0;
+  for(unsigned int k=0; k < nbins;k++)
+  {
+   double x1 = interval_min_+(k)*h;
+   double x2 = interval_min_+(k+1)*h;
+   double v1 = getValue(x1,i,dummy_dbl,dummy_bool);
+   double v2 = getValue(x2,i,dummy_dbl,dummy_bool);
+   sum = sum + (v1+v2);
+  }
+  // normilzed with the "volume of the interval"
+  bf_integrals_[i] = (0.5*h*sum)/interval_range_; 
+ } 
+}
+
 
 }
 }
