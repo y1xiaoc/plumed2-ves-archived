@@ -96,9 +96,13 @@ void FourierBF::setupDescription()
   bf_description_[i]="cos("+is+"*s)";
   bf_description_[i+norder_]="sin("+is+"*s)";
  }
- }
+}
 
-void FourierBF::setupBFIntegrals(){bf_integrals_.assign(nbasis_,0.0);}
+void FourierBF::setupBFIntegrals()
+{
+ bf_integrals_.assign(nbasis_,0.0);
+ bf_integrals_[0]=1.0;
+}
 
 
 }

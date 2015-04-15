@@ -90,7 +90,6 @@ void ChebyshevBF::setupBFIntegrals(){
   if( i % 2 == 0){bf_integrals_[i] = -2.0/( pow(io,2.0)-1.0)*0.5;}
   else{bf_integrals_[i]=0.0;}
  }
- bf_integrals_[0]=0.0;
 }
 
 

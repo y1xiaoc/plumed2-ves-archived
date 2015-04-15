@@ -160,8 +160,7 @@ void BasisFunctions::numericalBFIntegrals()
 
  bool dummy_bool=true;
  double dummy_dbl=0.0;
- bf_integrals_[0]=0.0;
- for(unsigned int i=1; i < nbasis_;i++)
+ for(unsigned int i=0; i < nbasis_;i++)
  {
   // Trapezoidal rule on a uniform grid with Nbins+1 grid points
   double sum=0.0;
