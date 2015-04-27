@@ -44,7 +44,8 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
  interval_default_max_=+1.0;
  periodic_=false;
  interval_bounded_=true;
- type_="Chebyshev polynomials of the first kind";
+ type_="chebyshev-1st-kind";
+ description_="Chebyshev polynomials of the first kind";
  bf_description_prefix_="T";
  setupBF();
  printInfo();

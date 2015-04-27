@@ -46,7 +46,8 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
  spacing_=(interval_max_-interval_min_)/norder_;
  periodic_=false;
  interval_bounded_=true;
- type_="Cubic B-splines (2nd order splines)";
+ type_="splines_2nd-order";
+ description_="Cubic B-splines (2nd order splines)";
  bf_description_prefix_="S";
  setupBF();
  printInfo();

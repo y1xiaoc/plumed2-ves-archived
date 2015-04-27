@@ -47,14 +47,19 @@ protected:
   bool print_debug_info_;
   // to check if the basis set has been defined
   bool has_been_set;
+  // description of the basis set
+  std::string description_;
   // the type of the basis set
   std::string type_;
   // the maximum order of the basis functions 
   unsigned int norder_;
   // the total number of basis functions
   unsigned int nbasis_;
-  // description of each basis function
+  // the keywords used to invoke the basis set 
+  std::vector<std::string> bf_keywords_;   
+  // prefix for the basis function descriptions 
   std::string bf_description_prefix_; 
+  // description of each basis function
   std::vector<std::string> bf_description_; 
   // if the basis functions are periodic or not
   bool periodic_;
@@ -82,6 +87,9 @@ protected:
   void numericalBFIntegrals();
   virtual void setupDescription();
   virtual void setupBFIntegrals();
+  template<typename T>
+  void addKeywordToList(const std::string, const T);
+  void addKeywordToList(const std::string, const bool);
 public:
   static void registerKeywords(Keywords&);
   BasisFunctions(const ActionOptions&ao);
@@ -99,6 +107,7 @@ public:
   double getBasisFunctionIntegral(const unsigned int);
   std::vector<double> getBasisFunctionIntegrals();
   unsigned getNumberOfDerivatives();
+  std::vector<std::string> getKeywordList();
   //
   BasisFunctions();
   double translateArgument(const double, bool&);
@@ -109,6 +118,7 @@ public:
   // calcuate the values for all basis functions
   virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&)=0;
   void printInfo();
+  std::string getKeywordString();
 };
 
 inline
@@ -149,6 +159,9 @@ std::vector<double> BasisFunctions::getBasisFunctionIntegrals(){return bf_integr
 
 inline
 unsigned BasisFunctions::getNumberOfDerivatives(){return 0;}
+
+inline
+std::vector<std::string> BasisFunctions::getKeywordList(){return bf_keywords_;}
 
 }
 }

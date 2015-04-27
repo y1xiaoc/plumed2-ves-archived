@@ -30,11 +30,12 @@ Action(ao),
 ActionWithValue(ao),
 print_debug_info_(false),
 has_been_set(false),
+description_("Undefined"),
 type_("Undefined"),
 norder_(0),
 nbasis_(1),
 bf_description_prefix_("f"),
-bf_description_(nbasis_,"1"),
+bf_description_(nbasis_,"f0"),
 periodic_(false),
 interval_bounded_(true),
 interval_default_min_(1.0),
@@ -49,13 +50,19 @@ argT_derivf_(1.0),
 numerical_bf_integrals_(false),
 bf_integrals_(nbasis_,0.0)
 {
- parse("ORDER",norder_);
+ bf_keywords_.push_back(getName());
+ parse("ORDER",norder_); addKeywordToList("ORDER",norder_);
  nbasis_=norder_+1;
- parse("INTERVAL_MIN",interval_min_);
- parse("INTERVAL_MAX",interval_max_);
+ //
+ std::string str_imin_; std::string str_imax_;
+ parse("INTERVAL_MIN",str_imin_); addKeywordToList("INTERVAL_MIN",str_imin_);
+ parse("INTERVAL_MAX",str_imax_); addKeywordToList("INTERVAL_MAX",str_imax_);
+ Tools::convert(str_imin_,interval_min_); Tools::convert(str_imax_,interval_max_);
  if(interval_min_>interval_max_){error("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
+ //
  parseFlag("DEBUG_INFO",print_debug_info_);
- parseFlag("NUMERICAL_BF_INTEGRALS",numerical_bf_integrals_);
+ parseFlag("NUMERICAL_BF_INTEGRALS",numerical_bf_integrals_); 
+ log.printf(" %s \n",getKeywordString().c_str());
 }
 
 void BasisFunctions::registerKeywords( Keywords& keys ){
@@ -114,6 +121,7 @@ void BasisFunctions::setupBFIntegrals()
 
 void BasisFunctions::setupBF()
 {
+ checkRead();
  if(interval_default_min_>interval_default_max_){error("setupBF: default intervals are not correctly set");}
  setupInterval();
  setupDescription();
@@ -122,6 +130,7 @@ void BasisFunctions::setupBF()
  else{numericalBFIntegrals();}
  if(bf_integrals_.size()==1){error("setupBF: the integrals of the basis functions is not correct.");}
  if(type_=="Undefined"){error("setupBF: the type of the basis function is not defined.");}
+ if(description_=="Undefined"){error("setupBF: the description of the basis function is not defined.");}
  has_been_set=true;
 }
 
@@ -129,6 +138,7 @@ void BasisFunctions::printInfo()
 {
  if(!has_been_set){error("the basis set has not be setup correctly");}
  log.printf("  One-dimensional basis set\n");
+ log.printf("   Description: %s\n",description_.c_str());
  log.printf("   Type: %s\n",type_.c_str());
  if(periodic_){log.printf("   The basis functions are periodic\n");}
  log.printf("   Order of basis set: %d\n",norder_);
@@ -175,6 +185,26 @@ void BasisFunctions::numericalBFIntegrals()
   // norm with the "volume of the interval"
   bf_integrals_[i] = (0.5*h*sum)/interval_range_; 
  } 
+}
+
+template<typename T>
+void BasisFunctions::addKeywordToList(const std::string keyword, const T value)
+{
+ std::string str_value;
+ Tools::convert(value,str_value);
+ bf_keywords_.push_back(keyword+"="+str_value);
+}
+
+void BasisFunctions::addKeywordToList(const std::string keyword, const bool value)
+{
+ if(value){bf_keywords_.push_back(keyword);}
+}
+
+std::string BasisFunctions::getKeywordString()
+{
+ std::string str_keywords;
+ for(unsigned int i=0; i<bf_keywords_.size();i++){str_keywords+=bf_keywords_[i]+" ";}
+ return str_keywords;
 }
 
 

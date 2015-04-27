@@ -45,7 +45,8 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
  interval_default_max_=+pi;
  periodic_=true;
  interval_bounded_=true;
- type_="Trigonometric (cos/sin)";
+ type_="trigonometric_cos-sin";
+ description_="Trigonometric (cos/sin)";
  setupBF();
  printInfo();
 }
