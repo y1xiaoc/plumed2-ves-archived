@@ -173,12 +173,12 @@ void Coeffs::writeHeader(OFile& ofile){
  ofile.addConstantField("type");
  ofile.printField("type",coeffs_type_);
  ofile.addConstantField("ncoeffs_total");
- ofile.printField("ncoeffs_total",int(ncoeffs_total_));
+ ofile.printField("ncoeffs_total",(int) ncoeffs_total_);
  for(unsigned i=0;i<dimension_;++i){
    ofile.addConstantField("ncoeffs_" + dimension_labels_[i]);
-   ofile.printField("ncoeffs_" + dimension_labels_[i],int(ncoeffs_per_dimension_[i]));
+   ofile.printField("ncoeffs_" + dimension_labels_[i],(int) ncoeffs_per_dimension_[i]);
  }
- if(use_counter_){ofile.addConstantField("iteration").printField("iteration",int(counter));}
+ if(use_counter_){ofile.addConstantField("iteration").printField("iteration",(int) counter);}
 }
 
 void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
