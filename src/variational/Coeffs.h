@@ -41,6 +41,8 @@ protected:
  std::vector<double> aux_coeffs;
  bool useaux_;
  bool usecounter_;
+ // if the coeffs are for a linear basis set expansion composed of products of 1-D basis functions
+ bool linearBFcoeffs_;
  std::string coeffs_label_;
  std::string coeffs_type_;
  std::vector<std::string> coeffs_description_;
@@ -90,14 +92,14 @@ public:
  void setAuxValue(const unsigned, const double);
  void setAuxValue(const std::vector<unsigned int>&, const double);
 /// add to value
- void addValue(const unsigned int , const double); 
- void addValue(const std::vector<unsigned int>&, const double);
- void addAuxValue(const unsigned int, const double); 
- void addAuxValue(const std::vector<unsigned int>&, const double);
+ void addToValue(const unsigned int , const double); 
+ void addToValue(const std::vector<unsigned int>&, const double);
+ void addToAuxValue(const unsigned int, const double); 
+ void addToAuxValue(const std::vector<unsigned int>&, const double);
 /// scale all values 
- void scaleCoeffs(const double);
- void scaleMainCoeffs(const double);
- void scaleAuxCoeffs(const double);
+ void scaleAllValues(const double);
+ void scaleOnlyMainValues(const double);
+ void scaleOnlyAuxValues(const double);
 
 
 /// file output stuff

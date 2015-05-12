@@ -163,35 +163,35 @@ void Coeffs::setAuxValue(const vector<unsigned int>& indices, const double value
  setAuxValue(getIndex(indices),value);
 }
 
-void Coeffs::addValue(const unsigned int index, const double value){
+void Coeffs::addToValue(const unsigned int index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_);
  coeffs[index]+=value;
 }
 
-void Coeffs::addValue(const vector<unsigned int>& indices, const double value){
- addValue(getIndex(indices),value);
+void Coeffs::addToValue(const vector<unsigned int>& indices, const double value){
+ addToValue(getIndex(indices),value);
 }
 
-void Coeffs::addAuxValue(const unsigned int index, const double value){
+void Coeffs::addToAuxValue(const unsigned int index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
  aux_coeffs[index]+=value;
 }
 
-void Coeffs::addAuxValue(const vector<unsigned int>& indices, const double value){
- addAuxValue(getIndex(indices),value);
+void Coeffs::addToAuxValue(const vector<unsigned int>& indices, const double value){
+ addToAuxValue(getIndex(indices),value);
 }
 
-void Coeffs::scaleCoeffs(const double scalef ){
+void Coeffs::scaleAllValues(const double scalef ){
   for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]*=scalef;}
   if(useaux_){for(unsigned int i=0;i<coeffs.size();i++){aux_coeffs[i]*=scalef;}}
 }
 
-void Coeffs::scaleMainCoeffs(const double scalef ){
+void Coeffs::scaleOnlyMainValues(const double scalef ){
   for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]*=scalef;}
 }
 
-void Coeffs::scaleAuxCoeffs(const double scalef ){
-  for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]*=scalef;}
+void Coeffs::scaleOnlyAuxValues(const double scalef ){
+  if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]*=scalef;}}
 }
 
 void Coeffs::writeHeader(OFile& ofile){
