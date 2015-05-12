@@ -35,19 +35,19 @@
 using namespace std;
 namespace PLMD{
 
-Coeffs::Coeffs(const std::string & coeffs_label, const std::string coeffs_type,
-        const std::vector<std::string> & dimension_labels,
-        const std::vector<unsigned int> & ncoeffs_per_dimension,
-        const std::vector<std::string> coeffs_description,
+Coeffs::Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
+        const std::vector<std::string>& dimension_labels,
+        const std::vector<unsigned int>& ncoeffs_per_dimension,
+        const std::vector<std::string>& coeffs_description,
         const bool use_aux_coeffs, const bool use_counter)
 {
  Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, coeffs_description, use_aux_coeffs, use_counter);
 }
 
-void Coeffs::Init(const std::string & coeffs_label, const std::string coeffs_type,
-        const std::vector<std::string> & dimension_labels,
-        const std::vector<unsigned int> & ncoeffs_per_dimension,
-        const std::vector<std::string> coeffs_description,
+void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_type,
+        const std::vector<std::string>& dimension_labels,
+        const std::vector<unsigned int>& ncoeffs_per_dimension,
+        const std::vector<std::string>& coeffs_description,
         const bool use_aux_coeffs, const bool use_counter)
 {
  fmt_="%14.9f"; 
@@ -57,14 +57,14 @@ void Coeffs::Init(const std::string & coeffs_label, const std::string coeffs_typ
  ncoeffs_per_dimension_=ncoeffs_per_dimension;
  coeffs_label_=coeffs_label;
  coeffs_type_=coeffs_type;
- use_counter_=use_counter;
- use_aux_coeffs_=use_aux_coeffs;
+ usecounter_=use_counter;
+ useaux_=use_aux_coeffs;
  ncoeffs_total_=1;
  for(unsigned int i=0;i<dimension_;i++){ncoeffs_total_*=ncoeffs_per_dimension_[i];}
  // coeffs_description
  plumed_massert(coeffs_description.size()==ncoeffs_total_,"Coeffs: size of coeffs_descriptions don't match total number of coeffs");
  coeffs_description_=coeffs_description;
- if(use_counter_){resetCounter();}
+ if(usecounter_){resetCounter();}
  clear();
 }
 
@@ -80,7 +80,7 @@ void Coeffs::clearAux(){
 
 void Coeffs::clear(){
  clearMain();
- if(use_aux_coeffs_){clearAux();}
+ if(useaux_){clearAux();}
 }
 
 vector<unsigned int> Coeffs::getNumberOfCoeffsPerDimension() const {
@@ -136,6 +136,15 @@ double Coeffs::getValue(const vector<unsigned int>& indices) const {
  return getValue(getIndex(indices));
 }
 
+double Coeffs::getAuxValue(const unsigned int index) const {
+ plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
+ return aux_coeffs[index];
+}
+
+double Coeffs::getAuxValue(const vector<unsigned int>& indices) const {
+ return getAuxValue(getIndex(indices));
+}
+
 void Coeffs::setValue(const unsigned int index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_);
  coeffs[index]=value;
@@ -143,6 +152,15 @@ void Coeffs::setValue(const unsigned int index, const double value){
 
 void Coeffs::setValue(const vector<unsigned int>& indices, const double value){
  setValue(getIndex(indices),value); 
+}
+
+void Coeffs::setAuxValue(const unsigned int index, const double value){
+ plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
+ aux_coeffs[index]=value;
+}
+
+void Coeffs::setAuxValue(const vector<unsigned int>& indices, const double value){
+ setAuxValue(getIndex(indices),value);
 }
 
 void Coeffs::addValue(const unsigned int index, const double value){
@@ -154,16 +172,25 @@ void Coeffs::addValue(const vector<unsigned int>& indices, const double value){
  addValue(getIndex(indices),value);
 }
 
-void Coeffs::scaleAllCoeffs(const double& scalef ){
-  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]*=scalef;}
-  if(use_aux_coeffs_){for(unsigned int i=0;i<coeffs.size();i++){aux_coeffs[i]*=scalef;}}
+void Coeffs::addAuxValue(const unsigned int index, const double value){
+ plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
+ aux_coeffs[index]+=value;
 }
 
-void Coeffs::scaleMainCoeffs(const double& scalef ){
+void Coeffs::addAuxValue(const vector<unsigned int>& indices, const double value){
+ addAuxValue(getIndex(indices),value);
+}
+
+void Coeffs::scaleCoeffs(const double scalef ){
+  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]*=scalef;}
+  if(useaux_){for(unsigned int i=0;i<coeffs.size();i++){aux_coeffs[i]*=scalef;}}
+}
+
+void Coeffs::scaleMainCoeffs(const double scalef ){
   for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]*=scalef;}
 }
 
-void Coeffs::scaleAuxCoeffs(const double& scalef ){
+void Coeffs::scaleAuxCoeffs(const double scalef ){
   for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]*=scalef;}
 }
 
@@ -178,7 +205,7 @@ void Coeffs::writeHeader(OFile& ofile){
    ofile.addConstantField("ncoeffs_" + dimension_labels_[i]);
    ofile.printField("ncoeffs_" + dimension_labels_[i],(int) ncoeffs_per_dimension_[i]);
  }
- if(use_counter_){ofile.addConstantField("iteration").printField("iteration",(int) counter);}
+ if(usecounter_){ofile.addConstantField("iteration").printField("iteration",(int) counter);}
 }
 
 void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
@@ -198,7 +225,7 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
    sprintf(s1,int_fmt.c_str(),indices[k]); ofile.printField(dimension_labels_[k],s1);
   }
   ofile.fmtField(" "+fmt_).printField("coeff",coeffs[i]);
-  if(use_aux_coeffs_){ofile.fmtField(" "+fmt_).printField("aux_coeff",aux_coeffs[i]);}
+  if(useaux_){ofile.fmtField(" "+fmt_).printField("aux_coeff",aux_coeffs[i]);}
   if(print_description){ofile.printField("description",coeffs_description_[i]);}
   sprintf(s1,int_fmt.c_str(),i); ofile.printField("index",s1);
 

@@ -39,8 +39,8 @@ class Coeffs
 protected:
  std::vector<double> coeffs;
  std::vector<double> aux_coeffs;
- bool use_aux_coeffs_;
- bool use_counter_;
+ bool useaux_;
+ bool usecounter_;
  std::string coeffs_label_;
  std::string coeffs_type_;
  std::vector<std::string> coeffs_description_;
@@ -51,16 +51,16 @@ protected:
  unsigned int counter;
  std::string fmt_; // format for output 
 public:
- Coeffs(const std::string & coeffs_label, const std::string coeffs_type,
-        const std::vector<std::string> & dimension_labels,
-        const std::vector<unsigned int> & ncoeffs_per_dimension,
-        const std::vector<std::string> coeffs_description,
+ Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
+        const std::vector<std::string>& dimension_labels,
+        const std::vector<unsigned int>& ncoeffs_per_dimension,
+        const std::vector<std::string>& coeffs_description,
         const bool use_aux_coeffs=false, const bool use_counter=false);
  ///
- void Init(const std::string & coeffs_label, const std::string coeffs_type, 
-        const std::vector<std::string> & dimension_labels,
-        const std::vector<unsigned int> & ncoeffs_per_dimension, 
-        const std::vector<std::string> coeffs_description,
+ void Init(const std::string& coeffs_label, const std::string& coeffs_type, 
+        const std::vector<std::string>& dimension_labels,
+        const std::vector<unsigned int>& ncoeffs_per_dimension, 
+        const std::vector<std::string>& coeffs_description,
         const bool use_aux_coeffs, const bool use_counter);
 
 /// clear coeffs
@@ -95,9 +95,9 @@ public:
  void addAuxValue(const unsigned int, const double); 
  void addAuxValue(const std::vector<unsigned int>&, const double);
 /// scale all values 
- void scaleAllCoeffs(const double&);
- void scaleMainCoeffs(const double&);
- void scaleAuxCoeffs(const double&);
+ void scaleCoeffs(const double);
+ void scaleMainCoeffs(const double);
+ void scaleAuxCoeffs(const double);
 
 
 /// file output stuff
