@@ -38,16 +38,16 @@ namespace PLMD{
 Coeffs::Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const std::vector<std::string>& coeffs_description,
+        const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs, const bool use_counter)
 {
- Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, coeffs_description, use_aux_coeffs, use_counter);
+ Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, coeffs_descriptions, use_aux_coeffs, use_counter);
 }
 
 void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const std::vector<std::string>& coeffs_description,
+        const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs, const bool use_counter)
 {
  fmt_="%14.9f"; 
@@ -61,9 +61,9 @@ void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_typ
  useaux_=use_aux_coeffs;
  ncoeffs_total_=1;
  for(unsigned int i=0;i<dimension_;i++){ncoeffs_total_*=ncoeffs_per_dimension_[i];}
- // coeffs_description
- plumed_massert(coeffs_description.size()==ncoeffs_total_,"Coeffs: size of coeffs_descriptions don't match total number of coeffs");
- coeffs_description_=coeffs_description;
+ // coeffs_descriptions
+ plumed_massert(coeffs_descriptions.size()==ncoeffs_total_,"Coeffs: size of coeffs_descriptions don't match total number of coeffs");
+ coeffs_descriptions_=coeffs_descriptions;
  if(usecounter_){resetCounter();}
  clear();
 }
@@ -83,17 +83,15 @@ void Coeffs::clear(){
  if(useaux_){clearAux();}
 }
 
-vector<unsigned int> Coeffs::getNumberOfCoeffsPerDimension() const {
- return ncoeffs_per_dimension_;
-}
-
-unsigned Coeffs::getSize() const {
- return ncoeffs_total_;
-}
-
-unsigned Coeffs::getDimension() const {
- return dimension_;
-}
+// Various info about the coeffs
+std::string Coeffs::getLabel() const {return coeffs_label_;}
+std::string Coeffs::getType() const {return coeffs_type_;}
+bool Coeffs::isLinearBasisFunctionCoeffs() const {return linearBFcoeffs_;}
+bool Coeffs::hasAuxCoeffs() const {return useaux_;}
+bool Coeffs::hasCounter() const {return usecounter_;}
+vector<unsigned int> Coeffs::getNumberOfCoeffsPerDimension() const {return ncoeffs_per_dimension_;}
+unsigned int Coeffs::getSize() const {return ncoeffs_total_;}
+unsigned int Coeffs::getDimension() const {return dimension_;}
 
 // we are flattening arrays using a column-major order
 unsigned int Coeffs::getIndex(const vector<unsigned int>& indices) const {
@@ -226,7 +224,7 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
   }
   ofile.fmtField(" "+fmt_).printField("coeff",coeffs[i]);
   if(useaux_){ofile.fmtField(" "+fmt_).printField("aux_coeff",aux_coeffs[i]);}
-  if(print_description){ofile.printField("description",coeffs_description_[i]);}
+  if(print_description){ofile.printField("description",coeffs_descriptions_[i]);}
   sprintf(s1,int_fmt.c_str(),i); ofile.printField("index",s1);
 
   ofile.printField();
@@ -249,7 +247,7 @@ unsigned int Coeffs::getCounter() const {return counter;}
 // coeffs description stuff
 void Coeffs::setCoeffDescription(const unsigned int index, const std::string description)
 {
- coeffs_description_[index]=description;
+ coeffs_descriptions_[index]=description;
 }
 
 void Coeffs::setCoeffDescription(const std::vector<unsigned int>& indices, const std::string description)
@@ -259,12 +257,17 @@ void Coeffs::setCoeffDescription(const std::vector<unsigned int>& indices, const
 
 std::string Coeffs::getCoeffDescription(const unsigned int index) const 
 {
- return coeffs_description_[index];
+ return coeffs_descriptions_[index];
 }
 
 std::string Coeffs::getCoeffDescription(const std::vector<unsigned int>& indices) const 
 {
  return getCoeffDescription(getIndex(indices));
+}
+
+std::vector<std::string> Coeffs::getAllCoeffsDescriptions() const
+{
+ return coeffs_descriptions_;
 }
 
 

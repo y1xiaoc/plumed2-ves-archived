@@ -45,7 +45,7 @@ protected:
  bool linearBFcoeffs_;
  std::string coeffs_label_;
  std::string coeffs_type_;
- std::vector<std::string> coeffs_description_;
+ std::vector<std::string> coeffs_descriptions_;
  std::vector<std::string> dimension_labels_;
  std::vector<unsigned int> ncoeffs_per_dimension_;
  unsigned int ncoeffs_total_;
@@ -56,13 +56,13 @@ public:
  Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const std::vector<std::string>& coeffs_description,
+        const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs=false, const bool use_counter=false);
  ///
  void Init(const std::string& coeffs_label, const std::string& coeffs_type, 
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension, 
-        const std::vector<std::string>& coeffs_description,
+        const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs, const bool use_counter);
 
 /// clear coeffs
@@ -70,17 +70,19 @@ public:
  void clearAux();
  void clear();
 
-/// get number of basis function 
+ std::string getLabel() const;
+ std::string getType() const;
+ bool isLinearBasisFunctionCoeffs() const;
+ bool hasAuxCoeffs() const;
+ bool hasCounter() const;
  std::vector<unsigned int> getNumberOfCoeffsPerDimension() const;
-/// get dimension
+ unsigned int getSize() const;
  unsigned int getDimension() const;
  
 /// methods to handle indices 
  std::vector<unsigned int> getIndices(const unsigned int) const;
  unsigned int getIndex(const std::vector<unsigned int> &) const;
 
-/// get size
- unsigned getSize() const;
 /// get value
  double getValue(const unsigned int index) const;
  double getValue(const std::vector<unsigned int>&) const;
@@ -120,6 +122,7 @@ void setCoeffDescription(const unsigned int, const std::string);
 void setCoeffDescription(const std::vector<unsigned int>&, const std::string);
 std::string getCoeffDescription(const unsigned int) const;
 std::string getCoeffDescription(const std::vector<unsigned int>&) const;
+std::vector<std::string> getAllCoeffsDescriptions() const;
 
  ~Coeffs(){}
 
