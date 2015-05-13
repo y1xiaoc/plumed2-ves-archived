@@ -23,7 +23,6 @@
 
 
 namespace PLMD{
-namespace BasisFunctions{
 
 BasisFunctions::BasisFunctions(const ActionOptions&ao):
 Action(ao),
@@ -208,7 +207,6 @@ std::string BasisFunctions::getKeywordString()
 }
 
 
-}
 }
 
 

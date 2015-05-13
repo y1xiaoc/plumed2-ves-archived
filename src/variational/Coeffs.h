@@ -32,6 +32,7 @@ namespace PLMD{
 class Value;
 class IFile;
 class OFile;
+class BasisFunctions;
 
 /// \ingroup TOOLBOX
 class Coeffs
@@ -58,7 +59,12 @@ public:
         const std::vector<unsigned int>& ncoeffs_per_dimension,
         const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs=false, const bool use_counter=false);
- ///
+ //
+ Coeffs(const std::string& coeffs_label,
+        std::vector<Value*> args,
+        std::vector<BasisFunctions*> basisf,
+        const bool use_aux_coeffs=false, const bool use_counter=false);
+ //
  void Init(const std::string& coeffs_label, const std::string& coeffs_type, 
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension, 

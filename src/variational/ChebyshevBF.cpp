@@ -24,7 +24,6 @@
 
 
 namespace PLMD{
-namespace BasisFunctions{
 
 class ChebyshevBF : public BasisFunctions{
  virtual void setupBFIntegrals();
@@ -94,7 +93,6 @@ void ChebyshevBF::setupBFIntegrals(){
 }
 
 
-}
 }
 
 

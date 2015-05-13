@@ -40,7 +40,7 @@ namespace function{
 class TestBFs :
   public Function
 {
-  BasisFunctions::BasisFunctions* bf_pointer;
+  BasisFunctions* bf_pointer;
   unsigned int bf_order_;
 public:
   TestBFs(const ActionOptions&);
@@ -70,7 +70,7 @@ Function(ao)
   if(getNumberOfArguments()>1){error("only one argument allowed");}
   std::string basisset_label="";
   parse("BASIS_SET",basisset_label);
-  bf_pointer=plumed.getActionSet().selectWithLabel<BasisFunctions::BasisFunctions*>(basisset_label);
+  bf_pointer=plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_label);
   // bf_pointer->printInfo();
   parse("N",bf_order_);
   addComponent("value"); componentIsNotPeriodic("value");

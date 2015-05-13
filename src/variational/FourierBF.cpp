@@ -24,7 +24,6 @@
 
 
 namespace PLMD{
-namespace BasisFunctions{
 
 class FourierBF : public BasisFunctions{
  virtual void setupDescription();
@@ -106,7 +105,6 @@ void FourierBF::setupBFIntegrals()
 }
 
 
-}
 }
 
 

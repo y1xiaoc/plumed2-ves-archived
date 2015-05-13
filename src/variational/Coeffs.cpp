@@ -31,6 +31,7 @@
 #include "core/Value.h"
 #include "tools/File.h"
 #include "tools/Exception.h"
+#include "BasisFunctions.h"
 
 using namespace std;
 namespace PLMD{
@@ -41,6 +42,39 @@ Coeffs::Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs, const bool use_counter)
 {
+ Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, coeffs_descriptions, use_aux_coeffs, use_counter);
+}
+
+Coeffs::Coeffs(const std::string& coeffs_label, 
+        std::vector<Value*> args, 
+        std::vector<BasisFunctions::BasisFunctions*> basisf,
+        const bool use_aux_coeffs, const bool use_counter)
+{
+ plumed_massert(args.size()==basisf.size(),"number of arguments do not match number of basis functions");
+ std::string coeffs_type="LinearBasisFunctionCoeffs";
+ unsigned int dim=args.size();
+ std::vector<std::string>dimension_labels;
+ std::vector<unsigned int> ncoeffs_per_dimension;
+ dimension_labels.resize(dim); ncoeffs_per_dimension.resize(dim);
+ //
+ unsigned int ncoeffs=1;
+ for(unsigned int i=0;i<dim;i++){
+  dimension_labels[i]=args[i]->getName();
+  ncoeffs_per_dimension[i]=basisf[i]->getSize();
+  ncoeffs*=ncoeffs_per_dimension[i];
+ }
+ //
+ std::vector<std::string> coeffs_descriptions;
+ coeffs_descriptions.resize(ncoeffs);
+ for(unsigned int i=0;i<ncoeffs;i++)
+ {
+  std::vector<unsigned int> indices=getIndices(i);
+  std::string desc;
+  desc=basisf[0]->getBasisFunctionDescription(indices[0]);
+  for(unsigned int k=1;k<dim;k++){desc+="*"+basisf[k]->getBasisFunctionDescription(indices[k]);}
+  coeffs_descriptions[i]=desc;
+ }
+ //
  Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, coeffs_descriptions, use_aux_coeffs, use_counter);
 }
 
@@ -199,7 +233,7 @@ void Coeffs::writeHeader(OFile& ofile){
  ofile.printField("type",coeffs_type_);
  ofile.addConstantField("ncoeffs_total");
  ofile.printField("ncoeffs_total",(int) ncoeffs_total_);
- for(unsigned i=0;i<dimension_;++i){
+ for(unsigned int i=0;i<dimension_;++i){
    ofile.addConstantField("ncoeffs_" + dimension_labels_[i]);
    ofile.printField("ncoeffs_" + dimension_labels_[i],(int) ncoeffs_per_dimension_[i]);
  }
@@ -216,7 +250,7 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
  for(unsigned int k=0; k<dimension_; k++){ilabels[k]=ilabels_prefix+dimension_labels_[k];}
 
  writeHeader(ofile); 
- for(unsigned i=0;i<ncoeffs_total_;i++){
+ for(unsigned int i=0;i<ncoeffs_total_;i++){
   indices=getIndices(i);
   for(unsigned int k=0; k<dimension_; k++)
   {

@@ -30,7 +30,6 @@
 #define PLUMED_BASISFUNCTIONS_INIT(ao) Action(ao),BasisFunctions(ao)
 
 namespace PLMD{
-namespace BasisFunctions{
 
 /**
 \ingroup INHERIT
@@ -108,6 +107,8 @@ public:
   std::vector<double> getBasisFunctionIntegrals();
   unsigned getNumberOfDerivatives();
   std::vector<std::string> getKeywordList();
+  std::string getBasisFunctionDescription(const unsigned int);
+  std::vector<std::string> getBasisFunctionDescriptions();
   //
   BasisFunctions();
   double translateArgument(const double, bool&);
@@ -163,7 +164,13 @@ unsigned BasisFunctions::getNumberOfDerivatives(){return 0;}
 inline
 std::vector<std::string> BasisFunctions::getKeywordList(){return bf_keywords_;}
 
-}
+inline
+std::string BasisFunctions::getBasisFunctionDescription(unsigned int index){return bf_description_[index];}
+
+inline
+std::vector<std::string> BasisFunctions::getBasisFunctionDescriptions(){return bf_description_;}
+
+
 }
 
 #endif
