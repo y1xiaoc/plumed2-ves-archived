@@ -24,6 +24,8 @@
 #include "core/ActionSet.h"
 #include "core/PlumedMain.h"
 #include "BasisFunctions.h"
+#include "Coeffs.h"
+#include "tools/File.h"
 
 using namespace std;
 
@@ -41,6 +43,7 @@ class TestBFs :
   public Function
 {
   BasisFunctions* bf_pointer;
+  Coeffs* coeffs;
   unsigned int bf_order_;
 public:
   TestBFs(const ActionOptions&);
@@ -67,7 +70,7 @@ TestBFs::TestBFs(const ActionOptions&ao):
 Action(ao),
 Function(ao)
 {
-  if(getNumberOfArguments()>1){error("only one argument allowed");}
+  // if(getNumberOfArguments()>1){error("only one argument allowed");}
   std::string basisset_label="";
   parse("BASIS_SET",basisset_label);
   bf_pointer=plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_label);
@@ -80,6 +83,16 @@ Function(ao)
   addComponent("inside"); componentIsNotPeriodic("inside");
   checkRead();
   log.printf("  using the %d order basis function from the %s basis set\n",bf_order_,basisset_label.c_str());
+
+  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
+  std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
+  coeffs = new Coeffs("Test",args,bf,true,false);
+  for(unsigned int i=0;i<coeffs->getSize();i++){log.printf("  %s\n",coeffs->getAllCoeffsDescriptions()[i].c_str());}
+  OFile file; file.link(*this); 
+  file.open("test.data");
+  coeffs->writeToFile(file,false);
+  file.close();
+ 
 }
 
 void TestBFs::calculate(){

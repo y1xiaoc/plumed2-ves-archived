@@ -53,25 +53,22 @@ protected:
  unsigned int dimension_;
  unsigned int counter;
  std::string fmt_; // format for output 
+ void Init(const std::string& coeffs_label, const std::string& coeffs_type, 
+        const std::vector<std::string>& dimension_labels,
+        const std::vector<unsigned int>& ncoeffs_per_dimension, 
+        const bool use_aux_coeffs, const bool use_counter);
+ void setupCoeffsDescriptionsBasisFunctions(std::vector<BasisFunctions*>);
 public:
  Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs=false, const bool use_counter=false);
  //
  Coeffs(const std::string& coeffs_label,
         std::vector<Value*> args,
         std::vector<BasisFunctions*> basisf,
         const bool use_aux_coeffs=false, const bool use_counter=false);
- //
- void Init(const std::string& coeffs_label, const std::string& coeffs_type, 
-        const std::vector<std::string>& dimension_labels,
-        const std::vector<unsigned int>& ncoeffs_per_dimension, 
-        const std::vector<std::string>& coeffs_descriptions,
-        const bool use_aux_coeffs, const bool use_counter);
-
-/// clear coeffs
+ // clear coeffs
  void clearMain();
  void clearAux();
  void clear();
@@ -129,6 +126,7 @@ void setCoeffDescription(const std::vector<unsigned int>&, const std::string);
 std::string getCoeffDescription(const unsigned int) const;
 std::string getCoeffDescription(const std::vector<unsigned int>&) const;
 std::vector<std::string> getAllCoeffsDescriptions() const;
+void setupCoeffsDescriptionsGeneral(const std::string);
 
  ~Coeffs(){}
 

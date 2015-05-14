@@ -39,15 +39,16 @@ namespace PLMD{
 Coeffs::Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs, const bool use_counter)
 {
- Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, coeffs_descriptions, use_aux_coeffs, use_counter);
+ Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, use_aux_coeffs, use_counter);
+ std::string description_prefix="c";
+ setupCoeffsDescriptionsGeneral(description_prefix);
 }
 
 Coeffs::Coeffs(const std::string& coeffs_label, 
         std::vector<Value*> args, 
-        std::vector<BasisFunctions::BasisFunctions*> basisf,
+        std::vector<BasisFunctions*> basisf,
         const bool use_aux_coeffs, const bool use_counter)
 {
  plumed_massert(args.size()==basisf.size(),"number of arguments do not match number of basis functions");
@@ -63,25 +64,13 @@ Coeffs::Coeffs(const std::string& coeffs_label,
   ncoeffs_per_dimension[i]=basisf[i]->getSize();
   ncoeffs*=ncoeffs_per_dimension[i];
  }
- //
- std::vector<std::string> coeffs_descriptions;
- coeffs_descriptions.resize(ncoeffs);
- for(unsigned int i=0;i<ncoeffs;i++)
- {
-  std::vector<unsigned int> indices=getIndices(i);
-  std::string desc;
-  desc=basisf[0]->getBasisFunctionDescription(indices[0]);
-  for(unsigned int k=1;k<dim;k++){desc+="*"+basisf[k]->getBasisFunctionDescription(indices[k]);}
-  coeffs_descriptions[i]=desc;
- }
- //
- Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, coeffs_descriptions, use_aux_coeffs, use_counter);
+ Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, use_aux_coeffs, use_counter);
+ setupCoeffsDescriptionsBasisFunctions(basisf);
 }
 
 void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const std::vector<std::string>& coeffs_descriptions,
         const bool use_aux_coeffs, const bool use_counter)
 {
  fmt_="%14.9f"; 
@@ -95,9 +84,7 @@ void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_typ
  useaux_=use_aux_coeffs;
  ncoeffs_total_=1;
  for(unsigned int i=0;i<dimension_;i++){ncoeffs_total_*=ncoeffs_per_dimension_[i];}
- // coeffs_descriptions
- plumed_massert(coeffs_descriptions.size()==ncoeffs_total_,"Coeffs: size of coeffs_descriptions don't match total number of coeffs");
- coeffs_descriptions_=coeffs_descriptions;
+ coeffs_descriptions_.resize(ncoeffs_total_);
  if(usecounter_){resetCounter();}
  clear();
 }
@@ -258,8 +245,8 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
   }
   ofile.fmtField(" "+fmt_).printField("coeff",coeffs[i]);
   if(useaux_){ofile.fmtField(" "+fmt_).printField("aux_coeff",aux_coeffs[i]);}
-  if(print_description){ofile.printField("description",coeffs_descriptions_[i]);}
   sprintf(s1,int_fmt.c_str(),i); ofile.printField("index",s1);
+  if(print_description){ofile.printField("description","  " +coeffs_descriptions_[i]);}
 
   ofile.printField();
  }
@@ -303,6 +290,32 @@ std::vector<std::string> Coeffs::getAllCoeffsDescriptions() const
 {
  return coeffs_descriptions_;
 }
+
+void Coeffs::setupCoeffsDescriptionsBasisFunctions(std::vector<BasisFunctions*> basisf)
+{
+ for(unsigned int i=0;i<ncoeffs_total_;i++)
+ {
+  std::vector<unsigned int> indices=getIndices(i);
+  std::string desc;
+  desc=basisf[0]->getBasisFunctionDescription(indices[0]);
+  for(unsigned int k=1;k<dimension_;k++){desc+="*"+basisf[k]->getBasisFunctionDescription(indices[k]);}
+  coeffs_descriptions_[i]=desc;
+ }
+}
+
+void Coeffs::setupCoeffsDescriptionsGeneral(std::string description_prefix)
+{
+ for(unsigned int i=0;i<ncoeffs_total_;i++)
+ {
+  std::vector<unsigned int> indices=getIndices(i);
+  std::string is; Tools::convert(indices[0],is);
+  std::string desc=description_prefix+"("+is;
+  for(unsigned int k=1;k<dimension_;k++){Tools::convert(indices[k],is); desc+=","+is;}
+  desc+=")";
+  coeffs_descriptions_[i]=desc;
+ }
+}
+
 
 
 
