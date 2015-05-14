@@ -87,10 +87,10 @@ Function(ao)
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   coeffs = new Coeffs("Test",args,bf,true,false);
-  for(unsigned int i=0;i<coeffs->getSize();i++){log.printf("  %s\n",coeffs->getAllCoeffsDescriptions()[i].c_str());}
+  coeffs->setupCoeffsDescriptions("f");
   OFile file; file.link(*this); 
   file.open("test.data");
-  coeffs->writeToFile(file,false);
+  coeffs->writeToFile(file,true);
   file.close();
  
 }

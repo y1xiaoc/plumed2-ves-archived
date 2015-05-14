@@ -43,7 +43,7 @@ protected:
  bool useaux_;
  bool usecounter_;
  // if the coeffs are for a linear basis set expansion composed of products of 1-D basis functions
- bool linearBFcoeffs_;
+ bool isbasisfcoeffs_;
  std::string coeffs_label_;
  std::string coeffs_type_;
  std::vector<std::string> coeffs_descriptions_;
@@ -53,11 +53,19 @@ protected:
  unsigned int dimension_;
  unsigned int counter;
  std::string fmt_; // format for output 
+ //
+ std::vector<std::string> basisf_type_;
+ std::vector<unsigned int> basisf_order_;
+ std::vector<unsigned int> basisf_size_;
+ std::vector<double> basisf_min_;
+ std::vector<double> basisf_max_;
+ std::vector<std::string> basisf_keywords_;
+ //
  void Init(const std::string& coeffs_label, const std::string& coeffs_type, 
         const std::vector<std::string>& dimension_labels,
         const std::vector<unsigned int>& ncoeffs_per_dimension, 
         const bool use_aux_coeffs, const bool use_counter);
- void setupCoeffsDescriptionsBasisFunctions(std::vector<BasisFunctions*>);
+ void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);
 public:
  Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
@@ -75,7 +83,7 @@ public:
 
  std::string getLabel() const;
  std::string getType() const;
- bool isLinearBasisFunctionCoeffs() const;
+ bool isBasisFunctionCoeffs() const;
  bool hasAuxCoeffs() const;
  bool hasCounter() const;
  std::vector<unsigned int> getNumberOfCoeffsPerDimension() const;
@@ -126,7 +134,7 @@ void setCoeffDescription(const std::vector<unsigned int>&, const std::string);
 std::string getCoeffDescription(const unsigned int) const;
 std::string getCoeffDescription(const std::vector<unsigned int>&) const;
 std::vector<std::string> getAllCoeffsDescriptions() const;
-void setupCoeffsDescriptionsGeneral(const std::string);
+void setupCoeffsDescriptions(const std::string);
 
  ~Coeffs(){}
 

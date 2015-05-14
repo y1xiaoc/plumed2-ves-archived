@@ -43,7 +43,7 @@ Coeffs::Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
 {
  Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, use_aux_coeffs, use_counter);
  std::string description_prefix="c";
- setupCoeffsDescriptionsGeneral(description_prefix);
+ setupCoeffsDescriptions(description_prefix);
 }
 
 Coeffs::Coeffs(const std::string& coeffs_label, 
@@ -61,11 +61,12 @@ Coeffs::Coeffs(const std::string& coeffs_label,
  unsigned int ncoeffs=1;
  for(unsigned int i=0;i<dim;i++){
   dimension_labels[i]=args[i]->getName();
-  ncoeffs_per_dimension[i]=basisf[i]->getSize();
+  ncoeffs_per_dimension[i]=basisf[i]->getNumberOfBasisFunctions();
   ncoeffs*=ncoeffs_per_dimension[i];
  }
  Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, use_aux_coeffs, use_counter);
- setupCoeffsDescriptionsBasisFunctions(basisf);
+ setupBasisFunctionsInfo(basisf);
+ isbasisfcoeffs_=true;
 }
 
 void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_type,
@@ -73,6 +74,7 @@ void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_typ
         const std::vector<unsigned int>& ncoeffs_per_dimension,
         const bool use_aux_coeffs, const bool use_counter)
 {
+ isbasisfcoeffs_=false;
  fmt_="%14.9f"; 
  plumed_massert(ncoeffs_per_dimension.size()==dimension_labels.size(),"Coeffs: dimensions of vectors in Init(...) don't match");
  dimension_=ncoeffs_per_dimension.size(); 
@@ -107,7 +109,7 @@ void Coeffs::clear(){
 // Various info about the coeffs
 std::string Coeffs::getLabel() const {return coeffs_label_;}
 std::string Coeffs::getType() const {return coeffs_type_;}
-bool Coeffs::isLinearBasisFunctionCoeffs() const {return linearBFcoeffs_;}
+bool Coeffs::isBasisFunctionCoeffs() const {return isbasisfcoeffs_;}
 bool Coeffs::hasAuxCoeffs() const {return useaux_;}
 bool Coeffs::hasCounter() const {return usecounter_;}
 vector<unsigned int> Coeffs::getNumberOfCoeffsPerDimension() const {return ncoeffs_per_dimension_;}
@@ -220,9 +222,26 @@ void Coeffs::writeHeader(OFile& ofile){
  ofile.printField("type",coeffs_type_);
  ofile.addConstantField("ncoeffs_total");
  ofile.printField("ncoeffs_total",(int) ncoeffs_total_);
- for(unsigned int i=0;i<dimension_;++i){
-   ofile.addConstantField("ncoeffs_" + dimension_labels_[i]);
-   ofile.printField("ncoeffs_" + dimension_labels_[i],(int) ncoeffs_per_dimension_[i]);
+ if(isbasisfcoeffs_)
+ {
+  for(unsigned int i=0;i<dimension_;++i)
+  {
+   // ofile.addConstantField(dimension_labels_[i]+"_bf_type");
+   // ofile.printField(dimension_labels_[i]+"_bf_type",basisf_type_[i]);
+   // ofile.addConstantField(dimension_labels_[i]+"_bf_order");
+   // ofile.printField(dimension_labels_[i]+"_bf_order",(int) basisf_order_[i]);
+   // ofile.addConstantField(dimension_labels_[i]+"_bf_min");
+   // ofile.printField(dimension_labels_[i]+"_bf_min",basisf_min_[i]);
+   // ofile.addConstantField(dimension_labels_[i]+"_bf_max");
+   // ofile.printField(dimension_labels_[i]+"_bf_max",basisf_max_[i]);
+   ofile.addConstantField(dimension_labels_[i]+"_bf_keywords");
+   ofile.printField(dimension_labels_[i]+"_bf_keywords",basisf_keywords_[i]);
+  }
+ }
+ for(unsigned int i=0;i<dimension_;++i)
+ {
+  ofile.addConstantField(dimension_labels_[i]+"_ncoeffs");
+  ofile.printField(dimension_labels_[i]+"_ncoeffs",(int) ncoeffs_per_dimension_[i]);
  }
  if(usecounter_){ofile.addConstantField("iteration").printField("iteration",(int) counter);}
 }
@@ -291,8 +310,25 @@ std::vector<std::string> Coeffs::getAllCoeffsDescriptions() const
  return coeffs_descriptions_;
 }
 
-void Coeffs::setupCoeffsDescriptionsBasisFunctions(std::vector<BasisFunctions*> basisf)
+void Coeffs::setupBasisFunctionsInfo(std::vector<BasisFunctions*> basisf)
 {
+ plumed_massert(basisf.size()==dimension_,"setupBasisFunctionsInfo: wrong number of basis functions given.");
+ basisf_type_.resize(dimension_);
+ basisf_order_.resize(dimension_);
+ basisf_size_.resize(dimension_);
+ basisf_min_.resize(dimension_);
+ basisf_max_.resize(dimension_);
+ basisf_keywords_.resize(dimension_);
+ for(unsigned int k=0;k<dimension_;k++)
+ {
+  basisf_type_[k]=basisf[k]->getType();
+  basisf_order_[k]=basisf[k]->getOrder();
+  basisf_size_[k]=basisf[k]->getNumberOfBasisFunctions();
+  basisf_min_[k]=basisf[k]->intervalMin();
+  basisf_max_[k]=basisf[k]->intervalMax();
+  basisf_keywords_[k]=basisf[k]->getKeywordString();
+ }
+ //
  for(unsigned int i=0;i<ncoeffs_total_;i++)
  {
   std::vector<unsigned int> indices=getIndices(i);
@@ -303,7 +339,7 @@ void Coeffs::setupCoeffsDescriptionsBasisFunctions(std::vector<BasisFunctions*> 
  }
 }
 
-void Coeffs::setupCoeffsDescriptionsGeneral(std::string description_prefix)
+void Coeffs::setupCoeffsDescriptions(std::string description_prefix)
 {
  for(unsigned int i=0;i<ncoeffs_total_;i++)
  {

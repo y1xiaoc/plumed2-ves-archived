@@ -93,6 +93,8 @@ public:
   static void registerKeywords(Keywords&);
   BasisFunctions(const ActionOptions&ao);
   bool hasBeenSet();
+  std::string getType();
+  std::string getDescription();
   unsigned int getOrder();
   unsigned int getNumberOfBasisFunctions();
   unsigned int getSize();
@@ -124,6 +126,12 @@ public:
 
 inline
 bool BasisFunctions::hasBeenSet(){return has_been_set;}
+
+inline
+std::string BasisFunctions::getType(){return type_;}
+
+inline
+std::string BasisFunctions::getDescription(){return description_;}
 
 inline
 unsigned int BasisFunctions::getOrder(){return norder_;}
