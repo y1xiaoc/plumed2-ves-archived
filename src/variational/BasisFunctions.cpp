@@ -57,7 +57,7 @@ bf_integrals_(nbasis_,0.0)
  parse("INTERVAL_MIN",str_imin_); addKeywordToList("INTERVAL_MIN",str_imin_);
  parse("INTERVAL_MAX",str_imax_); addKeywordToList("INTERVAL_MAX",str_imax_);
  Tools::convert(str_imin_,interval_min_); Tools::convert(str_imax_,interval_max_);
- if(interval_min_>interval_max_){error("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
+ if(interval_min_>interval_max_){plumed_merror("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
  //
  parseFlag("DEBUG_INFO",print_debug_info_);
  parseFlag("NUMERICAL_BF_INTEGRALS",numerical_bf_integrals_); 
@@ -75,7 +75,7 @@ void BasisFunctions::registerKeywords( Keywords& keys ){
 }
 
 void BasisFunctions::setupInterval(){
- // if(!intervalBounded()){error("setupInterval() only works for bounded interval");}
+ // if(!intervalBounded()){plumed_merror("setupInterval() only works for bounded interval");}
  interval_default_range_ = interval_default_max_-interval_default_min_;
  interval_default_mean_  = 0.5*(interval_default_max_+interval_default_min_);
  interval_range_ = interval_max_-interval_min_;
@@ -121,21 +121,21 @@ void BasisFunctions::setupBFIntegrals()
 void BasisFunctions::setupBF()
 {
  checkRead();
- if(interval_default_min_>interval_default_max_){error("setupBF: default intervals are not correctly set");}
+ if(interval_default_min_>interval_default_max_){plumed_merror("setupBF: default intervals are not correctly set");}
  setupInterval();
  setupDescription();
- if(bf_description_.size()==1){error("setupBF: the description of the basis functions is not correct.");}
+ if(bf_description_.size()==1){plumed_merror("setupBF: the description of the basis functions is not correct.");}
  if(!numerical_bf_integrals_){setupBFIntegrals();}
  else{numericalBFIntegrals();}
- if(bf_integrals_.size()==1){error("setupBF: the integrals of the basis functions is not correct.");}
- if(type_=="Undefined"){error("setupBF: the type of the basis function is not defined.");}
- if(description_=="Undefined"){error("setupBF: the description of the basis function is not defined.");}
+ if(bf_integrals_.size()==1){plumed_merror("setupBF: the integrals of the basis functions is not correct.");}
+ if(type_=="Undefined"){plumed_merror("setupBF: the type of the basis function is not defined.");}
+ if(description_=="Undefined"){plumed_merror("setupBF: the description of the basis function is not defined.");}
  has_been_set=true;
 }
 
 void BasisFunctions::printInfo()
 {
- if(!has_been_set){error("the basis set has not be setup correctly");}
+ if(!has_been_set){plumed_merror("the basis set has not be setup correctly");}
  log.printf("  One-dimensional basis set\n");
  log.printf("   Description: %s\n",description_.c_str());
  log.printf("   Type: %s\n",type_.c_str());
@@ -201,8 +201,8 @@ void BasisFunctions::addKeywordToList(const std::string keyword, const bool valu
 
 std::string BasisFunctions::getKeywordString()
 {
- std::string str_keywords;
- for(unsigned int i=0; i<bf_keywords_.size();i++){str_keywords+=bf_keywords_[i]+" ";}
+ std::string str_keywords=bf_keywords_[0];
+ for(unsigned int i=1; i<bf_keywords_.size();i++){str_keywords+=" "+bf_keywords_[i];}
  return str_keywords;
 }
 

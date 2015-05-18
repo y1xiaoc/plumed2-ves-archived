@@ -96,24 +96,28 @@ Function(ao)
 
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer2;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
-  coeffs = new Coeffs("Test",args,bf,true,false);
+  coeffs = new Coeffs("Test",args,bf,false,false);
   // coeffs->setupCoeffsDescriptions("f");
-  coeffs->setValueAndAux(0,1000.0, 0.0001); 
-  coeffs->setValueAndAux(1,0.0001, 1000.0); 
+  // coeffs->setValueAndAux(0,1000.0, 0.0001); 
+  // coeffs->setValueAndAux(1,0.0001, 1000.0); 
+  coeffs->setValue(0,1000.0); 
+  coeffs->setValue(1,0.0001); 
   OFile file; file.link(*this); 
   file.open("test.data");
   coeffs->writeToFile(file,true);
   file.close();
   
-  coeffs2 = new Coeffs("Test",args,bf,true,false);
+  // coeffs2 = new Coeffs("Test",args,bf,false,false);
   IFile file2; file2.link(*this);
-  file2.open("test.data");
-  coeffs2->readFromFile(file2,false);
+  file2.open("testA.data");
+  // coeffs2->readFromFile(file2,false);
+  coeffs2 = Coeffs::createFromFile(file2,false);
   OFile file3; file3.link(*this);
-  file.open("test2.data");
+  file3.open("test2.data");
   coeffs2->setCounter(100);
-  coeffs2->writeToFile(file,true);
-  file.close();
+  coeffs2->writeToFile(file3,true);
+  file3.close();
+
   
   
 }

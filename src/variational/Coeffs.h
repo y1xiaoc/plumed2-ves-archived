@@ -66,6 +66,7 @@ protected:
         const std::vector<unsigned int>& ncoeffs_per_dimension, 
         const bool use_aux_coeffs, const bool use_counter);
  void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);
+ void setupBasisFunctionFromFile(const std::vector<std::string>&);
 public:
  Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
         const std::vector<std::string>& dimension_labels,
@@ -121,6 +122,7 @@ public:
  void writeHeader(OFile&);
  void writeToFile(OFile&,const bool);
  unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
+ static Coeffs* createFromFile(IFile& ifile, const bool ignore_missing_coeffs);
 /// set output format
  void setOutputFmt(std::string ss){fmt_=ss;}
 
