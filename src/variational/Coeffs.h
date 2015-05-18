@@ -104,6 +104,8 @@ public:
  void setValue(const std::vector<unsigned int>&, const double);
  void setAuxValue(const unsigned, const double);
  void setAuxValue(const std::vector<unsigned int>&, const double);
+ void setValueAndAux(const unsigned, const double, const double);
+ void setValueAndAux(const std::vector<unsigned int>&, const double, const double);
 /// add to value
  void addToValue(const unsigned int , const double); 
  void addToValue(const std::vector<unsigned int>&, const double);
@@ -118,6 +120,8 @@ public:
 /// file output stuff
  void writeHeader(OFile&);
  void writeToFile(OFile&,const bool);
+ std::vector<std::string> readFromFile(IFile&, const bool ignore_missing_coeffs=false);
+ // unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
 /// set output format
  void setOutputFmt(std::string ss){fmt_=ss;}
 

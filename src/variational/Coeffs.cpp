@@ -123,8 +123,8 @@ unsigned int Coeffs::getIndex(const vector<unsigned int>& indices) const {
   if(indices[i]>=ncoeffs_per_dimension_[i]) {
     std::string is;
     Tools::convert(i,is);
-    std::string msg="ERROR: the system is looking for a value outside the indices along the " + is;
-    plumed_merror(msg+" index!");
+    std::string msg="ERROR: the system is looking for a value outside the indices along the " + is + "index!";
+    plumed_merror(msg);
   }
  unsigned int index=indices[dimension_-1];
  for(unsigned int i=dimension_-1;i>0;--i){
@@ -183,6 +183,18 @@ void Coeffs::setAuxValue(const unsigned int index, const double value){
 void Coeffs::setAuxValue(const vector<unsigned int>& indices, const double value){
  setAuxValue(getIndex(indices),value);
 }
+
+void Coeffs::setValueAndAux(const unsigned int index, const double main_value, const double aux_value)
+{
+ plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
+ coeffs[index]=main_value;
+ aux_coeffs[index]=aux_value;
+}
+
+void Coeffs::setValueAndAux(const vector<unsigned int>& indices, const double main_value, const double aux_value){
+ setValueAndAux(getIndex(indices),main_value,aux_value);
+}
+
 
 void Coeffs::addToValue(const unsigned int index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_);
@@ -251,7 +263,7 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
  std::string str_seperate="#!-------------------";
  std::string ilabels_prefix="idx_";
  char* s1 = new char[20];
- std::vector<unsigned int> indices;
+ std::vector<unsigned int> indices(dimension_);
  std::vector<std::string> ilabels(dimension_);
  for(unsigned int k=0; k<dimension_; k++){ilabels[k]=ilabels_prefix+dimension_labels_[k];}
 
@@ -260,7 +272,7 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
   indices=getIndices(i);
   for(unsigned int k=0; k<dimension_; k++)
   {
-   sprintf(s1,int_fmt.c_str(),indices[k]); ofile.printField(dimension_labels_[k],s1);
+   sprintf(s1,int_fmt.c_str(),indices[k]); ofile.printField(ilabels[k],s1);
   }
   ofile.fmtField(" "+fmt_).printField("coeff",coeffs[i]);
   if(useaux_){ofile.fmtField(" "+fmt_).printField("aux_coeff",aux_coeffs[i]);}
@@ -275,6 +287,56 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
  ofile.printf("\n");
  ofile.printf("\n");
  delete [] s1;
+}
+
+// unsigned int Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs)
+std::vector<std::string> Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs)
+{
+ ifile.allowIgnoredFields();
+
+ std::string ilabels_prefix="idx_";
+ std::vector<std::string> ilabels(dimension_);
+ for(unsigned int k=0; k<dimension_; k++){ilabels[k]=ilabels_prefix+dimension_labels_[k];}
+
+ std::vector<std::string> test_str(dimension_);
+ for(unsigned int k=0; k<dimension_; k++)
+ {
+  std::string str1;
+  ifile.scanField(dimension_labels_[k]+"_bf_keywords",str1);
+  test_str[k]=str1;
+ }
+ 
+ std::vector<unsigned int> indices(dimension_);
+ double coeff_tmp=0.0;
+ unsigned int ncoeffs_read=0;
+
+ while(ifile.scanField("coeff",coeff_tmp))
+ {
+  int idx_tmp;
+  for(unsigned int k=0; k<dimension_; k++)
+  {
+   ifile.scanField(ilabels[k],idx_tmp);
+   indices[k] = (unsigned int) idx_tmp;
+  }
+  coeffs[getIndex(indices)] = coeff_tmp;
+  ifile.scanField("aux_coeff",coeff_tmp);
+  aux_coeffs[getIndex(indices)] = coeff_tmp;
+  ifile.scanField("index",idx_tmp);
+  if(getIndex(indices)!=idx_tmp)
+  {
+   std::string is1; Tools::convert(idx_tmp,is1);
+   std::string msg="ERROR: problem with indices at index " + is1 + " when reading coefficients from file";
+   plumed_merror(msg);
+  }
+  ifile.scanField();
+  ncoeffs_read++;
+ }
+ // checks on the coeffs read
+ if(!ignore_missing_coeffs && ncoeffs_read < ncoeffs_total_){plumed_merror("ERROR: missing coefficients when reading from file");}
+ if(ncoeffs_read > ncoeffs_total_){plumed_merror("something wrong in the coefficients file, perhaps multiple entries");}
+ //
+ // return ncoeffs_read;
+ return test_str;
 }
 
 // counter stuff
