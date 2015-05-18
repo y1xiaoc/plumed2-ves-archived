@@ -206,7 +206,6 @@ std::string BasisFunctions::getKeywordString()
  return str_keywords;
 }
 
-
 }
 
 

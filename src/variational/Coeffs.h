@@ -120,8 +120,7 @@ public:
 /// file output stuff
  void writeHeader(OFile&);
  void writeToFile(OFile&,const bool);
- std::vector<std::string> readFromFile(IFile&, const bool ignore_missing_coeffs=false);
- // unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
+ unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
 /// set output format
  void setOutputFmt(std::string ss){fmt_=ss;}
 

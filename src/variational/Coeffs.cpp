@@ -289,8 +289,7 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
  delete [] s1;
 }
 
-// unsigned int Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs)
-std::vector<std::string> Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs)
+unsigned int Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs)
 {
  ifile.allowIgnoredFields();
 
@@ -301,9 +300,8 @@ std::vector<std::string> Coeffs::readFromFile(IFile& ifile, const bool ignore_mi
  std::vector<std::string> test_str(dimension_);
  for(unsigned int k=0; k<dimension_; k++)
  {
-  std::string str1;
-  ifile.scanField(dimension_labels_[k]+"_bf_keywords",str1);
-  test_str[k]=str1;
+  // std::string str1;
+  // ifile.scanField(dimension_labels_[k]+"_bf_keywords",str1);
  }
  
  std::vector<unsigned int> indices(dimension_);
@@ -335,8 +333,7 @@ std::vector<std::string> Coeffs::readFromFile(IFile& ifile, const bool ignore_mi
  if(!ignore_missing_coeffs && ncoeffs_read < ncoeffs_total_){plumed_merror("ERROR: missing coefficients when reading from file");}
  if(ncoeffs_read > ncoeffs_total_){plumed_merror("something wrong in the coefficients file, perhaps multiple entries");}
  //
- // return ncoeffs_read;
- return test_str;
+ return ncoeffs_read;
 }
 
 // counter stuff

@@ -85,10 +85,19 @@ Function(ao)
   checkRead();
   log.printf("  using the %d order basis function from the %s basis set\n",bf_order_,basisset_label.c_str());
 
-  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
+  std::vector<std::string> bf1;
+  bf1.push_back("BF_FOURIER");
+  bf1.push_back("ORDER=10");
+  bf1.push_back("LABEL=bf2");
+  bf1.push_back("INTERVAL_MIN=-pi");
+  bf1.push_back("INTERVAL_MAX=pi");
+  plumed.readInputWords(bf1);
+  BasisFunctions* bf_pointer2=plumed.getActionSet().selectWithLabel<BasisFunctions*>("bf2");
+
+  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer2;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   coeffs = new Coeffs("Test",args,bf,true,false);
-  coeffs->setupCoeffsDescriptions("f");
+  // coeffs->setupCoeffsDescriptions("f");
   coeffs->setValueAndAux(0,1000.0, 0.0001); 
   coeffs->setValueAndAux(1,0.0001, 1000.0); 
   OFile file; file.link(*this); 
@@ -99,8 +108,7 @@ Function(ao)
   coeffs2 = new Coeffs("Test",args,bf,true,false);
   IFile file2; file2.link(*this);
   file2.open("test.data");
-  std::vector<std::string> ts1=coeffs2->readFromFile(file2,false);
-  for(unsigned int i=0; i<ts1.size(); i++){log.printf("  keyword %d: %s\n",i,ts1[i].c_str());}
+  coeffs2->readFromFile(file2,false);
   OFile file3; file3.link(*this);
   file.open("test2.data");
   coeffs2->setCounter(100);
