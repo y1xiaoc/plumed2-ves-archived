@@ -120,9 +120,14 @@ public:
 
 /// file output stuff
  void writeHeader(OFile&);
- void writeToFile(OFile&,const bool);
+ void writeToFile(OFile&,const bool print_description=false);
+ void writeToFile(const std::string&,const bool print_description=false);
  unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
- static Coeffs* createFromFile(IFile& ifile, const bool ignore_missing_coeffs);
+ unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false);
+ static Coeffs* createFromFile(IFile&, const bool ignore_missing_coeffs=false);
+ static Coeffs* createFromFile(const std::string&, const bool ignore_missing_coeffs=false);
+ static std::vector<std::string> getBasisFunctionKeywordsFromFile(IFile&);
+ static std::vector<std::string> getBasisFunctionKeywordsFromFile(const std::string&);
 /// set output format
  void setOutputFmt(std::string ss){fmt_=ss;}
 

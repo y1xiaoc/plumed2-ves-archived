@@ -61,7 +61,7 @@ bf_integrals_(nbasis_,0.0)
  //
  parseFlag("DEBUG_INFO",print_debug_info_);
  parseFlag("NUMERICAL_BF_INTEGRALS",numerical_bf_integrals_); 
- log.printf(" %s \n",getKeywordString().c_str());
+ // log.printf(" %s \n",getKeywordString().c_str());
 }
 
 void BasisFunctions::registerKeywords( Keywords& keys ){

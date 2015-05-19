@@ -255,7 +255,8 @@ void Coeffs::writeHeader(OFile& ofile){
  if(usecounter_){ofile.addConstantField("iteration").printField("iteration",(int) counter);}
 }
 
-void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
+void Coeffs::writeToFile(OFile& ofile, const bool print_description)
+{
  std::string int_fmt="%8d";
  std::string str_seperate="#!-------------------";
  std::string ilabels_prefix="idx_";
@@ -284,6 +285,12 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description=false){
  ofile.printf("\n");
  ofile.printf("\n");
  delete [] s1;
+}
+
+void Coeffs::writeToFile(const std::string& filepath, const bool print_description)
+{
+ OFile file; file.open(filepath);
+ writeToFile(file,print_description);
 }
 
 unsigned int Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs)
@@ -366,6 +373,13 @@ unsigned int Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs
  return ncoeffs_read;
 }
 
+unsigned int Coeffs::readFromFile(const std::string& filepath, const bool ignore_missing_coeffs)
+{
+ IFile file; file.open(filepath);
+ unsigned int ncoeffs_read=readFromFile(file,ignore_missing_coeffs);
+ return ncoeffs_read;
+}
+
 Coeffs* Coeffs::createFromFile(IFile& ifile, const bool ignore_missing_coeffs)
 {
  Coeffs* coeffs_ptr=NULL;
@@ -418,7 +432,47 @@ Coeffs* Coeffs::createFromFile(IFile& ifile, const bool ignore_missing_coeffs)
  return coeffs_ptr;
 }
 
+Coeffs* Coeffs::createFromFile(const std::string& filepath, const bool ignore_missing_coeffs)
+{
+ IFile file; file.open(filepath);
+ Coeffs* coeffs_ptr=createFromFile(file,ignore_missing_coeffs);
+ return coeffs_ptr;
+}
 
+std::vector<std::string> Coeffs::getBasisFunctionKeywordsFromFile(IFile& ifile)
+{
+ // Find labels and number dimensions
+ std::vector<std::string> fields;
+ std::vector<std::string> dimension_labels_f;
+ ifile.allowIgnoredFields();
+ ifile.scanFieldList(fields);
+ for(unsigned int i=0;i<fields.size();i++)
+ {
+  if(fields[i].substr(0,4)=="idx_"){dimension_labels_f.push_back(fields[i].substr(4));}
+ }
+ unsigned int dim=dimension_labels_f.size();
+
+ bool isbasisfcoeffs_f=false;
+ if(ifile.FieldExist(dimension_labels_f[0]+"_bf_keywords")){isbasisfcoeffs_f=true;}
+ std::vector<std::string>  basisf_keywords_f;
+ if(isbasisfcoeffs_f)
+ {
+  basisf_keywords_f.resize(dim);
+  for(unsigned int k=0; k<dim; k++)
+  {
+   ifile.scanField(dimension_labels_f[k]+"_bf_keywords",basisf_keywords_f[k]);
+  }
+ }
+ ifile.scanField();
+ return basisf_keywords_f;
+}
+
+std::vector<std::string> Coeffs::getBasisFunctionKeywordsFromFile(const std::string& filepath)
+{
+ IFile file; file.open(filepath);
+ std::vector<std::string> basisf_keywords_f=getBasisFunctionKeywordsFromFile(file);
+ return basisf_keywords_f;
+}
 
 // counter stuff
 void Coeffs::resetCounter(){counter=0;}
