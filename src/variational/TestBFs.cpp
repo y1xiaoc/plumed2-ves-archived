@@ -101,14 +101,14 @@ Function(ao)
   coeffs->setValueAndAux(1,0.0001, 1000.0); 
   coeffs->setValueAndAux(10,2.0000001, 400.0); 
   coeffs->writeToFile("TEST.data");
-  
-  coeffs2 = Coeffs::createFromFile("TEST.data");
-  coeffs2->setCounter(100);
-  coeffs2->writeToFile("TEST2.data");
+  coeffs->writeToFile("TEST.data");
+  // coeffs2 = Coeffs::createFromFile("TEST.data");
+  // coeffs2->setCounter(100);
+  // coeffs2->writeToFile("TEST.data",true,true);
  
-  std::vector<std::string> bfk=Coeffs::getBasisFunctionKeywordsFromFile("TEST.data");
-  plumed.readInputWords(Tools::getWords(bfk[0]));
-  plumed.readInputWords(Tools::getWords(bfk[1]));
+  // std::vector<std::string> bfk=Coeffs::getBasisFunctionKeywordsFromFile("TEST.data");
+  // plumed.readInputWords(Tools::getWords(bfk[0]));
+  // plumed.readInputWords(Tools::getWords(bfk[1]));
 
 
 }

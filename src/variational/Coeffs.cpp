@@ -287,9 +287,11 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description)
  delete [] s1;
 }
 
-void Coeffs::writeToFile(const std::string& filepath, const bool print_description)
+void Coeffs::writeToFile(const std::string& filepath, const bool print_description, const bool append_file)
 {
- OFile file; file.open(filepath);
+ OFile file; 
+ if(append_file){file.enforceRestart();}
+ file.open(filepath);
  writeToFile(file,print_description);
 }
 

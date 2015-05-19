@@ -121,7 +121,7 @@ public:
 /// file output stuff
  void writeHeader(OFile&);
  void writeToFile(OFile&,const bool print_description=false);
- void writeToFile(const std::string&,const bool print_description=false);
+ void writeToFile(const std::string&,const bool print_description=false, const bool append_file=false);
  unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
  unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false);
  static Coeffs* createFromFile(IFile&, const bool ignore_missing_coeffs=false);
