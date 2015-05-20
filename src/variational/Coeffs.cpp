@@ -33,7 +33,6 @@
 #include "tools/Exception.h"
 #include "BasisFunctions.h"
 
-using namespace std;
 namespace PLMD{
 
 Coeffs::Coeffs(const std::string& coeffs_label, const std::string& coeffs_type,
@@ -112,12 +111,12 @@ std::string Coeffs::getType() const {return coeffs_type_;}
 bool Coeffs::isBasisFunctionCoeffs() const {return isbasisfcoeffs_;}
 bool Coeffs::hasAuxCoeffs() const {return useaux_;}
 bool Coeffs::hasCounter() const {return usecounter_;}
-vector<unsigned int> Coeffs::getNumberOfCoeffsPerDimension() const {return ncoeffs_per_dimension_;}
+std::vector<unsigned int> Coeffs::getNumberOfCoeffsPerDimension() const {return ncoeffs_per_dimension_;}
 unsigned int Coeffs::getSize() const {return ncoeffs_total_;}
 unsigned int Coeffs::getDimension() const {return dimension_;}
 
 // we are flattening arrays using a column-major order
-unsigned int Coeffs::getIndex(const vector<unsigned int>& indices) const {
+unsigned int Coeffs::getIndex(const std::vector<unsigned int>& indices) const {
  plumed_dbg_assert(indices.size()==dimension_);
  for(unsigned int i=0;i<dimension_;i++)
   if(indices[i]>=ncoeffs_per_dimension_[i]) {
@@ -134,8 +133,8 @@ unsigned int Coeffs::getIndex(const vector<unsigned int>& indices) const {
 }
 
 // we are flattening arrays using a column-major order
-vector<unsigned int> Coeffs::getIndices(const unsigned int index) const {
- vector<unsigned int> indices(dimension_);
+std::vector<unsigned int> Coeffs::getIndices(const unsigned int index) const {
+ std::vector<unsigned int> indices(dimension_);
  unsigned int kk=index;
  indices[0]=(index%ncoeffs_per_dimension_[0]);
  for(unsigned int i=1;i<dimension_-1;++i){
@@ -153,7 +152,7 @@ double Coeffs::getValue(const unsigned int index) const {
  return coeffs[index];
 }
 
-double Coeffs::getValue(const vector<unsigned int>& indices) const {
+double Coeffs::getValue(const std::vector<unsigned int>& indices) const {
  return getValue(getIndex(indices));
 }
 
@@ -162,7 +161,7 @@ double Coeffs::getAuxValue(const unsigned int index) const {
  return aux_coeffs[index];
 }
 
-double Coeffs::getAuxValue(const vector<unsigned int>& indices) const {
+double Coeffs::getAuxValue(const std::vector<unsigned int>& indices) const {
  return getAuxValue(getIndex(indices));
 }
 
@@ -171,7 +170,7 @@ void Coeffs::setValue(const unsigned int index, const double value){
  coeffs[index]=value;
 }
 
-void Coeffs::setValue(const vector<unsigned int>& indices, const double value){
+void Coeffs::setValue(const std::vector<unsigned int>& indices, const double value){
  setValue(getIndex(indices),value); 
 }
 
@@ -180,7 +179,7 @@ void Coeffs::setAuxValue(const unsigned int index, const double value){
  aux_coeffs[index]=value;
 }
 
-void Coeffs::setAuxValue(const vector<unsigned int>& indices, const double value){
+void Coeffs::setAuxValue(const std::vector<unsigned int>& indices, const double value){
  setAuxValue(getIndex(indices),value);
 }
 
@@ -191,7 +190,7 @@ void Coeffs::setValueAndAux(const unsigned int index, const double main_value, c
  aux_coeffs[index]=aux_value;
 }
 
-void Coeffs::setValueAndAux(const vector<unsigned int>& indices, const double main_value, const double aux_value){
+void Coeffs::setValueAndAux(const std::vector<unsigned int>& indices, const double main_value, const double aux_value){
  setValueAndAux(getIndex(indices),main_value,aux_value);
 }
 
@@ -201,7 +200,7 @@ void Coeffs::addToValue(const unsigned int index, const double value){
  coeffs[index]+=value;
 }
 
-void Coeffs::addToValue(const vector<unsigned int>& indices, const double value){
+void Coeffs::addToValue(const std::vector<unsigned int>& indices, const double value){
  addToValue(getIndex(indices),value);
 }
 
@@ -210,7 +209,7 @@ void Coeffs::addToAuxValue(const unsigned int index, const double value){
  aux_coeffs[index]+=value;
 }
 
-void Coeffs::addToAuxValue(const vector<unsigned int>& indices, const double value){
+void Coeffs::addToAuxValue(const std::vector<unsigned int>& indices, const double value){
  addToAuxValue(getIndex(indices),value);
 }
 

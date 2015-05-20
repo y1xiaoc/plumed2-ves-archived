@@ -27,7 +27,7 @@
 #include "Coeffs.h"
 #include "tools/File.h"
 
-using namespace std;
+// using namespace std;
 
 namespace PLMD{
 namespace function{
