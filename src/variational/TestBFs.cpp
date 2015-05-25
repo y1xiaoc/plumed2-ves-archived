@@ -26,6 +26,8 @@
 #include "BasisFunctions.h"
 #include "Coeffs.h"
 #include "tools/File.h"
+#include <limits>
+
 
 // using namespace std;
 
@@ -109,6 +111,8 @@ Function(ao)
   // std::vector<std::string> bfk=Coeffs::getBasisFunctionKeywordsFromFile("TEST.data");
   // plumed.readInputWords(Tools::getWords(bfk[0]));
   // plumed.readInputWords(Tools::getWords(bfk[1]));
+  log.printf("max(unsigned int) = %u\n",std::numeric_limits<unsigned int>::max());
+  log.printf("max(size_t) = %u\n",std::numeric_limits<size_t>::max());
 
 
 }
