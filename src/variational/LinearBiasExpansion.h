@@ -33,12 +33,14 @@ class Coeffs;
 class BasisFunctions;
 class Value;
 class Communicator;
+class Grid;
 
 class LinearBiasExpansion{
   Communicator& mycomm;
   std::string bias_label_;
   bool serial_;
   Coeffs* bias_coeffs;
+  Grid* bias_grid;
   std::vector<Value*> args_;
   std::vector<BasisFunctions*> basisf_;
   unsigned int ncv_;
@@ -51,7 +53,11 @@ class LinearBiasExpansion{
                       std::vector<Value*>,
                       std::vector<BasisFunctions*>,
                       Communicator &cc);
-  Coeffs* getPointerToCoeffs() const ;
+  Coeffs* getPointerToBiasCoeffs() const ;
+  Grid* getPointerToBiasGrid() const ;
+  void setupGrid(const std::vector<unsigned int>&);
+  void updateBiasGrid();
+  void writeBiasGridToFile(const std::string, const bool);
   double getBiasAndDerivatives(const std::vector<double>&, std::vector<double>& derivatives);
 };
 

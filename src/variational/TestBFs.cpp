@@ -101,22 +101,19 @@ Function(ao)
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer2;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
-  coeffs = bias_expansion->getPointerToCoeffs();
+  coeffs = bias_expansion->getPointerToBiasCoeffs();
   // coeffs = new Coeffs("Test",args,bf,true,true);
   // coeffs->setValueAndAux(0,1000.0,0.0); 
+  std::vector<unsigned int> nbins(2,300);
+  bias_expansion->setupGrid(nbins);
   coeffs->setValueAndAux(20,1.0,0.0);
   coeffs->setValueAndAux(30,2.0,0.0);
   coeffs->setValueAndAux(100,2.0,0.0);
+  bias_expansion->updateBiasGrid();
+  bias_expansion->writeBiasGridToFile("bias.data",false);
+  bias_expansion->writeBiasGridToFile("bias2.data",false);
+  bias_expansion->writeBiasGridToFile("bias2.data",true);
 
-  std::vector<double> cv(2,2.0);
-  std::vector<double> der(2);
-  double value=bias_expansion->getBiasAndDerivatives(cv,der);
-  log.printf("bias: %f\n",value);
-  log.printf("der[0]: %f\n",der[0]);
-  log.printf("der[1]: %f\n",der[1]);
-  
-
- 
   // coeffs->setValueAndAux(10,2.0000001, 400.0); 
   coeffs->writeToFile("TEST.data");
   // coeffs->writeToFile("TEST.data");

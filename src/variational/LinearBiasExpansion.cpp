@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "LinearBiasExpansion.h"
 #include "tools/Keywords.h"
+#include "tools/Grid.h"
 #include "Coeffs.h"
 #include "BasisFunctions.h"
 #include "tools/Communicator.h"
@@ -52,7 +53,41 @@ basisf_(basisf)
  for(unsigned int k=0;k<ncv_;k++){num_bf_[k]=basisf_[k]->getNumberOfBasisFunctions();}
 }
 
-Coeffs* LinearBiasExpansion::getPointerToCoeffs() const {return bias_coeffs;} 
+Coeffs* LinearBiasExpansion::getPointerToBiasCoeffs() const {return bias_coeffs;} 
+Grid* LinearBiasExpansion::getPointerToBiasGrid() const {return bias_grid;} 
+
+void LinearBiasExpansion::setupGrid(const std::vector<unsigned int>& nbins)
+{
+ std::vector<std::string> min(ncv_);
+ std::vector<std::string> max(ncv_);
+ for(unsigned int k=0;k<ncv_;k++)
+ {
+  Tools::convert(basisf_[k]->intervalMin(),min[k]);
+  Tools::convert(basisf_[k]->intervalMax(),max[k]);
+ }
+ bias_grid = new Grid(bias_label_+".bias",args_,min,max,nbins,false,false);
+}
+
+void LinearBiasExpansion::updateBiasGrid()
+{
+ for(unsigned int l=0; l<bias_grid->getSize(); l++)
+ {
+  std::vector<double> derivatives(ncv_);
+  std::vector<double> cv_value(ncv_);
+  cv_value=bias_grid->getPoint(l);
+  double bias_value=getBiasAndDerivatives(cv_value,derivatives);
+  bias_grid->setValue(l,bias_value);
+ }
+}
+
+void LinearBiasExpansion::writeBiasGridToFile(const std::string filepath, const bool append_file)
+{
+ OFile file;
+ if(append_file){file.enforceRestart();}
+ file.open(filepath);
+ bias_grid->writeToFile(file);
+ file.close();
+}
 
 double LinearBiasExpansion::getBiasAndDerivatives(const std::vector<double>& cv_values, std::vector<double>& derivatives) 
 {
