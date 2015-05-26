@@ -116,6 +116,7 @@ public:
  void scaleAllValues(const double);
  void scaleOnlyMainValues(const double);
  void scaleOnlyAuxValues(const double);
+ void randomizeCoeffs();
 
 
 /// file output stuff

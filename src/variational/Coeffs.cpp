@@ -32,6 +32,7 @@
 #include "tools/File.h"
 #include "tools/Exception.h"
 #include "BasisFunctions.h"
+#include "tools/Random.h"
 
 namespace PLMD{
 
@@ -225,6 +226,13 @@ void Coeffs::scaleOnlyMainValues(const double scalef ){
 void Coeffs::scaleOnlyAuxValues(const double scalef ){
   if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]*=scalef;}}
 }
+
+void Coeffs::randomizeCoeffs()
+{
+ Random rnd;
+ for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=rnd.Gaussian();}
+}
+
 
 void Coeffs::writeHeader(OFile& ofile){
  ofile.addConstantField("label").printField("label",coeffs_label_);
@@ -569,5 +577,9 @@ void Coeffs::setupBasisFunctionFromFile(const std::vector<std::string>& basisf_k
  }
  isbasisfcoeffs_=true;
 }
+
+
+
+
 
 }

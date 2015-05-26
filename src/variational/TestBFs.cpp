@@ -106,9 +106,8 @@ Function(ao)
   // coeffs->setValueAndAux(0,1000.0,0.0); 
   std::vector<unsigned int> nbins(2,300);
   bias_expansion->setupGrid(nbins);
-  coeffs->setValueAndAux(20,1.0,0.0);
-  coeffs->setValueAndAux(30,2.0,0.0);
-  coeffs->setValueAndAux(100,2.0,0.0);
+  coeffs->randomizeCoeffs();
+
   bias_expansion->updateBiasGrid();
   bias_expansion->writeBiasGridToFile("bias.data",false);
   bias_expansion->writeBiasGridToFile("bias2.data",false);
