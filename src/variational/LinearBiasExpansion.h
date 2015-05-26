@@ -35,7 +35,7 @@ class Value;
 class Communicator;
 
 class LinearBiasExpansion{
-  Communicator & comm;
+  Communicator& mycomm;
   std::string bias_label_;
   bool serial_;
   Coeffs* bias_coeffs;
@@ -50,9 +50,9 @@ class LinearBiasExpansion{
   LinearBiasExpansion(const std::string, 
                       std::vector<Value*>,
                       std::vector<BasisFunctions*>,
-                      Communicator& cc);
+                      Communicator &cc);
   Coeffs* getPointerToCoeffs() const ;
-  double getBiasAndDerivatives(const std::vector<double>&, double* derivatives=NULL);
+  double getBiasAndDerivatives(const std::vector<double>&, std::vector<double>& derivatives);
 };
 
 }

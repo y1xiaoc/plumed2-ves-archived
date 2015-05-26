@@ -26,7 +26,8 @@
 #include "BasisFunctions.h"
 #include "Coeffs.h"
 #include "tools/File.h"
-#include <limits>
+#include "LinearBiasExpansion.h"
+#include "tools/Communicator.h"
 
 
 // using namespace std;
@@ -47,6 +48,7 @@ class TestBFs :
   BasisFunctions* bf_pointer;
   Coeffs* coeffs;
   Coeffs* coeffs2;
+  LinearBiasExpansion* bias_expansion;
   unsigned int bf_order_;
 public:
   TestBFs(const ActionOptions&);
@@ -98,12 +100,26 @@ Function(ao)
 
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer2;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
-  coeffs = new Coeffs("Test",args,bf,true,true);
-  coeffs->setValueAndAux(0,1000.0, 0.0001); 
-  coeffs->setValueAndAux(1,0.0001, 1000.0); 
-  coeffs->setValueAndAux(10,2.0000001, 400.0); 
+  bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
+  coeffs = bias_expansion->getPointerToCoeffs();
+  // coeffs = new Coeffs("Test",args,bf,true,true);
+  // coeffs->setValueAndAux(0,1000.0,0.0); 
+  coeffs->setValueAndAux(20,1.0,0.0);
+  coeffs->setValueAndAux(30,2.0,0.0);
+  coeffs->setValueAndAux(100,2.0,0.0);
+
+  std::vector<double> cv(2,2.0);
+  std::vector<double> der(2);
+  double value=bias_expansion->getBiasAndDerivatives(cv,der);
+  log.printf("bias: %f\n",value);
+  log.printf("der[0]: %f\n",der[0]);
+  log.printf("der[1]: %f\n",der[1]);
+  
+
+ 
+  // coeffs->setValueAndAux(10,2.0000001, 400.0); 
   coeffs->writeToFile("TEST.data");
-  coeffs->writeToFile("TEST.data");
+  // coeffs->writeToFile("TEST.data");
   // coeffs2 = Coeffs::createFromFile("TEST.data");
   // coeffs2->setCounter(100);
   // coeffs2->writeToFile("TEST.data",true,true);
@@ -111,8 +127,6 @@ Function(ao)
   // std::vector<std::string> bfk=Coeffs::getBasisFunctionKeywordsFromFile("TEST.data");
   // plumed.readInputWords(Tools::getWords(bfk[0]));
   // plumed.readInputWords(Tools::getWords(bfk[1]));
-  log.printf("max(unsigned int) = %u\n",std::numeric_limits<unsigned int>::max());
-  log.printf("max(size_t) = %u\n",std::numeric_limits<size_t>::max());
 
 
 }

@@ -21,7 +21,6 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "LinearBiasExpansion.h"
 #include "tools/Keywords.h"
-#include <vector>
 #include "Coeffs.h"
 #include "BasisFunctions.h"
 #include "tools/Communicator.h"
@@ -39,8 +38,9 @@ void LinearBiasExpansion::registerKeywords( Keywords& keys ){
 
 LinearBiasExpansion::LinearBiasExpansion(const std::string label,
                     std::vector<Value*> args,
-                    std::vector<BasisFunctions*> basisf,Communicator& cc):
-comm(cc),
+                    std::vector<BasisFunctions*> basisf,
+                    Communicator &cc):
+mycomm(cc),
 bias_label_(label),
 args_(args),
 basisf_(basisf)
@@ -48,12 +48,13 @@ basisf_(basisf)
  plumed_massert(args_.size()==basisf_.size(),"number of arguments and basis functions do not match");
  bias_coeffs = new Coeffs(label,args_,basisf_,true,true);
  ncv_=args_.size();
+ num_bf_.resize(ncv_);
  for(unsigned int k=0;k<ncv_;k++){num_bf_[k]=basisf_[k]->getNumberOfBasisFunctions();}
 }
 
 Coeffs* LinearBiasExpansion::getPointerToCoeffs() const {return bias_coeffs;} 
 
-double LinearBiasExpansion::getBiasAndDerivatives(const std::vector<double>& cv_values, double* derivatives) 
+double LinearBiasExpansion::getBiasAndDerivatives(const std::vector<double>& cv_values, std::vector<double>& derivatives) 
 {
 
  std::vector<double> cv_values_trsfrm(ncv_);
@@ -73,14 +74,12 @@ double LinearBiasExpansion::getBiasAndDerivatives(const std::vector<double>& cv_
   bf_derivs.push_back(tmp_der);
  } 
  
- unsigned int stride;
- unsigned int rank;
- if(serial_){
-  stride=1;
-  rank=0;
- }else{
-  stride=comm.Get_size();
-  rank=comm.Get_rank();
+ unsigned int stride=1;
+ unsigned int rank=0;
+ if(!serial_)
+ {
+  stride=mycomm.Get_size();
+  rank=mycomm.Get_rank();
  }
 
  // loop over coeffs
@@ -97,8 +96,8 @@ double LinearBiasExpansion::getBiasAndDerivatives(const std::vector<double>& cv_
 
  if(!serial_)
  {
-  comm.Sum(bias); 
-  comm.Sum(derivatives);
+  mycomm.Sum(bias); 
+  mycomm.Sum(derivatives);
  }
  return bias; 
 }

@@ -120,7 +120,7 @@ public:
   virtual double getValue(const double, const unsigned int, double&, bool&)=0;
   // calcuate the values for all basis functions
   virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&)=0;
-  virtual void get2ndDerivaties(const double, double&, bool&, std::vector<double>&, std::vector<double>&)=0;
+  //virtual void get2ndDerivaties(const double, std::vector<double>&)=0;
   void printInfo();
   std::string getKeywordString();
 };

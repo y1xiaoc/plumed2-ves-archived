@@ -74,7 +74,7 @@ void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_typ
         const bool use_aux_coeffs, const bool use_counter)
 {
  isbasisfcoeffs_=false;
- fmt_="%14.9f"; 
+ fmt_="%30.16e"; 
  plumed_massert(ncoeffs_per_dimension.size()==dimension_labels.size(),"Coeffs: dimensions of vectors in Init(...) don't match");
  dimension_=ncoeffs_per_dimension.size(); 
  dimension_labels_=dimension_labels;
