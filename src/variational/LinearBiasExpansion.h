@@ -45,19 +45,27 @@ class LinearBiasExpansion{
   std::vector<BasisFunctions*> basisf_;
   unsigned int ncv_;
   std::vector<unsigned int> num_bf_;
-///
+  //
  public:
   static void registerKeywords( Keywords& keys );
-/// Constructor
+  // Constructor
   LinearBiasExpansion(const std::string, 
                       std::vector<Value*>,
                       std::vector<BasisFunctions*>,
                       Communicator &cc);
+  //
+  std::vector<Value*> getPointerToArguments() const ;
+  std::vector<BasisFunctions*> getPointerToBasisFunctions() const ;
   Coeffs* getPointerToBiasCoeffs() const ;
   Grid* getPointerToBiasGrid() const ;
+  unsigned int getNumberOfArguments() const ;
+  std::vector<unsigned int> getNumberOfBasisFunctions() const ;
+  unsigned int getNumberOfCoeffs() const ;
+  // Grid stuff
   void setupGrid(const std::vector<unsigned int>&);
   void updateBiasGrid();
   void writeBiasGridToFile(const std::string, const bool);
+  // calculate bias and derivatives
   double getBiasAndDerivatives(const std::vector<double>&, std::vector<double>& derivatives);
 };
 

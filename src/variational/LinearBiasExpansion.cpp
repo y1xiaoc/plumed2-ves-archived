@@ -53,8 +53,13 @@ basisf_(basisf)
  for(unsigned int k=0;k<ncv_;k++){num_bf_[k]=basisf_[k]->getNumberOfBasisFunctions();}
 }
 
+std::vector<Value*> LinearBiasExpansion::getPointerToArguments() const {return args_;}
+std::vector<BasisFunctions*> LinearBiasExpansion::getPointerToBasisFunctions() const {return basisf_;}
 Coeffs* LinearBiasExpansion::getPointerToBiasCoeffs() const {return bias_coeffs;} 
-Grid* LinearBiasExpansion::getPointerToBiasGrid() const {return bias_grid;} 
+Grid* LinearBiasExpansion::getPointerToBiasGrid() const {return bias_grid;}
+unsigned int LinearBiasExpansion::getNumberOfArguments() const {return ncv_;}
+std::vector<unsigned int> LinearBiasExpansion::getNumberOfBasisFunctions() const {return num_bf_;}
+unsigned int LinearBiasExpansion::getNumberOfCoeffs() const {return bias_coeffs->getSize();}
 
 void LinearBiasExpansion::setupGrid(const std::vector<unsigned int>& nbins)
 {
