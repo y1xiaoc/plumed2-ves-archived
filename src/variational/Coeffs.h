@@ -116,6 +116,18 @@ public:
  void scaleAllValues(const double);
  void scaleOnlyMainValues(const double);
  void scaleOnlyAuxValues(const double);
+ /// set all values 
+ void setValues(const double);
+ void setAuxValues(const double);
+/// add to all values
+ void addToValues(const double);
+ void addToAuxValues(const double);
+/// set Aux values equal to main
+ void setAuxEqualToMain();
+/// copy values for another Coeffs instance
+ void copyOtherCoeffs(Coeffs*);
+ void copyAndScaleOtherCoeffs(Coeffs*, const double);
+/// Random coeffs
  void randomizeCoeffs();
 
 

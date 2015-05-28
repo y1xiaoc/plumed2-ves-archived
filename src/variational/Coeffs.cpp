@@ -227,6 +227,38 @@ void Coeffs::scaleOnlyAuxValues(const double scalef ){
   if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]*=scalef;}}
 }
 
+void Coeffs::setValues(const double value){
+  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=value;}
+}
+
+void Coeffs::setAuxValues(const double value){
+  if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]=value;}}
+}
+
+void Coeffs::addToValues(const double value){
+  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]+=value;}
+}
+
+void Coeffs::addToAuxValues(const double value){
+  if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]+=value;}}
+}
+
+void Coeffs::setAuxEqualToMain(){
+  if(useaux_){for(unsigned int i=0;i<coeffs.size();i++){aux_coeffs[i]=coeffs[i];}}
+}
+
+void Coeffs::copyOtherCoeffs(Coeffs* other_coeffs)
+{
+ plumed_massert(coeffs.size()==other_coeffs->getSize(),"Coeffs do not have same number of elements");
+ for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=other_coeffs->getValue(i);}
+}
+
+void Coeffs::copyAndScaleOtherCoeffs(Coeffs* other_coeffs,const double scalef)
+{
+ plumed_massert(coeffs.size()==other_coeffs->getSize(),"Coeffs do not have same number of elements");
+ for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=scalef*other_coeffs->getValue(i);}
+}
+
 void Coeffs::randomizeCoeffs()
 {
  Random rnd;

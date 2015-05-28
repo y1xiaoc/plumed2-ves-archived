@@ -40,7 +40,11 @@ class LinearBiasExpansion{
   std::string bias_label_;
   bool serial_;
   Coeffs* bias_coeffs;
+  Coeffs* wt_coeffs;
+  Coeffs* basisf_norm;
   Grid* bias_grid;
+  Grid* fes_grid;
+  Grid* ps_grid;
   std::vector<Value*> args_;
   std::vector<BasisFunctions*> basisf_;
   unsigned int ncv_;
