@@ -37,6 +37,10 @@ class BasisFunctions;
 /// \ingroup TOOLBOX
 class Coeffs
 {
+public:
+// the type of 1D index for the coeffs 
+ typedef size_t index_t;
+// typedef unsigned int index_t;
 protected:
  std::vector<double> coeffs;
  std::vector<double> aux_coeffs;
@@ -49,7 +53,7 @@ protected:
  std::vector<std::string> coeffs_descriptions_;
  std::vector<std::string> dimension_labels_;
  std::vector<unsigned int> ncoeffs_per_dimension_;
- unsigned int ncoeffs_total_;
+ index_t ncoeffs_total_;
  unsigned int dimension_;
  unsigned int counter;
  std::string fmt_; // format for output 
@@ -88,29 +92,29 @@ public:
  bool hasAuxCoeffs() const;
  bool hasCounter() const;
  std::vector<unsigned int> getNumberOfCoeffsPerDimension() const;
- unsigned int getSize() const;
+ index_t getSize() const;
  unsigned int getDimension() const;
  
 /// methods to handle indices 
- std::vector<unsigned int> getIndices(const unsigned int) const;
- unsigned int getIndex(const std::vector<unsigned int> &) const;
+ std::vector<unsigned int> getIndices(const index_t) const;
+ index_t getIndex(const std::vector<unsigned int> &) const;
 
 /// get value
- double getValue(const unsigned int index) const;
+ double getValue(const index_t) const;
  double getValue(const std::vector<unsigned int>&) const;
- double getAuxValue(const unsigned int index) const;
+ double getAuxValue(const index_t) const;
  double getAuxValue(const std::vector<unsigned int>&) const;
 /// set value 
- void setValue(const unsigned int, const double);
+ void setValue(const index_t, const double);
  void setValue(const std::vector<unsigned int>&, const double);
- void setAuxValue(const unsigned, const double);
+ void setAuxValue(const index_t, const double);
  void setAuxValue(const std::vector<unsigned int>&, const double);
- void setValueAndAux(const unsigned, const double, const double);
+ void setValueAndAux(const index_t, const double, const double);
  void setValueAndAux(const std::vector<unsigned int>&, const double, const double);
 /// add to value
- void addToValue(const unsigned int , const double); 
+ void addToValue(const index_t, const double); 
  void addToValue(const std::vector<unsigned int>&, const double);
- void addToAuxValue(const unsigned int, const double); 
+ void addToAuxValue(const index_t, const double); 
  void addToAuxValue(const std::vector<unsigned int>&, const double);
 /// scale all values 
  void scaleAllValues(const double);
@@ -125,8 +129,10 @@ public:
 /// set Aux values equal to main
  void setAuxEqualToMain();
 /// copy values for another Coeffs instance
- void copyOtherCoeffs(Coeffs*);
- void copyAndScaleOtherCoeffs(Coeffs*, const double);
+ void setFromOtherCoeffs(Coeffs*);
+ void setFromOtherCoeffs(Coeffs*,const double);
+ void addFromOtherCoeffs(Coeffs*);
+ void addFromOtherCoeffs(Coeffs*,const double);
 /// Random coeffs
  void randomizeCoeffs();
 

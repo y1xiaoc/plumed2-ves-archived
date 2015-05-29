@@ -40,7 +40,7 @@ void LinearBiasExpansion::registerKeywords( Keywords& keys ){
 LinearBiasExpansion::LinearBiasExpansion(const std::string label,
                     std::vector<Value*> args,
                     std::vector<BasisFunctions*> basisf,
-                    Communicator &cc):
+                    Communicator& cc):
 mycomm(cc),
 bias_label_(label),
 args_(args),

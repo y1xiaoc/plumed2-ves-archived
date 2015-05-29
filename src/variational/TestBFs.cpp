@@ -102,11 +102,15 @@ Function(ao)
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
   coeffs = bias_expansion->getPointerToBiasCoeffs();
-  // coeffs = new Coeffs("Test",args,bf,true,true);
   // coeffs->setValueAndAux(0,1000.0,0.0); 
   std::vector<unsigned int> nbins(2,300);
   bias_expansion->setupGrid(nbins);
   coeffs->randomizeCoeffs();
+ 
+  coeffs2 = new Coeffs("Test",args,bf,true,true);
+  coeffs2->setFromOtherCoeffs(coeffs,-1.0);
+  coeffs2->addFromOtherCoeffs(coeffs2,-1.0);
+  coeffs2->writeToFile("TEST2.data");
 
   bias_expansion->updateBiasGrid();
   bias_expansion->writeBiasGridToFile("bias.data",false);
@@ -114,7 +118,6 @@ Function(ao)
   bias_expansion->writeBiasGridToFile("bias2.data",true);
 
   // coeffs->setValueAndAux(10,2.0000001, 400.0); 
-  coeffs->writeToFile("TEST.data");
   // coeffs->writeToFile("TEST.data");
   // coeffs2 = Coeffs::createFromFile("TEST.data");
   // coeffs2->setCounter(100);

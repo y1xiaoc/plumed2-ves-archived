@@ -58,11 +58,9 @@ Coeffs::Coeffs(const std::string& coeffs_label,
  std::vector<unsigned int> ncoeffs_per_dimension;
  dimension_labels.resize(dim); ncoeffs_per_dimension.resize(dim);
  //
- unsigned int ncoeffs=1;
  for(unsigned int i=0;i<dim;i++){
   dimension_labels[i]=args[i]->getName();
   ncoeffs_per_dimension[i]=basisf[i]->getNumberOfBasisFunctions();
-  ncoeffs*=ncoeffs_per_dimension[i];
  }
  Init(coeffs_label, coeffs_type, dimension_labels, ncoeffs_per_dimension, use_aux_coeffs, use_counter);
  setupBasisFunctionsInfo(basisf);
@@ -93,12 +91,12 @@ void Coeffs::Init(const std::string& coeffs_label, const std::string& coeffs_typ
 
 void Coeffs::clearMain(){
  coeffs.resize(ncoeffs_total_);
- for(unsigned int i=0;i<ncoeffs_total_;i++){coeffs[i]=0.0;}
+ for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]=0.0;}
 }
 
 void Coeffs::clearAux(){
  aux_coeffs.resize(ncoeffs_total_);
- for(unsigned int i=0;i<ncoeffs_total_;i++){aux_coeffs[i]=0.0;}
+ for(index_t i=0;i<ncoeffs_total_;i++){aux_coeffs[i]=0.0;}
 }
 
 void Coeffs::clear(){
@@ -113,11 +111,11 @@ bool Coeffs::isBasisFunctionCoeffs() const {return isbasisfcoeffs_;}
 bool Coeffs::hasAuxCoeffs() const {return useaux_;}
 bool Coeffs::hasCounter() const {return usecounter_;}
 std::vector<unsigned int> Coeffs::getNumberOfCoeffsPerDimension() const {return ncoeffs_per_dimension_;}
-unsigned int Coeffs::getSize() const {return ncoeffs_total_;}
+Coeffs::index_t Coeffs::getSize() const {return ncoeffs_total_;}
 unsigned int Coeffs::getDimension() const {return dimension_;}
 
 // we are flattening arrays using a column-major order
-unsigned int Coeffs::getIndex(const std::vector<unsigned int>& indices) const {
+Coeffs::index_t Coeffs::getIndex(const std::vector<unsigned int>& indices) const {
  plumed_dbg_assert(indices.size()==dimension_);
  for(unsigned int i=0;i<dimension_;i++)
   if(indices[i]>=ncoeffs_per_dimension_[i]) {
@@ -126,7 +124,7 @@ unsigned int Coeffs::getIndex(const std::vector<unsigned int>& indices) const {
     std::string msg="ERROR: the system is looking for a value outside the indices along the " + is + "index!";
     plumed_merror(msg);
   }
- unsigned int index=indices[dimension_-1];
+ index_t index=indices[dimension_-1];
  for(unsigned int i=dimension_-1;i>0;--i){
   index=index*ncoeffs_per_dimension_[i-1]+indices[i-1];
  }
@@ -134,9 +132,9 @@ unsigned int Coeffs::getIndex(const std::vector<unsigned int>& indices) const {
 }
 
 // we are flattening arrays using a column-major order
-std::vector<unsigned int> Coeffs::getIndices(const unsigned int index) const {
+std::vector<unsigned int> Coeffs::getIndices(const index_t index) const {
  std::vector<unsigned int> indices(dimension_);
- unsigned int kk=index;
+ index_t kk=index;
  indices[0]=(index%ncoeffs_per_dimension_[0]);
  for(unsigned int i=1;i<dimension_-1;++i){
   kk=(kk-indices[i-1])/ncoeffs_per_dimension_[i-1];
@@ -148,7 +146,7 @@ std::vector<unsigned int> Coeffs::getIndices(const unsigned int index) const {
  return indices;
 }
 
-double Coeffs::getValue(const unsigned int index) const {
+double Coeffs::getValue(const index_t index) const {
  plumed_dbg_assert(index<ncoeffs_total_);
  return coeffs[index];
 }
@@ -157,7 +155,7 @@ double Coeffs::getValue(const std::vector<unsigned int>& indices) const {
  return getValue(getIndex(indices));
 }
 
-double Coeffs::getAuxValue(const unsigned int index) const {
+double Coeffs::getAuxValue(const index_t index) const {
  plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
  return aux_coeffs[index];
 }
@@ -166,7 +164,7 @@ double Coeffs::getAuxValue(const std::vector<unsigned int>& indices) const {
  return getAuxValue(getIndex(indices));
 }
 
-void Coeffs::setValue(const unsigned int index, const double value){
+void Coeffs::setValue(const index_t index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_);
  coeffs[index]=value;
 }
@@ -175,7 +173,7 @@ void Coeffs::setValue(const std::vector<unsigned int>& indices, const double val
  setValue(getIndex(indices),value); 
 }
 
-void Coeffs::setAuxValue(const unsigned int index, const double value){
+void Coeffs::setAuxValue(const index_t index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
  aux_coeffs[index]=value;
 }
@@ -184,7 +182,7 @@ void Coeffs::setAuxValue(const std::vector<unsigned int>& indices, const double 
  setAuxValue(getIndex(indices),value);
 }
 
-void Coeffs::setValueAndAux(const unsigned int index, const double main_value, const double aux_value)
+void Coeffs::setValueAndAux(const index_t index, const double main_value, const double aux_value)
 {
  plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
  coeffs[index]=main_value;
@@ -196,7 +194,7 @@ void Coeffs::setValueAndAux(const std::vector<unsigned int>& indices, const doub
 }
 
 
-void Coeffs::addToValue(const unsigned int index, const double value){
+void Coeffs::addToValue(const index_t index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_);
  coeffs[index]+=value;
 }
@@ -205,7 +203,7 @@ void Coeffs::addToValue(const std::vector<unsigned int>& indices, const double v
  addToValue(getIndex(indices),value);
 }
 
-void Coeffs::addToAuxValue(const unsigned int index, const double value){
+void Coeffs::addToAuxValue(const index_t index, const double value){
  plumed_dbg_assert(index<ncoeffs_total_ && useaux_);
  aux_coeffs[index]+=value;
 }
@@ -215,54 +213,66 @@ void Coeffs::addToAuxValue(const std::vector<unsigned int>& indices, const doubl
 }
 
 void Coeffs::scaleAllValues(const double scalef ){
-  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]*=scalef;}
-  if(useaux_){for(unsigned int i=0;i<coeffs.size();i++){aux_coeffs[i]*=scalef;}}
+  for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]*=scalef;}
+  if(useaux_){for(index_t i=0;i<ncoeffs_total_;i++){aux_coeffs[i]*=scalef;}}
 }
 
 void Coeffs::scaleOnlyMainValues(const double scalef ){
-  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]*=scalef;}
+  for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]*=scalef;}
 }
 
 void Coeffs::scaleOnlyAuxValues(const double scalef ){
-  if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]*=scalef;}}
+  if(useaux_){for(index_t i=0;i<ncoeffs_total_;i++){aux_coeffs[i]*=scalef;}}
 }
 
 void Coeffs::setValues(const double value){
-  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=value;}
+  for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]=value;}
 }
 
 void Coeffs::setAuxValues(const double value){
-  if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]=value;}}
+  if(useaux_){for(index_t i=0;i<ncoeffs_total_;i++){aux_coeffs[i]=value;}}
 }
 
 void Coeffs::addToValues(const double value){
-  for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]+=value;}
+  for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]+=value;}
 }
 
 void Coeffs::addToAuxValues(const double value){
-  if(useaux_){for(unsigned int i=0;i<aux_coeffs.size();i++){aux_coeffs[i]+=value;}}
+  if(useaux_){for(index_t i=0;i<ncoeffs_total_;i++){aux_coeffs[i]+=value;}}
 }
 
 void Coeffs::setAuxEqualToMain(){
-  if(useaux_){for(unsigned int i=0;i<coeffs.size();i++){aux_coeffs[i]=coeffs[i];}}
+  if(useaux_){for(index_t i=0;i<ncoeffs_total_;i++){aux_coeffs[i]=coeffs[i];}}
 }
 
-void Coeffs::copyOtherCoeffs(Coeffs* other_coeffs)
+void Coeffs::setFromOtherCoeffs(Coeffs* other_coeffs)
 {
- plumed_massert(coeffs.size()==other_coeffs->getSize(),"Coeffs do not have same number of elements");
- for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=other_coeffs->getValue(i);}
+ plumed_massert(ncoeffs_total_==other_coeffs->getSize(),"Coeffs do not have same number of elements");
+ for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]=other_coeffs->getValue(i);}
 }
 
-void Coeffs::copyAndScaleOtherCoeffs(Coeffs* other_coeffs,const double scalef)
+void Coeffs::setFromOtherCoeffs(Coeffs* other_coeffs,const double scalef)
 {
- plumed_massert(coeffs.size()==other_coeffs->getSize(),"Coeffs do not have same number of elements");
- for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=scalef*other_coeffs->getValue(i);}
+ plumed_massert(ncoeffs_total_==other_coeffs->getSize(),"Coeffs do not have same number of elements");
+ for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]=scalef*other_coeffs->getValue(i);}
+}
+
+void Coeffs::addFromOtherCoeffs(Coeffs* other_coeffs)
+{
+ plumed_massert(ncoeffs_total_==other_coeffs->getSize(),"Coeffs do not have same number of elements");
+ for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]+=other_coeffs->getValue(i);}
+}
+
+void Coeffs::addFromOtherCoeffs(Coeffs* other_coeffs, const double scalef)
+{
+ plumed_massert(ncoeffs_total_==other_coeffs->getSize(),"Coeffs do not have same number of elements");
+ for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]+=scalef*other_coeffs->getValue(i);}
 }
 
 void Coeffs::randomizeCoeffs()
 {
  Random rnd;
- for(unsigned int i=0;i<coeffs.size();i++){coeffs[i]=rnd.Gaussian();}
+ for(index_t i=0;i<ncoeffs_total_;i++){coeffs[i]=rnd.Gaussian();}
 }
 
 
@@ -305,7 +315,7 @@ void Coeffs::writeToFile(OFile& ofile, const bool print_description)
  for(unsigned int k=0; k<dimension_; k++){ilabels[k]=ilabels_prefix+dimension_labels_[k];}
 
  writeHeader(ofile); 
- for(unsigned int i=0;i<ncoeffs_total_;i++){
+ for(index_t i=0;i<ncoeffs_total_;i++){
   indices=getIndices(i);
   for(unsigned int k=0; k<dimension_; k++)
   {
@@ -352,7 +362,7 @@ unsigned int Coeffs::readFromFile(IFile& ifile, const bool ignore_missing_coeffs
  ifile.scanField("type",coeffs_type_f);
  // total number of coeffs
  ifile.scanField("ncoeffs_total",int_tmp);
- unsigned int ncoeffs_total_f=(unsigned int) int_tmp; 
+ index_t ncoeffs_total_f=(index_t) int_tmp; 
  // basis function keywords
  if(isbasisfcoeffs_)
  {
