@@ -112,7 +112,6 @@ public:
   std::string getBasisFunctionDescription(const unsigned int);
   std::vector<std::string> getBasisFunctionDescriptions();
   //
-  BasisFunctions();
   double translateArgument(const double, bool&);
   void apply();
   void calculate();

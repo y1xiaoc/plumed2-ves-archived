@@ -108,8 +108,7 @@ Function(ao)
   coeffs->randomizeCoeffs();
  
   coeffs2 = new Coeffs("Test",args,bf,true,true);
-  coeffs2->setFromOtherCoeffs(coeffs,-1.0);
-  coeffs2->addFromOtherCoeffs(coeffs2,-1.0);
+  for(unsigned int i=0;i<coeffs2->getSize();i++){coeffs2->setValue(i,1.0*i*i*i);}
   coeffs2->writeToFile("TEST2.data");
 
   bias_expansion->updateBiasGrid();
