@@ -28,6 +28,7 @@
 #include "tools/File.h"
 #include "LinearBiasExpansion.h"
 #include "tools/Communicator.h"
+#include "TargetDistribution1DimBase.h"
 
 
 // using namespace std;
@@ -115,6 +116,8 @@ Function(ao)
   bias_expansion->writeBiasGridToFile("bias.data",false);
   bias_expansion->writeBiasGridToFile("bias2.data",false);
   bias_expansion->writeBiasGridToFile("bias2.data",true);
+
+  TargetDistribution1DimBase::writeDistributionToFile("dist","GAUSSIAN CENTER=-2.0,2.0 SIGMA=0.5,0.5 WEIGHT=1,4 DO_NOT_NORMALIZE",-4.0,4.0,200);
 
   // coeffs->setValueAndAux(10,2.0000001, 400.0); 
   // coeffs->writeToFile("TEST.data");

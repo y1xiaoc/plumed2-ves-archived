@@ -21,14 +21,14 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution1DimBase.h"
 #include "TargetDistribution1DimRegister.h"
-#include "BasisFunctions.h"
 
 namespace PLMD {
 
 class Uniform1DimDistribution : public TargetDistribution1DimBase {
+ double inverse_normalization;
 public:
   Uniform1DimDistribution( const TargetDistribution1DimOptions& to );
-  double calculate_ps(double);
+  double distribution(const double);
 };
 
 VARIATIONAL_REGISTER_TARGET_DISTRIBUTION_1D(Uniform1DimDistribution,"UNIFORM")
@@ -36,13 +36,20 @@ VARIATIONAL_REGISTER_TARGET_DISTRIBUTION_1D(Uniform1DimDistribution,"UNIFORM")
 Uniform1DimDistribution::Uniform1DimDistribution( const TargetDistribution1DimOptions& to ):
 TargetDistribution1DimBase(to)
 {
- setNormalizationFactor(BF_pointer()->intervalRange());
+ double normalization;
+ if(parse("NORMALIZATION",normalization,true)){
+  inverse_normalization=1.0/normalization;
+  setNormalized();
+ }else{
+  inverse_normalization=1.0;
+  setNotNormalized();
+ }
 }
 
-double Uniform1DimDistribution::calculate_ps(double cv_value)
+double Uniform1DimDistribution::distribution(const double argument)
 {
- double ps_value=1.0/getNormalizationFactor();
- return ps_value;
+ double value=inverse_normalization;
+ return value;
 }
 
 }

@@ -28,16 +28,16 @@
 #include "tools/Tools.h"
 
 namespace PLMD {
-class BasisFunctions;
+
+class Grid;
 
 class TargetDistribution1DimOptions{
 friend class TargetDistribution1DimRegister;
 friend class TargetDistribution1DimBase;
 private:
   std::vector<std::string> words;
-  BasisFunctions* basisf;
 public:
-  TargetDistribution1DimOptions( const std::vector<std::string>& input, BasisFunctions* mybasisf );
+  TargetDistribution1DimOptions( const std::vector<std::string>& input);
 };
 
 class TargetDistribution1DimBase {
@@ -46,49 +46,52 @@ private:
   std::string type;
 /// The input to the target distribution
   std::vector<std::string> input;
-/// A pointer to the underlying BasisFunction
-  BasisFunctions* basisf;
 /// is the target distribution normalize or not
   bool normalized;
-  double normalization_factor;
 protected:
 /// Read a keywords from the input 
   template <class T>
-  void parse(const std::string& ,T& );
+  bool parse(const std::string& ,T& , bool optional=false);
 /// Read a keywords vector from the input 
   template <class T>
-  void parseVector(const std::string& ,std::vector<T>& );
+  bool parseVector(const std::string& ,std::vector<T>& , bool optional=false);
 /// Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
-/// NormalizationFactor
-   void setNormalizationFactor(double);
-   double getNormalizationFactor(){return normalization_factor;}
 public:
   TargetDistribution1DimBase( const TargetDistribution1DimOptions& to );
   virtual ~TargetDistribution1DimBase();
 /// Check everything was read in
   void checkRead() const ;
-/// Return a description of the landmark selection protocol
+/// Return a description 
   std::string description();
 /// Overwrite this to have a more descriptive output
   virtual std::string rest_of_description(){ return ""; };
 /// is the target distribution normalize or not
-   bool isNormalized(){return normalized;};
-   BasisFunctions* BF_pointer(){return basisf;};
+   bool isNormalized()const{return normalized;};
+/// set the that target distribution is normalized
+   void setNormalized(){normalized=true;};
+   void setNotNormalized(){normalized=false;};  
+/// get type of distribution
+   std::string getType()const{return type;};
 /// calculate the target distribution itself
-  virtual double calculate_ps(double)=0;
+  virtual double distribution(const double)=0;
+/// write the distribution out to file
+  static void writeDistributionToFile(const std::string, const std::string, const double, const double, const unsigned int );
+  void calculateDistributionOnGrid(Grid*);
 };
 
 template <class T>
-void TargetDistribution1DimBase::parse( const std::string& key, T& t ){
+bool TargetDistribution1DimBase::parse( const std::string& key, T& t, bool optional){
   bool found=Tools::parse(input,key,t);
-  if(!found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
+  if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
+  return found;
 }
 
 template <class T>
-void TargetDistribution1DimBase::parseVector( const std::string& key, std::vector<T>& t ){
+bool TargetDistribution1DimBase::parseVector( const std::string& key, std::vector<T>& t , bool optional){
   bool found=Tools::parseVector(input,key,t);
-  if(!found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
+  if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
+  return found;
 }
 
 }
