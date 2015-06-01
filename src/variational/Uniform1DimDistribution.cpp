@@ -24,7 +24,6 @@
 #include "BasisFunctions.h"
 
 namespace PLMD {
-namespace variational {
 
 class Uniform1DimDistribution : public TargetDistribution1DimBase {
 public:
@@ -46,5 +45,4 @@ double Uniform1DimDistribution::calculate_ps(double cv_value)
  return ps_value;
 }
 
-}
 }

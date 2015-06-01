@@ -23,7 +23,6 @@
 #include "BasisFunctions.h"
 
 namespace PLMD {
-namespace variational {
 
 TargetDistribution1DimOptions::TargetDistribution1DimOptions( const std::vector<std::string>& input, BasisFunctions* mybasisf ):
 words(input),
@@ -57,9 +56,8 @@ void TargetDistribution1DimBase::checkRead() const {
 }
 
 std::string TargetDistribution1DimBase::description(){
-  std::ostringstream ostr;
-  ostr<<"using all data";
-  return ostr.str();
+  std::string str="Type: " + type;
+  return str;
 }
 
 void TargetDistribution1DimBase::setNormalizationFactor(double value){
@@ -67,6 +65,5 @@ void TargetDistribution1DimBase::setNormalizationFactor(double value){
   normalization_factor=value;
 }
 
-}
 }
 

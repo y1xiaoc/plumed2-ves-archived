@@ -29,7 +29,6 @@
 
 namespace PLMD {
 class BasisFunctions;
-namespace variational {
 
 class TargetDistribution1DimOptions{
 friend class TargetDistribution1DimRegister;
@@ -56,8 +55,12 @@ protected:
 /// Read a keywords from the input 
   template <class T>
   void parse(const std::string& ,T& );
+/// Read a keywords vector from the input 
+  template <class T>
+  void parseVector(const std::string& ,std::vector<T>& );
 /// Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
+/// NormalizationFactor
    void setNormalizationFactor(double);
    double getNormalizationFactor(){return normalization_factor;}
 public:
@@ -82,6 +85,11 @@ void TargetDistribution1DimBase::parse( const std::string& key, T& t ){
   if(!found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
 }
 
+template <class T>
+void TargetDistribution1DimBase::parseVector( const std::string& key, std::vector<T>& t ){
+  bool found=Tools::parseVector(input,key,t);
+  if(!found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
 }
+
 }
 #endif

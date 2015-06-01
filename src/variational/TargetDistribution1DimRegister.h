@@ -31,7 +31,6 @@
 namespace PLMD{
 
 
-namespace variational{
 
 class TargetDistribution1DimRegister{
 private:
@@ -62,6 +61,5 @@ TargetDistribution1DimRegister& targetDistribution1DimRegister();
     ~classname##RegisterMe(){targetDistribution1DimRegister().remove(create);}; \
   } classname##RegisterMeObject;
 
-}
 }
 #endif

@@ -23,7 +23,6 @@
 #include <iostream>
 
 namespace PLMD{
-namespace variational{
 
 TargetDistribution1DimRegister::~TargetDistribution1DimRegister(){
   if(m.size()>0){
@@ -65,5 +64,4 @@ TargetDistribution1DimBase* TargetDistribution1DimRegister::create( const Target
   return lselect;
 }
 
-}
 }
