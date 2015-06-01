@@ -20,12 +20,15 @@
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "Optimizer.h"
+#include "Coeffs.h"
+#include "VariationalBias.h"
 
 
 namespace PLMD{
 
 Optimizer::Optimizer(const ActionOptions&ao):
 Action(ao),
+ActionPilot(ao),
 ActionWithValue(ao),
 has_been_set(false),
 usehessian_(false),
@@ -37,6 +40,7 @@ type_("Undefined")
 
 void Optimizer::registerKeywords( Keywords& keys ){
   Action::registerKeywords(keys);
+  ActionPilot::registerKeywords(keys);
   ActionWithValue::registerKeywords(keys);
   keys.add("compulsory","STEP_SIZE","the step size used for the optimization");
 }
@@ -59,6 +63,8 @@ void Optimizer::linkCoeffs(Coeffs* bias_coeffs_in, Coeffs* gradient_in)
  bias_coeffs = bias_coeffs_in;
  gradient = gradient_in;
 }
+
+void Optimizer::linkBias(VariationalBias* bias_ptr_in){bias_ptr=bias_ptr_in;}
 
 
 }

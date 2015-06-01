@@ -25,9 +25,10 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include "core/ActionPilot.h"
 #include "core/ActionWithValue.h"
 
-#define PLUMED_BASISFUNCTIONS_INIT(ao) Action(ao),Optimizer(ao)
+#define PLUMED_OPTIMIZER_INIT(ao) Action(ao),Optimizer(ao)
 
 namespace PLMD{
 
@@ -37,8 +38,10 @@ Abstract base class for implenting new optimization methods
 */
 
 class Coeffs;
+class VariationalBias;
 
 class Optimizer :
+ public ActionPilot,
  public ActionWithValue
 {
 private:
@@ -54,6 +57,7 @@ protected:
   Coeffs* bias_coeffs;
   Coeffs* gradient;
   Coeffs* hessian_diag;
+  VariationalBias* bias_ptr;
 public:
   static void registerKeywords(Keywords&);
   Optimizer(const ActionOptions&ao);
@@ -66,6 +70,7 @@ public:
   // 
   void linkCoeffs(Coeffs*, Coeffs*, Coeffs*);
   void linkCoeffs(Coeffs*, Coeffs*);
+  void linkBias(VariationalBias*);
 
 };
 

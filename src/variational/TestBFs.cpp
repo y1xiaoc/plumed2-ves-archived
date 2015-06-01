@@ -126,6 +126,8 @@ Function(ao)
   // plumed.readInputWords(Tools::getWords(bfk[0]));
   // plumed.readInputWords(Tools::getWords(bfk[1]));
 
+  log.printf("bbb: %s\n",this->getName().c_str());
+
 
 }
 
