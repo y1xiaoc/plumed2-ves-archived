@@ -36,18 +36,18 @@ class TargetDistribution1DimRegister{
 private:
 /// Pointer to a function which, given the type for a ReferenceConfiguration, creates it
   typedef TargetDistribution1DimBase*(*creator_pointer)(const TargetDistribution1DimOptions&);
-/// The set of possible landmark selection algorithms we can work with
+/// The set of possible target distribution we can use
   std::map<std::string,creator_pointer> m;
 public:
 /// The destructor
   ~TargetDistribution1DimRegister();
-/// Add a new landmark selection style to the register of landmark selectors
+/// Add a new target distribution to the register
   void add( std::string type, creator_pointer );
-/// Remove a landmark selection style from the register of metrics
+/// Remove a target distribution to the register
   void remove(creator_pointer f);
-/// Verify if a landmark selection style is present in the register
+/// Verify if a target distribution is present in the register
   bool check(std::string type);
-/// Create a landmark selection object
+/// Create a target distribution object
   TargetDistribution1DimBase* create( const TargetDistribution1DimOptions& to );
 };
 
