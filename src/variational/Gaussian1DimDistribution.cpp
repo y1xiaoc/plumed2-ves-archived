@@ -21,8 +21,15 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution1DimBase.h"
 #include "TargetDistribution1DimRegister.h"
+#include "tools/Keywords.h"
 
 namespace PLMD {
+
+//+PLUMEDOC INTERNAL GAUSSIAN
+/*
+ One dimensional target distribution
+*/
+//+ENDPLUMEDOC
 
 class Gaussian1DimDistribution : public TargetDistribution1DimBase {
  // properties of the Gaussians 
@@ -32,11 +39,21 @@ class Gaussian1DimDistribution : public TargetDistribution1DimBase {
  bool normalize_distribution;
  double GaussianDist(const double, const double, const double, const bool normalize=true);
 public:
+  static void registerKeywords( Keywords&);
   Gaussian1DimDistribution( const TargetDistribution1DimOptions& to );
   double distribution(const double);
 };
 
 VARIATIONAL_REGISTER_TARGET_DISTRIBUTION_1D(Gaussian1DimDistribution,"GAUSSIAN")
+
+void Gaussian1DimDistribution::registerKeywords( Keywords& keys )
+{
+ TargetDistribution1DimBase::registerKeywords(keys);
+ keys.add("compulsory","CENTER","The centers of the Gaussians.");
+ keys.add("compulsory","SIGMA","The sigmas of the Gaussians.");
+ keys.add("optional","WEIGHT","The weight of the Gaussians.");
+ keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized.");
+}
 
 Gaussian1DimDistribution::Gaussian1DimDistribution( const TargetDistribution1DimOptions& to ):
 TargetDistribution1DimBase(to)
@@ -60,6 +77,8 @@ TargetDistribution1DimBase(to)
   setNotNormalized();
  }
 }
+
+
 
 double Gaussian1DimDistribution::distribution(const double argument)
 {

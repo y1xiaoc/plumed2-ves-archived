@@ -28,12 +28,18 @@ namespace PLMD{
 class ChebyshevBF : public BasisFunctions{
  virtual void setupBFIntegrals();
 public:
+ static void registerKeywords( Keywords&);
  ChebyshevBF(const ActionOptions&);
  double getValue(const double, const unsigned int, double&, bool&);
  void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
 };
 
 PLUMED_REGISTER_ACTION(ChebyshevBF,"BF_CHEBYSHEV")
+
+void ChebyshevBF::registerKeywords( Keywords& keys )
+{
+ BasisFunctions::registerKeywords(keys);
+}
 
 ChebyshevBF::ChebyshevBF(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)

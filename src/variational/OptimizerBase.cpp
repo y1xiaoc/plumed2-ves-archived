@@ -29,6 +29,9 @@ words(input)
 {
 }
 
+void OptimizerBase::registerKeywords( Keywords& keys ){
+}
+
 OptimizerBase::OptimizerBase( const OptimizerOptions& to ):
 type(to.words[0]),
 input(to.words)

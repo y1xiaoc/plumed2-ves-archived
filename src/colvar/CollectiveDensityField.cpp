@@ -31,7 +31,7 @@ using namespace std;
 namespace PLMD{
 namespace colvar{
 
-//+PLUMEDOC COLVAR TEMPLATE
+//+PLUMEDOC COLVAR COLLECTIVE_DENSITY_FIELD
 /*
 This file provides a template for if you want to introduce a new CV.
 

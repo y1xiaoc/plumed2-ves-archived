@@ -29,12 +29,18 @@ class CubicBsplineBF : public BasisFunctions{
  double spacing_;
  double spline(const double, double&);
 public:
+ static void registerKeywords( Keywords&);
  CubicBsplineBF(const ActionOptions&);
  double getValue(const double, const unsigned int, double&, bool&);
  void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
 };
 
 PLUMED_REGISTER_ACTION(CubicBsplineBF,"Cubic_Bsplines")
+
+void CubicBsplineBF::registerKeywords( Keywords& keys )
+{
+ BasisFunctions::registerKeywords(keys);
+}
 
 CubicBsplineBF::CubicBsplineBF(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)

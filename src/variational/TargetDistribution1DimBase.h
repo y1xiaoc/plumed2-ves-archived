@@ -30,6 +30,7 @@
 namespace PLMD {
 
 class Grid;
+class Keywords;
 
 class TargetDistribution1DimOptions{
 friend class TargetDistribution1DimRegister;
@@ -58,6 +59,8 @@ protected:
 /// Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
 public:
+/// keywords
+  static void registerKeywords( Keywords&);
   TargetDistribution1DimBase( const TargetDistribution1DimOptions& to );
   virtual ~TargetDistribution1DimBase();
 /// Check everything was read in

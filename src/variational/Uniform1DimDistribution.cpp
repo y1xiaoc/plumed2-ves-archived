@@ -21,17 +21,25 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution1DimBase.h"
 #include "TargetDistribution1DimRegister.h"
+#include "tools/Keywords.h"
 
 namespace PLMD {
 
 class Uniform1DimDistribution : public TargetDistribution1DimBase {
  double inverse_normalization;
 public:
+  static void registerKeywords( Keywords&);
   Uniform1DimDistribution( const TargetDistribution1DimOptions& to );
   double distribution(const double);
 };
 
 VARIATIONAL_REGISTER_TARGET_DISTRIBUTION_1D(Uniform1DimDistribution,"UNIFORM")
+
+void Uniform1DimDistribution::registerKeywords( Keywords& keys )
+{
+ TargetDistribution1DimBase::registerKeywords(keys);
+ keys.add("optional","NORMALIZATION","Normalization factor for the uniform distribution. If not given the distribution will be left unnormalized.");
+}
 
 Uniform1DimDistribution::Uniform1DimDistribution( const TargetDistribution1DimOptions& to ):
 TargetDistribution1DimBase(to)

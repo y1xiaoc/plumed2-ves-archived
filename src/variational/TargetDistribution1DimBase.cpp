@@ -24,12 +24,16 @@
 #include "core/Value.h"
 #include "tools/Grid.h"
 #include "tools/File.h"
+#include "tools/Keywords.h"
 
 namespace PLMD {
 
 TargetDistribution1DimOptions::TargetDistribution1DimOptions( const std::vector<std::string>& input):
 words(input)
 {
+}
+
+void TargetDistribution1DimBase::registerKeywords( Keywords& keys ){
 }
 
 TargetDistribution1DimBase::TargetDistribution1DimBase( const TargetDistribution1DimOptions& to ):
@@ -42,6 +46,7 @@ normalized(false)
 
 TargetDistribution1DimBase::~TargetDistribution1DimBase(){
 }
+
 
 void TargetDistribution1DimBase::parseFlag(const std::string& key, bool& t){
   Tools::parseFlag(input,key,t);

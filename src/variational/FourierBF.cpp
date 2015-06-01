@@ -29,12 +29,18 @@ class FourierBF : public BasisFunctions{
  virtual void setupDescription();
  virtual void setupBFIntegrals();
 public:
+ static void registerKeywords( Keywords&);
  FourierBF(const ActionOptions&);
  double getValue(const double, const unsigned int, double&, bool&);
  void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
 };
 
 PLUMED_REGISTER_ACTION(FourierBF,"BF_FOURIER")
+
+void FourierBF::registerKeywords( Keywords& keys )
+{
+ BasisFunctions::registerKeywords(keys);
+}
 
 FourierBF::FourierBF(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)

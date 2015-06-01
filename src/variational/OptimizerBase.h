@@ -29,6 +29,8 @@
 
 namespace PLMD {
 
+class Keywords;
+
 class OptimizerOptions{
 friend class OptimizerRegister;
 friend class OptimizerBase;
@@ -54,6 +56,8 @@ protected:
 /// Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
 public:
+/// keywords
+  static void registerKeywords( Keywords&);
   OptimizerBase( const OptimizerOptions& to );
   virtual ~OptimizerBase();
 /// Check everything was read in

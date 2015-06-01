@@ -24,6 +24,16 @@
 
 namespace PLMD{
 
+void BasisFunctions::registerKeywords( Keywords& keys ){
+  Action::registerKeywords(keys);
+  ActionWithValue::registerKeywords(keys);
+  keys.add("compulsory","ORDER","The order of the basis functions.");
+  keys.add("compulsory","INTERVAL_MIN","the minimum of the interval on which the basis functions are defined");
+  keys.add("compulsory","INTERVAL_MAX","the maximum of the interval on which the basis functions are defined");
+  keys.addFlag("DEBUG_INFO",false,"print out more detailed information about the basis set, useful for debugging");
+  keys.addFlag("NUMERICAL_BF_INTEGRALS",false,"calculate basis function integral over the interval numerically");
+}
+
 BasisFunctions::BasisFunctions(const ActionOptions&ao):
 Action(ao),
 ActionWithValue(ao),
@@ -62,16 +72,6 @@ bf_integrals_(nbasis_,0.0)
  parseFlag("DEBUG_INFO",print_debug_info_);
  parseFlag("NUMERICAL_BF_INTEGRALS",numerical_bf_integrals_); 
  // log.printf(" %s \n",getKeywordString().c_str());
-}
-
-void BasisFunctions::registerKeywords( Keywords& keys ){
-  Action::registerKeywords(keys);
-  ActionWithValue::registerKeywords(keys);
-  keys.add("compulsory","ORDER","The order of the basis functions.");
-  keys.add("compulsory","INTERVAL_MIN","the minimum of the interval on which the basis functions are defined");
-  keys.add("compulsory","INTERVAL_MAX","the maximum of the interval on which the basis functions are defined");
-  keys.addFlag("DEBUG_INFO",false,"print out more detailed information about the basis set, useful for debugging");
-  keys.addFlag("NUMERICAL_BF_INTEGRALS",false,"calculate basis function integral over the interval numerically");
 }
 
 void BasisFunctions::setupInterval(){
