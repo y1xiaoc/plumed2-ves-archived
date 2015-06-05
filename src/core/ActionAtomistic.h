@@ -25,6 +25,7 @@
 #include "Action.h"
 #include "tools/Tensor.h"
 #include "Atoms.h"
+#include "tools/Pbc.h"
 #include <vector>
 #include <set>
 
@@ -43,7 +44,6 @@ class ActionAtomistic :
   std::set<AtomNumber>  unique;
   std::vector<Vector>   positions;       // positions of the needed atoms
   double                energy;
-  Tensor                box;
   Pbc&                  pbc;
   Tensor                virial;
   std::vector<double>   masses;
@@ -106,6 +106,8 @@ public:
   unsigned getNumberOfAtoms()const{return indexes.size();}
 /// Compute the pbc distance between two positions
   Vector pbcDistance(const Vector&,const Vector&)const;
+/// Applies  PBCs to a seriens of positions or distances
+  void pbcApply(std::vector<Vector>& dlist, unsigned max_index=0) const;
 /// Get the vector of absolute indexes
   const std::vector<AtomNumber> & getAbsoluteIndexes()const;
 /// Get the absolute index of an atom
@@ -218,7 +220,7 @@ const double & ActionAtomistic::getEnergy()const{
 
 inline
 const Tensor & ActionAtomistic::getBox()const{
-  return box;
+  return pbc.getBox();
 }
 
 inline

@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "Bias.h"
 #include "ActionRegister.h"
+#include "core/ActionSet.h"
 #include "tools/Grid.h"
 #include "core/PlumedMain.h"
 #include "core/Atoms.h"
@@ -31,7 +32,6 @@
 #include <string>
 #include <cstring>
 #include "tools/File.h"
-#include "time.h"
 #include <iostream>
 #include <limits>
 
@@ -263,9 +263,8 @@ private:
   double uppI_;
   double lowI_;
   bool doInt_;
-  bool isFirstStep;
-/// accumulator for work
   double work_;
+  bool isFirstStep;
   
   void   readGaussians(IFile*);
   bool   readChunkOfGaussians(IFile *ifile, unsigned n);
@@ -294,6 +293,7 @@ void MetaD::registerKeywords(Keywords& keys){
   Bias::registerKeywords(keys);
   componentsAreNotOptional(keys);
   keys.addOutputComponent("bias","default","the instantaneous value of the bias potential");
+  keys.addOutputComponent("work","default","accumulator for work");
   keys.addOutputComponent("acc","ACCELERATION","the metadynamics acceleration factor");
   keys.use("ARG");
   keys.add("compulsory","SIGMA","the widths of the Gaussian hills");
@@ -324,6 +324,9 @@ void MetaD::registerKeywords(Keywords& keys){
   keys.add("optional","SIGMA_MIN","the lower bounds for the sigmas (in CV units) when using adaptive hills. Negative number means no bounds ");
   keys.addFlag("WALKERS_MPI",false,"Switch on MPI version of multiple walkers - not compatible with other WALKERS_* options");
   keys.addFlag("ACCELERATION",false,"Set to TRUE if you want to compute the metadynamics acceleration factor.");  
+  keys.use("RESTART");
+  keys.use("UPDATE_FROM");
+  keys.use("UPDATE_UNTIL");
 }
 
 MetaD::~MetaD(){
@@ -676,6 +679,12 @@ isFirstStep(true)
 // output periodicities of variables
   for(unsigned i=0;i<getNumberOfArguments();++i) hillsOfile_.setupPrintValue( getPntrToArgument(i) );
 
+  bool concurrent=false;
+
+  const ActionSet&actionSet(plumed.getActionSet());
+  for(ActionSet::const_iterator p=actionSet.begin();p!=actionSet.end();++p) if(dynamic_cast<MetaD*>(*p)){ concurrent=true; break; }
+  if(concurrent) log<<"  You are using concurrent metadynamics\n";
+
   log<<"  Bibliography "<<plumed.cite("Laio and Parrinello, PNAS 99, 12562 (2002)");
   if(welltemp_) log<<plumed.cite(
     "Barducci, Bussi, and Parrinello, Phys. Rev. Lett. 100, 020603 (2008)");
@@ -687,6 +696,9 @@ isFirstStep(true)
      "Baftizadeh, Cossio, Pietrucci, and Laio, Curr. Phys. Chem. 2, 79 (2012)");
   if(acceleration) log<<plumed.cite(
      "Pratyush and Parrinello, Phys. Rev. Lett. 111, 230602 (2013)");
+  if(concurrent) log<<plumed.cite(
+     "Gil-Ley and Bussi, J. Chem. Theory Comput. 11, 1077 (2015)");
+ 
   log<<"\n";
 
 }
@@ -788,12 +800,12 @@ void MetaD::addGaussian(const Gaussian& hill)
  else{
   unsigned ncv=getNumberOfArguments();
   vector<unsigned> nneighb=getGaussianSupport(hill);
-  vector<unsigned> neighbors=BiasGrid_->getNeighbors(hill.center,nneighb);
+  vector<Grid::index_t> neighbors=BiasGrid_->getNeighbors(hill.center,nneighb);
   vector<double> der(ncv);
   vector<double> xx(ncv);
   if(comm.Get_size()==1){
     for(unsigned i=0;i<neighbors.size();++i){
-     unsigned ineigh=neighbors[i];
+     Grid::index_t ineigh=neighbors[i];
      for(unsigned j=0;j<ncv;++j){der[j]=0.0;}
      BiasGrid_->getPoint(ineigh,xx);
      double bias=evaluateGaussian(xx,hill,&der[0]);
@@ -805,14 +817,14 @@ void MetaD::addGaussian(const Gaussian& hill)
     vector<double> allder(ncv*neighbors.size(),0.0);
     vector<double> allbias(neighbors.size(),0.0);
     for(unsigned i=rank;i<neighbors.size();i+=stride){
-     unsigned ineigh=neighbors[i];
+     Grid::index_t ineigh=neighbors[i];
      BiasGrid_->getPoint(ineigh,xx);
      allbias[i]=evaluateGaussian(xx,hill,&allder[ncv*i]);
     }
     comm.Sum(allbias);
     comm.Sum(allder);
     for(unsigned i=0;i<neighbors.size();++i){
-     unsigned ineigh=neighbors[i];
+     Grid::index_t ineigh=neighbors[i];
      for(unsigned j=0;j<ncv;++j){der[j]=allder[ncv*i+j];}
      BiasGrid_->addValueAndDerivatives(ineigh,allbias[i],der);
     }
@@ -1104,25 +1116,25 @@ void MetaD::update(){
   double vbias1=getBiasAndDerivatives(cv);
   work_+=vbias1-vbias;
 
-// dump grid on file
+  // dump grid on file
   if(wgridstride_>0&&getStep()%wgridstride_==0){
-// in case old grids are stored, a sequence of grids should appear
-// this call results in a repetition of the header:
+    // in case old grids are stored, a sequence of grids should appear
+    // this call results in a repetition of the header:
     if(storeOldGrids_) gridfile_.clearFields();
-// in case only latest grid is stored, file should be rewound
-// this will overwrite previously written grids
+    // in case only latest grid is stored, file should be rewound
+    // this will overwrite previously written grids
     else gridfile_.rewind();
     BiasGrid_->writeToFile(gridfile_); 
-// if a single grid is stored, it is necessary to flush it, otherwise
-// the file might stay empty forever (when a single grid is not large enough to
-// trigger flushing from the operating system).
-// on the other hand, if grids are stored one after the other this is
-// no necessary, and we leave the flushing control to the user as usual
-// (with FLUSH keyword)
+    // if a single grid is stored, it is necessary to flush it, otherwise
+    // the file might stay empty forever (when a single grid is not large enough to
+    // trigger flushing from the operating system).
+    // on the other hand, if grids are stored one after the other this is
+    // no necessary, and we leave the flushing control to the user as usual
+    // (with FLUSH keyword)
     if(!storeOldGrids_) gridfile_.flush();
   }
 
-// if multiple walkers and time to read Gaussians
+  // if multiple walkers and time to read Gaussians
  if(mw_n_>1 && getStep()%mw_rstride_==0){
    for(int i=0;i<mw_n_;++i){
     // don't read your own Gaussians
