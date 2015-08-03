@@ -7,7 +7,7 @@ SUBDIRS := $(SRCDIRS) user-doc developer-doc regtest
 SUBDIRSCLEAN:=$(addsuffix .clean,$(SUBDIRS))
 
      
-.PHONY: all lib clean $(SRCDIRS) doc docclean check cppcheck
+.PHONY: all lib clean $(SRCDIRS) doc docclean check cppcheck distclean
 
 # if machine dependent configuration has been found:
 ifdef GCCDEP
@@ -56,11 +56,14 @@ clean: $(SUBDIRSCLEAN)
 $(SUBDIRSCLEAN): %.clean:
 	$(MAKE) -C $* clean
 
+distclean: fullclean
+
 fullclean:
 	make clean
 	rm -f Makefile.conf
 	rm -f sourceme.sh
 	rm -f config.log 
+	rm -f */*.on */*.off
 
 
 docclean:

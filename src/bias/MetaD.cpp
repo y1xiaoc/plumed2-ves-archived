@@ -134,6 +134,10 @@ Additional material and examples can be also found in the tutorials:
 - \ref belfast-7
 - \ref belfast-8
 
+Notice that at variance with PLUMED 1.3 it is now straightforward to apply concurrent metadynamics
+as done e.g. in Ref. \cite gil2015enhanced . This indeed can be obtained by using the METAD
+action multiple times in the same input file.
+
 \par Examples
 The following input is for a standard metadynamics calculation using as
 collective variables the distance between atoms 3 and 5
@@ -265,6 +269,7 @@ private:
   bool doInt_;
   double work_;
   bool isFirstStep;
+  long int last_step_warn_grid;
   
   void   readGaussians(IFile*);
   bool   readChunkOfGaussians(IFile *ifile, unsigned n);
@@ -279,7 +284,7 @@ private:
   std::string fmt;
 
 public:
-  MetaD(const ActionOptions&);
+  explicit MetaD(const ActionOptions&);
   ~MetaD();
   void calculate();
   void update();
@@ -359,7 +364,8 @@ acceleration(false), acc(0.0),
 // Interval initialization
 uppI_(-1), lowI_(-1), doInt_(false),
 work_(0.0),
-isFirstStep(true)
+isFirstStep(true),
+last_step_warn_grid(0)
 {
   // parse the flexible hills
   string adaptiveoption;
@@ -888,6 +894,13 @@ double MetaD::getBiasAndDerivatives(const vector<double>& cv, double* der)
 {
  double bias=0.0;
  if(!grid_){
+  if(hills_.size()>10000 && (getStep()-last_step_warn_grid)>10000){
+    std::string msg;
+    Tools::convert(hills_.size(),msg);
+    msg="You have accumulated "+msg+" hills, you should enable GRIDs to avoid serious performance hits";
+    warning(msg);
+    last_step_warn_grid=getStep();
+  }
   unsigned stride=comm.Get_size();
   unsigned rank=comm.Get_rank();
   for(unsigned i=rank;i<hills_.size();i+=stride){
