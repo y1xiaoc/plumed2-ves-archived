@@ -37,7 +37,7 @@ Abstract base class for implenting new 1D basis sets.
 */
 
 class BasisFunctions :
- public ActionWithValue
+  public ActionWithValue
 {
 private:
 
@@ -50,21 +50,21 @@ protected:
   std::string description_;
   // the type of the basis set
   std::string type_;
-  // the maximum order of the basis functions 
+  // the maximum order of the basis functions
   unsigned int norder_;
   // the total number of basis functions
   unsigned int nbasis_;
-  // the keywords used to invoke the basis set 
-  std::vector<std::string> bf_keywords_;   
-  // prefix for the basis function descriptions 
-  std::string bf_description_prefix_; 
+  // the keywords used to invoke the basis set
+  std::vector<std::string> bf_keywords_;
+  // prefix for the basis function descriptions
+  std::string bf_description_prefix_;
   // description of each basis function
-  std::vector<std::string> bf_description_; 
+  std::vector<std::string> bf_description_;
   // if the basis functions are periodic or not
   bool periodic_;
   // if the basis functions are defined on a bounded interval or not
   bool interval_bounded_;
-  // the default interval of the basis functions 
+  // the default interval of the basis functions
   double interval_default_min_;
   double interval_default_max_;
   double interval_default_range_;
@@ -124,56 +124,74 @@ public:
   std::string getKeywordString();
 };
 
+
 inline
 bool BasisFunctions::hasBeenSet(){return has_been_set;}
+
 
 inline
 std::string BasisFunctions::getType(){return type_;}
 
+
 inline
 std::string BasisFunctions::getDescription(){return description_;}
+
 
 inline
 unsigned int BasisFunctions::getOrder(){return norder_;}
 
+
 inline
 unsigned int BasisFunctions::getNumberOfBasisFunctions(){return nbasis_;}
+
 
 inline
 unsigned int BasisFunctions::getSize(){return getNumberOfBasisFunctions();}
 
+
 inline
 bool BasisFunctions::arePeriodic(){return periodic_;}
+
 
 inline
 bool BasisFunctions::intervalBounded(){return interval_bounded_;}
 
+
 inline
 double BasisFunctions::intervalMin(){return interval_min_;}
+
 
 inline
 double BasisFunctions::intervalMax(){return interval_max_;}
 
+
 inline
 double BasisFunctions::intervalRange(){return interval_range_;}
+
 
 inline
 double BasisFunctions::intervalMean(){return interval_mean_;}
 
+
 inline
 double BasisFunctions::getBasisFunctionIntegral(unsigned int index){return bf_integrals_[index];}
+
 
 inline
 std::vector<double> BasisFunctions::getBasisFunctionIntegrals(){return bf_integrals_;}
 
+
 inline
 unsigned BasisFunctions::getNumberOfDerivatives(){return 0;}
+
 
 inline
 std::vector<std::string> BasisFunctions::getKeywordList(){return bf_keywords_;}
 
+
 inline
 std::string BasisFunctions::getBasisFunctionDescription(unsigned int index){return bf_description_[index];}
+
 
 inline
 std::vector<std::string> BasisFunctions::getBasisFunctionDescriptions(){return bf_description_;}
@@ -182,4 +200,3 @@ std::vector<std::string> BasisFunctions::getBasisFunctionDescriptions(){return b
 }
 
 #endif
-

@@ -25,10 +25,8 @@
 namespace PLMD{
 namespace bias{
 
-VariationalBias::VariationalBias(const ActionOptions&ao):
-Bias(ao)
-{
-}
+VariationalBias::VariationalBias(const ActionOptions&ao): Bias(ao){}
+
 
 void VariationalBias::registerKeywords( Keywords& keys ){
   Bias::registerKeywords(keys);
@@ -36,5 +34,3 @@ void VariationalBias::registerKeywords( Keywords& keys ){
 
 }
 }
-
-

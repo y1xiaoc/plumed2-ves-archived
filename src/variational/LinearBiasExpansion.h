@@ -53,7 +53,7 @@ class LinearBiasExpansion{
  public:
   static void registerKeywords( Keywords& keys );
   // Constructor
-  LinearBiasExpansion(const std::string, 
+  LinearBiasExpansion(const std::string,
                       std::vector<Value*>,
                       std::vector<BasisFunctions*>,
                       Communicator &cc);
@@ -76,4 +76,3 @@ class LinearBiasExpansion{
 }
 
 #endif
-

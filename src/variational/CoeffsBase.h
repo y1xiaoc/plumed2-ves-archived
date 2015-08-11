@@ -25,33 +25,43 @@
 #include <vector>
 #include <string>
 
-namespace PLMD{ 
+namespace PLMD{
 
 
 /// \ingroup TOOLBOX
 class CoeffsBase
 {
 public:
-// the type of 1D index for the coeffs 
- typedef size_t index_t;
-// typedef unsigned int index_t;
+  // the type of 1D index for the coeffs
+  typedef size_t index_t;
+  // typedef unsigned int index_t;
 protected:
- std::vector<unsigned int> ncoeffs_per_dimension_;
- index_t ncoeffs_total_;
- unsigned int dimension_;
+  unsigned int dimension_;
+  std::vector<unsigned int> ncoeffs_per_dimension_;
+  index_t ncoeffs_total_;
+  std::vector<std::string> coeffs_descriptions_;
+  std::vector<std::string> dimension_labels_;
 public:
- CoeffsBase(){}
- ~CoeffsBase(){}
- //
- std::vector<unsigned int> getNumberOfCoeffsPerDimension() const;
- index_t getNumberOfCoeffs() const;
- unsigned int getDimension() const;
- // 
- index_t getIndex(const std::vector<unsigned int>&) const;
- std::vector<unsigned int> getIndices(const index_t) const;
- //
+  CoeffsBase();
+  CoeffsBase(const std::vector<unsigned int>&);
+  ~CoeffsBase(){}
+  //
+  std::vector<unsigned int> getNumberOfCoeffsPerDimension() const;
+  index_t getNumberOfCoeffs() const;
+  unsigned int getDimension() const;
+  //
+  index_t getIndex(const std::vector<unsigned int>&) const;
+  std::vector<unsigned int> getIndices(const index_t) const;
+  //
+  void setCoeffDescription(const index_t, const std::string);
+  void setCoeffDescription(const std::vector<unsigned int>&, const std::string);
+  std::string getCoeffDescription(const index_t) const;
+  std::string getCoeffDescription(const std::vector<unsigned int>&) const;
+  std::vector<std::string> getAllCoeffsDescriptions() const;
+  void setAllCoeffDescriptions(const std::string);
+  void setAllCoeffDescriptions(const std::vector<std::string>&);
 protected:
- void setupIndices(const std::vector<unsigned int>&);
+  void setupIndices(const std::vector<unsigned int>&);
 };
 }
 #endif

@@ -31,73 +31,72 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class Gaussian1DimDistribution : public TargetDistribution1DimBase {
- // properties of the Gaussians 
- std::vector<double> sigmas;
- std::vector<double> centers;
- std::vector<double> weights;
- bool normalize_distribution;
- double GaussianDist(const double, const double, const double, const bool normalize=true);
+class Gaussian1DimDistribution: public TargetDistribution1DimBase {
+  // properties of the Gaussians
+  std::vector<double> sigmas;
+  std::vector<double> centers;
+  std::vector<double> weights;
+  bool normalize_distribution;
+  double GaussianDist(const double, const double, const double, const bool normalize=true);
 public:
-  static void registerKeywords( Keywords&);
-  Gaussian1DimDistribution( const TargetDistribution1DimOptions& to );
+  static void registerKeywords(Keywords&);
+  Gaussian1DimDistribution(const TargetDistribution1DimOptions& to);
   double distribution(const double);
 };
 
+
 VARIATIONAL_REGISTER_TARGET_DISTRIBUTION_1D(Gaussian1DimDistribution,"GAUSSIAN")
 
-void Gaussian1DimDistribution::registerKeywords( Keywords& keys )
-{
- TargetDistribution1DimBase::registerKeywords(keys);
- keys.add("compulsory","CENTER","The centers of the Gaussians.");
- keys.add("compulsory","SIGMA","The sigmas of the Gaussians.");
- keys.add("optional","WEIGHT","The weight of the Gaussians.");
- keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized.");
+
+void Gaussian1DimDistribution::registerKeywords(Keywords& keys){
+  TargetDistribution1DimBase::registerKeywords(keys);
+  keys.add("compulsory","CENTER","The centers of the Gaussians.");
+  keys.add("compulsory","SIGMA","The sigmas of the Gaussians.");
+  keys.add("optional","WEIGHT","The weight of the Gaussians.");
+  keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized.");
 }
+
 
 Gaussian1DimDistribution::Gaussian1DimDistribution( const TargetDistribution1DimOptions& to ):
 TargetDistribution1DimBase(to)
 {
- parseVector("CENTER",centers);
- parseVector("SIGMA",sigmas);
- plumed_massert(centers.size()==sigmas.size(),"CENTER and SIGMA need to be of the same size");
- // 
- if(!parseVector("WEIGHT",weights,true)){weights.assign(centers.size(),1.0);}
- plumed_massert(centers.size()==weights.size(),"CENTER and WEIGHT need to be of the same size");
- //
- bool do_not_normalize=false;
- parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
- normalize_distribution=!do_not_normalize;
- if(normalize_distribution){
-  double sum_weights=0.0;
-  for(unsigned int i=0;i<weights.size();i++){sum_weights+=weights[i];}
-  for(unsigned int i=0;i<weights.size();i++){weights[i]/=sum_weights;}
-  setNormalized();
- }else{
-  setNotNormalized();
- }
+  parseVector("CENTER",centers);
+  parseVector("SIGMA",sigmas);
+  plumed_massert(centers.size()==sigmas.size(),"CENTER and SIGMA need to be of the same size");
+  //
+  if(!parseVector("WEIGHT",weights,true)){weights.assign(centers.size(),1.0);}
+  plumed_massert(centers.size()==weights.size(),"CENTER and WEIGHT need to be of the same size");
+  //
+  bool do_not_normalize=false;
+  parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
+  normalize_distribution=!do_not_normalize;
+  if(normalize_distribution){
+    double sum_weights=0.0;
+    for(unsigned int i=0;i<weights.size();i++){sum_weights+=weights[i];}
+    for(unsigned int i=0;i<weights.size();i++){weights[i]/=sum_weights;}
+    setNormalized();
+  }
+  else{
+    setNotNormalized();
+  }
 }
 
 
-
-double Gaussian1DimDistribution::distribution(const double argument)
-{
- double value=0.0;
- for(unsigned int i=0;i<weights.size();i++){
-  value+=weights[i]*GaussianDist(argument, centers[i], sigmas[i],normalize_distribution);
- }
- return value;
-}
-
-double Gaussian1DimDistribution::GaussianDist(const double argument, const double center, const double sigma, bool normalize)
-{
- double argumentT=(argument-center)/sigma;
- double value=exp(-0.5*argumentT*argumentT);
- if(normalize){value/=(sigma*sqrt(2.0*pi));}
- return value;
+double Gaussian1DimDistribution::distribution(const double argument){
+  double value=0.0;
+  for(unsigned int i=0;i<weights.size();i++){
+    value+=weights[i]*GaussianDist(argument, centers[i], sigmas[i],normalize_distribution);
+  }
+  return value;
 }
 
 
+double Gaussian1DimDistribution::GaussianDist(const double argument, const double center, const double sigma, bool normalize){
+  double argumentT=(argument-center)/sigma;
+  double value=exp(-0.5*argumentT*argumentT);
+  if(normalize){value/=(sigma*sqrt(2.0*pi));}
+  return value;
+}
 
 
 }

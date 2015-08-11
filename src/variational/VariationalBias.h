@@ -34,12 +34,12 @@ namespace bias{
 
 /**
 \ingroup INHERIT
-Abstract base class for implementing biases the extents the normal Bias.h class 
+Abstract base class for implementing biases the extents the normal Bias.h class
 to include functions related to the variational approach.
 */
 
 class VariationalBias:
-  public Bias
+public Bias
 {
 public:
   static void registerKeywords(Keywords&);
@@ -50,4 +50,3 @@ public:
 }
 
 #endif
-
