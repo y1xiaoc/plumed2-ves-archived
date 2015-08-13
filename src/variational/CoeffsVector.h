@@ -26,7 +26,8 @@
 #include <string>
 #include <cmath>
 
-#include "CoeffsBase.h"
+#include "IndicesBase.h"
+#include "CounterBase.h"
 
 namespace PLMD{
 
@@ -38,56 +39,51 @@ class BasisFunctions;
 
 /// \ingroup TOOLBOX
 class CoeffsVector:
-  public CoeffsBase
+  public CounterBase,
+  public IndicesBase
 {
 public:
 protected:
-
   std::vector<double> data;
   std::vector<double> aux_data;
   bool useaux_;
-  bool usecounter_;
-  // if the coeffs are for a linear basis set expansion composed of products of 1-D basis functions
-  bool isbasisfcoeffs_;
   std::string coeffs_label_;
-  std::string coeffs_type_;
-  unsigned int counter;
+  enum {Generic,LinearBasisSet} coeffs_type_;
   std::string fmt_; // format for output
   //
-  std::vector<std::string> basisf_type_;
-  std::vector<unsigned int> basisf_order_;
-  std::vector<unsigned int> basisf_size_;
-  std::vector<double> basisf_min_;
-  std::vector<double> basisf_max_;
-  std::vector<std::string> basisf_keywords_;
-  //
-  void Init(const std::string& coeffs_label, const std::string& coeffs_type,
-        const std::vector<std::string>& dimension_labels,
-        const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const bool use_aux_coeffs, const bool use_counter);
-  void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);
-  void setupBasisFunctionFromFile(const std::vector<std::string>&);
+  void Init(const std::string& coeffs_label,
+    const std::vector<std::string>& dimension_labels,
+    const std::vector<unsigned int>& ncoeffs_per_dimension,
+    const bool use_aux_coeffs, const bool use_counter
+  );
 public:
-  CoeffsVector(const std::string& coeffs_label, const std::string& coeffs_type,
-        const std::vector<std::string>& dimension_labels,
-        const std::vector<unsigned int>& ncoeffs_per_dimension,
-        const bool use_aux_coeffs=false, const bool use_counter=false);
+  CoeffsVector(const std::string& coeffs_label,
+    const std::vector<std::string>& dimension_labels,
+    const std::vector<unsigned int>& ncoeffs_per_dimension,
+    const bool use_aux_coeffs=false, const bool use_counter=false
+  );
   //
   CoeffsVector(const std::string& coeffs_label,
-        std::vector<Value*> args,
-        std::vector<BasisFunctions*> basisf,
-        const bool use_aux_coeffs=false, const bool use_counter=false);
+    std::vector<Value*> args,
+    std::vector<BasisFunctions*> basisf,
+    const bool use_aux_coeffs=false, const bool use_counter=false
+  );
+  //
+  ~CoeffsVector(){}
+  //
+  index_t getSize() const;
+  index_t getNumberOfCoeffs() const;
+  std::string getLabel() const;
+  std::string getType() const;
+  bool isGenericCoeffs() const;
+  bool isLinearBasisSetCoeffs() const;
+  bool hasAuxCoeffs() const;
+  std::string getCoeffDescription(const index_t index) const;
+  std::string getCoeffDescription(const std::vector<unsigned int>&) const;
   // clear coeffs
   void clearMain();
   void clearAux();
   void clear();
-
-  std::string getLabel() const;
-  std::string getType() const;
-  bool isBasisFunctionCoeffs() const;
-  bool hasAuxCoeffs() const;
-  bool hasCounter() const;
-
   // get value
   double getValue(const index_t) const;
   double getValue(const std::vector<unsigned int>&) const;
@@ -115,37 +111,28 @@ public:
   // add to all values
   void addToValues(const double);
   void addToAuxValues(const double);
-  // set Aux values equal to main
+  // set Aux values equal to main and vice versa
   void setAuxEqualToMain();
+  void setMainEqualToAux();
   // copy values for another Coeffs instance
   void setFromOtherCoeffsVector(CoeffsVector*);
   void setFromOtherCoeffsVector(CoeffsVector*,const double);
   void addFromOtherCoeffsVector(CoeffsVector*);
   void addFromOtherCoeffsVector(CoeffsVector*,const double);
   // Random coeffs
-  void randomizeCoeffs();
+  void randomizeCoeffsGaussian();
 
   // file input/output stuff
-  void writeHeader(OFile&);
+  void writeHeaderToFile(OFile&);
+  void writeDataToFile(OFile&,const bool print_description=false);
   void writeToFile(OFile&,const bool print_description=false);
   void writeToFile(const std::string&,const bool print_description=false, const bool append_file=false);
+  void readHeaderFromFile(IFile&);
+  unsigned int readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
   unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
   unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false);
-  static CoeffsVector* createFromFile(IFile&, const bool ignore_missing_coeffs=false);
-  static CoeffsVector* createFromFile(const std::string&, const bool ignore_missing_coeffs=false);
-  static std::vector<std::string> getBasisFunctionKeywordsFromFile(IFile&);
-  static std::vector<std::string> getBasisFunctionKeywordsFromFile(const std::string&);
   // set output format
-  void setOutputFmt(std::string ss){fmt_=ss;}
-
-  // counter stuff
-  void resetCounter();
-  void increaseCounter();
-  void addToCounter(unsigned int);
-  void setCounter(unsigned int);
-  unsigned int getCounter() const;
-
-  ~CoeffsVector(){}
+  void setOutputFmt(std::string ss){ fmt_=ss; }
 
 };
 }
