@@ -289,7 +289,45 @@ void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffs, const do
 }
 
 
-void CoeffsVector::randomizeCoeffsGaussian(){
+double CoeffsVector::getMinValue() const {
+  double min_value=DBL_MAX;
+  for(index_t i=0; i<data.size(); i++){
+	  if(data[i]<min_value){
+      min_value=data[i];
+    }
+  }
+  return min_value;
+}
+
+
+double CoeffsVector::getMaxValue() const {
+  double max_value=DBL_MIN;
+  for(index_t i=0; i<data.size(); i++){
+	  if(data[i]>max_value){
+      max_value=data[i];
+    }
+  }
+  return max_value;
+}
+
+
+double CoeffsVector::getNorm() const {
+  double norm;
+  for(index_t i=0; i<data.size(); i++){
+    norm=data[i]*data[i];
+  }
+  norm=sqrt(norm);
+  return norm;
+}
+
+
+void CoeffsVector::normalizeCoeffs() {
+  double norm=getNorm();
+  scaleAllValues(norm);
+}
+
+
+void CoeffsVector::randomizeCoeffsGaussian() {
   Random rnd;
   for(index_t i=0; i<data.size(); i++){
     data[i]=rnd.Gaussian();

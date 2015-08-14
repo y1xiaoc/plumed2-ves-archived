@@ -25,6 +25,7 @@
 #include "core/PlumedMain.h"
 #include "BasisFunctions.h"
 #include "Coeffs.h"
+#include "CoeffsVector.h"
 #include "tools/File.h"
 #include "LinearBiasExpansion.h"
 #include "tools/Communicator.h"
@@ -48,7 +49,7 @@ class TestBFs :
 {
   BasisFunctions* bf_pointer;
   Coeffs* coeffs;
-  Coeffs* coeffs2;
+  CoeffsVector* coeffs2;
   LinearBiasExpansion* bias_expansion;
   unsigned int bf_order_;
 public:
@@ -103,14 +104,28 @@ Function(ao)
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
   coeffs = bias_expansion->getPointerToBiasCoeffs();
-  // coeffs->setValueAndAux(0,1000.0,0.0); 
+  // coeffs->setValueAndAux(0,1000.0,0.0);
   std::vector<unsigned int> nbins(2,300);
   bias_expansion->setupGrid(nbins);
   coeffs->randomizeCoeffs();
- 
-  coeffs2 = new Coeffs("Test",args,bf,true,true);
-  for(unsigned int i=0;i<coeffs2->getSize();i++){coeffs2->setValue(i,1.0*i*i*i);}
-  coeffs2->writeToFile("TEST2.data");
+  coeffs->writeToFile("TEST.data");
+
+  coeffs2 = new CoeffsVector("Test",args,bf,true,true);
+  // for(unsigned int i=0;i<coeffs2->getSize();i++){coeffs2->setValue(i,1.0*i*i*i);}
+  coeffs2->randomizeCoeffsGaussian();
+  coeffs2->setCounter(100);
+  coeffs2->writeToFile("TEST2.data",true,true);
+  log.printf("Min:  %f\n",coeffs2->getMinValue());
+  log.printf("Max:  %f\n",coeffs2->getMaxValue());
+  log.printf("Norm: %f\n",coeffs2->getNorm());
+  coeffs2->setAuxEqualToMain();
+  coeffs2->normalizeCoeffs();
+  coeffs2->writeToFile("TEST3.data",true,true);
+  coeffs2->clearAux();
+  coeffs2->writeToFile("TEST4.data",true,true);
+  coeffs2->setMainEqualToAux();
+  coeffs2->writeToFile("TEST5.data",true,true);
+
 
   bias_expansion->updateBiasGrid();
   bias_expansion->writeBiasGridToFile("bias.data",false);
@@ -119,12 +134,12 @@ Function(ao)
 
   TargetDistribution1DimBase::writeDistributionToFile("dist","GAUSSIAN CENTER=-2.0,2.0 SIGMA=0.5,0.5 WEIGHT=1,4 DO_NOT_NORMALIZE",-4.0,4.0,200);
 
-  // coeffs->setValueAndAux(10,2.0000001, 400.0); 
+  // coeffs->setValueAndAux(10,2.0000001, 400.0);
   // coeffs->writeToFile("TEST.data");
   // coeffs2 = Coeffs::createFromFile("TEST.data");
   // coeffs2->setCounter(100);
   // coeffs2->writeToFile("TEST.data",true,true);
- 
+
   // std::vector<std::string> bfk=Coeffs::getBasisFunctionKeywordsFromFile("TEST.data");
   // plumed.readInputWords(Tools::getWords(bfk[0]));
   // plumed.readInputWords(Tools::getWords(bfk[1]));
@@ -135,7 +150,7 @@ Function(ao)
 }
 
 void TestBFs::calculate(){
-  
+
   std::vector<double> values(bf_pointer->getNumberOfBasisFunctions());
   std::vector<double> derivs(bf_pointer->getNumberOfBasisFunctions());
   bool inside_interval=true;
@@ -153,5 +168,3 @@ void TestBFs::calculate(){
 
 }
 }
-
-

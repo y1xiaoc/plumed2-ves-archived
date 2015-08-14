@@ -104,6 +104,12 @@ public:
   void setFromOtherCoeffsVector(CoeffsVector*,const double);
   void addFromOtherCoeffsVector(CoeffsVector*);
   void addFromOtherCoeffsVector(CoeffsVector*,const double);
+  //
+  double getMinValue() const;
+  double getMaxValue() const;
+  double getNorm() const;
+  //
+  void normalizeCoeffs();
   // Random coeffs
   void randomizeCoeffsGaussian();
 
