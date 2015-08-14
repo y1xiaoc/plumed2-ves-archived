@@ -62,7 +62,7 @@ CoeffsBase(coeffs_label,args,basisf)
 
 void CoeffsVector::setupVector(const bool use_aux_coeffs)
 {
-  fmt_="%30.16e";
+  output_fmt_="%30.16e";
   useaux_=use_aux_coeffs;
   clear();
 }
@@ -355,8 +355,8 @@ void CoeffsVector::writeHeaderToFile(OFile& ofile) {
 void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descriptions) {
   //
   std::string field_indices_prefix = "idx_";
-  std::string field_coeffs = "coeff";
-  std::string field_aux_coeffs = "aux_coeff";
+  std::string field_coeffs = "value";
+  std::string field_aux_coeffs = "aux_value";
   std::string field_index = "index";
   std::string field_description = "description";
   //
@@ -376,8 +376,8 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descrip
       sprintf(s1,int_fmt.c_str(),indices[k]);
       ofile.printField(ilabels[k],s1);
     }
-    ofile.fmtField(" "+fmt_).printField(field_coeffs,data[i]);
-    if(useaux_){ ofile.fmtField(" "+fmt_).printField(field_aux_coeffs,aux_data[i]); }
+    ofile.fmtField(" "+output_fmt_).printField(field_coeffs,data[i]);
+    if(useaux_){ ofile.fmtField(" "+output_fmt_).printField(field_aux_coeffs,aux_data[i]); }
     sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
     if(print_coeffs_descriptions){ ofile.printField(field_description,"  "+getCoeffDescription(i));}
     ofile.printField();
@@ -436,8 +436,8 @@ void CoeffsVector::readHeaderFromFile(IFile& ifile) {
 unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_coeffs) {
   //
   std::string field_indices_prefix = "idx_";
-  std::string field_coeffs = "coeff";
-  std::string field_aux_coeffs = "aux_coeff";
+  std::string field_coeffs = "value";
+  std::string field_aux_coeffs = "aux_value";
   std::string field_index = "index";
   std::string field_description = "description";
   //

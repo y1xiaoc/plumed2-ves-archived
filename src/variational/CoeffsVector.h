@@ -47,7 +47,7 @@ private:
   std::vector<double> data;
   std::vector<double> aux_data;
   bool useaux_;
-  std::string fmt_; // format for output
+  std::string output_fmt_; // format for output
   //
   void setupVector(const bool);
 public:
@@ -123,7 +123,7 @@ public:
   unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
   unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false);
   // set output format
-  void setOutputFmt(std::string ss){ fmt_=ss; }
+  void setOutputFmt(std::string ss){ output_fmt_=ss; }
 
 };
 }
