@@ -19,48 +19,72 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#ifndef __PLUMED_variational_IndicesBase_h
-#define __PLUMED_variational_IndicesBase_h
+#ifndef __PLUMED_variational_CoeffsBase_h
+#define __PLUMED_variational_CoeffsBase_h
 
 #include <vector>
 #include <string>
 
 namespace PLMD{
 
+class Value;
+class BasisFunctions;
+
 
 /// \ingroup TOOLBOX
-class IndicesBase
+class CoeffsBase
 {
 public:
   // the type of 1D index
   typedef size_t index_t;
   // typedef unsigned int index_t;
 private:
+  std::string coeffs_label_;
+  enum CoeffsType {
+    Generic,
+    LinearBasisSet
+  } coeffs_type_;
   unsigned int ndimensions_;
-  std::vector<unsigned int> nelements_per_dimension_;
-  index_t nelements_total_;
-  std::vector<std::string> elements_descriptions_;
+  std::vector<unsigned int> indices_shape_;
+  index_t ncoeffs_;
+  std::vector<std::string> coeffs_descriptions_;
   std::vector<std::string> dimension_labels_;
 public:
-  IndicesBase();
-  IndicesBase(const std::vector<unsigned int>&);
-  ~IndicesBase() {}
+  CoeffsBase();
+  CoeffsBase(
+    const std::string&,
+    const std::vector<std::string>&,
+    const std::vector<unsigned int>&);
+  CoeffsBase(
+    const std::string&,
+    std::vector<Value*> args,
+    std::vector<BasisFunctions*> basisf);
+  ~CoeffsBase() {}
   //
-  std::vector<unsigned int> getNumberOfElementsPerDimension() const;
-  unsigned int getNumberOfElementsPerDimension(const unsigned int) const;
-  index_t getTotalNumberOfElements() const;
-  unsigned int numberOfDimension() const;
+  std::string getLabel() const;
+  void setLabel(const std::string);
+  //
+  CoeffsType getType() const;
+  std::string getTypeStr() const;
+  void setType(const CoeffsType coeffs_type);
+  bool isGenericCoeffs() const;
+  bool isLinearBasisSetCoeffs() const;
+  //
+  std::vector<unsigned int> shapeOfIndices() const;
+  unsigned int shapeOfIndices(const unsigned int) const;
+  index_t numberOfCoeffs() const;
+  unsigned int numberOfDimensions() const;
   //
   index_t getIndex(const std::vector<unsigned int>&) const;
   std::vector<unsigned int> getIndices(const index_t) const;
   //
-  std::string getElementDescription(const index_t) const;
-  std::string getElementDescription(const std::vector<unsigned int>&) const;
-  std::vector<std::string> getAllElementsDescriptions() const;
-  void setElementDescription(const index_t, const std::string);
-  void setElementDescription(const std::vector<unsigned int>&, const std::string);
-  void setAllElementDescriptions(const std::string);
-  void setAllElementDescriptions(const std::vector<std::string>&);
+  std::string getCoeffDescription(const index_t) const;
+  std::string getCoeffDescription(const std::vector<unsigned int>&) const;
+  std::vector<std::string> getAllCoeffsDescriptions() const;
+  void setCoeffDescription(const index_t, const std::string);
+  void setCoeffDescription(const std::vector<unsigned int>&, const std::string);
+  void setAllCoeffsDescriptions(const std::string);
+  void setAllCoeffsDescriptions(const std::vector<std::string>&);
   //
   std::string getDimensionLabel(const unsigned int) const;
   std::vector<std::string> getAllDimensionLabels() const;
@@ -69,6 +93,7 @@ public:
   void setAllDimensionLabels(const std::vector<std::string>);
 protected:
   void setupIndices(const std::vector<unsigned int>&);
+  void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);
 };
 }
 #endif

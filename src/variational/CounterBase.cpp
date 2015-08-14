@@ -25,10 +25,10 @@
 
 namespace PLMD{
 
-CounterBase::CounterBase():
+CounterBase::CounterBase(const bool counter_active):
 counter(0),
 field_name_("iteration"),
-isActive(true) {
+isActive(counter_active) {
 }
 
 

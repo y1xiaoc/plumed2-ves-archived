@@ -36,7 +36,7 @@ private:
   std::string field_name_;
   bool isActive;
 public:
-  CounterBase();
+  CounterBase(const bool counter_active=true);
   ~CounterBase() {}
   //
   void turnOnCounter();

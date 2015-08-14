@@ -36,112 +36,45 @@
 
 namespace PLMD{
 
-CoeffsVector::CoeffsVector(const std::string& coeffs_label,
+CoeffsVector::CoeffsVector(
+  const std::string& coeffs_label,
   const std::vector<std::string>& dimension_labels,
-  const std::vector<unsigned int>& ncoeffs_per_dimension,
+  const std::vector<unsigned int>& indices_shape,
   const bool use_aux_coeffs, const bool use_counter):
-CounterBase(),
-IndicesBase()
+CounterBase(use_counter),
+CoeffsBase(coeffs_label,dimension_labels,indices_shape)
 {
-  Init(coeffs_label, dimension_labels, ncoeffs_per_dimension, use_aux_coeffs, use_counter);
-  coeffs_type_=Generic;
-  std::string coeffs_description_prefix="c";
-  setAllElementDescriptions(coeffs_description_prefix);
+  setupVector(use_aux_coeffs);
 }
 
 
-CoeffsVector::CoeffsVector(const std::string& coeffs_label,
+CoeffsVector::CoeffsVector(
+  const std::string& coeffs_label,
   std::vector<Value*> args,
   std::vector<BasisFunctions*> basisf,
   const bool use_aux_coeffs, const bool use_counter):
-CounterBase(),
-IndicesBase()
+CounterBase(use_counter),
+CoeffsBase(coeffs_label,args,basisf)
 {
-  plumed_massert(args.size()==basisf.size(),"number of arguments do not match number of basis functions");
-  //
-  std::vector<std::string>dimension_labels;
-  std::vector<unsigned int> ncoeffs_per_dimension;
-  dimension_labels.resize(args.size());
-  ncoeffs_per_dimension.resize(args.size());
-  //
-  for(unsigned int i=0;i<args.size();i++){
-    dimension_labels[i]=args[i]->getName();
-    ncoeffs_per_dimension[i]=basisf[i]->getNumberOfBasisFunctions();
-  }
-  Init(coeffs_label, dimension_labels, ncoeffs_per_dimension, use_aux_coeffs, use_counter);
-  coeffs_type_=LinearBasisSet;
+  setupVector(use_aux_coeffs);
 }
 
 
-void CoeffsVector::Init(const std::string& coeffs_label,
-  const std::vector<std::string>& dimension_labels,
-  const std::vector<unsigned int>& ncoeffs_per_dimension,
-  const bool use_aux_coeffs, const bool use_counter)
+void CoeffsVector::setupVector(const bool use_aux_coeffs)
 {
   fmt_="%30.16e";
-  plumed_massert(ncoeffs_per_dimension.size()==dimension_labels.size(),"Coeffs: dimensions of vectors in Init(...) don't match");
-  setupIndices(ncoeffs_per_dimension);
-  setAllDimensionLabels(dimension_labels);
-  if(use_counter){
-    turnOnCounter();
-    resetCounter();
-  }
-  else{
-    turnOffCounter();
-  }
   useaux_=use_aux_coeffs;
   clear();
 }
 
 
-CoeffsVector::index_t CoeffsVector::getSize() const {
-  return getTotalNumberOfElements();
-}
-
-
-CoeffsVector::index_t CoeffsVector::getNumberOfCoeffs() const {
-  return getTotalNumberOfElements();
-}
-
-
-std::string CoeffsVector::getLabel() const {
-  return coeffs_label_;
-}
-
-std::string CoeffsVector::getType() const {
-  std::string type="";
-  if(coeffs_type_==Generic){
-    type = "Generic";
-  }
-  else if(coeffs_type_==LinearBasisSet) {
-    type = "LinearBasisSet";
-  }
-  return type;
-}
-
-
-bool CoeffsVector::isGenericCoeffs() const {
-  return coeffs_type_==Generic;
-}
-
-
-bool CoeffsVector::isLinearBasisSetCoeffs() const {
-  return coeffs_type_==LinearBasisSet;
+CoeffsBase::index_t CoeffsVector::getSize() const {
+  return numberOfCoeffs();
 }
 
 
 bool CoeffsVector::hasAuxCoeffs() const {
   return useaux_;
-}
-
-
-std::string CoeffsVector::getCoeffDescription(const index_t index) const {
-  return getElementDescription(index);
-}
-
-
-std::string CoeffsVector::getCoeffDescription(const std::vector<unsigned int>& indices) const {
-  return getElementDescription(getIndex(indices));
 }
 
 
@@ -368,14 +301,14 @@ void CoeffsVector::writeHeaderToFile(OFile& ofile) {
   std::string field_label = "label";
   std::string field_type = "type";
   std::string field_ncoeffs_total = "ncoeffs_total";
-  std::string field_ncoeffs_dim = "_ncoeffs";
+  std::string field_shape_prefix = "shape_";
   //
   ofile.addConstantField(field_label).printField(field_label,getLabel());
-  ofile.addConstantField(field_type).printField(field_type,getType());
+  ofile.addConstantField(field_type).printField(field_type,getTypeStr());
   ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) getSize());
-  for(unsigned int k=0; k<numberOfDimension(); k++){
-    ofile.addConstantField(getDimensionLabel(k)+field_ncoeffs_dim);
-    ofile.printField(getDimensionLabel(k)+field_ncoeffs_dim,(int) getNumberOfElementsPerDimension()[k]);
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
+    ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
+    ofile.printField(field_shape_prefix+getDimensionLabel(k),(int) shapeOfIndices(k));
   }
   writeCounterFieldToFile(ofile);
 }
@@ -393,15 +326,15 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descrip
   std::string str_seperate = "#!-------------------";
   //
   char* s1 = new char[20];
-  std::vector<unsigned int> indices(numberOfDimension());
-  std::vector<std::string> ilabels(numberOfDimension());
-  for(unsigned int k=0; k<numberOfDimension(); k++){
+  std::vector<unsigned int> indices(numberOfDimensions());
+  std::vector<std::string> ilabels(numberOfDimensions());
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
     ilabels[k]=field_indices_prefix+getDimensionLabel(k);
   }
   //
   for(index_t i=0; i<data.size(); i++){
     indices=getIndices(i);
-    for(unsigned int k=0; k<numberOfDimension(); k++){
+    for(unsigned int k=0; k<numberOfDimensions(); k++){
       sprintf(s1,int_fmt.c_str(),indices[k]);
       ofile.printField(ilabels[k],s1);
     }
@@ -440,7 +373,7 @@ void CoeffsVector::readHeaderFromFile(IFile& ifile) {
   std::string field_label = "label";
   std::string field_type = "type";
   std::string field_ncoeffs_total = "ncoeffs_total";
-  std::string field_ncoeffs_dim = "_ncoeffs";
+  std::string field_shape_prefix = "shape_";
   //
   int int_tmp;
   // label
@@ -452,11 +385,11 @@ void CoeffsVector::readHeaderFromFile(IFile& ifile) {
   // total number of coeffs
   ifile.scanField(field_ncoeffs_total,int_tmp);
   index_t ncoeffs_total_f=(index_t) int_tmp;
-  // number of coeffs per dimension
-  std::vector<unsigned int> ncoeffs_per_dimension_f(numberOfDimension());
-  for(unsigned int k=0; k<numberOfDimension(); k++) {
-    ifile.scanField(getDimensionLabel(k)+field_ncoeffs_dim,int_tmp);
-    ncoeffs_per_dimension_f[k]=(unsigned int) int_tmp;
+  // shape of indices
+  std::vector<unsigned int> indices_shape_f(numberOfDimensions());
+  for(unsigned int k=0; k<numberOfDimensions(); k++) {
+    ifile.scanField(field_shape_prefix+getDimensionLabel(k),int_tmp);
+    indices_shape_f[k]=(unsigned int) int_tmp;
   }
   getCounterFieldFromFile(ifile);
 }
@@ -470,19 +403,19 @@ unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_miss
   std::string field_index = "index";
   std::string field_description = "description";
   //
-  std::vector<std::string> ilabels(numberOfDimension());
-  for(unsigned int k=0; k<numberOfDimension(); k++){
+  std::vector<std::string> ilabels(numberOfDimensions());
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
     ilabels[k]=field_indices_prefix+getDimensionLabel(k);
   }
   //
-  std::vector<unsigned int> indices(numberOfDimension());
+  std::vector<unsigned int> indices(numberOfDimensions());
   double coeff_tmp=0.0;
   std::string str_tmp;
   unsigned int ncoeffs_read=0;
   //
   while(ifile.scanField(field_coeffs,coeff_tmp)){
     int idx_tmp;
-    for(unsigned int k=0; k<numberOfDimension(); k++){
+    for(unsigned int k=0; k<numberOfDimensions(); k++){
       ifile.scanField(ilabels[k],idx_tmp);
       indices[k] = (unsigned int) idx_tmp;
     }
@@ -503,10 +436,10 @@ unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_miss
     ncoeffs_read++;
   }
   // checks on the coeffs read
-  if(!ignore_missing_coeffs && ncoeffs_read < getNumberOfCoeffs()){
+  if(!ignore_missing_coeffs && ncoeffs_read < numberOfCoeffs()){
     plumed_merror("ERROR: missing coefficients when reading from file");
   }
-  if(ncoeffs_read > getNumberOfCoeffs()){
+  if(ncoeffs_read > numberOfCoeffs()){
     plumed_merror("something wrong in the coefficients file, perhaps multiple entries");
   }
   //

@@ -26,7 +26,7 @@
 #include <string>
 #include <cmath>
 
-#include "IndicesBase.h"
+#include "CoeffsBase.h"
 #include "CounterBase.h"
 
 namespace PLMD{
@@ -40,46 +40,31 @@ class BasisFunctions;
 /// \ingroup TOOLBOX
 class CoeffsVector:
   public CounterBase,
-  public IndicesBase
+  public CoeffsBase
 {
 public:
-protected:
+private:
   std::vector<double> data;
   std::vector<double> aux_data;
   bool useaux_;
-  std::string coeffs_label_;
-  enum {Generic,LinearBasisSet} coeffs_type_;
   std::string fmt_; // format for output
   //
-  void Init(const std::string& coeffs_label,
-    const std::vector<std::string>& dimension_labels,
-    const std::vector<unsigned int>& ncoeffs_per_dimension,
-    const bool use_aux_coeffs, const bool use_counter
-  );
+  void setupVector(const bool);
 public:
-  CoeffsVector(const std::string& coeffs_label,
-    const std::vector<std::string>& dimension_labels,
-    const std::vector<unsigned int>& ncoeffs_per_dimension,
-    const bool use_aux_coeffs=false, const bool use_counter=false
-  );
-  //
-  CoeffsVector(const std::string& coeffs_label,
-    std::vector<Value*> args,
-    std::vector<BasisFunctions*> basisf,
-    const bool use_aux_coeffs=false, const bool use_counter=false
-  );
-  //
+  CoeffsVector(
+    const std::string&,
+    const std::vector<std::string>&,
+    const std::vector<unsigned int>&,
+    const bool use_aux_coeffs=false, const bool use_counter=false);
+  CoeffsVector(
+    const std::string&,
+    std::vector<Value*>,
+    std::vector<BasisFunctions*>,
+    const bool use_aux_coeffs=false, const bool use_counter=false);
   ~CoeffsVector(){}
   //
   index_t getSize() const;
-  index_t getNumberOfCoeffs() const;
-  std::string getLabel() const;
-  std::string getType() const;
-  bool isGenericCoeffs() const;
-  bool isLinearBasisSetCoeffs() const;
   bool hasAuxCoeffs() const;
-  std::string getCoeffDescription(const index_t index) const;
-  std::string getCoeffDescription(const std::vector<unsigned int>&) const;
   // clear coeffs
   void clearMain();
   void clearAux();
