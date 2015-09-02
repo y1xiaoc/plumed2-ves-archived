@@ -42,9 +42,11 @@ CoeffsVector::CoeffsVector(
   const std::vector<unsigned int>& indices_shape,
   const bool use_aux_coeffs, const bool use_counter):
 CounterBase(use_counter),
-CoeffsBase(coeffs_label,dimension_labels,indices_shape)
+CoeffsBase(coeffs_label,dimension_labels,indices_shape),
+useaux_(use_aux_coeffs),
+output_fmt_("%30.16e")
 {
-  setupVector(use_aux_coeffs);
+  clear();
 }
 
 
@@ -54,16 +56,10 @@ CoeffsVector::CoeffsVector(
   std::vector<BasisFunctions*> basisf,
   const bool use_aux_coeffs, const bool use_counter):
 CounterBase(use_counter),
-CoeffsBase(coeffs_label,args,basisf)
+CoeffsBase(coeffs_label,args,basisf),
+useaux_(use_aux_coeffs),
+output_fmt_("%30.16e")
 {
-  setupVector(use_aux_coeffs);
-}
-
-
-void CoeffsVector::setupVector(const bool use_aux_coeffs)
-{
-  output_fmt_="%30.16e";
-  useaux_=use_aux_coeffs;
   clear();
 }
 
@@ -257,34 +253,34 @@ void CoeffsVector::setMainEqualToAux() {
 
 
 
-void CoeffsVector::setFromOtherCoeffsVector(CoeffsVector* other_coeffsvec) {
-  plumed_massert(data.size()==other_coeffsvec->getSize(),"Coeffs do not have same number of elements");
+void CoeffsVector::setFromOtherCoeffsVector(CoeffsVector* other_coeffsvector) {
+  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
   for(index_t i=0; i<data.size(); i++){
-    data[i]=other_coeffsvec->getValue(i);
+    data[i]=other_coeffsvector->getValue(i);
   }
 }
 
 
-void CoeffsVector::setFromOtherCoeffsVector(CoeffsVector* other_coeffsvec,const double scalef) {
-  plumed_massert(data.size()==other_coeffsvec->getSize(),"Coeffs do not have same number of elements");
+void CoeffsVector::setFromOtherCoeffsVector(CoeffsVector* other_coeffsvector,const double scalef) {
+  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
   for(index_t i=0; i<data.size(); i++){
-    data[i]=scalef*other_coeffsvec->getValue(i);
+    data[i]=scalef*other_coeffsvector->getValue(i);
   }
 }
 
 
-void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffsvec) {
-  plumed_massert(data.size()==other_coeffsvec->getSize(),"Coeffs do not have same number of elements");
+void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffsvector) {
+  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
   for(index_t i=0; i<data.size(); i++){
-    data[i]+=other_coeffsvec->getValue(i);
+    data[i]+=other_coeffsvector->getValue(i);
   }
 }
 
 
-void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffs, const double scalef) {
-  plumed_massert(data.size()==other_coeffs->getSize(),"Coeffs do not have same number of elements");
+void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffsvector, const double scalef) {
+  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
   for(index_t i=0; i<data.size(); i++){
-    data[i]+=scalef*other_coeffs->getValue(i);
+    data[i]+=scalef*other_coeffsvector->getValue(i);
   }
 }
 
@@ -327,7 +323,7 @@ void CoeffsVector::normalizeCoeffs() {
 }
 
 
-void CoeffsVector::randomizeCoeffsGaussian() {
+void CoeffsVector::randomizeValuesGaussian() {
   Random rnd;
   for(index_t i=0; i<data.size(); i++){
     data[i]=rnd.Gaussian();

@@ -49,7 +49,6 @@ private:
   bool useaux_;
   std::string output_fmt_; // format for output
   //
-  void setupVector(const bool);
 public:
   CoeffsVector(
     const std::string&,
@@ -110,8 +109,8 @@ public:
   double getNorm() const;
   //
   void normalizeCoeffs();
-  // Random coeffs
-  void randomizeCoeffsGaussian();
+  // Random values
+  void randomizeValuesGaussian();
 
   // file input/output stuff
   void writeHeaderToFile(OFile&);
