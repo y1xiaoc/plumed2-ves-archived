@@ -45,6 +45,7 @@ friend class StoreCentralAtomsVessel;
 friend class MultiColvarFunction;
 friend class BridgedMultiColvarFunction;
 friend class VolumeGradientBase;
+friend class InputMultiColvarSet;
 friend class MultiColvarFilter;
 friend class MultiColvar;
 private:
@@ -52,19 +53,19 @@ private:
   bool usepbc;
 /// The forces we are going to apply to things
   std::vector<double> forcesToApply;
+/// In certain cases we can make three atom link cells faster
+  bool uselinkforthree;
 /// Stuff for link cells - this is used to make coordination number like variables faster
   LinkCells linkcells;
-/// This remembers where the boundaries are for the tasks. It makes link cells work fast
-  Matrix<std::pair<unsigned,unsigned> > bookeeping;
 /// Bool vector telling us which atoms are required to calculate central atom position
   std::vector<bool> use_for_central_atom;
 /// 1/number of atoms involved in central atoms
   double numberForCentralAtom;
-/// A copy of the vessel containg the values of each colvar
-//  StoreColvarVessel* myvalues;
+protected:
+/// This remembers where the boundaries are for the tasks. It makes link cells work fast
+  Matrix<std::pair<unsigned,unsigned> > bookeeping;
 /// This resizes the arrays that are used for link cell update
   void resizeBookeepingArray( const unsigned& num1, const unsigned& num2 );
-protected:
 /// Using the species keyword to read in atoms
   bool usespecies;
 /// Number of atoms in each block
@@ -108,6 +109,8 @@ public:
   virtual double doCalculation( const unsigned& tindex, AtomValuePack& myatoms ) const ;  
 /// Update the atoms that have derivatives
   virtual void updateActiveAtoms( AtomValuePack& myatoms ) const=0;
+/// Get the absolute index of the central atom
+  virtual AtomNumber getAbsoluteIndexOfCentralAtom( const unsigned& i ) const=0;
 /// This is replaced once we have a function to calculate the cv
   virtual double compute( const unsigned& tindex, AtomValuePack& myatoms ) const=0;
 /// Apply the forces from this action
@@ -122,33 +125,16 @@ public:
   virtual Vector getCentralAtomPos( const unsigned& curr );
 /// You can use this to screen contributions that are very small so we can avoid expensive (and pointless) calculations
   virtual void calculateWeight( AtomValuePack& myatoms ) const ;
-/// Get the list of indices that have derivatives
-// virtual void getIndexList( const unsigned& ntotal, const unsigned& jstore, const unsigned& maxder, std::vector<unsigned>& indices );
 /// Is this a density?
   virtual bool isDensity() const { return false; }
-/// Store central atoms so that this can be used in a function
-//  virtual vesselbase::StoreDataVessel* buildDataStashes( const bool& allow_wcutoff, const double& wtol );
-/// Calculate and store getElementValue(uder)/getElementValue(vder) and its derivatives in getElementValue(iout)
-//  void quotientRule( const unsigned& uder, const unsigned& vder, const unsigned& iout );
-/// Activate the atoms that have derivatives from a storeDataVessel
-//  void activateIndexes( const unsigned& istart, const unsigned& number, const std::vector<unsigned>& indexes ); 
-/// Add central atom derivatives to a multicolvar function
-//  void addCentralAtomDerivativeToFunction( const unsigned& iatom, const unsigned& jout, const unsigned& base_cv_no, const Vector& der, MultiColvarFunction* func ); 
-/// Get the value for this task
-//  virtual void getValueForTask( const unsigned& iatom, std::vector<double>& vals ); 
-/// Used to accumulate values
-//  virtual void addWeightedValueDerivatives( const unsigned& iatom, const unsigned& base_cv_no, const double& weight, MultiColvarFunction* func );
-/// Used for calculating weighted averages
-//  virtual void finishWeightedAverageCalculation( MultiColvarFunction* func );
-/// Add derivatives to the orientations
-//  virtual void addOrientationDerivativesToBase( const unsigned& iatom, const unsigned& jstore, const unsigned& base_cv_no, 
-//                                                const std::vector<double>& weight, MultiColvarFunction* func );
 /// Is the iatom'th stored value currently active
   bool storedValueIsActive( const unsigned& iatom );
 /// This is true if multicolvar is calculating a vector or if the multicolvar is the density
   virtual bool hasDifferentiableOrientation() const { return false; }
 /// This makes sure we are not calculating the director when we do LocalAverage
   virtual void doNotCalculateDirector(){}
+/// Ensure that derivatives are only calculated when needed
+  bool doNotCalculateDerivatives() const ;
 };
 
 inline
@@ -159,6 +145,12 @@ unsigned MultiColvarBase::getNumberOfDerivatives(){
 inline
 bool MultiColvarBase::usesPbc() const {
   return usepbc;
+}
+
+inline
+bool MultiColvarBase::doNotCalculateDerivatives() const {
+  if( !dertime ) return true;
+  return ActionWithValue::doNotCalculateDerivatives();
 }
 
 }
