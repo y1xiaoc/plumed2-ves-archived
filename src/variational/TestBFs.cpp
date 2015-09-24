@@ -112,7 +112,7 @@ Function(ao)
 
   coeffs2 = new CoeffsVector("Test",args,bf,true,true);
   // for(unsigned int i=0;i<coeffs2->getSize();i++){coeffs2->setValue(i,1.0*i*i*i);}
-  coeffs2->randomizeCoeffsGaussian();
+  coeffs2->randomizeValuesGaussian();
   coeffs2->setCounter(100);
   coeffs2->writeToFile("TEST2.data",true,true);
   log.printf("Min:  %f\n",coeffs2->getMinValue());
