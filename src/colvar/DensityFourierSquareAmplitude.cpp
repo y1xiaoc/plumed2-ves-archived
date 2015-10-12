@@ -73,7 +73,7 @@ DensityFourierSquareAmplitude::DensityFourierSquareAmplitude(const ActionOptions
 PLUMED_COLVAR_INIT(ao),
 pbc(true),
 serial(false),
-wv_int_(3),
+wv_int_(3)
 //sqrtNumAtom(0.0)
 {
   vector<AtomNumber> atoms;
