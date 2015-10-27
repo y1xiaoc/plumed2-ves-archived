@@ -42,6 +42,7 @@ LinearBiasExpansion::LinearBiasExpansion(const std::string label,
                     std::vector<BasisFunctions*> basisf,
                     Communicator& cc):
 mycomm(cc),
+serial_(false),
 bias_label_(label),
 args_(args),
 basisf_(basisf)
