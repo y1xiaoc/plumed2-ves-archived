@@ -37,8 +37,8 @@ class Grid;
 
 class LinearBiasExpansion{
   Communicator& mycomm;
-  std::string bias_label_;
   bool serial_;
+  std::string bias_label_;
   Coeffs* bias_coeffs;
   Coeffs* wt_coeffs;
   Coeffs* basisf_norm;

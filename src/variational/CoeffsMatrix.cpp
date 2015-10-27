@@ -1,0 +1,315 @@
+/* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   Copyright (c) 2011-2014 The plumed team
+   (see the PEOPLE file at the root of the distribution for a list of names)
+
+   See http://www.plumed-code.org for more information.
+
+   This file is part of plumed, version 2.
+
+   plumed is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   plumed is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with plumed.  If not, see <http://www.gnu.org/licenses/>.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include <sstream>
+#include <cstdio>
+#include <cfloat>
+
+#include "CoeffsMatrix.h"
+#include "tools/Tools.h"
+#include "core/Value.h"
+#include "tools/File.h"
+#include "tools/Exception.h"
+#include "BasisFunctions.h"
+#include "tools/Random.h"
+
+namespace PLMD{
+
+CoeffsMatrix::CoeffsMatrix(
+  const std::string& coeffs_label,
+  const std::vector<std::string>& dimension_labels,
+  const std::vector<unsigned int>& indices_shape,
+  const bool symmetric, const bool diagonal,
+  const bool use_counter):
+CounterBase(use_counter),
+CoeffsBase(coeffs_label,dimension_labels,indices_shape),
+symmetric_(symmetric),
+diagonal_(diagonal),
+output_fmt_("%30.16e")
+{
+  setupMatrix();
+}
+
+
+CoeffsMatrix::CoeffsMatrix(
+  const std::string& coeffs_label,
+  std::vector<Value*> args,
+  std::vector<BasisFunctions*> basisf,
+  const bool symmetric, const bool diagonal,
+  const bool use_counter):
+CounterBase(use_counter),
+CoeffsBase(coeffs_label,args,basisf),
+symmetric_(symmetric),
+diagonal_(diagonal),
+output_fmt_("%30.16e")
+{
+  setupMatrix();
+}
+
+
+void CoeffsMatrix::setupMatrix() {
+  if(diagonal_){
+    symmetric_=true;
+    nrows_=numberOfCoeffs();
+    ncolumns_=1;
+  }
+  else{
+    nrows_=numberOfCoeffs();
+    ncolumns_=numberOfCoeffs();
+  }
+  size_=nrows_*ncolumns_;
+  clear();
+}
+
+
+CoeffsBase::index_t CoeffsMatrix::getSize() const {
+  return size_;
+}
+
+bool CoeffsMatrix::isSymmetric() const {
+  return symmetric_;
+}
+
+
+bool CoeffsMatrix::isDiagonal() const {
+  return diagonal_;
+}
+
+
+CoeffsBase::index_t CoeffsMatrix::getMatrixIndex(const index_t index1, const index_t index2) const {
+  index_t matrix_idx;
+  plumed_dbg_assert(index1<nrows_);
+  plumed_dbg_assert(index2<ncolumns_);
+  if(diagonal_){
+    plumed_massert(index1==index2,"CoeffsMatrix: you trying to access a off-diagonal element of a diagonal coeffs matrix");
+    matrix_idx=index1;
+  }
+  else {
+    matrix_idx=index2+index1*ncolumns_;
+  }
+  return matrix_idx;
+}
+
+
+void CoeffsMatrix::clear() {
+  data.resize(getSize());
+  for(index_t i=0; i<data.size(); i++){
+    data[i]=0.0;
+  }
+}
+
+
+double CoeffsMatrix::getValue(const index_t index1, const index_t index2) const {
+  return data[getMatrixIndex(index1,index2)];
+}
+
+double CoeffsMatrix::getValue(const std::vector<unsigned int>& indices1, const std::vector<unsigned int>& indices2) const {
+  return getValue(getIndex(indices1),getIndex(indices2));
+}
+
+
+void CoeffsMatrix::setValue(const index_t index1, const index_t index2, const double value) {
+  data[getMatrixIndex(index1,index2)]=value;
+  if(symmetric_ && !diagonal_){
+    data[getMatrixIndex(index2,index1)]=value;
+  }
+}
+
+
+void CoeffsMatrix::setValue(const std::vector<unsigned int>& indices1, const std::vector<unsigned int>& indices2, const double value) {
+  setValue(getIndex(indices1),getIndex(indices2),value);
+}
+
+
+void CoeffsMatrix::addToValue(const index_t index1, const index_t index2, const double value) {
+  data[getMatrixIndex(index1,index2)]+=value;
+  if(symmetric_ && !diagonal_){
+    data[getMatrixIndex(index2,index1)]+=value;
+  }
+}
+
+
+void CoeffsMatrix::addToValue(const std::vector<unsigned int>& indices1, const std::vector<unsigned int>& indices2, const double value) {
+  addToValue(getIndex(indices1),getIndex(indices2),value);
+}
+
+
+void CoeffsMatrix::scaleAllValues(const double scalef) {
+  for(index_t i=0; i<data.size(); i++){
+    data[i]*=scalef;
+  }
+}
+
+
+void CoeffsMatrix::setValues(const double value) {
+  for(index_t i=0; i<data.size(); i++){
+    data[i]=value;
+  }
+}
+
+
+void CoeffsMatrix::addToValues(const double value) {
+  for(index_t i=0; i<data.size(); i++){
+    data[i]+=value;
+  }
+}
+
+
+double CoeffsMatrix::getMinValue() const {
+  double min_value=DBL_MAX;
+  for(index_t i=0; i<data.size(); i++){
+	  if(data[i]<min_value){
+      min_value=data[i];
+    }
+  }
+  return min_value;
+}
+
+
+double CoeffsMatrix::getMaxValue() const {
+  double max_value=DBL_MIN;
+  for(index_t i=0; i<data.size(); i++){
+	  if(data[i]>max_value){
+      max_value=data[i];
+    }
+  }
+  return max_value;
+}
+
+
+void CoeffsMatrix::randomizeValuesGaussian() {
+  Random rnd;
+  for(index_t i=0; i<data.size(); i++){
+    data[i]=rnd.Gaussian();
+  }
+}
+
+
+void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
+  std::string field_label = "label";
+  std::string field_type = "type";
+  std::string field_ncoeffs_total = "ncoeffs_total";
+  std::string field_shape_prefix = "shape_";
+  std::string field_symmetric = "symmetric_matrix";
+  std::string field_diagonal = "diagonal_matrix";
+  //
+  ofile.addConstantField(field_label).printField(field_label,getLabel());
+  ofile.addConstantField(field_type).printField(field_type,getTypeStr());
+  ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) getSize());
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
+    ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
+    ofile.printField(field_shape_prefix+getDimensionLabel(k),(int) shapeOfIndices(k));
+  }
+  ofile.addConstantField(field_symmetric).printField(field_symmetric,isSymmetric());
+  ofile.addConstantField(field_diagonal).printField(field_symmetric,isDiagonal());
+  writeCounterFieldToFile(ofile);
+}
+
+
+void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
+  //
+  std::string field_indices_prefix = "idx_";
+  std::string field_coeffs = "value";
+  std::string field_index = "index";
+  //
+  std::string int_fmt = "%8d";
+  std::string str_seperate = "#!-------------------";
+  //
+  char* s1 = new char[20];
+  std::vector<unsigned int> indices(numberOfDimensions());
+  std::vector<std::string> ilabels(numberOfDimensions());
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
+    ilabels[k]=field_indices_prefix+getDimensionLabel(k);
+  }
+  //
+  for(index_t i=0; i<numberOfCoeffs(); i++){
+    indices=getIndices(i);
+    for(unsigned int k=0; k<numberOfDimensions(); k++){
+      sprintf(s1,int_fmt.c_str(),indices[k]);
+      ofile.printField(ilabels[k],s1);
+    }
+    ofile.fmtField(" "+output_fmt_).printField(field_coeffs,getValue(i,i));
+    sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
+    ofile.printField();
+  }
+  ofile.fmtField();
+  // blank line between iterations to allow proper plotting with gnuplot
+  ofile.printf("%s\n",str_seperate.c_str());
+  ofile.printf("\n");
+  ofile.printf("\n");
+  delete [] s1;
+}
+
+
+void CoeffsMatrix::writeDataToFile(OFile& ofile) {
+  //
+  std::string field_index_row = "idx_row";
+  std::string field_index_column = "idx_column";
+  std::string field_coeffs = "value";
+  //
+  std::string int_fmt = "%8d";
+  std::string str_seperate = "#!-------------------";
+  //
+  char* s1 = new char[20];
+  //
+  for(index_t i=0; i<nrows_; i++){
+    for(index_t j=0; j<ncolumns_; j++){
+      sprintf(s1,int_fmt.c_str(),i);
+      ofile.printField(field_index_row,s1);
+      sprintf(s1,int_fmt.c_str(),j);
+      ofile.printField(field_index_column,s1);
+      ofile.fmtField(" "+output_fmt_).printField(field_coeffs,getValue(i,j));
+      ofile.printField();
+    }
+  }
+  ofile.fmtField();
+  // blank line between iterations to allow proper plotting with gnuplot
+  ofile.printf("%s\n",str_seperate.c_str());
+  ofile.printf("\n");
+  ofile.printf("\n");
+  delete [] s1;
+}
+
+
+void CoeffsMatrix::writeToFile(OFile& ofile) {
+  writeHeaderToFile(ofile);
+  if(diagonal_){
+    writeDataDiagonalToFile(ofile);
+  }
+  else{
+    writeDataToFile(ofile);
+  }
+}
+
+
+void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_file) {
+  OFile file;
+  if(append_file){ file.enforceRestart(); }
+  file.open(filepath);
+  writeToFile(file);
+}
+
+
+
+}
