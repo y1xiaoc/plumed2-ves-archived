@@ -91,6 +91,7 @@ Function(ao)
   checkRead();
   log.printf("  using the %d order basis function from the %s basis set\n",bf_order_,basisset_label.c_str());
 
+  /*
   std::vector<std::string> bf1;
   bf1.push_back("BF_FOURIER");
   bf1.push_back("ORDER=10");
@@ -98,9 +99,9 @@ Function(ao)
   bf1.push_back("INTERVAL_MIN=-pi");
   bf1.push_back("INTERVAL_MAX=pi");
   plumed.readInputWords(bf1);
-  BasisFunctions* bf_pointer2=plumed.getActionSet().selectWithLabel<BasisFunctions*>("bf2");
+  // BasisFunctions* bf_pointer2=plumed.getActionSet().selectWithLabel<BasisFunctions*>("bf2");
 
-  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer2;
+  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
   coeffs = bias_expansion->getPointerToBiasCoeffs();
@@ -145,7 +146,7 @@ Function(ao)
   // plumed.readInputWords(Tools::getWords(bfk[1]));
 
   log.printf("bbb: %s\n",this->getName().c_str());
-
+  */
 
 }
 
