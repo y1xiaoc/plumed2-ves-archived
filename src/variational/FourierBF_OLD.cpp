@@ -24,26 +24,26 @@
 
 namespace PLMD{
 
-class FourierBF : public BasisFunctions {
+class FourierBF_OLD : public BasisFunctions {
   virtual void setupDescription();
   virtual void setupBFIntegrals();
 public:
   static void registerKeywords(Keywords&);
-  FourierBF(const ActionOptions&);
+  FourierBF_OLD(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&);
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
 };
 
 
-PLUMED_REGISTER_ACTION(FourierBF,"BF_FOURIER")
+PLUMED_REGISTER_ACTION(FourierBF_OLD,"BF_FOURIER_OLD")
 
 
-void FourierBF::registerKeywords(Keywords& keys){
+void FourierBF_OLD::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
 }
 
 
-FourierBF::FourierBF(const ActionOptions&ao):
+FourierBF_OLD::FourierBF_OLD(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   nbasis_ = 2*norder_+1;
@@ -58,27 +58,21 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
 }
 
 
-double FourierBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range){
+double FourierBF_OLD::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range){
   if(n>=nbasis_){error("getValue: n is outside range of the defined order of the basis set");}
   inside_range=true;
   argT=translateArgument(arg, inside_range);
   double value=0.0;
-  if(n == 0){
-    value=1.0;
-  }
-  else if(n%2 == 1){
-    double k = (n+1.0)/2.0;
-    value=cos(k*argT);
-  }
-  else if(n%2 == 0){
-    double k = n/2.0;
-    value=sin(k*argT);
-  }
+  double n_cos = n;
+  double n_sin = n-norder_;
+  if(n==0){value=1.0;}
+  else if(n <= norder_){value=cos(n_cos*argT);}
+  else if(n <= 2*norder_){value=sin(n_sin*argT);}
   return value;
 }
 
 
-void FourierBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs){
+void FourierBF_OLD::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs){
   if(values.size()!=nbasis_ || derivs.size()!=nbasis_){error("getAllValues: wrong size of values or derivs vectors");}
   inside_range=true;
   argT=translateArgument(arg, inside_range);
@@ -90,29 +84,27 @@ void FourierBF::getAllValues(const double arg, double& argT, bool& inside_range,
     double io = i;
     cos_tmp = cos(io*argT);
     sin_tmp = sin(io*argT);
-    values[2*i-1] = cos_tmp;
-    derivs[2*i-1] = -io*sin_tmp*argT_derivf_;
-    values[2*i] = sin_tmp;
-    derivs[2*i] = io*cos_tmp*argT_derivf_;
+    values[i] = cos_tmp;
+    derivs[i] = -io*sin_tmp*argT_derivf_;
+    values[i+norder_] = sin_tmp;
+    derivs[i+norder_] = io*cos_tmp*argT_derivf_;
   }
-  if(!inside_range){
-    for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}
-  }
+  if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
 }
 
 
-void FourierBF::setupDescription(){
+void FourierBF_OLD::setupDescription(){
   bf_description_.resize(nbasis_);
   bf_description_[0]="1";
   for(unsigned int i=1; i < norder_+1;i++){
     std::string is; Tools::convert(i,is);
-    bf_description_[2*i-1]="cos("+is+"*s)";
-    bf_description_[2*i]="sin("+is+"*s)";
+    bf_description_[i]="cos("+is+"*s)";
+    bf_description_[i+norder_]="sin("+is+"*s)";
   }
 }
 
 
-void FourierBF::setupBFIntegrals(){
+void FourierBF_OLD::setupBFIntegrals(){
   bf_integrals_.assign(nbasis_,0.0);
   bf_integrals_[0]=1.0;
 }
