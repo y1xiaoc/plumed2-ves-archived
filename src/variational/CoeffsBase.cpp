@@ -44,6 +44,7 @@ CoeffsBase::CoeffsBase(
   setAllDimensionLabels(dimension_labels);
   std::string coeffs_description_prefix="C";
   setAllCoeffsDescriptions(coeffs_description_prefix);
+  setupFileFields();
 }
 
 
@@ -64,6 +65,7 @@ CoeffsBase::CoeffsBase(
   setType(LinearBasisSet);
   setAllDimensionLabels(dimension_labels);
   setupBasisFunctionsInfo(basisf);
+  setupFileFields();
 }
 
 
@@ -273,14 +275,20 @@ void CoeffsBase::setAllDimensionLabels(const std::vector<std::string> labels) {
 }
 
 
+void CoeffsBase::setupFileFields() {
+  field_label = "label";
+  field_type = "type";
+  field_ndimensions = "ndimensions";
+  field_ncoeffs_total = "ncoeffs_total";
+  field_shape_prefix = "shape_";
+}
+
+
 void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) {
-  std::string field_label = "label";
-  std::string field_type = "type";
-  std::string field_ncoeffs_total = "ncoeffs_total";
-  std::string field_shape_prefix = "shape_";
   //
   ofile.addConstantField(field_label).printField(field_label,getLabel());
   ofile.addConstantField(field_type).printField(field_type,getTypeStr());
+  ofile.addConstantField(field_ndimensions).printField(field_ndimensions,(int) numberOfDimensions());
   ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) numberOfCoeffs());
   for(unsigned int k=0; k<numberOfDimensions(); k++){
     ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
@@ -289,13 +297,8 @@ void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) {
 }
 
 
-void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile) {
-  //
-  std::string field_label = "label";
-  std::string field_type = "type";
-  std::string field_ncoeffs_total = "ncoeffs_total";
-  std::string field_shape_prefix = "shape_";
-  //
+void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_info) {
+
   int int_tmp;
   // label
   std::string coeffs_label_f;
@@ -303,6 +306,9 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile) {
   // type
   std::string coeffs_type_f;
   ifile.scanField(field_type,coeffs_type_f);
+  // number of dimensions
+  ifile.scanField(field_ndimensions,int_tmp);
+  unsigned int ndimensions_f=(unsigned int) int_tmp;
   // total number of coeffs
   ifile.scanField(field_ncoeffs_total,int_tmp);
   index_t ncoeffs_total_f=(index_t) int_tmp;
@@ -311,6 +317,43 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile) {
   for(unsigned int k=0; k<numberOfDimensions(); k++) {
     ifile.scanField(field_shape_prefix+getDimensionLabel(k),int_tmp);
     indices_shape_f[k]=(unsigned int) int_tmp;
+  }
+  if(!ignore_coeffs_info){
+    std::string msg_header="Error when reading in coeffs from file " + ifile.getPath() + ": ";
+    checkCoeffsInfo(msg_header,coeffs_label_f, coeffs_type_f, ndimensions_f, ncoeffs_total_f, indices_shape_f);
+  }
+}
+
+
+void CoeffsBase::checkCoeffsInfo(const std::string msg_header, const std::string coeffs_label_f, const std::string coeffs_type_f, const unsigned int ndimensions_f, const index_t ncoeffs_total_f, const std::vector<unsigned int> indices_shape_f){
+
+  if(coeffs_label_f != getLabel()){
+    std::string msg= msg_header + "coeffs label " + coeffs_label_f + " from file doesn't match the defined value " + getLabel();
+    plumed_merror(msg);
+  }
+  if(coeffs_type_f != getTypeStr()){
+    std::string msg = msg_header + " coeffs type " + coeffs_type_f + " from file doesn't match the defined value " + getTypeStr();
+    plumed_merror(msg);
+  }
+  if(ndimensions_f != numberOfDimensions() ){
+    std::string s1; Tools::convert(ndimensions_f,s1);
+    std::string s2; Tools::convert(numberOfDimensions(),s2);
+    std::string msg = msg_header + " the number of dimensions " + s1 + " in file doesn't match the defined value " + s2;
+    plumed_merror(msg);
+  }
+  if(ncoeffs_total_f != numberOfCoeffs() ){
+    std::string s1; Tools::convert(ncoeffs_total_f,s1);
+    std::string s2; Tools::convert(numberOfCoeffs(),s2);
+    std::string msg = msg_header + " the number of coeffs " + s1 + " in file doesn't match the defined value " + s2;
+    plumed_merror(msg);
+  }
+  for(unsigned int k=0; k<numberOfDimensions(); k++) {
+    if(indices_shape_f[k] != shapeOfIndices(k) ){
+      std::string s1; Tools::convert(indices_shape_f[k],s1);
+      std::string s2; Tools::convert(shapeOfIndices(k),s2);
+      std::string msg = msg_header + " for dimension labeled " + getDimensionLabel(k) + " the shape of indices " + s1 + " in file doesn't match defined value " + s2;
+      plumed_merror(msg);
+    }
   }
 }
 

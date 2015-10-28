@@ -331,6 +331,20 @@ void CoeffsVector::randomizeValuesGaussian() {
 }
 
 
+void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_descriptions) {
+  writeHeaderToFile(ofile);
+  writeDataToFile(ofile,print_coeffs_descriptions);
+}
+
+
+void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const bool append_file) {
+  OFile file;
+  if(append_file){ file.enforceRestart(); }
+  file.open(filepath);
+  writeToFile(file,print_coeffs_descriptions);
+}
+
+
 void CoeffsVector::writeHeaderToFile(OFile& ofile) {
   writeCounterFieldToFile(ofile);
   writeCoeffsInfoToFile(ofile);
@@ -376,23 +390,22 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descrip
 }
 
 
-void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_descriptions) {
-  writeHeaderToFile(ofile);
-  writeDataToFile(ofile,print_coeffs_descriptions);
+unsigned int CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs, const bool ignore_coeffs_info) {
+  readHeaderFromFile(ifile, ignore_coeffs_info);
+  unsigned int ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
+  return ncoeffs_read;
 }
 
 
-
-void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const bool append_file) {
-  OFile file;
-  if(append_file){ file.enforceRestart(); }
-  file.open(filepath);
-  writeToFile(file,print_coeffs_descriptions);
+unsigned int CoeffsVector::readFromFile(const std::string& filepath, const bool ignore_missing_coeffs, const bool ignore_coeffs_info) {
+  IFile file; file.open(filepath);
+  unsigned int ncoeffs_read=readFromFile(file,ignore_missing_coeffs, ignore_coeffs_info);
+  return ncoeffs_read;
 }
 
 
-void CoeffsVector::readHeaderFromFile(IFile& ifile) {
-  getCoeffsInfoFromFile(ifile);
+void CoeffsVector::readHeaderFromFile(IFile& ifile, const bool ignore_coeffs_info) {
+  getCoeffsInfoFromFile(ifile,ignore_coeffs_info);
   getCounterFieldFromFile(ifile);
 }
 
@@ -445,20 +458,6 @@ unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_miss
     plumed_merror("something wrong in the coefficients file, perhaps multiple entries");
   }
   //
-  return ncoeffs_read;
-}
-
-
-unsigned int CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs) {
-  readHeaderFromFile(ifile);
-  unsigned int ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
-  return ncoeffs_read;
-}
-
-
-unsigned int CoeffsVector::readFromFile(const std::string& filepath, const bool ignore_missing_coeffs) {
-  IFile file; file.open(filepath);
-  unsigned int ncoeffs_read=readFromFile(file,ignore_missing_coeffs);
   return ncoeffs_read;
 }
 

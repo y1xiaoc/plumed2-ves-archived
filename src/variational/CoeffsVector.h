@@ -113,14 +113,14 @@ public:
   void randomizeValuesGaussian();
 
   // file input/output stuff
-  void writeHeaderToFile(OFile&);
-  void writeDataToFile(OFile&,const bool print_description=false);
   void writeToFile(OFile&,const bool print_description=false);
   void writeToFile(const std::string&,const bool print_description=false, const bool append_file=false);
-  void readHeaderFromFile(IFile&);
+  void writeHeaderToFile(OFile&);
+  void writeDataToFile(OFile&,const bool print_description=false);
+  unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
+  unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
+  void readHeaderFromFile(IFile&, const bool ignore_coeffs_info=false);
   unsigned int readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
-  unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false);
-  unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false);
   // set output format
   void setOutputFmt(std::string ss){ output_fmt_=ss; }
 

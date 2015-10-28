@@ -101,6 +101,10 @@ Function(ao)
   coeffsV-> randomizeValuesGaussian();
   coeffsV->writeToFile("coeffsV.data");
 
+  CoeffsVector* coeffsV2 = new CoeffsVector("coeffsV",args,bf,false,true);
+  coeffsV2->readFromFile("save.coeffsV.data");
+
+
 
   /*
   std::vector<std::string> bf1;

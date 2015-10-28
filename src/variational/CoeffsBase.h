@@ -51,6 +51,12 @@ private:
   index_t ncoeffs_;
   std::vector<std::string> coeffs_descriptions_;
   std::vector<std::string> dimension_labels_;
+  // Labels for field in output/input files
+  std::string field_label;
+  std::string field_type;
+  std::string field_ndimensions;
+  std::string field_ncoeffs_total;
+  std::string field_shape_prefix;
 public:
   CoeffsBase();
   CoeffsBase(
@@ -93,8 +99,10 @@ public:
   void setDimensionLabel(const unsigned int, const std::string);
   void setAllDimensionLabels(const std::string);
   void setAllDimensionLabels(const std::vector<std::string>);
+  void setupFileFields();
   void writeCoeffsInfoToFile(OFile&);
-  void getCoeffsInfoFromFile(IFile&);
+  void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
+  void checkCoeffsInfo(const std::string, const std::string, const std::string, const unsigned int, const index_t, const std::vector<unsigned int>);
 protected:
   void setupIndices(const std::vector<unsigned int>&);
   void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);
