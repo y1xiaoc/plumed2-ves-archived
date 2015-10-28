@@ -332,19 +332,8 @@ void CoeffsVector::randomizeValuesGaussian() {
 
 
 void CoeffsVector::writeHeaderToFile(OFile& ofile) {
-  std::string field_label = "label";
-  std::string field_type = "type";
-  std::string field_ncoeffs_total = "ncoeffs_total";
-  std::string field_shape_prefix = "shape_";
-  //
-  ofile.addConstantField(field_label).printField(field_label,getLabel());
-  ofile.addConstantField(field_type).printField(field_type,getTypeStr());
-  ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) getSize());
-  for(unsigned int k=0; k<numberOfDimensions(); k++){
-    ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
-    ofile.printField(field_shape_prefix+getDimensionLabel(k),(int) shapeOfIndices(k));
-  }
   writeCounterFieldToFile(ofile);
+  writeCoeffsInfoToFile(ofile);
 }
 
 
@@ -403,28 +392,7 @@ void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coe
 
 
 void CoeffsVector::readHeaderFromFile(IFile& ifile) {
-  //
-  std::string field_label = "label";
-  std::string field_type = "type";
-  std::string field_ncoeffs_total = "ncoeffs_total";
-  std::string field_shape_prefix = "shape_";
-  //
-  int int_tmp;
-  // label
-  std::string coeffs_label_f;
-  ifile.scanField(field_label,coeffs_label_f);
-  // type
-  std::string coeffs_type_f;
-  ifile.scanField(field_type,coeffs_type_f);
-  // total number of coeffs
-  ifile.scanField(field_ncoeffs_total,int_tmp);
-  index_t ncoeffs_total_f=(index_t) int_tmp;
-  // shape of indices
-  std::vector<unsigned int> indices_shape_f(numberOfDimensions());
-  for(unsigned int k=0; k<numberOfDimensions(); k++) {
-    ifile.scanField(field_shape_prefix+getDimensionLabel(k),int_tmp);
-    indices_shape_f[k]=(unsigned int) int_tmp;
-  }
+  getCoeffsInfoFromFile(ifile);
   getCounterFieldFromFile(ifile);
 }
 

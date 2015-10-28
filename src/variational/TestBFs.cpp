@@ -26,6 +26,7 @@
 #include "BasisFunctions.h"
 #include "Coeffs.h"
 #include "CoeffsVector.h"
+#include "CoeffsMatrix.h"
 #include "tools/File.h"
 #include "LinearBiasExpansion.h"
 #include "tools/Communicator.h"
@@ -90,6 +91,16 @@ Function(ao)
   addComponent("inside"); componentIsNotPeriodic("inside");
   checkRead();
   log.printf("  using the %d order basis function from the %s basis set\n",bf_order_,basisset_label.c_str());
+
+  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
+  std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
+  CoeffsMatrix* coeffsM = new CoeffsMatrix("coeffsM",args,bf,false,false,true);
+  coeffsM->randomizeValuesGaussian();
+  coeffsM->writeToFile("coeffsM.data");
+  CoeffsVector* coeffsV = new CoeffsVector("coeffsV",args,bf,false,true);
+  coeffsV-> randomizeValuesGaussian();
+  coeffsV->writeToFile("coeffsV.data");
+
 
   /*
   std::vector<std::string> bf1;

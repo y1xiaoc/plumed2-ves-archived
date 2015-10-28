@@ -28,6 +28,8 @@
 namespace PLMD{
 
 class Value;
+class IFile;
+class OFile;
 class BasisFunctions;
 
 
@@ -91,6 +93,8 @@ public:
   void setDimensionLabel(const unsigned int, const std::string);
   void setAllDimensionLabels(const std::string);
   void setAllDimensionLabels(const std::vector<std::string>);
+  void writeCoeffsInfoToFile(OFile&);
+  void getCoeffsInfoFromFile(IFile&);
 protected:
   void setupIndices(const std::vector<unsigned int>&);
   void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);

@@ -111,6 +111,7 @@ public:
   void randomizeValuesGaussian();
   //
   // file input/output stuff
+  void writeMatrixInfoToFile(OFile&);
   void writeHeaderToFile(OFile&);
   void writeDataDiagonalToFile(OFile&);
   void writeDataToFile(OFile&);

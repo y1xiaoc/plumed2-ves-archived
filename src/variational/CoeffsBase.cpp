@@ -24,6 +24,7 @@
 
 #include "CoeffsBase.h"
 #include "tools/Tools.h"
+#include "tools/File.h"
 #include "tools/Exception.h"
 #include "BasisFunctions.h"
 #include "core/Value.h"
@@ -268,6 +269,48 @@ void CoeffsBase::setAllDimensionLabels(const std::string label_prefix) {
 void CoeffsBase::setAllDimensionLabels(const std::vector<std::string> labels) {
   for(unsigned int i=0; i<numberOfDimensions(); i++){
     dimension_labels_[i]=labels[i];
+  }
+}
+
+
+void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) {
+  std::string field_label = "label";
+  std::string field_type = "type";
+  std::string field_ncoeffs_total = "ncoeffs_total";
+  std::string field_shape_prefix = "shape_";
+  //
+  ofile.addConstantField(field_label).printField(field_label,getLabel());
+  ofile.addConstantField(field_type).printField(field_type,getTypeStr());
+  ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) numberOfCoeffs());
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
+    ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
+    ofile.printField(field_shape_prefix+getDimensionLabel(k),(int) shapeOfIndices(k));
+  }
+}
+
+
+void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile) {
+  //
+  std::string field_label = "label";
+  std::string field_type = "type";
+  std::string field_ncoeffs_total = "ncoeffs_total";
+  std::string field_shape_prefix = "shape_";
+  //
+  int int_tmp;
+  // label
+  std::string coeffs_label_f;
+  ifile.scanField(field_label,coeffs_label_f);
+  // type
+  std::string coeffs_type_f;
+  ifile.scanField(field_type,coeffs_type_f);
+  // total number of coeffs
+  ifile.scanField(field_ncoeffs_total,int_tmp);
+  index_t ncoeffs_total_f=(index_t) int_tmp;
+  // shape of indices
+  std::vector<unsigned int> indices_shape_f(numberOfDimensions());
+  for(unsigned int k=0; k<numberOfDimensions(); k++) {
+    ifile.scanField(field_shape_prefix+getDimensionLabel(k),int_tmp);
+    indices_shape_f[k]=(unsigned int) int_tmp;
   }
 }
 

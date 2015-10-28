@@ -206,24 +206,18 @@ void CoeffsMatrix::randomizeValuesGaussian() {
 }
 
 
-void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
-  std::string field_label = "label";
-  std::string field_type = "type";
-  std::string field_ncoeffs_total = "ncoeffs_total";
-  std::string field_shape_prefix = "shape_";
+void CoeffsMatrix::writeMatrixInfoToFile(OFile& ofile) {
   std::string field_symmetric = "symmetric_matrix";
   std::string field_diagonal = "diagonal_matrix";
-  //
-  ofile.addConstantField(field_label).printField(field_label,getLabel());
-  ofile.addConstantField(field_type).printField(field_type,getTypeStr());
-  ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) getSize());
-  for(unsigned int k=0; k<numberOfDimensions(); k++){
-    ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
-    ofile.printField(field_shape_prefix+getDimensionLabel(k),(int) shapeOfIndices(k));
-  }
   ofile.addConstantField(field_symmetric).printField(field_symmetric,isSymmetric());
-  ofile.addConstantField(field_diagonal).printField(field_symmetric,isDiagonal());
+  ofile.addConstantField(field_diagonal).printField(field_diagonal,isDiagonal());
+}
+
+
+void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
   writeCounterFieldToFile(ofile);
+  writeCoeffsInfoToFile(ofile);
+  writeMatrixInfoToFile(ofile);
 }
 
 
