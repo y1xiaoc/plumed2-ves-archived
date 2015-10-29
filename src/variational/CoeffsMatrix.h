@@ -108,7 +108,7 @@ public:
   double getMinValue() const;
   double getMaxValue() const;
   //
-  void randomizeValuesGaussian();
+  void randomizeValuesGaussian(int);
   //
   // file input/output stuff
   void writeMatrixInfoToFile(OFile&);

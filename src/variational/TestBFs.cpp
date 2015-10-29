@@ -95,15 +95,15 @@ Function(ao)
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   CoeffsMatrix* coeffsM = new CoeffsMatrix("coeffsM",args,bf,false,false,true);
-  coeffsM->randomizeValuesGaussian();
+  coeffsM->randomizeValuesGaussian(1);
   coeffsM->writeToFile("coeffsM.data");
   CoeffsVector* coeffsV = new CoeffsVector("coeffsV",args,bf,false,true);
-  coeffsV-> randomizeValuesGaussian();
+  coeffsV-> randomizeValuesGaussian(41413);
   coeffsV->writeToFile("coeffsV.data");
 
-  CoeffsVector* coeffsV2 = new CoeffsVector("coeffsV",args,bf,false,true);
-  coeffsV2->readFromFile("save.coeffsV.data");
-
+  CoeffsVector coeffsV_copy4 = CoeffsVector(*coeffsV);
+  coeffsV_copy4.randomizeValuesGaussian(45222);
+  coeffsV_copy4.writeToFile("coeffsV_copy4.data");
 
 
   /*

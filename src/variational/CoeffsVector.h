@@ -110,7 +110,7 @@ public:
   //
   void normalizeCoeffs();
   // Random values
-  void randomizeValuesGaussian();
+  void randomizeValuesGaussian(int);
 
   // file input/output stuff
   void writeToFile(OFile&,const bool print_description=false);

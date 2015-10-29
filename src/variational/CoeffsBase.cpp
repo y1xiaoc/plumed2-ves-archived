@@ -244,7 +244,7 @@ void CoeffsBase::setAllCoeffsDescriptions(const std::vector<std::string>& coeffs
 
 
 std::string CoeffsBase::getDimensionLabel(const unsigned int dim_index) const {
-  plumed_massert(dim_index<numberOfDimensions(),"Trying to set the label of a dimension outside the number of dimensions");
+  plumed_massert(dim_index<numberOfDimensions(),"Trying to get the label of a dimension outside the number of dimensions");
   return dimension_labels_[dim_index];
 }
 

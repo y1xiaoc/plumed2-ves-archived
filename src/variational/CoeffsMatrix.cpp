@@ -198,8 +198,10 @@ double CoeffsMatrix::getMaxValue() const {
 }
 
 
-void CoeffsMatrix::randomizeValuesGaussian() {
+void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
   Random rnd;
+  if (randomSeed<0){randomSeed = -randomSeed;}
+  rnd.setSeed(-randomSeed);
   for(index_t i=0; i<data.size(); i++){
     data[i]=rnd.Gaussian();
   }

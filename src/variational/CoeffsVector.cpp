@@ -284,6 +284,8 @@ void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffsvector, co
   }
 }
 
+// CoeffsVector& CoeffsVector::operator +()
+
 
 double CoeffsVector::getMinValue() const {
   double min_value=DBL_MAX;
@@ -323,8 +325,10 @@ void CoeffsVector::normalizeCoeffs() {
 }
 
 
-void CoeffsVector::randomizeValuesGaussian() {
+void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
   Random rnd;
+  if (randomSeed<0){randomSeed = -randomSeed;}
+  rnd.setSeed(-randomSeed);
   for(index_t i=0; i<data.size(); i++){
     data[i]=rnd.Gaussian();
   }
