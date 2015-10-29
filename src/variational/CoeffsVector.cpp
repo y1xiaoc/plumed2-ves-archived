@@ -106,6 +106,18 @@ double CoeffsVector::getValue(const std::vector<unsigned int>& indices) const {
 }
 
 
+double& CoeffsVector::operator [](const index_t index) {
+  plumed_dbg_assert(index<data.size());
+  return data[index];
+}
+
+
+const double& CoeffsVector::operator [](const index_t index) const {
+  plumed_dbg_assert(index<data.size());
+  return data[index];
+}
+
+
 double CoeffsVector::getAuxValue(const index_t index) const {
   plumed_dbg_assert(index<aux_data.size() && useaux_);
   return aux_data[index];
@@ -183,6 +195,21 @@ void CoeffsVector::scaleAllValues(const double scalef) {
       aux_data[i]*=scalef;
     }
   }
+}
+
+
+CoeffsVector CoeffsVector::operator *=(const double scalef) {
+  scaleAllValues(scalef);
+  return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator *=(const CoeffsVector other_coeffsvector) {
+  plumed_massert(data.size()==other_coeffsvector.getSize(),"Coeffs vectors do not have the same size");
+  for(index_t i=0; i<data.size(); i++){
+    data[i]*=other_coeffsvector.data[i];
+  }
+  return *this;
 }
 
 

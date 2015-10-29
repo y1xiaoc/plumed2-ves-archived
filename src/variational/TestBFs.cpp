@@ -101,9 +101,13 @@ Function(ao)
   coeffsV-> randomizeValuesGaussian(41413);
   coeffsV->writeToFile("coeffsV.data");
 
-  CoeffsVector coeffsV_copy4 = CoeffsVector(*coeffsV);
-  coeffsV_copy4.randomizeValuesGaussian(45222);
-  coeffsV_copy4.writeToFile("coeffsV_copy4.data");
+  CoeffsVector coeffsV_copy1 = CoeffsVector(*coeffsV);
+  coeffsV_copy1.setValues(10.0);
+  coeffsV_copy1[0]=1.0;
+  coeffsV_copy1[1]=1.0;
+  coeffsV_copy1[3]=4.0;
+  coeffsV_copy1 *= *coeffsV;
+  coeffsV_copy1.writeToFile("coeffsV_copy1.data");
 
 
   /*

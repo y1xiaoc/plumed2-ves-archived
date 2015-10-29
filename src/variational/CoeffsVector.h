@@ -73,6 +73,8 @@ public:
   double getValue(const std::vector<unsigned int>&) const;
   double getAuxValue(const index_t) const;
   double getAuxValue(const std::vector<unsigned int>&) const;
+  double& operator [](const index_t index);
+  const double& operator [](const index_t index) const;
   // set value
   void setValue(const index_t, const double);
   void setValue(const std::vector<unsigned int>&, const double);
@@ -87,6 +89,8 @@ public:
   void addToAuxValue(const std::vector<unsigned int>&, const double);
   // scale all values
   void scaleAllValues(const double);
+  CoeffsVector operator *=(const double scalef);
+  CoeffsVector operator *=(const CoeffsVector other_coeffsvector);
   void scaleOnlyMainValues(const double);
   void scaleOnlyAuxValues(const double);
   // set all values
