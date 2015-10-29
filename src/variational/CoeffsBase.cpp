@@ -320,17 +320,13 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_in
   }
   if(!ignore_coeffs_info){
     std::string msg_header="Error when reading in coeffs from file " + ifile.getPath() + ": ";
-    checkCoeffsInfo(msg_header,coeffs_label_f, coeffs_type_f, ndimensions_f, ncoeffs_total_f, indices_shape_f);
+    checkCoeffsInfo(msg_header, coeffs_type_f, ndimensions_f, ncoeffs_total_f, indices_shape_f);
   }
 }
 
 
-void CoeffsBase::checkCoeffsInfo(const std::string msg_header, const std::string coeffs_label_f, const std::string coeffs_type_f, const unsigned int ndimensions_f, const index_t ncoeffs_total_f, const std::vector<unsigned int> indices_shape_f){
+void CoeffsBase::checkCoeffsInfo(const std::string msg_header, const std::string coeffs_type_f, const unsigned int ndimensions_f, const index_t ncoeffs_total_f, const std::vector<unsigned int> indices_shape_f){
 
-  if(coeffs_label_f != getLabel()){
-    std::string msg= msg_header + "coeffs label " + coeffs_label_f + " from file doesn't match the defined value " + getLabel();
-    plumed_merror(msg);
-  }
   if(coeffs_type_f != getTypeStr()){
     std::string msg = msg_header + " coeffs type " + coeffs_type_f + " from file doesn't match the defined value " + getTypeStr();
     plumed_merror(msg);

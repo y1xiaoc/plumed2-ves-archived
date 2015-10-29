@@ -97,7 +97,7 @@ Function(ao)
   CoeffsMatrix* coeffsM = new CoeffsMatrix("coeffsM",args,bf,false,false,true);
   coeffsM->randomizeValuesGaussian(1);
   coeffsM->writeToFile("coeffsM.data");
-  CoeffsVector* coeffsV = new CoeffsVector("coeffsV",args,bf,false,true);
+  CoeffsVector* coeffsV = new CoeffsVector("coeffsV",args,bf,true);
   coeffsV-> randomizeValuesGaussian(41413);
   coeffsV->writeToFile("coeffsV.data");
 

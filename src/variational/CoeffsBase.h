@@ -102,7 +102,7 @@ public:
   void setupFileFields();
   void writeCoeffsInfoToFile(OFile&);
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
-  void checkCoeffsInfo(const std::string, const std::string, const std::string, const unsigned int, const index_t, const std::vector<unsigned int>);
+  void checkCoeffsInfo(const std::string, const std::string, const unsigned int, const index_t, const std::vector<unsigned int>);
 protected:
   void setupIndices(const std::vector<unsigned int>&);
   void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);

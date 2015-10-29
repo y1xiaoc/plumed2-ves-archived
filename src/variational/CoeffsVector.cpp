@@ -40,10 +40,9 @@ CoeffsVector::CoeffsVector(
   const std::string& coeffs_label,
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape,
-  const bool use_aux_coeffs, const bool use_counter):
+  const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase(coeffs_label,dimension_labels,indices_shape),
-useaux_(use_aux_coeffs),
 output_fmt_("%30.16e")
 {
   clear();
@@ -54,10 +53,9 @@ CoeffsVector::CoeffsVector(
   const std::string& coeffs_label,
   std::vector<Value*> args,
   std::vector<BasisFunctions*> basisf,
-  const bool use_aux_coeffs, const bool use_counter):
+  const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase(coeffs_label,args,basisf),
-useaux_(use_aux_coeffs),
 output_fmt_("%30.16e")
 {
   clear();
@@ -69,30 +67,11 @@ CoeffsBase::index_t CoeffsVector::getSize() const {
 }
 
 
-bool CoeffsVector::hasAuxCoeffs() const {
-  return useaux_;
-}
-
-
-void CoeffsVector::clearMain() {
+void CoeffsVector::clear() {
   data.resize(getSize());
   for(index_t i=0; i<data.size(); i++){
     data[i]=0.0;
   }
-}
-
-
-void CoeffsVector::clearAux() {
-  aux_data.resize(getSize());
-  for(index_t i=0; i<data.size(); i++){
-    aux_data[i]=0.0;
-  }
-}
-
-
-void CoeffsVector::clear() {
-  clearMain();
-  if(useaux_){ clearAux(); }
 }
 
 
@@ -118,17 +97,6 @@ const double& CoeffsVector::operator [](const index_t index) const {
 }
 
 
-double CoeffsVector::getAuxValue(const index_t index) const {
-  plumed_dbg_assert(index<aux_data.size() && useaux_);
-  return aux_data[index];
-}
-
-
-double CoeffsVector::getAuxValue(const std::vector<unsigned int>& indices) const {
-  return getAuxValue(getIndex(indices));
-}
-
-
 void CoeffsVector::setValue(const index_t index, const double value) {
   plumed_dbg_assert(index<data.size());
   data[index]=value;
@@ -137,30 +105,6 @@ void CoeffsVector::setValue(const index_t index, const double value) {
 
 void CoeffsVector::setValue(const std::vector<unsigned int>& indices, const double value) {
   setValue(getIndex(indices),value);
-}
-
-
-void CoeffsVector::setAuxValue(const index_t index, const double value) {
-  plumed_dbg_assert(index<data.size() && useaux_);
-  aux_data[index]=value;
-}
-
-
-void CoeffsVector::setAuxValue(const std::vector<unsigned int>& indices, const double value) {
-  setAuxValue(getIndex(indices),value);
-}
-
-
-void CoeffsVector::setValueAndAux(const index_t index, const double main_value, const double aux_value)
-{
-  plumed_dbg_assert(index<data.size() && useaux_);
-  data[index]=main_value;
-  aux_data[index]=aux_value;
-}
-
-
-void CoeffsVector::setValueAndAux(const std::vector<unsigned int>& indices, const double main_value, const double aux_value) {
-  setValueAndAux(getIndex(indices),main_value,aux_value);
 }
 
 
@@ -175,25 +119,9 @@ void CoeffsVector::addToValue(const std::vector<unsigned int>& indices, const do
 }
 
 
-void CoeffsVector::addToAuxValue(const index_t index, const double value) {
-  plumed_dbg_assert(index<aux_data.size() && useaux_);
-  aux_data[index]+=value;
-}
-
-
-void CoeffsVector::addToAuxValue(const std::vector<unsigned int>& indices, const double value) {
-  addToAuxValue(getIndex(indices),value);
-}
-
-
 void CoeffsVector::scaleAllValues(const double scalef) {
   for(index_t i=0; i<data.size(); i++){
     data[i]*=scalef;
-  }
-  if(useaux_){
-    for(index_t i=0; i<aux_data.size(); i++){
-      aux_data[i]*=scalef;
-    }
   }
 }
 
@@ -213,34 +141,9 @@ CoeffsVector CoeffsVector::operator *=(const CoeffsVector other_coeffsvector) {
 }
 
 
-void CoeffsVector::scaleOnlyMainValues(const double scalef) {
-  for(index_t i=0;i<data.size();i++){
-    data[i]*=scalef;
-  }
-}
-
-
-void CoeffsVector::scaleOnlyAuxValues(const double scalef) {
-  if(useaux_){
-    for(index_t i=0; i<aux_data.size(); i++){
-      aux_data[i]*=scalef;
-    }
-  }
-}
-
-
 void CoeffsVector::setValues(const double value) {
   for(index_t i=0; i<data.size(); i++){
     data[i]=value;
-  }
-}
-
-
-void CoeffsVector::setAuxValues(const double value) {
-  if(useaux_){
-    for(index_t i=0; i<aux_data.size(); i++){
-      aux_data[i]=value;
-    }
   }
 }
 
@@ -250,34 +153,6 @@ void CoeffsVector::addToValues(const double value) {
     data[i]+=value;
   }
 }
-
-
-void CoeffsVector::addToAuxValues(const double value) {
-  if(useaux_){
-    for(index_t i=0; i<aux_data.size(); i++){
-      aux_data[i]+=value;
-    }
-  }
-}
-
-
-void CoeffsVector::setAuxEqualToMain() {
-  if(useaux_){
-    for(index_t i=0; i<data.size(); i++){
-      aux_data[i]=data[i];
-    }
-  }
-}
-
-
-void CoeffsVector::setMainEqualToAux() {
-  if(useaux_){
-    for(index_t i=0; i<data.size(); i++){
-      data[i]=aux_data[i];
-    }
-  }
-}
-
 
 
 void CoeffsVector::setFromOtherCoeffsVector(CoeffsVector* other_coeffsvector) {
@@ -310,8 +185,6 @@ void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffsvector, co
     data[i]+=scalef*other_coeffsvector->getValue(i);
   }
 }
-
-// CoeffsVector& CoeffsVector::operator +()
 
 
 double CoeffsVector::getMinValue() const {
@@ -386,7 +259,6 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descrip
   //
   std::string field_indices_prefix = "idx_";
   std::string field_coeffs = "value";
-  std::string field_aux_coeffs = "aux_value";
   std::string field_index = "index";
   std::string field_description = "description";
   //
@@ -407,7 +279,6 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descrip
       ofile.printField(ilabels[k],s1);
     }
     ofile.fmtField(" "+output_fmt_).printField(field_coeffs,data[i]);
-    if(useaux_){ ofile.fmtField(" "+output_fmt_).printField(field_aux_coeffs,aux_data[i]); }
     sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
     if(print_coeffs_descriptions){ ofile.printField(field_description,"  "+getCoeffDescription(i));}
     ofile.printField();
@@ -445,7 +316,6 @@ unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_miss
   //
   std::string field_indices_prefix = "idx_";
   std::string field_coeffs = "value";
-  std::string field_aux_coeffs = "aux_value";
   std::string field_index = "index";
   std::string field_description = "description";
   //
@@ -466,10 +336,6 @@ unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_miss
       indices[k] = (unsigned int) idx_tmp;
     }
     data[getIndex(indices)] = coeff_tmp;
-    if(useaux_){
-      ifile.scanField(field_aux_coeffs,coeff_tmp);
-      aux_data[getIndex(indices)] = coeff_tmp;
-    }
     ifile.scanField(field_index,idx_tmp);
     if(getIndex(indices)!=idx_tmp){
       std::string is1; Tools::convert(idx_tmp,is1);

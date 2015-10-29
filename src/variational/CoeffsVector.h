@@ -45,8 +45,6 @@ class CoeffsVector:
 public:
 private:
   std::vector<double> data;
-  std::vector<double> aux_data;
-  bool useaux_;
   std::string output_fmt_; // format for output
   //
 public:
@@ -54,54 +52,36 @@ public:
     const std::string&,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&,
-    const bool use_aux_coeffs=false, const bool use_counter=false);
+    const bool use_counter=false);
   CoeffsVector(
     const std::string&,
     std::vector<Value*>,
     std::vector<BasisFunctions*>,
-    const bool use_aux_coeffs=false, const bool use_counter=false);
+    const bool use_counter=false);
   ~CoeffsVector(){}
   //
   index_t getSize() const;
-  bool hasAuxCoeffs() const;
-  // clear coeffs
-  void clearMain();
-  void clearAux();
+    // clear coeffs
   void clear();
   // get value
   double getValue(const index_t) const;
   double getValue(const std::vector<unsigned int>&) const;
-  double getAuxValue(const index_t) const;
-  double getAuxValue(const std::vector<unsigned int>&) const;
   double& operator [](const index_t index);
   const double& operator [](const index_t index) const;
   // set value
   void setValue(const index_t, const double);
   void setValue(const std::vector<unsigned int>&, const double);
-  void setAuxValue(const index_t, const double);
-  void setAuxValue(const std::vector<unsigned int>&, const double);
-  void setValueAndAux(const index_t, const double, const double);
-  void setValueAndAux(const std::vector<unsigned int>&, const double, const double);
-  // add to value
+    // add to value
   void addToValue(const index_t, const double);
   void addToValue(const std::vector<unsigned int>&, const double);
-  void addToAuxValue(const index_t, const double);
-  void addToAuxValue(const std::vector<unsigned int>&, const double);
   // scale all values
   void scaleAllValues(const double);
   CoeffsVector operator *=(const double scalef);
   CoeffsVector operator *=(const CoeffsVector other_coeffsvector);
-  void scaleOnlyMainValues(const double);
-  void scaleOnlyAuxValues(const double);
   // set all values
   void setValues(const double);
-  void setAuxValues(const double);
   // add to all values
   void addToValues(const double);
-  void addToAuxValues(const double);
-  // set Aux values equal to main and vice versa
-  void setAuxEqualToMain();
-  void setMainEqualToAux();
   // copy values for another Coeffs instance
   void setFromOtherCoeffsVector(CoeffsVector*);
   void setFromOtherCoeffsVector(CoeffsVector*,const double);
