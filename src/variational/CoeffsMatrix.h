@@ -111,12 +111,14 @@ public:
   void randomizeValuesGaussian(int);
   //
   // file input/output stuff
+  void writeToFile(OFile&);
+  void writeToFile(const std::string&, const bool append_file=false);
+private:
   void writeMatrixInfoToFile(OFile&);
   void writeHeaderToFile(OFile&);
   void writeDataDiagonalToFile(OFile&);
   void writeDataToFile(OFile&);
-  void writeToFile(OFile&);
-  void writeToFile(const std::string&, const bool append_file=false);
+public:  
     // set output format
   void setOutputFmt(std::string ss){ output_fmt_=ss; }
 

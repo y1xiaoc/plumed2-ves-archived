@@ -99,15 +99,20 @@ public:
   void randomizeValuesGaussian(int);
 
   // file input/output stuff
-  static void writeSetToFile(OFile&, const std::vector<CoeffsVector>&, const bool print_description=false);
+  void writeToFile(const std::string&, const bool print_description=false, const bool append_file=false);
   void writeToFile(OFile&,const bool print_description=false);
-  void writeToFile(const std::string&,const bool print_description=false, const bool append_file=false);
+  static void writeToFile(const std::string&, const std::vector<CoeffsVector>&, const bool print_description=false, const bool append_file=false);
+  static void writeToFile(OFile&, const std::vector<CoeffsVector>&, const bool print_description=false);
+private:
   void writeHeaderToFile(OFile&) const;
-  void writeDataToFile(OFile&,const bool print_description=false);
+  static void writeDataToFile(OFile&, const std::vector<CoeffsVector>&, const bool print_description=false);
+public:
   unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
   unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
+private:
   void readHeaderFromFile(IFile&, const bool ignore_coeffs_info=false);
   unsigned int readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
+public:
   // set output format
   void setOutputFmt(std::string ss){ output_fmt_=ss; }
   std::string getOutputFmt() const { return output_fmt_; }

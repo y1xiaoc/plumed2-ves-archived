@@ -208,6 +208,26 @@ void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
 }
 
 
+void CoeffsMatrix::writeToFile(OFile& ofile) {
+  writeHeaderToFile(ofile);
+  if(diagonal_){
+    writeDataDiagonalToFile(ofile);
+  }
+  else{
+    writeDataToFile(ofile);
+  }
+}
+
+
+void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_file) {
+  OFile file;
+  if(append_file){ file.enforceRestart(); }
+  file.open(filepath);
+  writeToFile(file);
+  file.close();
+}
+
+
 void CoeffsMatrix::writeMatrixInfoToFile(OFile& ofile) {
   std::string field_symmetric = "symmetric_matrix";
   std::string field_diagonal = "diagonal_matrix";
@@ -286,27 +306,6 @@ void CoeffsMatrix::writeDataToFile(OFile& ofile) {
   ofile.printf("\n");
   delete [] s1;
 }
-
-
-void CoeffsMatrix::writeToFile(OFile& ofile) {
-  writeHeaderToFile(ofile);
-  if(diagonal_){
-    writeDataDiagonalToFile(ofile);
-  }
-  else{
-    writeDataToFile(ofile);
-  }
-}
-
-
-void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_file) {
-  OFile file;
-  if(append_file){ file.enforceRestart(); }
-  file.open(filepath);
-  writeToFile(file);
-  file.close();
-}
-
 
 
 }
