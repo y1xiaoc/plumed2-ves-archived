@@ -99,7 +99,7 @@ bool CounterBase::isCounterFieldInFile(IFile& ifile) {
 }
 
 
-void CounterBase::writeCounterFieldToFile(OFile& ofile) {
+void CounterBase::writeCounterFieldToFile(OFile& ofile) const {
   if(isActive){
     ofile.addConstantField(field_name_).printField(field_name_,(int) counter);
   }

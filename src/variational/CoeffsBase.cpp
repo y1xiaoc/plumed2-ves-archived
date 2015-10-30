@@ -32,14 +32,15 @@
 namespace PLMD{
 
 CoeffsBase::CoeffsBase(
-  const std::string& coeffs_label,
+  const std::string& label,
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape)
 {
   plumed_massert(indices_shape.size()==dimension_labels.size(),"CoeffsBase: dimensions of vectors in Init(...) don't match");
   //
   setupIndices(indices_shape);
-  setLabel(coeffs_label);
+  setLabel(label);
+  setDataLabel(label);
   setType(Generic);
   setAllDimensionLabels(dimension_labels);
   std::string coeffs_description_prefix="C";
@@ -49,7 +50,7 @@ CoeffsBase::CoeffsBase(
 
 
 CoeffsBase::CoeffsBase(
-  const std::string& coeffs_label,
+  const std::string& label,
   std::vector<Value*> args,
   std::vector<BasisFunctions*> basisf)
 {
@@ -61,7 +62,8 @@ CoeffsBase::CoeffsBase(
     indices_shape[i]=basisf[i]->getNumberOfBasisFunctions();
   }
   setupIndices(indices_shape);
-  setLabel(coeffs_label);
+  setLabel(label);
+  setDataLabel(label);
   setType(LinearBasisSet);
   setAllDimensionLabels(dimension_labels);
   setupBasisFunctionsInfo(basisf);
@@ -100,13 +102,24 @@ void CoeffsBase::setupBasisFunctionsInfo(std::vector<BasisFunctions*> basisf) {
 
 
 std::string CoeffsBase::getLabel() const {
-  return coeffs_label_;
+  return label_;
 }
 
 
-void CoeffsBase::setLabel(const std::string coeffs_label) {
-  coeffs_label_=coeffs_label;
+void CoeffsBase::setLabel(const std::string label) {
+  label_=label;
 }
+
+
+std::string CoeffsBase::getDataLabel() const {
+  return data_label_;
+}
+
+
+void CoeffsBase::setDataLabel(const std::string data_label) {
+  data_label_=data_label;
+}
+
 
 
 CoeffsBase::CoeffsType CoeffsBase::getType() const {
@@ -276,7 +289,6 @@ void CoeffsBase::setAllDimensionLabels(const std::vector<std::string> labels) {
 
 
 void CoeffsBase::setupFileFields() {
-  field_label = "label";
   field_type = "type";
   field_ndimensions = "ndimensions";
   field_ncoeffs_total = "ncoeffs_total";
@@ -284,9 +296,8 @@ void CoeffsBase::setupFileFields() {
 }
 
 
-void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) {
+void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) const {
   //
-  ofile.addConstantField(field_label).printField(field_label,getLabel());
   ofile.addConstantField(field_type).printField(field_type,getTypeStr());
   ofile.addConstantField(field_ndimensions).printField(field_ndimensions,(int) numberOfDimensions());
   ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) numberOfCoeffs());
@@ -301,9 +312,6 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_in
 
   int int_tmp;
   // label
-  std::string coeffs_label_f;
-  ifile.scanField(field_label,coeffs_label_f);
-  // type
   std::string coeffs_type_f;
   ifile.scanField(field_type,coeffs_type_f);
   // number of dimensions

@@ -54,7 +54,7 @@ public:
   //
   bool getCounterFieldFromFile(IFile&);
   bool isCounterFieldInFile(IFile&);
-  void writeCounterFieldToFile(OFile&);
+  void writeCounterFieldToFile(OFile&) const;
   //
 };
 }

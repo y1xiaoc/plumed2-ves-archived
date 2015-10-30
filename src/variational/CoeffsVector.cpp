@@ -37,12 +37,12 @@
 namespace PLMD{
 
 CoeffsVector::CoeffsVector(
-  const std::string& coeffs_label,
+  const std::string& label,
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape,
   const bool use_counter):
 CounterBase(use_counter),
-CoeffsBase(coeffs_label,dimension_labels,indices_shape),
+CoeffsBase(label,dimension_labels,indices_shape),
 output_fmt_("%30.16e")
 {
   clear();
@@ -50,12 +50,12 @@ output_fmt_("%30.16e")
 
 
 CoeffsVector::CoeffsVector(
-  const std::string& coeffs_label,
+  const std::string& label,
   std::vector<Value*> args,
   std::vector<BasisFunctions*> basisf,
   const bool use_counter):
 CounterBase(use_counter),
-CoeffsBase(coeffs_label,args,basisf),
+CoeffsBase(label,args,basisf),
 output_fmt_("%30.16e")
 {
   clear();
@@ -72,6 +72,22 @@ void CoeffsVector::clear() {
   for(index_t i=0; i<data.size(); i++){
     data[i]=0.0;
   }
+}
+
+
+bool CoeffsVector::sameShape(const CoeffsVector other_coeffsvector) const {
+  if(numberOfDimensions()!=other_coeffsvector.numberOfDimensions()){
+    return false;
+  }
+  if(numberOfCoeffs()!=other_coeffsvector.numberOfCoeffs()){
+    return false;
+  }
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
+    if(shapeOfIndices(k)!=other_coeffsvector.shapeOfIndices(k)){
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -235,6 +251,60 @@ void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
 }
 
 
+void CoeffsVector::writeSetToFile(OFile& ofile, const std::vector<CoeffsVector>& CoeffsSet, const bool print_coeffs_descriptions) {
+  //
+  std::string field_indices_prefix = "idx_";
+  std::string field_index = "index";
+  std::string field_description = "description";
+  //
+  std::string int_fmt = "%8d";
+  std::string str_seperate = "#!-------------------";
+  //
+  unsigned int numvec = CoeffsSet.size();
+  unsigned int numdim = CoeffsSet[0].numberOfDimensions();
+  unsigned int numcoeffs = CoeffsSet[0].getSize();
+  std::vector<std::string> coeffs_descriptions = CoeffsSet[0].getAllCoeffsDescriptions();
+  std::string output_fmt = CoeffsSet[0].getOutputFmt();
+  std::vector<std::string> coeffs_datalabels(numvec);
+  coeffs_datalabels[0] = CoeffsSet[0].getDataLabel();
+  for(unsigned int k=1; k<numvec; k++){
+    if(!CoeffsSet[k].sameShape(CoeffsSet[0])){
+      plumed_merror("Error in writing a set of coeffs to file: The coeffs do not have the same shape and size");
+    }
+    coeffs_datalabels[k] = CoeffsSet[k].getDataLabel();
+  }
+  //
+  CoeffsSet[0].writeHeaderToFile(ofile);
+  //
+  char* s1 = new char[20];
+  std::vector<unsigned int> indices(numdim);
+  std::vector<std::string> ilabels(numdim);
+  for(unsigned int k=0; k<numdim; k++){
+    ilabels[k]=field_indices_prefix+CoeffsSet[0].getDimensionLabel(k);
+  }
+  //
+  for(index_t i=0; i<numcoeffs; i++){
+    indices=CoeffsSet[0].getIndices(i);
+    for(unsigned int k=0; k<numdim; k++){
+      sprintf(s1,int_fmt.c_str(),indices[k]);
+      ofile.printField(ilabels[k],s1);
+    }
+    for(unsigned int l=0; l<numvec; l++){
+      ofile.fmtField(" "+output_fmt).printField(coeffs_datalabels[l],CoeffsSet[l].getValue(i));
+    }
+    sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
+    if(print_coeffs_descriptions){ ofile.printField(field_description,"  "+coeffs_descriptions[i]);}
+    ofile.printField();
+  }
+  ofile.fmtField();
+  // blank line between iterations to allow proper plotting with gnuplot
+  ofile.printf("%s\n",str_seperate.c_str());
+  ofile.printf("\n");
+  ofile.printf("\n");
+  delete [] s1;
+}
+
+
 void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_descriptions) {
   writeHeaderToFile(ofile);
   writeDataToFile(ofile,print_coeffs_descriptions);
@@ -246,10 +316,11 @@ void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coe
   if(append_file){ file.enforceRestart(); }
   file.open(filepath);
   writeToFile(file,print_coeffs_descriptions);
+  file.close();
 }
 
 
-void CoeffsVector::writeHeaderToFile(OFile& ofile) {
+void CoeffsVector::writeHeaderToFile(OFile& ofile) const {
   writeCounterFieldToFile(ofile);
   writeCoeffsInfoToFile(ofile);
 }
@@ -258,7 +329,7 @@ void CoeffsVector::writeHeaderToFile(OFile& ofile) {
 void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descriptions) {
   //
   std::string field_indices_prefix = "idx_";
-  std::string field_coeffs = "value";
+  std::string field_coeffs = getDataLabel();
   std::string field_index = "index";
   std::string field_description = "description";
   //
@@ -293,6 +364,7 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const bool print_coeffs_descrip
 
 
 unsigned int CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs, const bool ignore_coeffs_info) {
+  ifile.allowIgnoredFields();
   readHeaderFromFile(ifile, ignore_coeffs_info);
   unsigned int ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
   return ncoeffs_read;
@@ -303,6 +375,7 @@ unsigned int CoeffsVector::readFromFile(const std::string& filepath, const bool 
   IFile file; file.open(filepath);
   unsigned int ncoeffs_read=readFromFile(file,ignore_missing_coeffs, ignore_coeffs_info);
   return ncoeffs_read;
+  file.close();
 }
 
 
@@ -315,7 +388,7 @@ void CoeffsVector::readHeaderFromFile(IFile& ifile, const bool ignore_coeffs_inf
 unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_coeffs) {
   //
   std::string field_indices_prefix = "idx_";
-  std::string field_coeffs = "value";
+  std::string field_coeffs = getDataLabel();
   std::string field_index = "index";
   std::string field_description = "description";
   //

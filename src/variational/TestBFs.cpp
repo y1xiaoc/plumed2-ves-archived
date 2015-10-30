@@ -97,17 +97,65 @@ Function(ao)
   CoeffsMatrix* coeffsM = new CoeffsMatrix("coeffsM",args,bf,false,false,true);
   coeffsM->randomizeValuesGaussian(1);
   coeffsM->writeToFile("coeffsM.data");
-  CoeffsVector* coeffsV = new CoeffsVector("coeffsV",args,bf,true);
+
+
+  std::vector<CoeffsVector> d1;
+
+  CoeffsVector* coeffsV = new CoeffsVector("coeffs",args,bf,true);
   coeffsV-> randomizeValuesGaussian(41413);
-  coeffsV->writeToFile("coeffsV.data");
+  coeffsV->writeToFile("coeffsV.1.data");
+  d1.push_back(*coeffsV);
+  coeffsV->clear();
+  coeffsV->writeToFile("coeffsV.before.data");
 
   CoeffsVector coeffsV_copy1 = CoeffsVector(*coeffsV);
   coeffsV_copy1.setValues(10.0);
-  coeffsV_copy1[0]=1.0;
-  coeffsV_copy1[1]=1.0;
-  coeffsV_copy1[3]=4.0;
-  coeffsV_copy1 *= *coeffsV;
-  coeffsV_copy1.writeToFile("coeffsV_copy1.data");
+  coeffsV_copy1.setDataLabel("aux_coeffs");
+  d1.push_back(coeffsV_copy1);
+  coeffsV_copy1.clear();
+  coeffsV_copy1.writeToFile("coeffsV_copy1.before.data");
+
+  CoeffsVector coeffsV_copy2 = CoeffsVector(coeffsV_copy1);
+  coeffsV_copy2.setDataLabel("aux_coeffs2");
+  coeffsV_copy2.setValues(2.0);
+  d1.push_back(coeffsV_copy2);
+  coeffsV_copy2.clear();
+  coeffsV_copy2.writeToFile("coeffsV_copy2.before.data");
+
+
+  OFile file1;
+  file1.open("test1.data");
+  CoeffsVector::writeSetToFile(file1,d1,true);
+  file1.close();
+
+
+  d1.clear();
+  d1.push_back(*coeffsV);
+  d1.push_back(coeffsV_copy1);
+  d1.push_back(coeffsV_copy2);
+  OFile file2;
+  file2.open("test2.data");
+  CoeffsVector::writeSetToFile(file2,d1,true);
+  file2.close();
+
+  coeffsV->readFromFile("test1.data");
+  coeffsV->writeToFile("coeffsV.after.data");
+
+  coeffsV_copy1.readFromFile("test1.data");
+  coeffsV_copy1.writeToFile("coeffsV_copy2.after.data");
+
+  coeffsV_copy2.readFromFile("test1.data");
+  coeffsV_copy2.writeToFile("coeffsV_copy2.after.data");
+
+  d1.clear();
+  d1.push_back(*coeffsV);
+  d1.push_back(coeffsV_copy1);
+  d1.push_back(coeffsV_copy2);
+  OFile file3;
+  file3.open("test3.data");
+  CoeffsVector::writeSetToFile(file3,d1,true);
+  file3.close();
+
 
 
   /*
@@ -124,7 +172,6 @@ Function(ao)
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
   coeffs = bias_expansion->getPointerToBiasCoeffs();
-  // coeffs->setValueAndAux(0,1000.0,0.0);
   std::vector<unsigned int> nbins(2,300);
   bias_expansion->setupGrid(nbins);
   coeffs->randomizeCoeffs();
@@ -138,12 +185,9 @@ Function(ao)
   log.printf("Min:  %f\n",coeffs2->getMinValue());
   log.printf("Max:  %f\n",coeffs2->getMaxValue());
   log.printf("Norm: %f\n",coeffs2->getNorm());
-  coeffs2->setAuxEqualToMain();
   coeffs2->normalizeCoeffs();
   coeffs2->writeToFile("TEST3.data",true,true);
-  coeffs2->clearAux();
   coeffs2->writeToFile("TEST4.data",true,true);
-  coeffs2->setMainEqualToAux();
   coeffs2->writeToFile("TEST5.data",true,true);
 
 
@@ -154,7 +198,7 @@ Function(ao)
 
   TargetDistribution1DimBase::writeDistributionToFile("dist","GAUSSIAN CENTER=-2.0,2.0 SIGMA=0.5,0.5 WEIGHT=1,4 DO_NOT_NORMALIZE",-4.0,4.0,200);
 
-  // coeffs->setValueAndAux(10,2.0000001, 400.0);
+
   // coeffs->writeToFile("TEST.data");
   // coeffs2 = Coeffs::createFromFile("TEST.data");
   // coeffs2->setCounter(100);

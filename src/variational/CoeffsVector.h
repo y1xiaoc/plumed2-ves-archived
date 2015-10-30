@@ -63,6 +63,8 @@ public:
   index_t getSize() const;
     // clear coeffs
   void clear();
+  //
+  bool sameShape(const CoeffsVector other_coeffsvector) const;
   // get value
   double getValue(const index_t) const;
   double getValue(const std::vector<unsigned int>&) const;
@@ -97,9 +99,10 @@ public:
   void randomizeValuesGaussian(int);
 
   // file input/output stuff
+  static void writeSetToFile(OFile&, const std::vector<CoeffsVector>&, const bool print_description=false);
   void writeToFile(OFile&,const bool print_description=false);
   void writeToFile(const std::string&,const bool print_description=false, const bool append_file=false);
-  void writeHeaderToFile(OFile&);
+  void writeHeaderToFile(OFile&) const;
   void writeDataToFile(OFile&,const bool print_description=false);
   unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
   unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
@@ -107,6 +110,7 @@ public:
   unsigned int readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
   // set output format
   void setOutputFmt(std::string ss){ output_fmt_=ss; }
+  std::string getOutputFmt() const { return output_fmt_; }
 
 };
 }

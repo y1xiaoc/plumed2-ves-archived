@@ -41,7 +41,8 @@ public:
   typedef size_t index_t;
   // typedef unsigned int index_t;
 private:
-  std::string coeffs_label_;
+  std::string label_;
+  std::string data_label_;
   enum CoeffsType {
     Generic,
     LinearBasisSet
@@ -52,7 +53,6 @@ private:
   std::vector<std::string> coeffs_descriptions_;
   std::vector<std::string> dimension_labels_;
   // Labels for field in output/input files
-  std::string field_label;
   std::string field_type;
   std::string field_ndimensions;
   std::string field_ncoeffs_total;
@@ -71,6 +71,8 @@ public:
   //
   std::string getLabel() const;
   void setLabel(const std::string);
+  std::string getDataLabel() const;
+  void setDataLabel(const std::string);
   //
   CoeffsType getType() const;
   std::string getTypeStr() const;
@@ -100,7 +102,7 @@ public:
   void setAllDimensionLabels(const std::string);
   void setAllDimensionLabels(const std::vector<std::string>);
   void setupFileFields();
-  void writeCoeffsInfoToFile(OFile&);
+  void writeCoeffsInfoToFile(OFile&) const;
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
   void checkCoeffsInfo(const std::string, const std::string, const unsigned int, const index_t, const std::vector<unsigned int>);
 protected:

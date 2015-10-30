@@ -37,13 +37,13 @@
 namespace PLMD{
 
 CoeffsMatrix::CoeffsMatrix(
-  const std::string& coeffs_label,
+  const std::string& label,
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape,
   const bool symmetric, const bool diagonal,
   const bool use_counter):
 CounterBase(use_counter),
-CoeffsBase(coeffs_label,dimension_labels,indices_shape),
+CoeffsBase(label,dimension_labels,indices_shape),
 symmetric_(symmetric),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
@@ -53,13 +53,13 @@ output_fmt_("%30.16e")
 
 
 CoeffsMatrix::CoeffsMatrix(
-  const std::string& coeffs_label,
+  const std::string& label,
   std::vector<Value*> args,
   std::vector<BasisFunctions*> basisf,
   const bool symmetric, const bool diagonal,
   const bool use_counter):
 CounterBase(use_counter),
-CoeffsBase(coeffs_label,args,basisf),
+CoeffsBase(label,args,basisf),
 symmetric_(symmetric),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
@@ -226,7 +226,7 @@ void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
 void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
   //
   std::string field_indices_prefix = "idx_";
-  std::string field_coeffs = "value";
+  std::string field_coeffs = getDataLabel();
   std::string field_index = "index";
   //
   std::string int_fmt = "%8d";
@@ -262,7 +262,7 @@ void CoeffsMatrix::writeDataToFile(OFile& ofile) {
   //
   std::string field_index_row = "idx_row";
   std::string field_index_column = "idx_column";
-  std::string field_coeffs = "value";
+  std::string field_coeffs = getDataLabel();
   //
   std::string int_fmt = "%8d";
   std::string str_seperate = "#!-------------------";
@@ -304,6 +304,7 @@ void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_fi
   if(append_file){ file.enforceRestart(); }
   file.open(filepath);
   writeToFile(file);
+  file.close();
 }
 
 
