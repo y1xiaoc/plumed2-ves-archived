@@ -101,13 +101,13 @@ double CoeffsVector::getValue(const std::vector<unsigned int>& indices) const {
 }
 
 
-double& CoeffsVector::operator [](const index_t index) {
+double& CoeffsVector::operator[](const index_t index) {
   plumed_dbg_assert(index<data.size());
   return data[index];
 }
 
 
-const double& CoeffsVector::operator [](const index_t index) const {
+const double& CoeffsVector::operator[](const index_t index) const {
   plumed_dbg_assert(index<data.size());
   return data[index];
 }
@@ -142,18 +142,33 @@ void CoeffsVector::scaleAllValues(const double scalef) {
 }
 
 
-CoeffsVector CoeffsVector::operator *=(const double scalef) {
+CoeffsVector CoeffsVector::operator*=(const double scalef) {
   scaleAllValues(scalef);
   return *this;
 }
 
 
-CoeffsVector CoeffsVector::operator *=(const CoeffsVector other_coeffsvector) {
+CoeffsVector operator*(const double scalef, const CoeffsVector& coeffsvector) {
+  return CoeffsVector(coeffsvector)*=scalef;
+}
+
+
+CoeffsVector operator*(const CoeffsVector& coeffsvector, const double scalef) {
+  return scalef*coeffsvector;
+}
+
+
+CoeffsVector CoeffsVector::operator*=(const CoeffsVector& other_coeffsvector) {
   plumed_massert(data.size()==other_coeffsvector.getSize(),"Coeffs vectors do not have the same size");
   for(index_t i=0; i<data.size(); i++){
     data[i]*=other_coeffsvector.data[i];
   }
   return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator*(const CoeffsVector& other_coeffsvector) const {
+  return CoeffsVector(*this)*=other_coeffsvector;
 }
 
 
@@ -164,6 +179,40 @@ void CoeffsVector::setValues(const double value) {
 }
 
 
+void CoeffsVector::setValues(const std::vector<double>& values) {
+  plumed_massert( data.size()==values.size(), "Incorrect size");
+  for(index_t i=0; i<data.size(); i++){
+    data[i]=values[i];
+  }
+}
+
+
+void CoeffsVector::setValues(const CoeffsVector& other_coeffsvector) {
+  plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
+  for(index_t i=0; i<data.size(); i++){
+    data[i]=other_coeffsvector.data[i];
+  }
+}
+
+
+CoeffsVector CoeffsVector::operator=(const double value) {
+  setValues(value);
+  return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator=(const std::vector<double>& values) {
+  setValues(values);
+  return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator=(const CoeffsVector& other_coeffsvector) {
+  setValues(other_coeffsvector);
+  return *this;
+}
+
+
 void CoeffsVector::addToValues(const double value) {
   for(index_t i=0; i<data.size(); i++){
     data[i]+=value;
@@ -171,35 +220,38 @@ void CoeffsVector::addToValues(const double value) {
 }
 
 
-void CoeffsVector::setFromOtherCoeffsVector(CoeffsVector* other_coeffsvector) {
-  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
+void CoeffsVector::addToValues(const CoeffsVector& other_coeffsvector) {
+  plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
   for(index_t i=0; i<data.size(); i++){
-    data[i]=other_coeffsvector->getValue(i);
+    data[i]+=other_coeffsvector.data[i];
   }
 }
 
 
-void CoeffsVector::setFromOtherCoeffsVector(CoeffsVector* other_coeffsvector,const double scalef) {
-  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
-  for(index_t i=0; i<data.size(); i++){
-    data[i]=scalef*other_coeffsvector->getValue(i);
-  }
+CoeffsVector CoeffsVector::operator+=(const double value) {
+  addToValues(value);
+  return *this;
 }
 
 
-void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffsvector) {
-  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
-  for(index_t i=0; i<data.size(); i++){
-    data[i]+=other_coeffsvector->getValue(i);
-  }
+CoeffsVector operator+(const double value, const CoeffsVector& coeffsvector) {
+  return CoeffsVector(coeffsvector)+=value;
 }
 
 
-void CoeffsVector::addFromOtherCoeffsVector(CoeffsVector* other_coeffsvector, const double scalef) {
-  plumed_massert(data.size()==other_coeffsvector->getSize(),"Coeffs vectors do not have the same size");
-  for(index_t i=0; i<data.size(); i++){
-    data[i]+=scalef*other_coeffsvector->getValue(i);
-  }
+CoeffsVector operator+(const CoeffsVector& coeffsvector, const double value) {
+  return value*coeffsvector;
+}
+
+
+CoeffsVector CoeffsVector::operator+=(const CoeffsVector& other_coeffsvector) {
+  addToValues(other_coeffsvector);
+  return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator+(const CoeffsVector& other_coeffsvector) const {
+  return CoeffsVector(*this)+=other_coeffsvector;
 }
 
 

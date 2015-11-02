@@ -94,18 +94,35 @@ Function(ao)
 
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
-  CoeffsMatrix* coeffsM = new CoeffsMatrix("coeffsM",args,bf,false,false,true);
-  coeffsM->randomizeValuesGaussian(1);
-  coeffsM->writeToFile("coeffsM.data");
+  CoeffsMatrix coeffsM = CoeffsMatrix("coeffsM",args,bf,false,false,true);
+  coeffsM.randomizeValuesGaussian(1);
+  coeffsM.writeToFile("coeffsM.data");
 
 
   std::vector<CoeffsVector> d1;
 
-  CoeffsVector* coeffsV = new CoeffsVector("coeffs",args,bf,true);
-  coeffsV-> randomizeValuesGaussian(41413);
-  coeffsV->writeToFile("coeffsV.1.data",true);
-  d1.push_back(*coeffsV);
+  CoeffsVector coeffsV = CoeffsVector("coeffs",args,bf,true);
 
+  coeffsV.setValues(3.0);
+  coeffsV.setOutputFmt("%5.1f");
+  CoeffsVector coeffsV2 = 2.0*coeffsV;
+  CoeffsVector coeffsV3 = coeffsV*-1.0;
+  CoeffsVector coeffsV4 = coeffsV*coeffsV2;
+  CoeffsVector coeffsV5 = coeffsV*coeffsV2*(1.0/3.0);
+  CoeffsVector coeffsV6 = coeffsV*(1.0/3.0)*coeffsV2;
+  CoeffsVector coeffsV7 = coeffsV*coeffsV2*coeffsV3;
+
+  d1.push_back(coeffsV);
+  d1.push_back(coeffsV2);
+  d1.push_back(coeffsV3);
+  d1.push_back(coeffsV4);
+  d1.push_back(coeffsV5);
+  d1.push_back(coeffsV6);
+  d1.push_back(coeffsV7);
+  CoeffsVector::writeToFile("test.data",d1,true);
+
+
+  /*
   std::vector<BasisFunctions*> bf2; bf2.resize(1); bf2[0]=bf_pointer;
   std::vector<Value*> args2; args2.resize(1); args2[0]=getArguments()[0];
   CoeffsVector* coeffsV2 = new CoeffsVector("coeffs2",args2,bf2,true);
@@ -119,36 +136,32 @@ Function(ao)
   coeffsV_copy1.clear();
   coeffsV_copy1.writeToFile("coeffsV_copy1.before.data");
 
-  CoeffsVector coeffsV_copy2 = CoeffsVector(coeffsV_copy1);
+
+
+
+  CoeffsVector coeffsV_copy2 = 2*CoeffsVector(coeffsV_copy1);
   coeffsV_copy2.setDataLabel("aux_coeffs2");
   coeffsV_copy2.setValues(2.0);
   d1.push_back(coeffsV_copy2);
   coeffsV_copy2.clear();
-  coeffsV_copy2.writeToFile("coeffsV_copy2.before.data");
-
-
+  CoeffsV_copy2.writeToFile("coeffsV_copy2.before.data");
 
   CoeffsVector::writeToFile("test.data",d1,true);
-
-
 
   d1.clear();
   d1.push_back(*coeffsV);
   CoeffsVector::writeToFile("test.data",d1,true,true);
 
-
   coeffsV->setValues(3e56);
   coeffsV_copy1.setValues(3.0);
   coeffsV_copy2.randomizeValuesGaussian(414);
-
 
   d1.clear();
   d1.push_back(*coeffsV);
   d1.push_back(coeffsV_copy1);
   d1.push_back(coeffsV_copy2);
   CoeffsVector::writeToFile("test.data",d1,true,true);
-
-
+  */
 
 
   /*
