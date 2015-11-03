@@ -70,6 +70,12 @@ public:
   double getValue(const std::vector<unsigned int>&) const;
   double& operator[](const index_t index);
   const double& operator[](const index_t index) const;
+  double& operator[](const std::vector<unsigned int>&);
+  const double& operator[](const std::vector<unsigned int>&) const;
+  double& operator()(const index_t index);
+  const double& operator()(const index_t index) const;
+  double& operator()(const std::vector<unsigned int>&);
+  const double& operator()(const std::vector<unsigned int>&) const;
   // set value
   void setValue(const index_t, const double);
   void setValue(const std::vector<unsigned int>&, const double);
@@ -78,26 +84,34 @@ public:
   void addToValue(const std::vector<unsigned int>&, const double);
   // scale all values
   void scaleAllValues(const double);
-  CoeffsVector operator*=(const double);
+  CoeffsVector& operator*=(const double);
   friend CoeffsVector operator*(const double, const CoeffsVector&);
   friend CoeffsVector operator*(const CoeffsVector&, const double);
-  CoeffsVector operator*=(const CoeffsVector&);
+  CoeffsVector& operator*=(const CoeffsVector&);
   CoeffsVector operator*(const CoeffsVector&) const;
   // set all values
   void setValues(const double);
   void setValues(const std::vector<double>&);
   void setValues(const CoeffsVector&);
-  CoeffsVector operator=(const double);
-  CoeffsVector operator=(const std::vector<double>&);
-  CoeffsVector operator=(const CoeffsVector&);
+  CoeffsVector& operator=(const double);
+  CoeffsVector& operator=(const std::vector<double>&);
+  CoeffsVector& operator=(const CoeffsVector&);
   // add to all values
+  CoeffsVector operator+() const;
+  CoeffsVector operator-() const;
   void addToValues(const double);
   void addToValues(const CoeffsVector&);
-  CoeffsVector operator+=(const double);
+  CoeffsVector& operator+=(const double);
   friend CoeffsVector operator+(const double, const CoeffsVector&);
   friend CoeffsVector operator+(const CoeffsVector&, const double);
-  CoeffsVector operator+=(const CoeffsVector&);
+  CoeffsVector& operator-=(const double);
+  friend CoeffsVector operator-(const double, const CoeffsVector&);
+  friend CoeffsVector operator-(const CoeffsVector&, const double);
+  CoeffsVector& operator+=(const CoeffsVector&);
   CoeffsVector operator+(const CoeffsVector&) const;
+  CoeffsVector& operator-=(const CoeffsVector&);
+  CoeffsVector operator-(const CoeffsVector&) const;
+
 
   //
   double getMinValue() const;

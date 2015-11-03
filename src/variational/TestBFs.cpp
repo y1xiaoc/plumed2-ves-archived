@@ -97,32 +97,50 @@ Function(ao)
   CoeffsMatrix coeffsM = CoeffsMatrix("coeffsM",args,bf,false,false,true);
   coeffsM.randomizeValuesGaussian(1);
   coeffsM.writeToFile("coeffsM.data");
+  coeffsM(1,2)=6.0;
+  coeffsM(1,1)=4.0;
+
+  std::vector<unsigned int> ind1 = coeffsM.getIndices(4);
+  std::vector<unsigned int> ind2 = coeffsM.getIndices(5);
+  coeffsM(ind1,ind2)=4.0;
+  coeffsM(ind1,ind2)+=23.0;
+
+  coeffsM.writeToFile("coeffsM.data");
 
 
   std::vector<CoeffsVector> d1;
 
-  CoeffsVector coeffsV = CoeffsVector("coeffs",args,bf,true);
+  CoeffsVector coeffsV1 = CoeffsVector("coeffs",args,bf,true);
+  CoeffsVector coeffsV2 = CoeffsVector("coeffs",args,bf,true);
 
-  coeffsV.setValues(3.0);
-  coeffsV.setOutputFmt("%5.1f");
-  CoeffsVector coeffsV2 = 2.0*coeffsV;
-  CoeffsVector coeffsV3 = coeffsV*-1.0;
-  CoeffsVector coeffsV4 = coeffsV*coeffsV2;
-  CoeffsVector coeffsV5 = coeffsV*coeffsV2*(1.0/3.0);
-  CoeffsVector coeffsV6 = coeffsV*(1.0/3.0)*coeffsV2;
-  CoeffsVector coeffsV7 = coeffsV*coeffsV2*coeffsV3;
+  std::vector<double> vec( coeffsV1.getSize() );
+  for (unsigned int i = 0; i < vec.size(); i++) {
+    vec[i]=i*i;
+  }
+  coeffsV1 = 3.0;
+  coeffsV2 = 100.0;
+  CoeffsVector coeffsV3 = coeffsV1-1.0;
 
-  d1.push_back(coeffsV);
-  d1.push_back(coeffsV2);
-  d1.push_back(coeffsV3);
-  d1.push_back(coeffsV4);
-  d1.push_back(coeffsV5);
-  d1.push_back(coeffsV6);
-  d1.push_back(coeffsV7);
-  CoeffsVector::writeToFile("test.data",d1,true);
+  ind1 = coeffsV3.getIndices(2);
+  coeffsV3(ind1)=1000.0;
+  coeffsV3[ind1]+=10000.0;
+
+  CoeffsVector coeffsV4 = 1.0-coeffsV1;
+  CoeffsVector coeffsV5 = coeffsV1+1.0;
+  CoeffsVector coeffsV6 = 1.0+coeffsV1;
+  CoeffsVector coeffsV7(coeffsV1);
+  coeffsV7 = vec;
+
+  coeffsV1.writeToFile("coeffsV1.data");
+  coeffsV2.writeToFile("coeffsV2.data");
+  coeffsV3.writeToFile("coeffsV3.data");
+  coeffsV4.writeToFile("coeffsV4.data");
+  coeffsV5.writeToFile("coeffsV5.data");
+  coeffsV6.writeToFile("coeffsV6.data");
+  coeffsV7.writeToFile("coeffsV7.data");
 
 
-  /*
+    /*
   std::vector<BasisFunctions*> bf2; bf2.resize(1); bf2[0]=bf_pointer;
   std::vector<Value*> args2; args2.resize(1); args2[0]=getArguments()[0];
   CoeffsVector* coeffsV2 = new CoeffsVector("coeffs2",args2,bf2,true);

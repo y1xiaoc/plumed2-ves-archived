@@ -113,6 +113,38 @@ const double& CoeffsVector::operator[](const index_t index) const {
 }
 
 
+double& CoeffsVector::operator[](const std::vector<unsigned int>& indices) {
+  return data[getIndex(indices)];
+}
+
+
+const double& CoeffsVector::operator[](const std::vector<unsigned int>& indices) const {
+  return data[getIndex(indices)];
+}
+
+
+double& CoeffsVector::operator()(const index_t index) {
+  plumed_dbg_assert(index<data.size());
+  return data[index];
+}
+
+
+const double& CoeffsVector::operator()(const index_t index) const {
+  plumed_dbg_assert(index<data.size());
+  return data[index];
+}
+
+
+double& CoeffsVector::operator()(const std::vector<unsigned int>& indices) {
+  return data[getIndex(indices)];
+}
+
+
+const double& CoeffsVector::operator()(const std::vector<unsigned int>& indices) const {
+  return data[getIndex(indices)];
+}
+
+
 void CoeffsVector::setValue(const index_t index, const double value) {
   plumed_dbg_assert(index<data.size());
   data[index]=value;
@@ -142,7 +174,7 @@ void CoeffsVector::scaleAllValues(const double scalef) {
 }
 
 
-CoeffsVector CoeffsVector::operator*=(const double scalef) {
+CoeffsVector& CoeffsVector::operator*=(const double scalef) {
   scaleAllValues(scalef);
   return *this;
 }
@@ -158,7 +190,7 @@ CoeffsVector operator*(const CoeffsVector& coeffsvector, const double scalef) {
 }
 
 
-CoeffsVector CoeffsVector::operator*=(const CoeffsVector& other_coeffsvector) {
+CoeffsVector& CoeffsVector::operator*=(const CoeffsVector& other_coeffsvector) {
   plumed_massert(data.size()==other_coeffsvector.getSize(),"Coeffs vectors do not have the same size");
   for(index_t i=0; i<data.size(); i++){
     data[i]*=other_coeffsvector.data[i];
@@ -195,21 +227,31 @@ void CoeffsVector::setValues(const CoeffsVector& other_coeffsvector) {
 }
 
 
-CoeffsVector CoeffsVector::operator=(const double value) {
+CoeffsVector& CoeffsVector::operator=(const double value) {
   setValues(value);
   return *this;
 }
 
 
-CoeffsVector CoeffsVector::operator=(const std::vector<double>& values) {
+CoeffsVector& CoeffsVector::operator=(const std::vector<double>& values) {
   setValues(values);
   return *this;
 }
 
 
-CoeffsVector CoeffsVector::operator=(const CoeffsVector& other_coeffsvector) {
+CoeffsVector& CoeffsVector::operator=(const CoeffsVector& other_coeffsvector) {
   setValues(other_coeffsvector);
   return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator+() const {
+  return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator-() const {
+  return CoeffsVector(*this)*=-1.0;
 }
 
 
@@ -228,23 +270,39 @@ void CoeffsVector::addToValues(const CoeffsVector& other_coeffsvector) {
 }
 
 
-CoeffsVector CoeffsVector::operator+=(const double value) {
+CoeffsVector& CoeffsVector::operator+=(const double value) {
   addToValues(value);
   return *this;
 }
 
 
 CoeffsVector operator+(const double value, const CoeffsVector& coeffsvector) {
-  return CoeffsVector(coeffsvector)+=value;
+  return coeffsvector+value;
 }
 
 
 CoeffsVector operator+(const CoeffsVector& coeffsvector, const double value) {
-  return value*coeffsvector;
+  return CoeffsVector(coeffsvector)+=value;
 }
 
 
-CoeffsVector CoeffsVector::operator+=(const CoeffsVector& other_coeffsvector) {
+CoeffsVector& CoeffsVector::operator-=(const double value) {
+  addToValues(-1.0*value);
+  return *this;
+}
+
+
+CoeffsVector operator-(const double value, const CoeffsVector& coeffsvector) {
+  return -1.0*coeffsvector+value;
+}
+
+
+CoeffsVector operator-(const CoeffsVector& coeffsvector, const double value) {
+  return CoeffsVector(coeffsvector)-=value;
+}
+
+
+CoeffsVector& CoeffsVector::operator+=(const CoeffsVector& other_coeffsvector) {
   addToValues(other_coeffsvector);
   return *this;
 }
@@ -252,6 +310,17 @@ CoeffsVector CoeffsVector::operator+=(const CoeffsVector& other_coeffsvector) {
 
 CoeffsVector CoeffsVector::operator+(const CoeffsVector& other_coeffsvector) const {
   return CoeffsVector(*this)+=other_coeffsvector;
+}
+
+
+CoeffsVector& CoeffsVector::operator-=(const CoeffsVector& other_coeffsvector) {
+  addToValues(-1.0*other_coeffsvector);
+  return *this;
+}
+
+
+CoeffsVector CoeffsVector::operator-(const CoeffsVector& other_coeffsvector) const {
+  return CoeffsVector(*this)-=other_coeffsvector;
 }
 
 

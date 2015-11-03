@@ -142,6 +142,26 @@ void CoeffsMatrix::setValue(const std::vector<unsigned int>& indices1, const std
 }
 
 
+double& CoeffsMatrix::operator()(const index_t index1, const index_t index2) {
+  return data[getMatrixIndex(index1,index2)];
+}
+
+
+const double& CoeffsMatrix::operator()(const index_t index1, const index_t index2) const {
+  return data[getMatrixIndex(index1,index2)];
+}
+
+
+double& CoeffsMatrix::operator()(const std::vector<unsigned int>& indices1, const std::vector<unsigned int>& indices2) {
+  return data[getMatrixIndex(getIndex(indices1),getIndex(indices2))];
+}
+
+
+const double& CoeffsMatrix::operator()(const std::vector<unsigned int>& indices1, const std::vector<unsigned int>& indices2) const {
+  return data[getMatrixIndex(getIndex(indices1),getIndex(indices2))];
+}
+
+
 void CoeffsMatrix::addToValue(const index_t index1, const index_t index2, const double value) {
   data[getMatrixIndex(index1,index2)]+=value;
   if(symmetric_ && !diagonal_){

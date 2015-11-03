@@ -90,6 +90,10 @@ public:
   // set value
   void setValue(const index_t, const index_t, const double);
   void setValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&, const double);
+  double& operator()(const index_t, const index_t);
+  const double& operator()(const index_t, const index_t) const;
+  double& operator()(const std::vector<unsigned int>&, const std::vector<unsigned int>&);
+  const double& operator()(const std::vector<unsigned int>&, const std::vector<unsigned int>&) const;
   // add to value
   void addToValue(const index_t, const index_t, const double);
   void addToValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&, const double);
@@ -118,7 +122,7 @@ private:
   void writeHeaderToFile(OFile&);
   void writeDataDiagonalToFile(OFile&);
   void writeDataToFile(OFile&);
-public:  
+public:
     // set output format
   void setOutputFmt(std::string ss){ output_fmt_=ss; }
 
