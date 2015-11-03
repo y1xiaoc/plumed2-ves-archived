@@ -36,6 +36,7 @@ class Value;
 class IFile;
 class OFile;
 class BasisFunctions;
+class Communicator;
 
 /// \ingroup TOOLBOX
 class CoeffsVector:
@@ -44,6 +45,7 @@ class CoeffsVector:
 {
 public:
 private:
+  Communicator& mycomm;
   std::vector<double> data;
   std::string output_fmt_; // format for output
   //
@@ -52,11 +54,13 @@ public:
     const std::string&,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&,
+    Communicator&,
     const bool use_counter=false);
   CoeffsVector(
     const std::string&,
     std::vector<Value*>,
     std::vector<BasisFunctions*>,
+    Communicator&,
     const bool use_counter=false);
   ~CoeffsVector(){}
   //
@@ -65,6 +69,8 @@ public:
   void clear();
   //
   bool sameShape(const CoeffsVector other_coeffsvector) const;
+  //
+  void sumMPI(); 
   // get value
   double getValue(const index_t) const;
   double getValue(const std::vector<unsigned int>&) const;
@@ -125,7 +131,7 @@ public:
   // file input/output stuff
   void writeToFile(const std::string&, const bool print_description=false, const bool append_file=false);
   void writeToFile(OFile&,const bool print_description=false);
-  static void writeToFile(const std::string&, const std::vector<CoeffsVector>&, const bool print_description=false, const bool append_file=false);
+  static void writeToFile(const std::string&, const std::vector<CoeffsVector>&, Communicator&, const bool print_description=false, const bool append_file=false);
   static void writeToFile(OFile&, const std::vector<CoeffsVector>&, const bool print_description=false);
 private:
   void writeHeaderToFile(OFile&) const;

@@ -94,24 +94,27 @@ Function(ao)
 
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
-  CoeffsMatrix coeffsM = CoeffsMatrix("coeffsM",args,bf,false,false,true);
+  CoeffsMatrix coeffsM = CoeffsMatrix("coeffsM",args,bf,comm);
   coeffsM.randomizeValuesGaussian(1);
   coeffsM.writeToFile("coeffsM.data");
-  coeffsM(1,2)=6.0;
-  coeffsM(1,1)=4.0;
 
   std::vector<unsigned int> ind1 = coeffsM.getIndices(4);
   std::vector<unsigned int> ind2 = coeffsM.getIndices(5);
-  coeffsM(ind1,ind2)=4.0;
-  coeffsM(ind1,ind2)+=23.0;
+  coeffsM(ind1,ind1)=4.0;
+  coeffsM(ind1,ind1)+=23.0;
 
-  coeffsM.writeToFile("coeffsM.data");
+  coeffsM.writeToFile("coeffsM.1.data");
+  coeffsM.sumMPI();
+  coeffsM.writeToFile("coeffsM.2.data");
+
+  // unsigned int rank comm.Rank();
 
 
-  std::vector<CoeffsVector> d1;
 
-  CoeffsVector coeffsV1 = CoeffsVector("coeffs",args,bf,true);
-  CoeffsVector coeffsV2 = CoeffsVector("coeffs",args,bf,true);
+
+
+  CoeffsVector coeffsV1 = CoeffsVector("coeffs",args,bf,comm,true);
+  CoeffsVector coeffsV2 = CoeffsVector("coeffs",args,bf,comm,true);
 
   std::vector<double> vec( coeffsV1.getSize() );
   for (unsigned int i = 0; i < vec.size(); i++) {
@@ -119,25 +122,33 @@ Function(ao)
   }
   coeffsV1 = 3.0;
   coeffsV2 = 100.0;
-  CoeffsVector coeffsV3 = coeffsV1-1.0;
+  CoeffsVector coeffsV3 = coeffsM*coeffsV1;
+  CoeffsVector coeffsV4 = coeffsV1*coeffsM;
 
-  ind1 = coeffsV3.getIndices(2);
-  coeffsV3(ind1)=1000.0;
-  coeffsV3[ind1]+=10000.0;
-
-  CoeffsVector coeffsV4 = 1.0-coeffsV1;
+  // CoeffsVector coeffsV4 = 1.0-coeffsV1;
   CoeffsVector coeffsV5 = coeffsV1+1.0;
   CoeffsVector coeffsV6 = 1.0+coeffsV1;
   CoeffsVector coeffsV7(coeffsV1);
   coeffsV7 = vec;
+  coeffsV1.clear();
 
-  coeffsV1.writeToFile("coeffsV1.data");
-  coeffsV2.writeToFile("coeffsV2.data");
-  coeffsV3.writeToFile("coeffsV3.data");
-  coeffsV4.writeToFile("coeffsV4.data");
-  coeffsV5.writeToFile("coeffsV5.data");
-  coeffsV6.writeToFile("coeffsV6.data");
-  coeffsV7.writeToFile("coeffsV7.data");
+  for(unsigned int i=comm.Get_rank(); i<coeffsV1.getSize(); i+=comm.Get_size()){
+    coeffsV1(i)=3.0;
+  }
+  coeffsV1.writeToFile("coeffsV1.1.data");
+  coeffsV1.sumMPI();
+  coeffsV1.writeToFile("coeffsV1.2.data");
+
+  // std::vector<CoeffsVector> d1;
+  // d1.push_back(coeffsV1);
+  // CoeffsVector::writeToFile("test.data",d1,comm,true);
+
+  // coeffsV2.writeToFile("coeffsV2.data");
+  // coeffsV3.writeToFile("coeffsV3.data");
+  // coeffsV4.writeToFile("coeffsV4.data");
+  // coeffsV5.writeToFile("coeffsV5.data");
+  // coeffsV6.writeToFile("coeffsV6.data");
+  // coeffsV7.writeToFile("coeffsV7.data");
 
 
     /*
@@ -164,7 +175,7 @@ Function(ao)
   coeffsV_copy2.clear();
   CoeffsV_copy2.writeToFile("coeffsV_copy2.before.data");
 
-  CoeffsVector::writeToFile("test.data",d1,true);
+
 
   d1.clear();
   d1.push_back(*coeffsV);

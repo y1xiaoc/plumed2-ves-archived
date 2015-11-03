@@ -33,6 +33,7 @@
 #include "tools/Exception.h"
 #include "BasisFunctions.h"
 #include "tools/Random.h"
+#include "tools/Communicator.h"
 
 namespace PLMD{
 
@@ -40,7 +41,9 @@ CoeffsVector::CoeffsVector(
   const std::string& label,
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape,
+  Communicator& cc,
   const bool use_counter):
+mycomm(cc),
 CounterBase(use_counter),
 CoeffsBase(label,dimension_labels,indices_shape),
 output_fmt_("%30.16e")
@@ -53,7 +56,9 @@ CoeffsVector::CoeffsVector(
   const std::string& label,
   std::vector<Value*> args,
   std::vector<BasisFunctions*> basisf,
+  Communicator& cc,
   const bool use_counter):
+mycomm(cc),
 CounterBase(use_counter),
 CoeffsBase(label,args,basisf),
 output_fmt_("%30.16e")
@@ -88,6 +93,11 @@ bool CoeffsVector::sameShape(const CoeffsVector other_coeffsvector) const {
     }
   }
   return true;
+}
+
+
+void CoeffsVector::sumMPI() {
+  mycomm.Sum(data);
 }
 
 
@@ -375,6 +385,7 @@ void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
 void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const bool append_file) {
   OFile file;
   if(append_file){ file.enforceRestart(); }
+  file.link(mycomm);
   file.open(filepath);
   writeToFile(file,print_coeffs_descriptions);
   file.close();
@@ -389,9 +400,10 @@ void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_description
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector>& CoeffsSet, const bool print_coeffs_descriptions, const bool append_file) {
+void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector>& CoeffsSet, Communicator& cc, const bool print_coeffs_descriptions, const bool append_file) {
   OFile file;
   if(append_file){ file.enforceRestart(); }
+  file.link(cc);
   file.open(filepath);
   writeToFile(file,CoeffsSet,print_coeffs_descriptions);
   file.close();
@@ -472,7 +484,10 @@ unsigned int CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_
 
 
 unsigned int CoeffsVector::readFromFile(const std::string& filepath, const bool ignore_missing_coeffs, const bool ignore_coeffs_info) {
-  IFile file; file.open(filepath);
+  IFile file;
+  file.link(mycomm);
+  file.open(filepath);
+
   unsigned int ncoeffs_read=readFromFile(file,ignore_missing_coeffs, ignore_coeffs_info);
   return ncoeffs_read;
   file.close();

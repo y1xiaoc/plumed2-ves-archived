@@ -27,12 +27,14 @@
 #include <cfloat>
 
 #include "CoeffsMatrix.h"
+#include "CoeffsVector.h"
 #include "tools/Tools.h"
 #include "core/Value.h"
 #include "tools/File.h"
 #include "tools/Exception.h"
 #include "BasisFunctions.h"
 #include "tools/Random.h"
+#include "tools/Communicator.h"
 
 namespace PLMD{
 
@@ -40,10 +42,12 @@ CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape,
+  Communicator& cc,
   const bool symmetric, const bool diagonal,
   const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase(label,dimension_labels,indices_shape),
+mycomm(cc),
 symmetric_(symmetric),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
@@ -56,10 +60,12 @@ CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
   std::vector<Value*> args,
   std::vector<BasisFunctions*> basisf,
+  Communicator& cc,
   const bool symmetric, const bool diagonal,
   const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase(label,args,basisf),
+mycomm(cc),
 symmetric_(symmetric),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
@@ -87,6 +93,7 @@ CoeffsBase::index_t CoeffsMatrix::getSize() const {
   return size_;
 }
 
+
 bool CoeffsMatrix::isSymmetric() const {
   return symmetric_;
 }
@@ -94,6 +101,11 @@ bool CoeffsMatrix::isSymmetric() const {
 
 bool CoeffsMatrix::isDiagonal() const {
   return diagonal_;
+}
+
+
+void CoeffsMatrix::sumMPI() {
+  mycomm.Sum(data);
 }
 
 
@@ -123,6 +135,7 @@ void CoeffsMatrix::clear() {
 double CoeffsMatrix::getValue(const index_t index1, const index_t index2) const {
   return data[getMatrixIndex(index1,index2)];
 }
+
 
 double CoeffsMatrix::getValue(const std::vector<unsigned int>& indices1, const std::vector<unsigned int>& indices2) const {
   return getValue(getIndex(indices1),getIndex(indices2));
@@ -159,6 +172,29 @@ double& CoeffsMatrix::operator()(const std::vector<unsigned int>& indices1, cons
 
 const double& CoeffsMatrix::operator()(const std::vector<unsigned int>& indices1, const std::vector<unsigned int>& indices2) const {
   return data[getMatrixIndex(getIndex(indices1),getIndex(indices2))];
+}
+
+
+CoeffsVector operator*(const CoeffsMatrix& coeffs_matrix, const CoeffsVector& coeffs_vector) {
+  CoeffsVector new_coeffs_vector(coeffs_vector);
+  CoeffsBase::index_t numcoeffs = coeffs_vector.getSize();
+  if(coeffs_matrix.isDiagonal()){
+    for(CoeffsBase::index_t i=0; i<numcoeffs; i++){
+      new_coeffs_vector(i) = coeffs_matrix(i,i)*coeffs_vector(i);
+    }
+  }
+  else{
+    for(CoeffsBase::index_t i=0; i<numcoeffs; i++){
+      for(CoeffsBase::index_t j=0; j<numcoeffs; j++){
+        new_coeffs_vector(i) = coeffs_matrix(i,j)*coeffs_vector(j);
+      }
+    }
+  }
+  return new_coeffs_vector;
+}
+
+CoeffsVector operator*(const CoeffsVector& coeffs_vector, const CoeffsMatrix& coeffs_matrix) {
+  return coeffs_matrix*coeffs_vector;
 }
 
 
@@ -242,6 +278,7 @@ void CoeffsMatrix::writeToFile(OFile& ofile) {
 void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_file) {
   OFile file;
   if(append_file){ file.enforceRestart(); }
+  file.link(mycomm);
   file.open(filepath);
   writeToFile(file);
   file.close();

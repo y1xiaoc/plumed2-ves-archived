@@ -36,6 +36,8 @@ class Value;
 class IFile;
 class OFile;
 class BasisFunctions;
+class CoeffsVector;
+class Communicator;
 
 /// \ingroup TOOLBOX
 class CoeffsMatrix:
@@ -44,6 +46,8 @@ class CoeffsMatrix:
 {
 public:
 private:
+  //
+  Communicator& mycomm;
   //
   index_t size_;
   index_t nrows_;
@@ -63,15 +67,17 @@ public:
     const std::string&,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&,
+    Communicator& cc,
     const bool symmetric=true,
-    const bool diagonal=false,
+    const bool diagonal=true,
     const bool use_counter=false);
   CoeffsMatrix(
     const std::string&,
     std::vector<Value*>,
     std::vector<BasisFunctions*>,
+    Communicator& cc,
     const bool symmetric=true,
-    const bool diagonal=false,
+    const bool diagonal=true,
     const bool use_counter=false);
   ~CoeffsMatrix(){}
   //
@@ -79,6 +85,8 @@ public:
   //
   bool isSymmetric() const;
   bool isDiagonal() const;
+  //
+  void sumMPI();
   //
   index_t getMatrixIndex(const index_t, const index_t) const;
   //
@@ -94,6 +102,9 @@ public:
   const double& operator()(const index_t, const index_t) const;
   double& operator()(const std::vector<unsigned int>&, const std::vector<unsigned int>&);
   const double& operator()(const std::vector<unsigned int>&, const std::vector<unsigned int>&) const;
+  //
+  friend CoeffsVector operator*(const CoeffsMatrix&, const CoeffsVector&);
+  friend CoeffsVector operator*(const CoeffsVector&, const CoeffsMatrix&);
   // add to value
   void addToValue(const index_t, const index_t, const double);
   void addToValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&, const double);
