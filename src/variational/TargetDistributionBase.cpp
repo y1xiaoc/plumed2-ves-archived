@@ -35,7 +35,6 @@ words(input)
 
 
 void TargetDistributionBase::registerKeywords( Keywords& keys ){
-  keys.add("optional","DIMENSION","The dimension of the target distribtion, is by default 1.");
 }
 
 
@@ -46,11 +45,15 @@ normalized_(false),
 dimension_(1)
 {
   input.erase( input.begin() );
-  parse("DIMENSION",dimension_,true);
 }
 
 
 TargetDistributionBase::~TargetDistributionBase() {
+}
+
+
+void TargetDistributionBase::setDimension(const unsigned int dimension){
+  dimension_=dimension;
 }
 
 
@@ -74,7 +77,7 @@ std::string TargetDistributionBase::description() {
 }
 
 
-void TargetDistributionBase::writeDistributionToFile(const std::string filepath, const std::string keywords, const std::vector<std::string> min, const std::vector<std::string> max, const std::vector<unsigned int>  nbins) {
+void TargetDistributionBase::writeDistributionToFile(const std::string filepath, const std::string keywords, const std::vector<std::string> min, const std::vector<std::string> max, const std::vector<unsigned int> nbins) {
   // create distribtion
   std::vector<std::string> words = Tools::getWords(keywords);
   TargetDistributionBase* distribution=targetDistributionRegister().create( (words) );
@@ -82,7 +85,8 @@ void TargetDistributionBase::writeDistributionToFile(const std::string filepath,
   // create grid
   std::vector<Value*> arguments(dimension);
   for (unsigned int i=0; i < dimension; i++) {
-    arguments[i]= new Value(NULL,"argument",false);
+    std::string is; Tools::convert(i+1,is);
+    arguments[i]= new Value(NULL,"arg"+is,false);
     arguments[i]->setNotPeriodic();
   }
   Grid* grid = new Grid(distribution->getType(),arguments,min,max,nbins,false,false);
@@ -100,7 +104,7 @@ void TargetDistributionBase::writeDistributionToFile(const std::string filepath,
 
 
 void TargetDistributionBase::calculateDistributionOnGrid(Grid* grid_ptr){
-  plumed_massert(grid_ptr->getDimension()==dimension_,"Grid is if the wrong dimension");
+  plumed_massert(grid_ptr->getDimension()==dimension_,"Grid is of the wrong dimension");
   for(unsigned int l=0; l<grid_ptr->getSize(); l++)
   {
    std::vector<double> argument=grid_ptr->getPoint(l);
@@ -108,6 +112,5 @@ void TargetDistributionBase::calculateDistributionOnGrid(Grid* grid_ptr){
    grid_ptr->setValue(l,value);
   }
 }
-
 
 }

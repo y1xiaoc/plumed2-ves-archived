@@ -30,7 +30,7 @@
 #include "tools/File.h"
 #include "LinearBiasExpansion.h"
 #include "tools/Communicator.h"
-#include "TargetDistribution1DimBase.h"
+#include "TargetDistributionBase.h"
 
 
 // using namespace std;
@@ -138,6 +138,24 @@ Function(ao)
   coeffsV1.writeToFile("coeffsV1.1.data");
   coeffsV1.sumMPI();
   coeffsV1.writeToFile("coeffsV1.2.data");
+
+  std::vector<std::string> min;
+  std::vector<std::string> max;
+  std::vector<unsigned int> nbins;
+  min.push_back("-4.0");
+  min.push_back("-4.0");
+
+  max.push_back("+4.0");
+  max.push_back("+4.0");
+
+  nbins.push_back(200);
+  nbins.push_back(200);
+  std::string keywords = "GAUSSIAN CENTER0=-2.0,-2.0 SIGMA0=1.0,1.0 CENTER1=2.0,2.0 SIGMA1=1.0,1.0 CENTER2=2.0,-2.0 SIGMA2=1.0,1.0 WEIGHTS=1.0,3.0,4.0";
+  TargetDistributionBase::writeDistributionToFile("dist",keywords,min,max,nbins);
+  keywords = "UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0";
+  TargetDistributionBase::writeDistributionToFile("dist2",keywords,min,max,nbins);
+
+
 
   // std::vector<CoeffsVector> d1;
   // d1.push_back(coeffsV1);

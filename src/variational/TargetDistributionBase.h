@@ -55,9 +55,13 @@ protected:
 /// Read a keywords from the input
   template <class T>
   bool parse(const std::string& ,T& , bool optional=false);
+  template <class T>
+  bool parseNumbered(const std::string& ,const unsigned int, T& , bool optional=false);
 /// Read a keywords vector from the input
   template <class T>
   bool parseVector(const std::string& ,std::vector<T>& , bool optional=false);
+  template <class T>
+  bool parseNumberedVector(const std::string& ,const unsigned int, std::vector<T>& , bool optional=false);
 /// Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
 public:
@@ -76,8 +80,9 @@ public:
 /// set the that target distribution is normalized
   void setNormalized(){normalized_=true;};
   void setNotNormalized(){normalized_=false;};
-/// get dimension
+/// dimension
   unsigned getDimension() const {return dimension_;}
+  void setDimension(const unsigned int);
 /// get type of distribution
   std::string getType()const{return type;};
 /// calculate the target distribution itself
@@ -87,6 +92,7 @@ public:
   void calculateDistributionOnGrid(Grid*);
 };
 
+
 template <class T>
 bool TargetDistributionBase::parse( const std::string& key, T& t, bool optional){
   bool found=Tools::parse(input,key,t);
@@ -94,12 +100,30 @@ bool TargetDistributionBase::parse( const std::string& key, T& t, bool optional)
   return found;
 }
 
+
 template <class T>
 bool TargetDistributionBase::parseVector( const std::string& key, std::vector<T>& t , bool optional){
   bool found=Tools::parseVector(input,key,t);
   if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
   return found;
 }
+
+
+template<class T>
+bool TargetDistributionBase::parseNumbered(const std::string&key, const unsigned int no, T&t, bool optional) {
+  std::string num; Tools::convert(no,num);
+  return Tools::parse(input,key+num,t);
+}
+
+
+template <class T>
+bool TargetDistributionBase::parseNumberedVector( const std::string& key, const unsigned int no, std::vector<T>& t , bool optional) {
+  std::string num; Tools::convert(no,num);
+  return Tools::parseVector(input,key+num,t);
+}
+
+
+
 
 }
 #endif
