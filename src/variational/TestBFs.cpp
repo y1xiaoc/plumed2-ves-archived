@@ -150,7 +150,7 @@ Function(ao)
 
   nbins.push_back(200);
   nbins.push_back(200);
-  std::string keywords = "GAUSSIAN CENTER0=-2.0,-2.0 SIGMA0=1.0,1.0 CENTER1=2.0,2.0 SIGMA1=1.0,1.0 CENTER2=2.0,-2.0 SIGMA2=1.0,1.0 WEIGHTS=1.0,3.0,4.0";
+  std::string keywords = "GAUSSIAN CENTER0=-2.0,-2.0 SIGMA0=0.3,1.0 CENTER1=2.0,2.0 SIGMA1=3.0,1.0 CENTER2=2.0,-2.0 SIGMA2=1.0,1.0 CORRELATION0=0.89 CORRELATION1=-0.99 CORRELATION2=0.3";
   TargetDistributionBase::writeDistributionToFile("dist",keywords,min,max,nbins);
   keywords = "UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0";
   TargetDistributionBase::writeDistributionToFile("dist2",keywords,min,max,nbins);

@@ -35,10 +35,13 @@ class GaussianDistribution: public TargetDistributionBase {
   // properties of the Gaussians
   std::vector< std::vector<double> > sigmas;
   std::vector< std::vector<double> > centers;
+  std::vector< std::vector<double> > correlation;
   std::vector<double> weights;
   bool normalize_distribution;
+  bool diagonal;
   unsigned int ngaussians;
-  double GaussianDist(const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true);
+  double GaussianDiagonal(const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true);
+  double Gaussian2D(const std::vector<double>, const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true);
 public:
   static void registerKeywords(Keywords&);
   GaussianDistribution(const TargetDistributionOptions& to);
@@ -53,6 +56,7 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
   TargetDistributionBase::registerKeywords(keys);
   keys.add("numbered","CENTER","The centers of the Gaussians.");
   keys.add("numbered","SIGMA","The sigmas of the Gaussians.");
+  keys.add("numbered","CORRELATION","The correlation between the arguments, currently only works for two-dimensional Gaussians ");
   keys.add("optional","WEIGHTS","The weights of the Gaussians.");
   keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized.");
   keys.remove("DIMENSION");
@@ -60,7 +64,8 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
 
 
 GaussianDistribution::GaussianDistribution( const TargetDistributionOptions& to ):
-TargetDistributionBase(to)
+TargetDistributionBase(to),
+diagonal(true)
 {
   for(unsigned int i=0;; i++) {
     std::vector<double> tmp_center;
@@ -75,6 +80,25 @@ TargetDistributionBase(to)
   plumed_massert(centers.size()==sigmas.size(),"there has to be an equal amount of numbered CENTER and SIGMA keywords");
   setDimension(centers[0].size());
   ngaussians = centers.size();
+
+  correlation.resize(ngaussians);
+  //
+  for(unsigned int i=0;i<ngaussians; i++){
+    std::vector<double> corr;
+    if(parseNumberedVector("CORRELATION",i,corr,true)){
+      plumed_massert(getDimension()==2,"CORRELATION is only defined for two-dimensional Gaussians");
+      plumed_massert(corr.size()==1,"only one value should be given in CORRELATION");
+      for(unsigned int k=0;k<corr.size(); k++){
+        plumed_massert(corr[k] >= -1.0 && corr[k] <= 1.0,"values given in CORRELATION should be between -1.0 and 1.0" );
+      }
+      correlation[i] = corr;
+      diagonal = false;
+    }
+    else {
+      corr.assign(1,0.0);
+      correlation[i] = corr;
+    }
+  }
   // check centers and sigmas
   for(unsigned int i=0; i<ngaussians; i++) {
     plumed_massert(centers[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
@@ -102,23 +126,43 @@ TargetDistributionBase(to)
 
 double GaussianDistribution::distribution(const std::vector<double> argument) {
   double value=0.0;
-  for(unsigned int i=0;i<ngaussians;i++){
-    value+=weights[i]*GaussianDist(argument, centers[i], sigmas[i],normalize_distribution);
+  if(diagonal){
+    for(unsigned int i=0;i<ngaussians;i++){
+      value+=weights[i]*GaussianDiagonal(argument, centers[i], sigmas[i],normalize_distribution);
+    }
+  }
+  else if(!diagonal && getDimension()==2){
+    for(unsigned int i=0;i<ngaussians;i++){
+      value+=weights[i]*Gaussian2D(argument, centers[i], sigmas[i],correlation[i],normalize_distribution);
+    }
   }
   return value;
 }
 
 
-double GaussianDistribution::GaussianDist(const std::vector<double> argument, const std::vector<double> center, const std::vector<double> sigma, bool normalize){
+double GaussianDistribution::GaussianDiagonal(const std::vector<double> argument, const std::vector<double> center, const std::vector<double> sigma, bool normalize){
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
-    double argT=(argument[k]-center[k])/sigma[k];
-    double tmp_exp = exp(-0.5*argT*argT);
+    double arg=(argument[k]-center[k])/sigma[k];
+    double tmp_exp = exp(-0.5*arg*arg);
     if(normalize){tmp_exp/=(sigma[k]*sqrt(2.0*pi));}
     value*=tmp_exp;
   }
   return value;
 }
 
+
+double GaussianDistribution::Gaussian2D(const std::vector<double> argument, const std::vector<double> center, const std::vector<double> sigma, const std::vector<double> correlation, bool normalize){
+  double arg1 = (argument[0]-center[0])/sigma[0];
+  double arg2 = (argument[1]-center[1])/sigma[1];
+  double corr = correlation[0];
+  double value = (arg1*arg1 + arg2*arg2 - corr*arg1*arg2);
+  value *= -1.0 / ( 2.0*(1.0-corr*corr) );
+  value = exp(value);
+  if(normalize){
+    value /=  2*pi*sigma[0]*sigma[1]*sqrt(1.0-corr*corr);
+  }
+  return value;
+}
 
 }
