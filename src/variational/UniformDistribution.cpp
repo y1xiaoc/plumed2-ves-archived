@@ -33,7 +33,7 @@ class UniformDistribution : public TargetDistributionBase {
 public:
   static void registerKeywords( Keywords&);
   UniformDistribution( const TargetDistributionOptions& to );
-  double distribution(const std::vector<double> argument);
+  double getValue(const std::vector<double> argument) const;
   double getNormalization() const;
 };
 
@@ -57,7 +57,7 @@ TargetDistributionBase(to)
   setDimension(minima.size());
   normalization = 1.0;
   for(unsigned int k=0; k<getDimension(); k++){
-    plumed_massert(maxima[k]>minima[k],"Check MINIMA and MAXIMA keywords");  
+    plumed_massert(maxima[k]>minima[k],"Check MINIMA and MAXIMA keywords");
     normalization *= maxima[k]-minima[k];
   }
   inverse_normalization=1.0/normalization;
@@ -66,7 +66,7 @@ TargetDistributionBase(to)
 }
 
 
-double UniformDistribution::distribution(const std::vector<double> argument) {
+double UniformDistribution::getValue(const std::vector<double> argument) const {
   double outside = 0.0;
   double inside = inverse_normalization;
   for(unsigned int k=0; k<getDimension(); k++){

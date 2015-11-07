@@ -40,12 +40,12 @@ class GaussianDistribution: public TargetDistributionBase {
   bool normalize_distribution;
   bool diagonal;
   unsigned int ngaussians;
-  double GaussianDiagonal(const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true);
-  double Gaussian2D(const std::vector<double>, const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true);
+  double GaussianDiagonal(const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true) const;
+  double Gaussian2D(const std::vector<double>, const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true) const;
 public:
   static void registerKeywords(Keywords&);
   GaussianDistribution(const TargetDistributionOptions& to);
-  double distribution(const std::vector<double>);
+  double getValue(const std::vector<double>) const;
 };
 
 
@@ -124,7 +124,7 @@ diagonal(true)
 }
 
 
-double GaussianDistribution::distribution(const std::vector<double> argument) {
+double GaussianDistribution::getValue(const std::vector<double> argument) const {
   double value=0.0;
   if(diagonal){
     for(unsigned int i=0;i<ngaussians;i++){
@@ -140,7 +140,7 @@ double GaussianDistribution::distribution(const std::vector<double> argument) {
 }
 
 
-double GaussianDistribution::GaussianDiagonal(const std::vector<double> argument, const std::vector<double> center, const std::vector<double> sigma, bool normalize){
+double GaussianDistribution::GaussianDiagonal(const std::vector<double> argument, const std::vector<double> center, const std::vector<double> sigma, bool normalize) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
     double arg=(argument[k]-center[k])/sigma[k];
@@ -152,11 +152,11 @@ double GaussianDistribution::GaussianDiagonal(const std::vector<double> argument
 }
 
 
-double GaussianDistribution::Gaussian2D(const std::vector<double> argument, const std::vector<double> center, const std::vector<double> sigma, const std::vector<double> correlation, bool normalize){
+double GaussianDistribution::Gaussian2D(const std::vector<double> argument, const std::vector<double> center, const std::vector<double> sigma, const std::vector<double> correlation, bool normalize) const {
   double arg1 = (argument[0]-center[0])/sigma[0];
   double arg2 = (argument[1]-center[1])/sigma[1];
   double corr = correlation[0];
-  double value = (arg1*arg1 + arg2*arg2 - corr*arg1*arg2);
+  double value = (arg1*arg1 + arg2*arg2 - 2.0*corr*arg1*arg2);
   value *= -1.0 / ( 2.0*(1.0-corr*corr) );
   value = exp(value);
   if(normalize){

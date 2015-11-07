@@ -108,7 +108,7 @@ void TargetDistributionBase::calculateDistributionOnGrid(Grid* grid_ptr){
   for(unsigned int l=0; l<grid_ptr->getSize(); l++)
   {
    std::vector<double> argument=grid_ptr->getPoint(l);
-   double value=distribution(argument);
+   double value=getValue(argument);
    grid_ptr->setValue(l,value);
   }
 }
