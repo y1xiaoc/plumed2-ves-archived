@@ -139,21 +139,28 @@ Function(ao)
   coeffsV1.sumMPI();
   coeffsV1.writeToFile("coeffsV1.2.data");
 
-  std::vector<std::string> min;
-  std::vector<std::string> max;
-  std::vector<unsigned int> nbins;
-  min.push_back("-4.0");
-  min.push_back("-4.0");
+  std::vector<std::string> min(2);
+  std::vector<std::string> max(2);
+  std::vector<unsigned int> nbins(2);
 
-  max.push_back("+4.0");
-  max.push_back("+4.0");
+  min[0]="-4.0";
+  min[1]="-4.0";
+  max[0]="4.0";
+  max[1]="4.0";
+  nbins[0]=200;
+  nbins[1]=200;
 
-  nbins.push_back(200);
-  nbins.push_back(200);
-  std::string keywords = "GAUSSIAN CENTER0=-2.0,-2.0 SIGMA0=0.3,1.0 CENTER1=2.0,2.0 SIGMA1=3.0,1.0 CENTER2=2.0,-2.0 SIGMA2=1.0,1.0 CORRELATION0=0.89 CORRELATION1=-0.99 CORRELATION2=0.3";
+  std::string keywords = "GAUSSIAN CENTER0=-0.0,0.0 SIGMA0=0.5,0.5 CORRELATION0=-0.89";
   TargetDistributionBase::writeDistributionToFile("dist",keywords,min,max,nbins);
+
   keywords = "UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0";
   TargetDistributionBase::writeDistributionToFile("dist2",keywords,min,max,nbins);
+
+  keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN";
+  TargetDistributionBase::writeDistributionToFile("dist3",keywords,min,max,nbins);
+
+  keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN NORMALIZE";
+  TargetDistributionBase::writeDistributionToFile("dist4",keywords,min,max,nbins);
 
 
 
