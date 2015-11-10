@@ -57,8 +57,8 @@ OptimizerRegister& optimizerRegister();
   static class classname##RegisterMe{ \
     static OptimizerBase * create(const OptimizerOptions&to){return new classname(to);} \
   public: \
-    classname##RegisterMe(){targetDistribution1DimRegister().add(type,create);}; \
-    ~classname##RegisterMe(){targetDistribution1DimRegister().remove(create);}; \
+    classname##RegisterMe(){optimizerRegisterRegister().add(type,create);}; \
+    ~classname##RegisterMe(){optimizerRegisterRegister().remove(create);}; \
   } classname##RegisterMeObject;
 
 }

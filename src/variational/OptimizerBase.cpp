@@ -48,9 +48,9 @@ void OptimizerBase::parseFlag(const std::string& key, bool& t){
 
 void OptimizerBase::checkRead() const {
   if(!input.empty()){
-     std::string msg="cannot understand the following words from landmark selection input : ";
+     std::string msg="cannot understand the following words from optimizer input : ";
      for(unsigned i=0;i<input.size();++i) msg = msg + input[i] + ", ";
-     plumed_merror(msg); 
+     plumed_merror(msg);
   }
 }
 
@@ -60,4 +60,3 @@ std::string OptimizerBase::description(){
 }
 
 }
-
