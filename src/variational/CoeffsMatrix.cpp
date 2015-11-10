@@ -58,8 +58,8 @@ output_fmt_("%30.16e")
 
 CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
-  std::vector<Value*> args,
-  std::vector<BasisFunctions*> basisf,
+  std::vector<Value*>& args,
+  std::vector<BasisFunctions*>& basisf,
   Communicator& cc,
   const bool symmetric, const bool diagonal,
   const bool use_counter):

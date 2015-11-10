@@ -43,16 +43,15 @@ CoeffsBase::CoeffsBase(
   setDataLabel(label);
   setType(Generic);
   setAllDimensionLabels(dimension_labels);
-  std::string coeffs_description_prefix="C";
-  setAllCoeffsDescriptions(coeffs_description_prefix);
+  setAllCoeffsDescriptions();
   setupFileFields();
 }
 
 
 CoeffsBase::CoeffsBase(
   const std::string& label,
-  std::vector<Value*> args,
-  std::vector<BasisFunctions*> basisf)
+  std::vector<Value*>& args,
+  std::vector<BasisFunctions*>& basisf)
 {
   plumed_massert(args.size()==basisf.size(),"CoeffsBase: number of arguments do not match number of basis functions");
   std::vector<std::string> dimension_labels(args.size());
@@ -83,7 +82,7 @@ void CoeffsBase::setupIndices(const std::vector<unsigned int>& indices_shape) {
 }
 
 
-void CoeffsBase::setupBasisFunctionsInfo(std::vector<BasisFunctions*> basisf) {
+void CoeffsBase::setupBasisFunctionsInfo(std::vector<BasisFunctions*>& basisf) {
   plumed_massert(basisf.size()==numberOfDimensions(),"setupBasisFunctionsInfo: wrong number of basis functions given.");
   // basisf_keywords_.resize(numberOfDimensions());
   // for(unsigned int k=0; k<numberOfDimensions(); k++){
@@ -281,7 +280,7 @@ void CoeffsBase::setAllDimensionLabels(const std::string label_prefix) {
 }
 
 
-void CoeffsBase::setAllDimensionLabels(const std::vector<std::string> labels) {
+void CoeffsBase::setAllDimensionLabels(const std::vector<std::string>& labels) {
   for(unsigned int i=0; i<numberOfDimensions(); i++){
     dimension_labels_[i]=labels[i];
   }

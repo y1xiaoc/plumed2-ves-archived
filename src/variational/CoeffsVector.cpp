@@ -54,8 +54,8 @@ output_fmt_("%30.16e")
 
 CoeffsVector::CoeffsVector(
   const std::string& label,
-  std::vector<Value*> args,
-  std::vector<BasisFunctions*> basisf,
+  std::vector<Value*>& args,
+  std::vector<BasisFunctions*>& basisf,
   Communicator& cc,
   const bool use_counter):
 mycomm(cc),
@@ -80,7 +80,7 @@ void CoeffsVector::clear() {
 }
 
 
-bool CoeffsVector::sameShape(const CoeffsVector other_coeffsvector) const {
+bool CoeffsVector::sameShape(const CoeffsVector& other_coeffsvector) const {
   if(numberOfDimensions()!=other_coeffsvector.numberOfDimensions()){
     return false;
   }

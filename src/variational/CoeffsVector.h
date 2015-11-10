@@ -58,8 +58,8 @@ public:
     const bool use_counter=false);
   CoeffsVector(
     const std::string&,
-    std::vector<Value*>,
-    std::vector<BasisFunctions*>,
+    std::vector<Value*>&,
+    std::vector<BasisFunctions*>&,
     Communicator&,
     const bool use_counter=false);
   ~CoeffsVector(){}
@@ -68,9 +68,9 @@ public:
     // clear coeffs
   void clear();
   //
-  bool sameShape(const CoeffsVector other_coeffsvector) const;
+  bool sameShape(const CoeffsVector& other_coeffsvector) const;
   //
-  void sumMPI(); 
+  void sumMPI();
   // get value
   double getValue(const index_t) const;
   double getValue(const std::vector<unsigned int>&) const;

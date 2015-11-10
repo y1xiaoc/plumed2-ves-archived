@@ -65,8 +65,8 @@ public:
     const std::vector<unsigned int>&);
   CoeffsBase(
     const std::string&,
-    std::vector<Value*> args,
-    std::vector<BasisFunctions*> basisf);
+    std::vector<Value*>& args,
+    std::vector<BasisFunctions*>& basisf);
   ~CoeffsBase() {}
   //
   std::string getLabel() const;
@@ -93,21 +93,21 @@ public:
   std::vector<std::string> getAllCoeffsDescriptions() const;
   void setCoeffDescription(const index_t, const std::string);
   void setCoeffDescription(const std::vector<unsigned int>&, const std::string);
-  void setAllCoeffsDescriptions(const std::string);
+  void setAllCoeffsDescriptions(const std::string description_prefix="C");
   void setAllCoeffsDescriptions(const std::vector<std::string>&);
   //
   std::string getDimensionLabel(const unsigned int) const;
   std::vector<std::string> getAllDimensionLabels() const;
   void setDimensionLabel(const unsigned int, const std::string);
   void setAllDimensionLabels(const std::string);
-  void setAllDimensionLabels(const std::vector<std::string>);
+  void setAllDimensionLabels(const std::vector<std::string>&);
   void setupFileFields();
   void writeCoeffsInfoToFile(OFile&) const;
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
   void checkCoeffsInfo(const std::string, const std::string, const unsigned int, const index_t, const std::vector<unsigned int>);
 protected:
   void setupIndices(const std::vector<unsigned int>&);
-  void setupBasisFunctionsInfo(std::vector<BasisFunctions*>);
+  void setupBasisFunctionsInfo(std::vector<BasisFunctions*>&);
 };
 }
 #endif

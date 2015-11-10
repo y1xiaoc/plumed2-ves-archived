@@ -73,8 +73,8 @@ public:
     const bool use_counter=false);
   CoeffsMatrix(
     const std::string&,
-    std::vector<Value*>,
-    std::vector<BasisFunctions*>,
+    std::vector<Value*>&,
+    std::vector<BasisFunctions*>&,
     Communicator& cc,
     const bool symmetric=true,
     const bool diagonal=true,
