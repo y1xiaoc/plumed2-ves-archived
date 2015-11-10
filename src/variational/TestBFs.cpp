@@ -24,7 +24,6 @@
 #include "core/ActionSet.h"
 #include "core/PlumedMain.h"
 #include "BasisFunctions.h"
-#include "Coeffs.h"
 #include "CoeffsVector.h"
 #include "CoeffsMatrix.h"
 #include "tools/File.h"
@@ -49,7 +48,6 @@ class TestBFs :
   public Function
 {
   BasisFunctions* bf_pointer;
-  Coeffs* coeffs;
   CoeffsVector* coeffs2;
   LinearBiasExpansion* bias_expansion;
   unsigned int bf_order_;
@@ -231,11 +229,8 @@ Function(ao)
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
   bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
-  coeffs = bias_expansion->getPointerToBiasCoeffs();
   std::vector<unsigned int> nbins(2,300);
   bias_expansion->setupGrid(nbins);
-  coeffs->randomizeCoeffs();
-  coeffs->writeToFile("TEST.data");
 
   coeffs2 = new CoeffsVector("Test",args,bf,true,true);
   // for(unsigned int i=0;i<coeffs2->getSize();i++){coeffs2->setValue(i,1.0*i*i*i);}
@@ -259,16 +254,6 @@ Function(ao)
   TargetDistribution1DimBase::writeDistributionToFile("dist","GAUSSIAN CENTER=-2.0,2.0 SIGMA=0.5,0.5 WEIGHT=1,4 DO_NOT_NORMALIZE",-4.0,4.0,200);
 
 
-  // coeffs->writeToFile("TEST.data");
-  // coeffs2 = Coeffs::createFromFile("TEST.data");
-  // coeffs2->setCounter(100);
-  // coeffs2->writeToFile("TEST.data",true,true);
-
-  // std::vector<std::string> bfk=Coeffs::getBasisFunctionKeywordsFromFile("TEST.data");
-  // plumed.readInputWords(Tools::getWords(bfk[0]));
-  // plumed.readInputWords(Tools::getWords(bfk[1]));
-
-  log.printf("bbb: %s\n",this->getName().c_str());
   */
 
 }

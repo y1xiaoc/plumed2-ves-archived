@@ -22,7 +22,7 @@
 #include "LinearBiasExpansion.h"
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
-#include "Coeffs.h"
+#include "CoeffsVector.h"
 #include "BasisFunctions.h"
 #include "tools/Communicator.h"
 
@@ -48,7 +48,7 @@ args_(args),
 basisf_(basisf)
 {
   plumed_massert(args_.size()==basisf_.size(),"number of arguments and basis functions do not match");
-  bias_coeffs = new Coeffs(label,args_,basisf_,true,true);
+  bias_coeffs = new CoeffsVector(label,args_,basisf_,mycomm,true);
   ncv_=args_.size();
   num_bf_.resize(ncv_);
   for(unsigned int k=0;k<ncv_;k++){num_bf_[k]=basisf_[k]->getNumberOfBasisFunctions();}
@@ -61,7 +61,7 @@ std::vector<Value*> LinearBiasExpansion::getPointerToArguments() const {return a
 std::vector<BasisFunctions*> LinearBiasExpansion::getPointerToBasisFunctions() const {return basisf_;}
 
 
-Coeffs* LinearBiasExpansion::getPointerToBiasCoeffs() const {return bias_coeffs;}
+CoeffsVector* LinearBiasExpansion::getPointerToBiasCoeffs() const {return bias_coeffs;}
 
 
 Grid* LinearBiasExpansion::getPointerToBiasGrid() const {return bias_grid;}

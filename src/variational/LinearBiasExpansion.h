@@ -24,12 +24,11 @@
 
 #include <vector>
 #include <string>
-// #include "Coeffs.h"
 
 namespace PLMD {
 
 class Keywords;
-class Coeffs;
+class CoeffsVector;
 class BasisFunctions;
 class Value;
 class Communicator;
@@ -39,9 +38,9 @@ class LinearBiasExpansion{
   Communicator& mycomm;
   bool serial_;
   std::string bias_label_;
-  Coeffs* bias_coeffs;
-  Coeffs* wt_coeffs;
-  Coeffs* basisf_norm;
+  CoeffsVector* bias_coeffs;
+  CoeffsVector* wt_coeffs;
+  CoeffsVector* basisf_norm;
   Grid* bias_grid;
   Grid* fes_grid;
   Grid* ps_grid;
@@ -60,7 +59,7 @@ class LinearBiasExpansion{
   //
   std::vector<Value*> getPointerToArguments() const ;
   std::vector<BasisFunctions*> getPointerToBasisFunctions() const ;
-  Coeffs* getPointerToBiasCoeffs() const ;
+  CoeffsVector* getPointerToBiasCoeffs() const ;
   Grid* getPointerToBiasGrid() const ;
   unsigned int getNumberOfArguments() const ;
   std::vector<unsigned int> getNumberOfBasisFunctions() const ;
