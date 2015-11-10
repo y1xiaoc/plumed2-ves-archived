@@ -87,6 +87,7 @@ public:
   //
   index_t getIndex(const std::vector<unsigned int>&) const;
   std::vector<unsigned int> getIndices(const index_t) const;
+  bool indicesExist(const std::vector<unsigned int>&) const;
   //
   std::string getCoeffDescription(const index_t) const;
   std::string getCoeffDescription(const std::vector<unsigned int>&) const;
@@ -108,6 +109,8 @@ public:
 protected:
   void setupIndices(const std::vector<unsigned int>&);
   void setupBasisFunctionsInfo(std::vector<BasisFunctions*>&);
+  void resizeIndices(const std::vector<unsigned int>&);
+  void resizeIndices(std::vector<BasisFunctions*>&);
 };
 }
 #endif

@@ -125,7 +125,7 @@ Function(ao)
 
   // CoeffsVector coeffsV4 = 1.0-coeffsV1;
   CoeffsVector coeffsV5 = coeffsV1+1.0;
-  CoeffsVector coeffsV6 = 1.0+coeffsV1;
+  CoeffsVector coeffsV6 = coeffsV1;
   CoeffsVector coeffsV7(coeffsV1);
   coeffsV7 = vec;
   coeffsV1.clear();

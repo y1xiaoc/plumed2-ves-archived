@@ -70,6 +70,9 @@ public:
   //
   bool sameShape(const CoeffsVector& other_coeffsvector) const;
   //
+  void resizeCoeffs(const std::vector<unsigned int>&);
+  void resizeCoeffs(std::vector<BasisFunctions*>&);
+  //
   void sumMPI();
   // get value
   double getValue(const index_t) const;
@@ -117,7 +120,8 @@ public:
   CoeffsVector operator+(const CoeffsVector&) const;
   CoeffsVector& operator-=(const CoeffsVector&);
   CoeffsVector operator-(const CoeffsVector&) const;
-
+  //
+  void setValuesFromDifferentShape(const CoeffsVector&);
 
   //
   double getMinValue() const;

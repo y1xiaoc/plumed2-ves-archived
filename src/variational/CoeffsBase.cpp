@@ -100,6 +100,26 @@ void CoeffsBase::setupBasisFunctionsInfo(std::vector<BasisFunctions*>& basisf) {
 }
 
 
+void CoeffsBase::resizeIndices(const std::vector<unsigned int>& indices_shape_new) {
+  plumed_massert(indices_shape_new.size()==numberOfDimensions(),"when resizeing Coeffs the dimension must be constant");
+
+  setupIndices(indices_shape_new);
+  setAllCoeffsDescriptions();
+}
+
+
+void CoeffsBase::resizeIndices(std::vector<BasisFunctions*>& basisf_new) {
+  plumed_massert(basisf_new.size()==numberOfDimensions(),"when resizeing Coeffs the dimension must be constant");
+
+  std::vector<unsigned int> indices_shape_new(basisf_new.size());
+  for(unsigned int i=0;i<basisf_new.size();i++){
+    indices_shape_new[i]=basisf_new[i]->getNumberOfBasisFunctions();
+  }
+  setupIndices(indices_shape_new);
+  setupBasisFunctionsInfo(basisf_new);
+}
+
+
 std::string CoeffsBase::getLabel() const {
   return label_;
 }
@@ -205,6 +225,17 @@ std::vector<unsigned int> CoeffsBase::getIndices(const CoeffsBase::index_t index
    indices[ndimensions_-1]=((kk-indices[ndimensions_-2])/indices_shape_[ndimensions_-2]);
   }
   return indices;
+}
+
+
+bool CoeffsBase::indicesExist(const std::vector<unsigned int>& indices) const {
+  plumed_dbg_assert(indices.size()==ndimensions_);
+  for(unsigned int k=0;k<ndimensions_;k++){
+    if(indices[k]>=indices_shape_[k]){
+      return false;
+    }
+  }
+  return true;
 }
 
 

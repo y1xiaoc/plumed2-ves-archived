@@ -96,6 +96,22 @@ bool CoeffsVector::sameShape(const CoeffsVector& other_coeffsvector) const {
 }
 
 
+void CoeffsVector::resizeCoeffs(const std::vector<unsigned int>& indices_shape_new) {
+  CoeffsVector coeffsVecOld(*this);
+  resizeIndices(indices_shape_new);
+  clear();
+  setValuesFromDifferentShape(coeffsVecOld);
+}
+
+
+void CoeffsVector::resizeCoeffs(std::vector<BasisFunctions*>& basisf_new) {
+  CoeffsVector coeffsVecOld(*this);
+  resizeIndices(basisf_new);
+  clear();
+  setValuesFromDifferentShape(coeffsVecOld);
+}
+
+
 void CoeffsVector::sumMPI() {
   mycomm.Sum(data);
 }
@@ -331,6 +347,18 @@ CoeffsVector& CoeffsVector::operator-=(const CoeffsVector& other_coeffsvector) {
 
 CoeffsVector CoeffsVector::operator-(const CoeffsVector& other_coeffsvector) const {
   return CoeffsVector(*this)-=other_coeffsvector;
+}
+
+
+void CoeffsVector::setValuesFromDifferentShape(const CoeffsVector& other_coeffsvector) {
+  plumed_massert(numberOfDimensions()==other_coeffsvector.numberOfDimensions(),"both coeffs vector need to have the same dimension");
+  for(index_t i=0; i<data.size(); i++){
+    std::vector<unsigned int> indices=getIndices(i);
+    if(other_coeffsvector.indicesExist(indices)){
+      index_t oidx = other_coeffsvector.getIndex(indices);
+      data[i] = other_coeffsvector.data[oidx];
+    }
+  }
 }
 
 
