@@ -72,6 +72,11 @@ unsigned int CounterBase::getCounter() const {
 }
 
 
+double CounterBase::getCounterDbl() const {
+  return (double) counter;
+}
+
+
 void CounterBase::setFieldName(const std::string field_name) {
   field_name_=field_name;
 }

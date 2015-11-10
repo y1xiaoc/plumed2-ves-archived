@@ -48,6 +48,7 @@ public:
   void addToCounter(const unsigned int);
   void setCounter(const unsigned int);
   unsigned int getCounter() const;
+  double getCounterDbl() const;
   //
   void setFieldName(const std::string);
   std::string getFieldName() const;
