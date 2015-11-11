@@ -107,7 +107,7 @@ diagonal(true)
   if(!parseVector("WEIGHTS",weights,true)){weights.assign(centers.size(),1.0);}
   plumed_massert(centers.size()==weights.size(),"there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   //
-  bool do_not_normalize;
+  bool do_not_normalize=false;
   parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
   normalize_distribution=!do_not_normalize;
   if(normalize_distribution){
