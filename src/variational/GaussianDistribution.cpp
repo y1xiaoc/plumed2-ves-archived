@@ -59,7 +59,6 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
   keys.add("numbered","CORRELATION","The correlation between the arguments, currently only works for two-dimensional Gaussians ");
   keys.add("optional","WEIGHTS","The weights of the Gaussians.");
   keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized.");
-  keys.remove("DIMENSION");
 }
 
 
