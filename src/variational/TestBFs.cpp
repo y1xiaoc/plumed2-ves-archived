@@ -48,6 +48,7 @@ class TestBFs :
   public Function
 {
   BasisFunctions* bf_pointer;
+  BasisFunctions* bf_pointer2;
   CoeffsVector* coeffs2;
   LinearBiasExpansion* bias_expansion;
   unsigned int bf_order_;
@@ -69,6 +70,7 @@ void TestBFs::registerKeywords(Keywords& keys){
   keys.addOutputComponent("inside","default","1.0 if inside interval, otherwise 0.0");
   keys.use("ARG");
   keys.add("compulsory","BASIS_SET","the label of the basis set that you want to use");
+  keys.add("compulsory","BASIS_SET2","the label of the basis set that you want to use");
   keys.add("compulsory","N","the number of the basis function you want to test");
 }
 
@@ -80,6 +82,8 @@ Function(ao)
   std::string basisset_label="";
   parse("BASIS_SET",basisset_label);
   bf_pointer=plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_label);
+  parse("BASIS_SET2",basisset_label);
+  bf_pointer2=plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_label);
   // bf_pointer->printInfo();
   parse("N",bf_order_);
   addComponent("value"); componentIsNotPeriodic("value");
@@ -90,57 +94,31 @@ Function(ao)
   checkRead();
   log.printf("  using the %d order basis function from the %s basis set\n",bf_order_,basisset_label.c_str());
 
-  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
+  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer2;
+  std::vector<BasisFunctions*> bf2; bf2.resize(2); bf2[0]=bf_pointer2; bf2[1]=bf_pointer;
   std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
+
   CoeffsMatrix coeffsM = CoeffsMatrix("coeffsM",args,bf,comm);
   coeffsM.randomizeValuesGaussian(1);
   coeffsM.writeToFile("coeffsM.data");
 
-  std::vector<unsigned int> ind1 = coeffsM.getIndices(4);
-  std::vector<unsigned int> ind2 = coeffsM.getIndices(5);
-  coeffsM(ind1,ind1)=4.0;
-  coeffsM(ind1,ind1)+=23.0;
-
-  coeffsM.writeToFile("coeffsM.1.data");
-  coeffsM.sumMPI();
-  coeffsM.writeToFile("coeffsM.2.data");
-
-  // unsigned int rank comm.Rank();
-
-
-
-
 
   CoeffsVector coeffsV1 = CoeffsVector("coeffs",args,bf,comm,true);
-  CoeffsVector coeffsV2 = CoeffsVector("coeffs",args,bf,comm,true);
+  coeffsV1.randomizeValuesGaussian(1);
+  coeffsV1.writeToFile("c1.1.data",true);
+  coeffsV1.resizeCoeffs(bf2);
+  coeffsV1.writeToFile("c1.2.data",true);
+  coeffsV1.resizeCoeffs(bf);
+  coeffsV1.writeToFile("c1.3.data",true);
+  coeffsV1.resizeCoeffs(bf2);
+  coeffsV1.writeToFile("c1.4.data",true);
 
-  std::vector<double> vec( coeffsV1.getSize() );
-  for (unsigned int i = 0; i < vec.size(); i++) {
-    vec[i]=i*i;
-  }
-  coeffsV1 = 3.0;
-  coeffsV2 = 100.0;
-  CoeffsVector coeffsV3 = coeffsM*coeffsV1;
-  CoeffsVector coeffsV4 = coeffsV1*coeffsM;
 
-  // CoeffsVector coeffsV4 = 1.0-coeffsV1;
-  CoeffsVector coeffsV5 = coeffsV1+1.0;
-  CoeffsVector coeffsV6 = coeffsV1;
-  CoeffsVector coeffsV7(coeffsV1);
-  coeffsV7 = vec;
-  coeffsV1.clear();
 
-  for(unsigned int i=comm.Get_rank(); i<coeffsV1.getSize(); i+=comm.Get_size()){
-    coeffsV1(i)=3.0;
-  }
-  coeffsV1.writeToFile("coeffsV1.1.data");
-  coeffsV1.sumMPI();
-  coeffsV1.writeToFile("coeffsV1.2.data");
 
   std::vector<std::string> min(2);
   std::vector<std::string> max(2);
   std::vector<unsigned int> nbins(2);
-
   min[0]="-4.0";
   min[1]="-4.0";
   max[0]="4.0";
@@ -148,113 +126,23 @@ Function(ao)
   nbins[0]=200;
   nbins[1]=200;
 
-  std::string keywords = "GAUSSIAN CENTER0=-0.0,0.0 SIGMA0=0.5,0.5 CORRELATION0=-0.89";
+  std::string keywords = "GAUSSIAN CENTER0=-2.0,0.0 SIGMA0=0.5,0.5 CENTER1=+2.0,0.0 SIGMA1=0.5,0.5 WEIGHTS=1.0,10.0";
   TargetDistributionBase::writeDistributionToFile("dist",keywords,min,max,nbins);
 
-  keywords = "UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0";
+  keywords = "LINEAR_COMBINATION DISTRIBUTION0={GAUSSIAN CENTER0=-2.0,0.0 SIGMA0=0.5,0.5} DISTRIBUTION1={GAUSSIAN CENTER0=+2.0,0.0 SIGMA0=0.5,0.5} WEIGHTS=1.0,10.0,2.0 DISTRIBUTION2={UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0}";
   TargetDistributionBase::writeDistributionToFile("dist2",keywords,min,max,nbins);
 
-  keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN";
-  TargetDistributionBase::writeDistributionToFile("dist3",keywords,min,max,nbins);
-
-  keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN NORMALIZE";
-  TargetDistributionBase::writeDistributionToFile("dist4",keywords,min,max,nbins);
-
-
-
-  // std::vector<CoeffsVector> d1;
-  // d1.push_back(coeffsV1);
-  // CoeffsVector::writeToFile("test.data",d1,comm,true);
-
-  // coeffsV2.writeToFile("coeffsV2.data");
-  // coeffsV3.writeToFile("coeffsV3.data");
-  // coeffsV4.writeToFile("coeffsV4.data");
-  // coeffsV5.writeToFile("coeffsV5.data");
-  // coeffsV6.writeToFile("coeffsV6.data");
-  // coeffsV7.writeToFile("coeffsV7.data");
-
-
-    /*
-  std::vector<BasisFunctions*> bf2; bf2.resize(1); bf2[0]=bf_pointer;
-  std::vector<Value*> args2; args2.resize(1); args2[0]=getArguments()[0];
-  CoeffsVector* coeffsV2 = new CoeffsVector("coeffs2",args2,bf2,true);
-  // d1.push_back(*coeffsV2);
-  (*coeffsV2).writeToFile("dd.data");
-
-  CoeffsVector coeffsV_copy1 = CoeffsVector(*coeffsV);
-  coeffsV_copy1.setValues(10.0);
-  coeffsV_copy1.setDataLabel("aux_coeffs");
-  d1.push_back(coeffsV_copy1);
-  coeffsV_copy1.clear();
-  coeffsV_copy1.writeToFile("coeffsV_copy1.before.data");
+  // keywords = "UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0";
+  //
+  // keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN";
+  // TargetDistributionBase::writeDistributionToFile("dist3",keywords,min,max,nbins);
+  //
+  // keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN NORMALIZE";
+  // TargetDistributionBase::writeDistributionToFile("dist4",keywords,min,max,nbins);
 
 
 
 
-  CoeffsVector coeffsV_copy2 = 2*CoeffsVector(coeffsV_copy1);
-  coeffsV_copy2.setDataLabel("aux_coeffs2");
-  coeffsV_copy2.setValues(2.0);
-  d1.push_back(coeffsV_copy2);
-  coeffsV_copy2.clear();
-  CoeffsV_copy2.writeToFile("coeffsV_copy2.before.data");
-
-
-
-  d1.clear();
-  d1.push_back(*coeffsV);
-  CoeffsVector::writeToFile("test.data",d1,true,true);
-
-  coeffsV->setValues(3e56);
-  coeffsV_copy1.setValues(3.0);
-  coeffsV_copy2.randomizeValuesGaussian(414);
-
-  d1.clear();
-  d1.push_back(*coeffsV);
-  d1.push_back(coeffsV_copy1);
-  d1.push_back(coeffsV_copy2);
-  CoeffsVector::writeToFile("test.data",d1,true,true);
-  */
-
-
-  /*
-  std::vector<std::string> bf1;
-  bf1.push_back("BF_FOURIER");
-  bf1.push_back("ORDER=10");
-  bf1.push_back("LABEL=bf2");
-  bf1.push_back("INTERVAL_MIN=-pi");
-  bf1.push_back("INTERVAL_MAX=pi");
-  plumed.readInputWords(bf1);
-  // BasisFunctions* bf_pointer2=plumed.getActionSet().selectWithLabel<BasisFunctions*>("bf2");
-
-  std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer;
-  std::vector<Value*> args; args.resize(2); args[0]=getArguments()[0]; args[1]=getArguments()[1];
-  bias_expansion = new LinearBiasExpansion("bla",args,bf,comm);
-  std::vector<unsigned int> nbins(2,300);
-  bias_expansion->setupGrid(nbins);
-
-  coeffs2 = new CoeffsVector("Test",args,bf,true,true);
-  // for(unsigned int i=0;i<coeffs2->getSize();i++){coeffs2->setValue(i,1.0*i*i*i);}
-  coeffs2->randomizeValuesGaussian();
-  coeffs2->setCounter(100);
-  coeffs2->writeToFile("TEST2.data",true,true);
-  log.printf("Min:  %f\n",coeffs2->getMinValue());
-  log.printf("Max:  %f\n",coeffs2->getMaxValue());
-  log.printf("Norm: %f\n",coeffs2->getNorm());
-  coeffs2->normalizeCoeffs();
-  coeffs2->writeToFile("TEST3.data",true,true);
-  coeffs2->writeToFile("TEST4.data",true,true);
-  coeffs2->writeToFile("TEST5.data",true,true);
-
-
-  bias_expansion->updateBiasGrid();
-  bias_expansion->writeBiasGridToFile("bias.data",false);
-  bias_expansion->writeBiasGridToFile("bias2.data",false);
-  bias_expansion->writeBiasGridToFile("bias2.data",true);
-
-  TargetDistribution1DimBase::writeDistributionToFile("dist","GAUSSIAN CENTER=-2.0,2.0 SIGMA=0.5,0.5 WEIGHT=1,4 DO_NOT_NORMALIZE",-4.0,4.0,200);
-
-
-  */
 
 }
 
