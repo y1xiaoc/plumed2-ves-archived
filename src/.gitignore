@@ -34,6 +34,12 @@
 !/vesselbase
 !/wrapper
 
+!/ves_basisfunctions
+!/ves_biases
+!/ves_optimizers
+!/ves_targetdistributions
+!/ves_tools
+
 # And just ignore these files
 *.xxd
 /*.on
