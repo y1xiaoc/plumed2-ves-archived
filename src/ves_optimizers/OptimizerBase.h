@@ -19,8 +19,8 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#ifndef __PLUMED_variational_OptimizerBase_h
-#define __PLUMED_variational_OptimizerBase_h
+#ifndef __PLUMED_ves_optimizers_OptimizerBase_h
+#define __PLUMED_ves_optimizers_OptimizerBase_h
 
 #include <vector>
 #include <string>
@@ -47,10 +47,10 @@ private:
 /// The input to the optimization algorithm
   std::vector<std::string> input;
 protected:
-/// Read a keywords from the input 
+/// Read a keywords from the input
   template <class T>
   bool parse(const std::string& ,T& , bool optional=false);
-/// Read a keywords vector from the input 
+/// Read a keywords vector from the input
   template <class T>
   bool parseVector(const std::string& ,std::vector<T>& , bool optional=false);
 /// Read a flag from the input
@@ -62,7 +62,7 @@ public:
   virtual ~OptimizerBase();
 /// Check everything was read in
   void checkRead() const ;
-/// Return a description 
+/// Return a description
   std::string description();
 /// Overwrite this to have a more descriptive output
   virtual std::string rest_of_description(){ return ""; };
