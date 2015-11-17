@@ -22,11 +22,12 @@
 #ifndef __PLUMED_variational_OptimizerRegister_h
 #define __PLUMED_variational_OptimizerRegister_h
 
+#include "OptimizerBase.h"
+
 #include <string>
 #include <cstring>
 #include <vector>
 #include <map>
-#include "OptimizerBase.h"
 
 namespace PLMD{
 

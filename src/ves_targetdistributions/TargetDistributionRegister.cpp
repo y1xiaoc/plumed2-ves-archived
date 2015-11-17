@@ -20,6 +20,7 @@
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistributionRegister.h"
+
 #include <iostream>
 
 namespace PLMD{

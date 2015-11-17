@@ -19,17 +19,19 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#include "ves_tools/CoeffsVector.h"
+#include "ves_tools/CoeffsMatrix.h"
+#include "ves_biases/LinearBiasExpansion.h"
+#include "ves_targetdistributions/TargetDistributionBase.h"
+#include "ves_basisFunctions/BasisFunctions.h"
+
 #include "../function/Function.h"
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
 #include "core/PlumedMain.h"
-#include "BasisFunctions.h"
-#include "CoeffsVector.h"
-#include "CoeffsMatrix.h"
 #include "tools/File.h"
-#include "LinearBiasExpansion.h"
 #include "tools/Communicator.h"
-#include "TargetDistributionBase.h"
+
 
 
 // using namespace std;

@@ -20,11 +20,13 @@
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "LinearBiasExpansion.h"
+#include "ves_tools/CoeffsVector.h"
+#include "ves_basisFunctions/BasisFunctions.h"
+
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
-#include "CoeffsVector.h"
-#include "BasisFunctions.h"
 #include "tools/Communicator.h"
+
 
 namespace PLMD{
 

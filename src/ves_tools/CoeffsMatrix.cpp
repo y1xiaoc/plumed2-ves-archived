@@ -28,11 +28,12 @@
 
 #include "CoeffsMatrix.h"
 #include "CoeffsVector.h"
+#include "ves_basisfunctions/BasisFunctions.h"
+
 #include "tools/Tools.h"
 #include "core/Value.h"
 #include "tools/File.h"
 #include "tools/Exception.h"
-#include "BasisFunctions.h"
 #include "tools/Random.h"
 #include "tools/Communicator.h"
 

@@ -22,11 +22,12 @@
 #ifndef __PLUMED_variational_TargetDistributionRegister_h
 #define __PLUMED_variational_TargetDistributionRegister_h
 
+#include "TargetDistributionBase.h"
+
 #include <string>
 #include <cstring>
 #include <vector>
 #include <map>
-#include "TargetDistributionBase.h"
 
 namespace PLMD{
 

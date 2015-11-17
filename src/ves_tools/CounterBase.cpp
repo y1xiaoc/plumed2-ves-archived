@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "CounterBase.h"
+
 #include "tools/File.h"
 
 namespace PLMD{

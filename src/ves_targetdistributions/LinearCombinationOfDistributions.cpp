@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistributionBase.h"
 #include "TargetDistributionRegister.h"
+
 #include "tools/Keywords.h"
 
 namespace PLMD {

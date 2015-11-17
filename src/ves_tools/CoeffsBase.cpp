@@ -23,11 +23,13 @@
 #include <string>
 
 #include "CoeffsBase.h"
+#include "ves_basisfunctions/BasisFunctions.h"
+
 #include "tools/Tools.h"
 #include "tools/File.h"
 #include "tools/Exception.h"
-#include "BasisFunctions.h"
 #include "core/Value.h"
+
 
 namespace PLMD{
 

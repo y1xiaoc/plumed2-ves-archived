@@ -20,6 +20,7 @@
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "BasisFunctions.h"
+
 #include "core/ActionRegister.h"
 
 
