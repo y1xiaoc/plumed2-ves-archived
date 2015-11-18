@@ -101,18 +101,18 @@ bool TargetDistributionBase::parse( const std::string& key, T& t, bool optional)
 }
 
 
+template<class T>
+bool TargetDistributionBase::parseNumbered(const std::string&key, const unsigned int no, T&t, bool optional) {
+  std::string num; Tools::convert(no,num);
+  return Tools::parse(input,key+num,t);
+}
+
+
 template <class T>
 bool TargetDistributionBase::parseVector( const std::string& key, std::vector<T>& t , bool optional){
   bool found=Tools::parseVector(input,key,t);
   if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
   return found;
-}
-
-
-template<class T>
-bool TargetDistributionBase::parseNumbered(const std::string&key, const unsigned int no, T&t, bool optional) {
-  std::string num; Tools::convert(no,num);
-  return Tools::parse(input,key+num,t);
 }
 
 
