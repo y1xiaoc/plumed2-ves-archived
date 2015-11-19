@@ -19,6 +19,8 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#include "ves_tools/CoeffsVector.h"
+
 #include "OptimizerBase.h"
 #include "OptimizerRegister.h"
 
@@ -29,22 +31,33 @@ words(input)
 {
 }
 
+
 void OptimizerBase::registerKeywords( Keywords& keys ){
 }
 
+
 OptimizerBase::OptimizerBase( const OptimizerOptions& to ):
 type(to.words[0]),
-input(to.words)
+input(to.words),
+has_been_set_(false),
+use_hessian_(false),
+update_stride_(1),
+coeffs(NULL),
+gradient(NULL),
+hessian(NULL)
 {
   input.erase( input.begin() );
 }
 
+
 OptimizerBase::~OptimizerBase(){
 }
+
 
 void OptimizerBase::parseFlag(const std::string& key, bool& t){
   Tools::parseFlag(input,key,t);
 }
+
 
 void OptimizerBase::checkRead() const {
   if(!input.empty()){
@@ -54,9 +67,29 @@ void OptimizerBase::checkRead() const {
   }
 }
 
+
 std::string OptimizerBase::description(){
   std::string str="Type: " + type;
   return str;
 }
+
+
+void OptimizerBase::setup(CoeffsVector* coeffs_in, CoeffsVector* gradient_in, CoeffsMatrix* hessian_in) {
+  coeffs = coeffs_in;
+  aux_coeffs = new CoeffsVector(*coeffs);
+  gradient = gradient_in;
+  hessian = hessian_in;
+  if(use_hessian_ && hessian == NULL){
+    plumed_merror("Hessian is also needed");
+  }
+}
+
+
+void OptimizerBase::updateCoeffs(unsigned int step_number) {
+  if(step_number % update_stride_ == 0){
+    updateCoeffs();
+  }
+}
+
 
 }
