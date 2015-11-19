@@ -1,0 +1,81 @@
+/* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   Copyright (c) 2011-2014 The plumed team
+   (see the PEOPLE file at the root of the distribution for a list of names)
+
+   See http://www.plumed-code.org for more information.
+
+   This file is part of plumed, version 2.
+
+   plumed is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   plumed is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with plumed.  If not, see <http://www.gnu.org/licenses/>.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#ifndef __PLUMED_ves_optimizers_Optimizer_h
+#define __PLUMED_ves_optimizers_Optimizer_h
+
+#include <vector>
+#include <string>
+#include <cmath>
+#include "core/ActionPilot.h"
+#include "core/ActionWithValue.h"
+#include "ves_biases/VesBias.h"
+
+#define PLUMED_OPTIMIZER_INIT(ao) Action(ao),Optimizer(ao)
+
+namespace PLMD{
+
+/**
+\ingroup INHERIT
+Abstract base class for implenting new optimization methods
+*/
+
+class CoeffsVector;
+class VesBias;
+
+class Optimizer :
+ public ActionPilot,
+ public ActionWithValue
+{
+private:
+  bool usehessian_;
+  std::string description_;
+  std::string type_;
+protected:
+  double step_size_;
+  CoeffsVector* coeffs_;
+  CoeffsVector* aux_coeffs_;
+  CoeffsVector* gradient_;
+  CoeffsMatrix* hessian_;
+  bias::VesBias* bias_ptr;
+protected:
+  void needHessian();
+public:
+  static void registerKeywords(Keywords&);
+  Optimizer(const ActionOptions&ao);
+  std::string getType();
+  std::string getDescription();
+  //
+  void apply(){};
+  void calculate(){};
+  //
+  bool useHessian(){return usehessian_;};
+  };
+
+inline
+std::string Optimizer::getType(){return type_;}
+
+inline
+std::string Optimizer::getDescription(){return description_;}
+
+}
+
+#endif

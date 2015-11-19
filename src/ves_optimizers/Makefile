@@ -1,4 +1,4 @@
-USE=tools ves_tools core
+USE=core tools ves_tools  ves_biases
 
 #generic makefile
 include ../maketools/make.module
