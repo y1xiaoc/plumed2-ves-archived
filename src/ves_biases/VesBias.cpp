@@ -1,5 +1,5 @@
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   Copyright (c) 2011-2014 The plumed team
+   Copyright (c) 2011-2015 The plumed team
    (see the PEOPLE file at the root of the distribution for a list of names)
 
    See http://www.plumed-code.org for more information.
@@ -19,34 +19,18 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#ifndef __PLUMED_ves_biases_VariationalBias_h
-#define __PLUMED_ves_biases_VariationalBias_h
+#include "VesBias.h"
 
-#include "core/ActionPilot.h"
-#include "core/ActionWithValue.h"
-#include "core/ActionWithArguments.h"
-#include "bias/Bias.h"
-
-#define PLUMED_VARIATIONALBIAS_INIT(ao) Action(ao),VariationalBias(ao)
 
 namespace PLMD{
 namespace bias{
 
-/**
-\ingroup INHERIT
-Abstract base class for implementing biases the extents the normal Bias.h class
-to include functions related to the variational approach.
-*/
+VesBias::VesBias(const ActionOptions&ao): Bias(ao){}
 
-class VariationalBias:
-public Bias
-{
-public:
-  static void registerKeywords(Keywords&);
-  VariationalBias(const ActionOptions&ao);
-};
+
+void VesBias::registerKeywords( Keywords& keys ){
+  Bias::registerKeywords(keys);
+}
 
 }
 }
-
-#endif
