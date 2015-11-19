@@ -49,32 +49,57 @@ private:
   bool usehessian_;
   std::string description_;
   std::string type_;
-protected:
   double step_size_;
-  CoeffsVector* coeffs_;
-  CoeffsVector* aux_coeffs_;
-  CoeffsVector* gradient_;
-  CoeffsMatrix* hessian_;
+  CoeffsVector* coeffs_ptr;
+  CoeffsVector* aux_coeffs_ptr;
+  CoeffsVector* gradient_ptr;
+  CoeffsMatrix* hessian_ptr;
   bias::VesBias* bias_ptr;
 protected:
-  void needHessian();
+  void turnOnHessian();
+  void turnOffHessian();
+  CoeffsVector& Coeffs() const;
+  CoeffsVector& AuxCoeffs() const;
+  CoeffsVector& Gradient() const;
+  CoeffsMatrix& Hessian() const;
+  virtual double StepSize() const;
 public:
   static void registerKeywords(Keywords&);
   Optimizer(const ActionOptions&ao);
-  std::string getType();
-  std::string getDescription();
+  std::string getType() const;
+  std::string getDescription() const;
+  //
+  double getStepSize() {return step_size_;}
+  void setStepSize(const double step_size_in){step_size_ = step_size_in;}
   //
   void apply(){};
   void calculate(){};
+  unsigned int getNumberOfDerivatives(){return 0;}
   //
-  bool useHessian(){return usehessian_;};
+  bool useHessian() const {return usehessian_;}  ;
   };
 
 inline
-std::string Optimizer::getType(){return type_;}
+std::string Optimizer::getType() const {return type_;}
 
 inline
-std::string Optimizer::getDescription(){return description_;}
+std::string Optimizer::getDescription() const {return description_;}
+
+inline
+double Optimizer::StepSize() const {return step_size_;}
+
+inline
+CoeffsVector& Optimizer::Coeffs() const {return *coeffs_ptr;}
+
+inline
+CoeffsVector& Optimizer::AuxCoeffs() const {return *aux_coeffs_ptr;}
+
+inline
+CoeffsVector& Optimizer::Gradient() const {return *gradient_ptr;}
+
+inline
+CoeffsMatrix& Optimizer::Hessian() const {return *hessian_ptr;}
+
 
 }
 

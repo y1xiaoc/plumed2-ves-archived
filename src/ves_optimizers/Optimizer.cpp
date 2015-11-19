@@ -46,14 +46,15 @@ type_("Undefined")
   bias_ptr=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_label);
   if(!bias_ptr){plumed_merror("VES bias "+bias_label+" does not exist");}
   //
-  coeffs_ = bias_ptr->getCoeffsPtr();
-  plumed_massert(coeffs_ != NULL,"coeffs are not linked correctly");
-  aux_coeffs_ = new CoeffsVector(*coeffs_);
+  coeffs_ptr = bias_ptr->getCoeffsPtr();
+  plumed_massert(coeffs_ptr != NULL,"coeffs are not linked correctly");
+  aux_coeffs_ptr = new CoeffsVector(*coeffs_ptr);
   //
-  gradient_ = bias_ptr->getGradientPtr();
-  plumed_massert(gradient_ != NULL,"gradient is not linked correctly");
-  hessian_ = bias_ptr->getHessianPtr();
+  gradient_ptr = bias_ptr->getGradientPtr();
+  plumed_massert(gradient_ptr != NULL,"gradient is not linked correctly");
+  hessian_ptr = bias_ptr->getHessianPtr();
 }
+
 
 void Optimizer::registerKeywords( Keywords& keys ){
   Action::registerKeywords(keys);
@@ -63,10 +64,17 @@ void Optimizer::registerKeywords( Keywords& keys ){
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
 }
 
-void Optimizer::needHessian(){
+
+void Optimizer::turnOnHessian(){
   usehessian_=true;
-  plumed_massert(hessian_ != NULL,"gradient is not linked correctly");
+  plumed_massert(hessian_ptr != NULL,"Hessian is needed but not linked correctly");
 }
+
+
+void Optimizer::turnOffHessian(){
+  usehessian_=false;
+}
+
 
 
 }
