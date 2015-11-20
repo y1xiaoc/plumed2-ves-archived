@@ -75,6 +75,24 @@ output_fmt_("%30.16e")
 }
 
 
+CoeffsMatrix::CoeffsMatrix(
+  const std::string& label,
+  CoeffsVector* coeffsVec,
+  const bool symmetric, const bool diagonal,
+  const bool use_counter):
+CounterBase(use_counter),
+CoeffsBase( *(static_cast<CoeffsBase*>(coeffsVec)) ),
+mycomm(coeffsVec->getCommunicator()),
+symmetric_(symmetric),
+diagonal_(diagonal),
+output_fmt_("%30.16e")
+{
+  setLabel(label);
+  setDataLabel(label);
+  setupMatrix();
+}
+
+
 void CoeffsMatrix::setupMatrix() {
   if(diagonal_){
     symmetric_=true;

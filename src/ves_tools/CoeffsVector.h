@@ -160,9 +160,9 @@ private:
   unsigned int readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
 public:
   // set output format
-  void setOutputFmt(std::string ss){ output_fmt_=ss; }
-  std::string getOutputFmt() const { return output_fmt_; }
-
+  void setOutputFmt(std::string ss){output_fmt_=ss;}
+  std::string getOutputFmt() const {return output_fmt_;}
+  Communicator& getCommunicator() const {return mycomm;}
 };
 }
 

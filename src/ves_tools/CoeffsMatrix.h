@@ -71,6 +71,7 @@ public:
     const bool symmetric=true,
     const bool diagonal=true,
     const bool use_counter=false);
+  //
   CoeffsMatrix(
     const std::string&,
     std::vector<Value*>&,
@@ -79,6 +80,14 @@ public:
     const bool symmetric=true,
     const bool diagonal=true,
     const bool use_counter=false);
+  //
+  CoeffsMatrix(
+    const std::string&,
+    CoeffsVector*,
+    const bool symmetric=true,
+    const bool diagonal=true,
+    const bool use_counter=false);
+  //
   ~CoeffsMatrix(){}
   //
   index_t getSize() const;
