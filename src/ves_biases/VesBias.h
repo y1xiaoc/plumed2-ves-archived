@@ -53,6 +53,8 @@ public:
   CoeffsVector* getCoeffsPtr(){return coeffs_;}
   CoeffsVector* getGradientPtr(){return gradient_;}
   CoeffsMatrix* getHessianPtr(){return hessian_;}
+  void updateGradientAndHessian();
+  void clearGradientAndHessian();
 };
 
 }

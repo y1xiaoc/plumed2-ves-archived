@@ -32,7 +32,7 @@ class SteepestDecent : public Optimizer {
 public:
   static void registerKeywords(Keywords&);
   SteepestDecent(const ActionOptions&);
-  void update();
+  void coeffsUpdate();
 };
 
 
@@ -43,20 +43,15 @@ void SteepestDecent::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
 }
 
-
 SteepestDecent::SteepestDecent(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
   turnOffHessian();
 }
 
-void SteepestDecent::update() {
+void SteepestDecent::coeffsUpdate() {
   Coeffs() = Coeffs() - StepSize()*Gradient();
 }
-
-
-
-
 
 
 }

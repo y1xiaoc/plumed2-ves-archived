@@ -32,5 +32,11 @@ void VesBias::registerKeywords( Keywords& keys ){
   Bias::registerKeywords(keys);
 }
 
+
+void VesBias::updateGradientAndHessian(){}
+
+
+void VesBias::clearGradientAndHessian(){}
+
 }
 }

@@ -50,11 +50,21 @@ private:
   std::string description_;
   std::string type_;
   double step_size_;
+  double current_step_size_;
+  //
   CoeffsVector* coeffs_ptr;
   CoeffsVector* aux_coeffs_ptr;
   CoeffsVector* gradient_ptr;
   CoeffsMatrix* hessian_ptr;
+  //
   bias::VesBias* bias_ptr;
+  //
+  Value* valueStepSize;
+  Value* valueGradRMS;
+  Value* valueGradMaxAbs;
+  Value* valueGradMaxAbsIndex;
+private:
+  void updateComponents() const;
 protected:
   void turnOnHessian();
   void turnOffHessian();
@@ -63,17 +73,22 @@ protected:
   CoeffsVector& Gradient() const;
   CoeffsMatrix& Hessian() const;
   virtual double StepSize() const;
+  virtual void coeffsUpdate()=0;
+  void setCurrentStepSize(const double);
 public:
   static void registerKeywords(Keywords&);
   Optimizer(const ActionOptions&ao);
+  ~Optimizer();
   std::string getType() const;
   std::string getDescription() const;
   //
-  double getStepSize() {return step_size_;}
+  double getStepSize() const;
+  double getCurrentStepSize() const;
   void setStepSize(const double step_size_in){step_size_ = step_size_in;}
   //
   void apply(){};
   void calculate(){};
+  void update();
   unsigned int getNumberOfDerivatives(){return 0;}
   //
   bool useHessian() const {return usehessian_;}  ;
@@ -99,6 +114,12 @@ CoeffsVector& Optimizer::Gradient() const {return *gradient_ptr;}
 
 inline
 CoeffsMatrix& Optimizer::Hessian() const {return *hessian_ptr;}
+
+inline
+double Optimizer::getStepSize() const {return step_size_;}
+
+inline
+double Optimizer::getCurrentStepSize() const {return current_step_size_;}
 
 
 }
