@@ -23,7 +23,7 @@
 #include "ves_tools/CoeffsMatrix.h"
 #include "ves_biases/LinearBiasExpansion.h"
 #include "ves_targetdistributions/TargetDistributionBase.h"
-#include "ves_basisFunctions/BasisFunctions.h"
+#include "BasisFunctions.h"
 
 #include "../function/Function.h"
 #include "core/ActionRegister.h"
@@ -114,6 +114,11 @@ Function(ao)
   coeffsV1.writeToFile("c1.3.data",true);
   coeffsV1.resizeCoeffs(bf2);
   coeffsV1.writeToFile("c1.4.data",true);
+
+  CoeffsMatrix coeffsM2 = CoeffsMatrix("Hessian",&coeffsV1,comm);
+  coeffsM2.randomizeValuesGaussian(1);
+  coeffsM2.writeToFile("coeffsM2.data");
+
 
 
 
