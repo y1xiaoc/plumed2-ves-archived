@@ -59,12 +59,8 @@ private:
   //
   bias::VesBias* bias_ptr;
   //
-  Value* valueStepSize;
-  Value* valueGradRMS;
-  Value* valueGradMaxAbs;
-  Value* valueGradMaxAbsIndex;
 private:
-  void updateComponents() const;
+  void updateOutputComponents();
 protected:
   void turnOnHessian();
   void turnOffHessian();
@@ -72,7 +68,7 @@ protected:
   CoeffsVector& AuxCoeffs() const;
   CoeffsVector& Gradient() const;
   CoeffsMatrix& Hessian() const;
-  virtual double StepSize() const;
+  double StepSize() const;
   virtual void coeffsUpdate()=0;
   void setCurrentStepSize(const double);
 public:

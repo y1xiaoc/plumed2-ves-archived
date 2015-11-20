@@ -39,7 +39,12 @@ usehessian_(false),
 description_("Undefined"),
 type_("Undefined"),
 step_size_(0.0),
-current_step_size_(0.0)
+current_step_size_(0.0),
+coeffs_ptr(NULL),
+aux_coeffs_ptr(NULL),
+gradient_ptr(NULL),
+hessian_ptr(NULL),
+bias_ptr(NULL)
 {
   parse("STEP_SIZE",step_size_);
   setCurrentStepSize(step_size_);
@@ -62,22 +67,14 @@ current_step_size_(0.0)
   turnOffHessian();
   //
   addComponent("stepsize"); componentIsNotPeriodic("stepsize");
-  valueStepSize=getPntrToComponent("stepsize");
   addComponent("grad_rms"); componentIsNotPeriodic("grad_rms");
-  valueGradRMS=getPntrToComponent("grad_rms");
   addComponent("grad_max"); componentIsNotPeriodic("grad_max");
-  valueGradMaxAbs=getPntrToComponent("grad_max");
   addComponent("grad_maxidx"); componentIsNotPeriodic("grad_maxidx");
-  valueGradMaxAbsIndex=getPntrToComponent("grad_maxidx");
+
 }
 
 
-Optimizer::~Optimizer() {
-  delete valueStepSize;
-  delete valueGradRMS;
-  delete valueGradMaxAbs;
-  delete valueGradMaxAbsIndex;
-}
+Optimizer::~Optimizer() {}
 
 
 void Optimizer::registerKeywords( Keywords& keys ) {
@@ -109,17 +106,17 @@ void Optimizer::turnOffHessian() {
 void Optimizer::update() {
   bias_ptr->updateGradientAndHessian();
   coeffsUpdate();
-  updateComponents();
+  updateOutputComponents();
   bias_ptr->clearGradientAndHessian();
 }
 
 
-void Optimizer::updateComponents() const {
-  valueStepSize->set( getCurrentStepSize() );
-  valueGradRMS->set( Gradient().getRMS() );
+void Optimizer::updateOutputComponents() {
+  getPntrToComponent("stepsize")->set( getCurrentStepSize() );
+  getPntrToComponent("grad_rms")->set( Gradient().getRMS() );
   CoeffsBase::index_t gradient_maxabs_idx=0;
-  valueGradMaxAbs->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
-  valueGradMaxAbsIndex->set( gradient_maxabs_idx );
+  getPntrToComponent("grad_max")->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
+  getPntrToComponent("grad_maxidx")->set( gradient_maxabs_idx );
 }
 
 
