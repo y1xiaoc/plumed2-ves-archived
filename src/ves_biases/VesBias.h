@@ -30,8 +30,12 @@
 #define PLUMED_VARIATIONALBIAS_INIT(ao) Action(ao),VesBias(ao)
 
 namespace PLMD{
+
   class CoeffsVector;
   class CoeffsMatrix;
+  class BasisFunctions;
+  class Value;
+
 namespace bias{
 
 /**
@@ -44,18 +48,38 @@ class VesBias:
 public Bias
 {
 private:
-  CoeffsVector* coeffs_;
-  CoeffsVector* gradient_;
-  CoeffsMatrix* hessian_;
+  CoeffsVector* coeffs_ptr;
+  CoeffsVector* gradient_ptr;
+  CoeffsMatrix* hessian_ptr;
+private:
+  void initializeGradientAndHessian();
+protected:
+  void initializeCoeffs(const std::vector<std::string>&,const std::vector<unsigned int>&);
+  void initializeCoeffs(std::vector<Value*>&,std::vector<BasisFunctions*>&);
 public:
   static void registerKeywords(Keywords&);
   VesBias(const ActionOptions&ao);
-  CoeffsVector* getCoeffsPtr(){return coeffs_;}
-  CoeffsVector* getGradientPtr(){return gradient_;}
-  CoeffsMatrix* getHessianPtr(){return hessian_;}
+  ~VesBias();
+  //
+  CoeffsVector* getCoeffsPtr() const {return coeffs_ptr;}
+  CoeffsVector* getGradientPtr()const {return gradient_ptr;}
+  CoeffsMatrix* getHessianPtr() const {return hessian_ptr;}
+  //
+  CoeffsVector& Coeffs() const;
+  CoeffsVector& Gradient() const;
+  CoeffsMatrix& Hessian() const;
   void updateGradientAndHessian();
   void clearGradientAndHessian();
 };
+
+inline
+CoeffsVector& VesBias::Coeffs() const {return *coeffs_ptr;}
+
+inline
+CoeffsVector& VesBias::Gradient() const {return *gradient_ptr;}
+
+inline
+CoeffsMatrix& VesBias::Hessian() const {return *hessian_ptr;}
 
 }
 }
