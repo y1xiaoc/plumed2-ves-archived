@@ -364,10 +364,37 @@ void CoeffsVector::setValuesFromDifferentShape(const CoeffsVector& other_coeffsv
 
 
 double CoeffsVector::getMinValue() const {
+  index_t min_index=0;
+  return getMinValue(min_index);
+}
+
+
+double CoeffsVector::getMinValue(index_t& min_index) const {
+  min_index=0;
   double min_value=DBL_MAX;
   for(index_t i=0; i<data.size(); i++){
 	  if(data[i]<min_value){
       min_value=data[i];
+      min_index=i;
+    }
+  }
+  return min_value;
+}
+
+
+double CoeffsVector::getMinAbsValue() const {
+  index_t min_index=0;
+  return getMinAbsValue(min_index);
+}
+
+
+double CoeffsVector::getMinAbsValue(index_t& min_index) const {
+  min_index=0;
+  double min_value=DBL_MAX;
+  for(index_t i=0; i<data.size(); i++){
+	  if(std::abs(data[i])<min_value){
+      min_value=std::abs(data[i]);
+      min_index=i;
     }
   }
   return min_value;
@@ -375,10 +402,37 @@ double CoeffsVector::getMinValue() const {
 
 
 double CoeffsVector::getMaxValue() const {
+  index_t max_index=0;
+  return getMaxValue(max_index);
+}
+
+
+double CoeffsVector::getMaxValue(index_t& max_index) const {
+  max_index=0;
   double max_value=DBL_MIN;
   for(index_t i=0; i<data.size(); i++){
 	  if(data[i]>max_value){
       max_value=data[i];
+      max_index=i;
+    }
+  }
+  return max_value;
+}
+
+
+double CoeffsVector::getMaxAbsValue() const {
+  index_t max_index=0;
+  return getMaxAbsValue(max_index);
+}
+
+
+double CoeffsVector::getMaxAbsValue(index_t& max_index) const {
+  max_index=0;
+  double max_value=0.0;
+  for(index_t i=0; i<data.size(); i++){
+	  if(std::abs(data[i])>max_value){
+      max_value=std::abs(data[i]);
+      max_index=i;
     }
   }
   return max_value;
@@ -386,11 +440,35 @@ double CoeffsVector::getMaxValue() const {
 
 
 double CoeffsVector::getNorm() const {
+  return getL2Norm();
+}
+
+
+double CoeffsVector::getL1Norm() const {
+  double norm;
+  for(index_t i=0; i<data.size(); i++){
+    norm=std::abs(data[i]);
+  }
+  return norm;
+}
+
+
+double CoeffsVector::getL2Norm() const {
   double norm;
   for(index_t i=0; i<data.size(); i++){
     norm=data[i]*data[i];
   }
   norm=sqrt(norm);
+  return norm;
+}
+
+
+double CoeffsVector::getLpNorm(const double p) const {
+  double norm;
+  for(index_t i=0; i<data.size(); i++){
+    norm=pow(data[i],p);
+  }
+  norm=pow(norm,(1.0/p));
   return norm;
 }
 

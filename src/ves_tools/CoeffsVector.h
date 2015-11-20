@@ -125,8 +125,19 @@ public:
 
   //
   double getMinValue() const;
+  double getMinValue(index_t&) const;
+  double getMinAbsValue() const;
+  double getMinAbsValue(index_t&) const;
+  //
   double getMaxValue() const;
+  double getMaxValue(index_t&) const;
+  double getMaxAbsValue() const;
+  double getMaxAbsValue(index_t&) const;
+  //
   double getNorm() const;
+  double getL1Norm() const;
+  double getL2Norm() const;
+  double getLpNorm(const double) const;
   //
   void normalizeCoeffs();
   // Random values
