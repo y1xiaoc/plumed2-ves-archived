@@ -138,6 +138,7 @@ public:
   double getL1Norm() const;
   double getL2Norm() const;
   double getLpNorm(const double) const;
+  double getRMS() const;
   //
   void normalizeCoeffs();
   // Random values

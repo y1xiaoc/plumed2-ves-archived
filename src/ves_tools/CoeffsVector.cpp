@@ -473,6 +473,11 @@ double CoeffsVector::getLpNorm(const double p) const {
 }
 
 
+double CoeffsVector::getRMS() const {
+  return getNorm()/sqrt(numberOfCoeffs());
+}
+
+
 void CoeffsVector::normalizeCoeffs() {
   double norm=getNorm();
   scaleAllValues(norm);
