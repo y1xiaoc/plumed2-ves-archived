@@ -55,7 +55,6 @@ private:
   //
   std::vector<double> data;
   //
-  bool symmetric_;
   bool diagonal_;
   //
   std::string output_fmt_; // format for output
@@ -68,7 +67,6 @@ public:
     const std::vector<std::string>&,
     const std::vector<unsigned int>&,
     Communicator& cc,
-    const bool symmetric=true,
     const bool diagonal=true,
     const bool use_counter=false);
   //
@@ -77,7 +75,6 @@ public:
     std::vector<Value*>&,
     std::vector<BasisFunctions*>&,
     Communicator& cc,
-    const bool symmetric=true,
     const bool diagonal=true,
     const bool use_counter=false);
   //
@@ -85,7 +82,6 @@ public:
     const std::string&,
     CoeffsVector*,
     Communicator& cc,
-    const bool symmetric=true,
     const bool diagonal=true,
     const bool use_counter=false);
   //

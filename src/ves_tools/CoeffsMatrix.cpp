@@ -44,12 +44,11 @@ CoeffsMatrix::CoeffsMatrix(
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape,
   Communicator& cc,
-  const bool symmetric, const bool diagonal,
+  const bool diagonal,
   const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase(label,dimension_labels,indices_shape),
 mycomm(cc),
-symmetric_(symmetric),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
 {
@@ -62,12 +61,11 @@ CoeffsMatrix::CoeffsMatrix(
   std::vector<Value*>& args,
   std::vector<BasisFunctions*>& basisf,
   Communicator& cc,
-  const bool symmetric, const bool diagonal,
+  const bool diagonal,
   const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase(label,args,basisf),
 mycomm(cc),
-symmetric_(symmetric),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
 {
@@ -79,12 +77,11 @@ CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
   CoeffsVector* coeffsVec,
   Communicator& cc,
-  const bool symmetric, const bool diagonal,
+  const bool diagonal,
   const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase( *(static_cast<CoeffsBase*>(coeffsVec)) ),
 mycomm(cc),
-symmetric_(symmetric),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
 {
@@ -95,27 +92,20 @@ output_fmt_("%30.16e")
 
 
 void CoeffsMatrix::setupMatrix() {
+  nrows_=numberOfCoeffs();
+  ncolumns_=nrows_;
   if(diagonal_){
-    symmetric_=true;
-    nrows_=numberOfCoeffs();
-    ncolumns_=1;
+    size_=nrows_;
   }
   else{
-    nrows_=numberOfCoeffs();
-    ncolumns_=numberOfCoeffs();
+    size_=(nrows_*nrows_-nrows_)/2+nrows_;
   }
-  size_=nrows_*ncolumns_;
   clear();
 }
 
 
 CoeffsBase::index_t CoeffsMatrix::getSize() const {
   return size_;
-}
-
-
-bool CoeffsMatrix::isSymmetric() const {
-  return symmetric_;
 }
 
 
@@ -134,11 +124,14 @@ CoeffsBase::index_t CoeffsMatrix::getMatrixIndex(const index_t index1, const ind
   plumed_dbg_assert(index1<nrows_);
   plumed_dbg_assert(index2<ncolumns_);
   if(diagonal_){
-    plumed_massert(index1==index2,"CoeffsMatrix: you trying to access a off-diagonal element of a diagonal coeffs matrix");
+    // plumed_massert(index1==index2,"CoeffsMatrix: you trying to access a off-diagonal element of a diagonal coeffs matrix");
     matrix_idx=index1;
   }
+  else if (index1<=index2){
+    matrix_idx=index2+index1*(nrows_-1)-index1*(index1-1)/2;
+  }
   else {
-    matrix_idx=index2+index1*ncolumns_;
+    matrix_idx=index1+index2*(nrows_-1)-index2*(index2-1)/2;
   }
   return matrix_idx;
 }
@@ -164,9 +157,6 @@ double CoeffsMatrix::getValue(const std::vector<unsigned int>& indices1, const s
 
 void CoeffsMatrix::setValue(const index_t index1, const index_t index2, const double value) {
   data[getMatrixIndex(index1,index2)]=value;
-  if(symmetric_ && !diagonal_){
-    data[getMatrixIndex(index2,index1)]=value;
-  }
 }
 
 
@@ -220,9 +210,6 @@ CoeffsVector operator*(const CoeffsVector& coeffs_vector, const CoeffsMatrix& co
 
 void CoeffsMatrix::addToValue(const index_t index1, const index_t index2, const double value) {
   data[getMatrixIndex(index1,index2)]+=value;
-  if(symmetric_ && !diagonal_){
-    data[getMatrixIndex(index2,index1)]+=value;
-  }
 }
 
 
@@ -306,9 +293,7 @@ void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_fi
 
 
 void CoeffsMatrix::writeMatrixInfoToFile(OFile& ofile) {
-  std::string field_symmetric = "symmetric_matrix";
   std::string field_diagonal = "diagonal_matrix";
-  ofile.addConstantField(field_symmetric).printField(field_symmetric,isSymmetric());
   ofile.addConstantField(field_diagonal).printField(field_diagonal,isDiagonal());
 }
 
