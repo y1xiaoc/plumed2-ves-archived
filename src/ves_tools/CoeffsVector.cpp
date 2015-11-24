@@ -138,6 +138,7 @@ double CoeffsVector::getValue(const index_t index) const {
   return data[index];
 }
 
+
 double CoeffsVector::getValue(const std::vector<unsigned int>& indices) const {
   return getValue(getIndex(indices));
 }

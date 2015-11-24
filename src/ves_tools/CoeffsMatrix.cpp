@@ -218,6 +218,7 @@ CoeffsVector operator*(const CoeffsMatrix& coeffs_matrix, const CoeffsVector& co
   return new_coeffs_vector;
 }
 
+
 CoeffsVector operator*(const CoeffsVector& coeffs_vector, const CoeffsMatrix& coeffs_matrix) {
   return coeffs_matrix*coeffs_vector;
 }
