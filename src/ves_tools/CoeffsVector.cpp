@@ -118,6 +118,21 @@ void CoeffsVector::sumMPI() {
 }
 
 
+void CoeffsVector::sumMPI(Communicator& cc) {
+  cc.Sum(data);
+}
+
+
+void CoeffsVector::gatherMultipleWalkerMPI(Communicator& multi_sim_cc) {
+  double nwalkers = (double) multi_sim_cc.Get_size();
+  if(multi_sim_cc.Get_rank()==0){
+    multi_sim_cc.Sum(data);
+    scaleAllValues(1.0/nwalkers);
+  }
+  multi_sim_cc.Bcast(data,0);
+}
+
+
 double CoeffsVector::getValue(const index_t index) const {
   plumed_dbg_assert(index<data.size());
   return data[index];

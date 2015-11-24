@@ -93,6 +93,9 @@ public:
   bool isDiagonal() const;
   //
   void sumMPI();
+  void sumMPI(Communicator&);
+  //
+  void gatherMultipleWalkerMPI(Communicator&);
   //
   index_t getMatrixIndex(const index_t, const index_t) const;
   //
