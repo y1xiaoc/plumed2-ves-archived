@@ -73,6 +73,8 @@ public:
   void setLabel(const std::string);
   std::string getDataLabel() const;
   void setDataLabel(const std::string);
+  void setLabels(const std::string);
+  void setLabels(const std::string, const std::string);
   //
   CoeffsType getType() const;
   std::string getTypeStr() const;

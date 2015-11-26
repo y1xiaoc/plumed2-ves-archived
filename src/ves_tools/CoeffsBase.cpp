@@ -41,8 +41,7 @@ CoeffsBase::CoeffsBase(
   plumed_massert(indices_shape.size()==dimension_labels.size(),"CoeffsBase: dimensions of vectors in Init(...) don't match");
   //
   setupIndices(indices_shape);
-  setLabel(label);
-  setDataLabel(label);
+  setLabels(label);
   setType(Generic);
   setAllDimensionLabels(dimension_labels);
   setAllCoeffsDescriptions();
@@ -63,8 +62,7 @@ CoeffsBase::CoeffsBase(
     indices_shape[i]=basisf[i]->getNumberOfBasisFunctions();
   }
   setupIndices(indices_shape);
-  setLabel(label);
-  setDataLabel(label);
+  setLabels(label);
   setType(LinearBasisSet);
   setAllDimensionLabels(dimension_labels);
   setupBasisFunctionsInfo(basisf);
@@ -141,6 +139,17 @@ void CoeffsBase::setDataLabel(const std::string data_label) {
   data_label_=data_label;
 }
 
+
+void CoeffsBase::setLabels(const std::string label) {
+  label_=label;
+  data_label_=label;
+}
+
+
+void CoeffsBase::setLabels(const std::string label, const std::string data_label) {
+  label_=label;
+  data_label_=data_label;
+}
 
 
 CoeffsBase::CoeffsType CoeffsBase::getType() const {
