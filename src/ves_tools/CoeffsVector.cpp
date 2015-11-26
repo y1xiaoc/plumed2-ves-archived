@@ -113,17 +113,17 @@ void CoeffsVector::resizeCoeffs(std::vector<BasisFunctions*>& basisf_new) {
 }
 
 
-void CoeffsVector::sumMPI() {
+void CoeffsVector::sumCommMPI() {
   mycomm.Sum(data);
 }
 
 
-void CoeffsVector::sumMPI(Communicator& cc) {
+void CoeffsVector::sumCommMPI(Communicator& cc) {
   cc.Sum(data);
 }
 
 
-void CoeffsVector::gatherMultipleWalkerMPI(Communicator& multi_sim_cc) {
+void CoeffsVector::sumMultiSimCommMPI(Communicator& multi_sim_cc) {
   double nwalkers = (double) multi_sim_cc.Get_size();
   if(multi_sim_cc.Get_rank()==0){
     multi_sim_cc.Sum(data);

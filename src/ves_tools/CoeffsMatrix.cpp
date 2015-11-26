@@ -114,17 +114,17 @@ bool CoeffsMatrix::isDiagonal() const {
 }
 
 
-void CoeffsMatrix::sumMPI() {
+void CoeffsMatrix::sumCommMPI() {
   mycomm.Sum(data);
 }
 
 
-void CoeffsMatrix::sumMPI(Communicator& cc) {
+void CoeffsMatrix::sumCommMPI(Communicator& cc) {
   cc.Sum(data);
 }
 
 
-void CoeffsMatrix::gatherMultipleWalkerMPI(Communicator& multi_sim_cc) {
+void CoeffsMatrix::sumMultiSimCommMPI(Communicator& multi_sim_cc) {
   double nwalkers = (double) multi_sim_cc.Get_size();
   if(multi_sim_cc.Get_rank()==0){
     multi_sim_cc.Sum(data);
@@ -241,6 +241,36 @@ void CoeffsMatrix::scaleAllValues(const double scalef) {
 }
 
 
+CoeffsMatrix& CoeffsMatrix::operator*=(const double scalef) {
+  scaleAllValues(scalef);
+  return *this;
+}
+
+
+CoeffsMatrix operator*(const double scalef, const CoeffsMatrix& coeffsmatrix) {
+  return CoeffsMatrix(coeffsmatrix)*=scalef;
+}
+
+
+CoeffsMatrix operator*(const CoeffsMatrix& coeffsmatrix, const double scalef) {
+  return scalef*coeffsmatrix;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator*=(const CoeffsMatrix& other_coeffsmatrix) {
+  plumed_massert(data.size()==other_coeffsmatrix.getSize(),"Coeffs matrices do not have the same size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]*=other_coeffsmatrix.data[i];
+  }
+  return *this;
+}
+
+
+CoeffsMatrix CoeffsMatrix::operator*(const CoeffsMatrix& other_coeffsmatrix) const {
+  return CoeffsMatrix(*this)*=other_coeffsmatrix;
+}
+
+
 void CoeffsMatrix::setValues(const double value) {
   for(size_t i=0; i<data.size(); i++){
     data[i]=value;
@@ -248,10 +278,179 @@ void CoeffsMatrix::setValues(const double value) {
 }
 
 
+void CoeffsMatrix::setValues(const std::vector<double>& values) {
+  plumed_massert( data.size()==values.size(), "Incorrect size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]=values[i];
+  }
+}
+
+
+void CoeffsMatrix::setValues(const CoeffsMatrix& other_coeffsmatrix) {
+  plumed_massert( data.size()==other_coeffsmatrix.getSize(), "Incorrect size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]=other_coeffsmatrix.data[i];
+  }
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator=(const double value) {
+  setValues(value);
+  return *this;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator=(const std::vector<double>& values) {
+  setValues(values);
+  return *this;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator=(const CoeffsMatrix& other_coeffsmatrix) {
+  setValues(other_coeffsmatrix);
+  return *this;
+}
+
+
+CoeffsMatrix CoeffsMatrix::operator+() const {
+  return *this;
+}
+
+
+CoeffsMatrix CoeffsMatrix::operator-() const {
+  return CoeffsMatrix(*this)*=-1.0;
+}
+
+
 void CoeffsMatrix::addToValues(const double value) {
   for(size_t i=0; i<data.size(); i++){
     data[i]+=value;
   }
+}
+
+
+void CoeffsMatrix::addToValues(const std::vector<double>& values) {
+  plumed_massert( data.size()==values.size(), "Incorrect size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]+=values[i];
+  }
+}
+
+
+void CoeffsMatrix::addToValues(const CoeffsMatrix& other_coeffsmatrix) {
+  plumed_massert( data.size()==other_coeffsmatrix.getSize(), "Incorrect size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]+=other_coeffsmatrix.data[i];
+  }
+}
+
+
+void CoeffsMatrix::subtractFromValues(const double value) {
+  for(size_t i=0; i<data.size(); i++){
+    data[i]-=value;
+  }
+}
+
+
+void CoeffsMatrix::subtractFromValues(const std::vector<double>& values) {
+  plumed_massert( data.size()==values.size(), "Incorrect size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]-=values[i];
+  }
+}
+
+
+void CoeffsMatrix::subtractFromValues(const CoeffsMatrix& other_coeffsmatrix) {
+  plumed_massert( data.size()==other_coeffsmatrix.getSize(), "Incorrect size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]-=other_coeffsmatrix.data[i];
+  }
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator+=(const double value) {
+  addToValues(value);
+  return *this;
+}
+
+
+CoeffsMatrix operator+(const double value, const CoeffsMatrix& coeffsmatrix) {
+  return coeffsmatrix+value;
+}
+
+
+CoeffsMatrix operator+(const CoeffsMatrix& coeffsmatrix, const double value) {
+  return CoeffsMatrix(coeffsmatrix)+=value;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator+=(const std::vector<double>& values) {
+  addToValues(values);
+  return *this;
+}
+
+
+CoeffsMatrix operator+(const std::vector<double>& values, const CoeffsMatrix& coeffsmatrix) {
+  return coeffsmatrix+values;
+}
+
+
+CoeffsMatrix operator+(const CoeffsMatrix& coeffsmatrix, const std::vector<double>& values) {
+  return CoeffsMatrix(coeffsmatrix)+=values;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator-=(const double value) {
+  subtractFromValues(value);
+  return *this;
+}
+
+
+CoeffsMatrix operator-(const double value, const CoeffsMatrix& coeffsmatrix) {
+  return -1.0*coeffsmatrix+value;
+}
+
+
+CoeffsMatrix operator-(const CoeffsMatrix& coeffsmatrix, const double value) {
+  return CoeffsMatrix(coeffsmatrix)-=value;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator-=(const std::vector<double>& values) {
+  subtractFromValues(values);
+  return *this;
+}
+
+
+CoeffsMatrix operator-(const std::vector<double>& values, const CoeffsMatrix& coeffsmatrix) {
+  return -1.0*coeffsmatrix+values;
+}
+
+
+CoeffsMatrix operator-(const CoeffsMatrix& coeffsmatrix, const std::vector<double>& values) {
+  return CoeffsMatrix(coeffsmatrix)-=values;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator+=(const CoeffsMatrix& other_coeffsmatrix) {
+  addToValues(other_coeffsmatrix);
+  return *this;
+}
+
+
+CoeffsMatrix CoeffsMatrix::operator+(const CoeffsMatrix& other_coeffsmatrix) const {
+  return CoeffsMatrix(*this)+=other_coeffsmatrix;
+}
+
+
+CoeffsMatrix& CoeffsMatrix::operator-=(const CoeffsMatrix& other_coeffsmatrix) {
+  subtractFromValues(other_coeffsmatrix);
+  return *this;
+}
+
+
+CoeffsMatrix CoeffsMatrix::operator-(const CoeffsMatrix& other_coeffsmatrix) const {
+  return CoeffsMatrix(*this)-=other_coeffsmatrix;
 }
 
 

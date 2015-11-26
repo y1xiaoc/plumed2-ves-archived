@@ -92,10 +92,10 @@ public:
   bool isSymmetric() const;
   bool isDiagonal() const;
   //
-  void sumMPI();
-  void sumMPI(Communicator&);
+  void sumCommMPI();
+  void sumCommMPI(Communicator&);
   //
-  void gatherMultipleWalkerMPI(Communicator&);
+  void sumMultiSimCommMPI(Communicator&);
   //
   size_t getMatrixIndex(const size_t, const size_t) const;
   //
@@ -113,16 +113,48 @@ public:
   const double& operator()(const std::vector<unsigned int>&, const std::vector<unsigned int>&) const;
   //
   friend CoeffsVector operator*(const CoeffsMatrix&, const CoeffsVector&);
-  friend CoeffsVector operator*(const CoeffsVector&, const CoeffsMatrix&);
   // add to value
   void addToValue(const size_t, const size_t, const double);
   void addToValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&, const double);
   // scale all values
   void scaleAllValues(const double);
+  CoeffsMatrix& operator*=(const double);
+  friend CoeffsMatrix operator*(const double, const CoeffsMatrix&);
+  friend CoeffsMatrix operator*(const CoeffsMatrix&, const double);
+  CoeffsMatrix& operator*=(const CoeffsMatrix&);
+  CoeffsMatrix operator*(const CoeffsMatrix&) const;
   // set all values
   void setValues(const double);
+  void setValues(const std::vector<double>&);
+  void setValues(const CoeffsMatrix&);
+  CoeffsMatrix& operator=(const double);
+  CoeffsMatrix& operator=(const std::vector<double>&);
+  CoeffsMatrix& operator=(const CoeffsMatrix&);
   // add to all values
+  CoeffsMatrix operator+() const;
+  CoeffsMatrix operator-() const;
   void addToValues(const double);
+  void addToValues(const std::vector<double>&);
+  void addToValues(const CoeffsMatrix&);
+  void subtractFromValues(const double);
+  void subtractFromValues(const std::vector<double>&);
+  void subtractFromValues(const CoeffsMatrix&);
+  CoeffsMatrix& operator+=(const double);
+  friend CoeffsMatrix operator+(const double, const CoeffsMatrix&);
+  friend CoeffsMatrix operator+(const CoeffsMatrix&, const double);
+  CoeffsMatrix& operator+=(const std::vector<double>&);
+  friend CoeffsMatrix operator+(const std::vector<double>&, const CoeffsMatrix&);
+  friend CoeffsMatrix operator+(const CoeffsMatrix&, const std::vector<double>&);
+  CoeffsMatrix& operator-=(const double);
+  friend CoeffsMatrix operator-(const double, const CoeffsMatrix&);
+  friend CoeffsMatrix operator-(const CoeffsMatrix&, const double);
+  CoeffsMatrix& operator-=(const std::vector<double>&);
+  friend CoeffsMatrix operator-(const std::vector<double>&, const CoeffsMatrix&);
+  friend CoeffsMatrix operator-(const CoeffsMatrix&, const std::vector<double>&);
+  CoeffsMatrix& operator+=(const CoeffsMatrix&);
+  CoeffsMatrix operator+(const CoeffsMatrix&) const;
+  CoeffsMatrix& operator-=(const CoeffsMatrix&);
+  CoeffsMatrix operator-(const CoeffsMatrix&) const;
   //
   double getMinValue() const;
   double getMaxValue() const;

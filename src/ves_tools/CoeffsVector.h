@@ -73,10 +73,10 @@ public:
   void resizeCoeffs(const std::vector<unsigned int>&);
   void resizeCoeffs(std::vector<BasisFunctions*>&);
   //
-  void sumMPI();
-  void sumMPI(Communicator& cc);
+  void sumCommMPI();
+  void sumCommMPI(Communicator& cc);
   //
-  void gatherMultipleWalkerMPI(Communicator&);
+  void sumMultiSimCommMPI(Communicator&);
   // get value
   double getValue(const size_t) const;
   double getValue(const std::vector<unsigned int>&) const;
