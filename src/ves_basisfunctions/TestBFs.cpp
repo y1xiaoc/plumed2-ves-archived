@@ -105,19 +105,35 @@ Function(ao)
   coeffsM.writeToFile("coeffsM.data");
 
 
-  CoeffsVector coeffsV1 = CoeffsVector("coeffs",args,bf,comm,true);
+  CoeffsVector coeffsV1 = CoeffsVector("coeffsV1",args,bf,comm,true);
+  CoeffsVector coeffsV2 = CoeffsVector("coeffsV2",args,bf2,comm,true);
+
+
+  std::vector<double> values(coeffsV1.numberOfCoeffs(),1.0);
+
   coeffsV1.randomizeValuesGaussian(1);
   coeffsV1.writeToFile("c1.1.data",true);
-  coeffsV1.resizeCoeffs(bf2);
-  coeffsV1.writeToFile("c1.2.data",true);
-  coeffsV1.resizeCoeffs(bf);
-  coeffsV1.writeToFile("c1.3.data",true);
-  coeffsV1.resizeCoeffs(bf2);
-  coeffsV1.writeToFile("c1.4.data",true);
+  coeffsV2 = coeffsV1-values;
+  coeffsV2.writeToFile("c2.1.data",true);
+  coeffsV2 = values-coeffsV1;
+  coeffsV2.writeToFile("c2.2.data",true);
+  coeffsV2 = coeffsV1-1.0;
+  coeffsV2.writeToFile("c2.3.data",true);
+  coeffsV2 = 1.0-coeffsV1;
+  coeffsV2.writeToFile("c2.4.data",true);
 
-  CoeffsMatrix coeffsM2 = CoeffsMatrix("Hessian",&coeffsV1,comm);
+
+
+  CoeffsMatrix coeffsM2 = CoeffsMatrix("Hessian1",&coeffsV1,comm,false);
   coeffsM2.randomizeValuesGaussian(1);
   coeffsM2.writeToFile("coeffsM2.data");
+
+  std::vector<double> values2(coeffsM2.getSize(),1.0);
+
+  CoeffsMatrix coeffsM3 = CoeffsMatrix("Hessian2",&coeffsV1,comm,false);
+  coeffsM3.randomizeValuesGaussian(1);
+  coeffsM3 = values2;
+  coeffsM3.writeToFile("coeffsM3.data");
 
 
 
