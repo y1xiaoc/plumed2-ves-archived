@@ -45,12 +45,14 @@ void BachAveragedSGD::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
 }
 
+
 BachAveragedSGD::BachAveragedSGD(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao),
 iter_counter(0)
 {
   turnOnHessian();
 }
+
 
 void BachAveragedSGD::coeffsUpdate() {
   double aver_decay = 1.0 / ( (double) iter_counter + 1.0 );

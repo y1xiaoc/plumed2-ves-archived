@@ -43,11 +43,13 @@ void SteepestDecent::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
 }
 
+
 SteepestDecent::SteepestDecent(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
   turnOffHessian();
 }
+
 
 void SteepestDecent::coeffsUpdate() {
   Coeffs() = Coeffs() - StepSize()*Gradient();
