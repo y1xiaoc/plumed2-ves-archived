@@ -53,8 +53,9 @@ iter_counter(0)
 }
 
 void BachAveragedSGD::coeffsUpdate() {
+  double aver_decay = 1.0 / ( (double) iter_counter + 1.0 );
   AuxCoeffs() = AuxCoeffs() - StepSize()*( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
-  Coeffs() += ( AuxCoeffs()-Coeffs() ) / ( (double) iter_counter + 1.0 );
+  Coeffs() += ( AuxCoeffs()-Coeffs() ) * aver_decay;
   iter_counter += 1;
 }
 
