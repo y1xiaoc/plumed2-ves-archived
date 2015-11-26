@@ -44,9 +44,9 @@ CoeffsVector::CoeffsVector(
   const std::vector<unsigned int>& indices_shape,
   Communicator& cc,
   const bool use_counter):
-mycomm(cc),
 CounterBase(use_counter),
 CoeffsBase(label,dimension_labels,indices_shape),
+mycomm(cc),
 output_fmt_("%30.16e")
 {
   clear();
@@ -59,9 +59,9 @@ CoeffsVector::CoeffsVector(
   std::vector<BasisFunctions*>& basisf,
   Communicator& cc,
   const bool use_counter):
-mycomm(cc),
 CounterBase(use_counter),
 CoeffsBase(label,args,basisf),
+mycomm(cc),
 output_fmt_("%30.16e")
 {
   clear();
@@ -305,10 +305,41 @@ void CoeffsVector::addToValues(const double value) {
 }
 
 
+void CoeffsVector::addToValues(const std::vector<double>& values) {
+  plumed_massert( data.size()==values.size(), "Incorrect size");
+  for(index_t i=0; i<data.size(); i++){
+    data[i]+=values[i];
+  }
+}
+
+
 void CoeffsVector::addToValues(const CoeffsVector& other_coeffsvector) {
   plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
   for(index_t i=0; i<data.size(); i++){
     data[i]+=other_coeffsvector.data[i];
+  }
+}
+
+
+void CoeffsVector::subtractFromValues(const double value) {
+  for(index_t i=0; i<data.size(); i++){
+    data[i]-=value;
+  }
+}
+
+
+void CoeffsVector::subtractFromValues(const std::vector<double>& values) {
+  plumed_massert( data.size()==values.size(), "Incorrect size");
+  for(index_t i=0; i<data.size(); i++){
+    data[i]-=values[i];
+  }
+}
+
+
+void CoeffsVector::subtractFromValues(const CoeffsVector& other_coeffsvector) {
+  plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
+  for(index_t i=0; i<data.size(); i++){
+    data[i]-=other_coeffsvector.data[i];
   }
 }
 
@@ -329,8 +360,24 @@ CoeffsVector operator+(const CoeffsVector& coeffsvector, const double value) {
 }
 
 
+CoeffsVector& CoeffsVector::operator+=(const std::vector<double>& values) {
+  addToValues(values);
+  return *this;
+}
+
+
+CoeffsVector operator+(const std::vector<double>& values, const CoeffsVector& coeffsvector) {
+  return coeffsvector+values;
+}
+
+
+CoeffsVector operator+(const CoeffsVector& coeffsvector, const std::vector<double>& values) {
+  return CoeffsVector(coeffsvector)+=values;
+}
+
+
 CoeffsVector& CoeffsVector::operator-=(const double value) {
-  addToValues(-1.0*value);
+  subtractFromValues(value);
   return *this;
 }
 
@@ -342,6 +389,22 @@ CoeffsVector operator-(const double value, const CoeffsVector& coeffsvector) {
 
 CoeffsVector operator-(const CoeffsVector& coeffsvector, const double value) {
   return CoeffsVector(coeffsvector)-=value;
+}
+
+
+CoeffsVector& CoeffsVector::operator-=(const std::vector<double>& values) {
+  subtractFromValues(values);
+  return *this;
+}
+
+
+CoeffsVector operator-(const std::vector<double>& values, const CoeffsVector& coeffsvector) {
+  return -1.0*coeffsvector+values;
+}
+
+
+CoeffsVector operator-(const CoeffsVector& coeffsvector, const std::vector<double>& values) {
+  return CoeffsVector(coeffsvector)-=values;
 }
 
 
@@ -357,7 +420,7 @@ CoeffsVector CoeffsVector::operator+(const CoeffsVector& other_coeffsvector) con
 
 
 CoeffsVector& CoeffsVector::operator-=(const CoeffsVector& other_coeffsvector) {
-  addToValues(-1.0*other_coeffsvector);
+  subtractFromValues(other_coeffsvector);
   return *this;
 }
 

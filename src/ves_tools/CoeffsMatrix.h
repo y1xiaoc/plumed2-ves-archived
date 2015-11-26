@@ -123,11 +123,6 @@ public:
   void setValues(const double);
   // add to all values
   void addToValues(const double);
-  // copy values for another Coeffs instance
-  void setFromOtherCoeffsMatrix(CoeffsMatrix*);
-  void setFromOtherCoeffsMatrix(CoeffsMatrix*,const double);
-  void addFromOtherCoeffsMatrix(CoeffsMatrix*);
-  void addFromOtherCoeffsMatrix(CoeffsMatrix*,const double);
   //
   double getMinValue() const;
   double getMaxValue() const;
