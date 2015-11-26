@@ -35,7 +35,7 @@
 #include <cmath>
 
 
-#define PLUMED_VARIATIONALBIAS_INIT(ao) Action(ao),VesBias(ao)
+#define PLUMED_VESBIAS_INIT(ao) Action(ao),VesBias(ao)
 
 namespace PLMD{
 
@@ -67,6 +67,8 @@ private:
   bool use_mwalkers_;
   //
   double aver_counter;
+  double kbt_;
+  double beta_;
 private:
   void initializeGradientAndHessian();
 protected:
@@ -87,6 +89,8 @@ public:
   CoeffsMatrix* getHessianPtr() const {return hessian_ptr;}
   //
   size_t numberOfCoeffs() const;
+  double getKbT() const;
+  double getBeta() const;
   //
   CoeffsVector& Coeffs() const;
   CoeffsVector& CoeffDerivsAverTargetDist() const;
@@ -114,6 +118,12 @@ CoeffsVector& VesBias::Gradient() const {return *gradient_ptr;}
 
 inline
 CoeffsMatrix& VesBias::Hessian() const {return *hessian_ptr;}
+
+inline
+double VesBias::getKbT() const {return kbt_;}
+
+inline
+double VesBias::getBeta() const {return beta_;}
 
 }
 }

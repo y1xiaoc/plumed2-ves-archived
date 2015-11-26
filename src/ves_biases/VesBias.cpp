@@ -25,7 +25,8 @@
 #include "ves_tools/CoeffsMatrix.h"
 
 #include "tools/Communicator.h"
-
+#include "core/PlumedMain.h"
+#include "core/Atoms.h"
 
 
 namespace PLMD{
@@ -40,7 +41,9 @@ hessian_ptr(NULL),
 coeffderivs_aver_sampled(0),
 hessian_diagonal_(true),
 use_mwalkers_(false),
-aver_counter(0.0)
+aver_counter(0.0),
+kbt_(0.0),
+beta_(0.0)
 {
   bool full_hessian=false;
   parseFlag("FULL_HESSIAN",full_hessian);
@@ -52,6 +55,12 @@ aver_counter(0.0)
    log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
    log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
  }
+ double temp=0.0;
+ parse("TEMP",temp);
+ if(temp>0.0) kbt_=plumed.getAtoms().getKBoltzmann()*temp;
+ else kbt_=plumed.getAtoms().getKbT();
+ if(kbt_==0.0) error("the MD engine does not pass the temperature to plumed so you need to give with the TEMP keyword");
+ beta_=1.0/kbt_;
 }
 
 VesBias::~VesBias(){
@@ -65,6 +74,8 @@ VesBias::~VesBias(){
 void VesBias::registerKeywords( Keywords& keys ) {
   Bias::registerKeywords(keys);
   keys.addFlag("FULL_HESSIAN","false","if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
+  keys.addFlag("MULTIPLE_WALKERS","false","if optimization is to be performed using multiple walkers connected via MPI");
+  keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature");
 }
 
 
@@ -95,12 +106,10 @@ void VesBias::linkCoeffs(CoeffsVector& coeffs_in) {
 void VesBias::initializeGradientAndHessian() {
   //
   coeffderivs_aver_ps_ptr = new CoeffsVector(*coeffs_ptr);
-  coeffderivs_aver_ps_ptr->setLabel("average-over-ps");
-  coeffderivs_aver_ps_ptr->setDataLabel("average-over-ps");
+  coeffderivs_aver_ps_ptr->setLabels("average-over-ps");
   //
   gradient_ptr = new CoeffsVector(*coeffs_ptr);
-  gradient_ptr->setLabel("gradient");
-  gradient_ptr->setDataLabel("gradient");
+  gradient_ptr->setLabels("gradient");
   //
   hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,hessian_diagonal_,false);
   //
@@ -113,8 +122,9 @@ void VesBias::initializeGradientAndHessian() {
 void VesBias::updateGradientAndHessian() {
   comm.Sum(coeffderivs_aver_sampled);
   comm.Sum(coeffderivs_cov_sampled);
-  Gradient() = coeffderivs_aver_sampled + CoeffDerivsAverTargetDist();
+  Gradient() = CoeffDerivsAverTargetDist() - coeffderivs_aver_sampled;
   Hessian() = coeffderivs_cov_sampled;
+  Hessian() *= getBeta();
   if(use_mwalkers_){
     Gradient().sumMultiSimCommMPI(multi_sim_comm);
     Hessian().sumMultiSimCommMPI(multi_sim_comm);
