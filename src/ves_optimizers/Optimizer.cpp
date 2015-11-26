@@ -59,6 +59,7 @@ bias_ptr(NULL)
   coeffs_ptr = bias_ptr->getCoeffsPtr();
   plumed_massert(coeffs_ptr != NULL,"coeffs are not linked correctly");
   aux_coeffs_ptr = new CoeffsVector(*coeffs_ptr);
+  aux_coeffs_ptr->setLabels("aux_"+coeffs_ptr->getLabel());
   //
   gradient_ptr = bias_ptr->getGradientPtr();
   plumed_massert(gradient_ptr != NULL,"gradient is not linked correctly");
