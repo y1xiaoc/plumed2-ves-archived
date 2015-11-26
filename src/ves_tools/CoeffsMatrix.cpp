@@ -104,7 +104,7 @@ void CoeffsMatrix::setupMatrix() {
 }
 
 
-CoeffsBase::index_t CoeffsMatrix::getSize() const {
+size_t CoeffsMatrix::getSize() const {
   return size_;
 }
 
@@ -134,8 +134,8 @@ void CoeffsMatrix::gatherMultipleWalkerMPI(Communicator& multi_sim_cc) {
 }
 
 
-CoeffsBase::index_t CoeffsMatrix::getMatrixIndex(const index_t index1, const index_t index2) const {
-  index_t matrix_idx;
+size_t CoeffsMatrix::getMatrixIndex(const size_t index1, const size_t index2) const {
+  size_t matrix_idx;
   plumed_dbg_assert(index1<nrows_);
   plumed_dbg_assert(index2<ncolumns_);
   if(diagonal_){
@@ -154,13 +154,13 @@ CoeffsBase::index_t CoeffsMatrix::getMatrixIndex(const index_t index1, const ind
 
 void CoeffsMatrix::clear() {
   data.resize(getSize());
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=0.0;
   }
 }
 
 
-double CoeffsMatrix::getValue(const index_t index1, const index_t index2) const {
+double CoeffsMatrix::getValue(const size_t index1, const size_t index2) const {
   return data[getMatrixIndex(index1,index2)];
 }
 
@@ -170,7 +170,7 @@ double CoeffsMatrix::getValue(const std::vector<unsigned int>& indices1, const s
 }
 
 
-void CoeffsMatrix::setValue(const index_t index1, const index_t index2, const double value) {
+void CoeffsMatrix::setValue(const size_t index1, const size_t index2, const double value) {
   data[getMatrixIndex(index1,index2)]=value;
 }
 
@@ -180,12 +180,12 @@ void CoeffsMatrix::setValue(const std::vector<unsigned int>& indices1, const std
 }
 
 
-double& CoeffsMatrix::operator()(const index_t index1, const index_t index2) {
+double& CoeffsMatrix::operator()(const size_t index1, const size_t index2) {
   return data[getMatrixIndex(index1,index2)];
 }
 
 
-const double& CoeffsMatrix::operator()(const index_t index1, const index_t index2) const {
+const double& CoeffsMatrix::operator()(const size_t index1, const size_t index2) const {
   return data[getMatrixIndex(index1,index2)];
 }
 
@@ -202,15 +202,15 @@ const double& CoeffsMatrix::operator()(const std::vector<unsigned int>& indices1
 
 CoeffsVector operator*(const CoeffsMatrix& coeffs_matrix, const CoeffsVector& coeffs_vector) {
   CoeffsVector new_coeffs_vector(coeffs_vector);
-  CoeffsBase::index_t numcoeffs = coeffs_vector.getSize();
+  size_t numcoeffs = coeffs_vector.getSize();
   if(coeffs_matrix.isDiagonal()){
-    for(CoeffsBase::index_t i=0; i<numcoeffs; i++){
+    for(size_t i=0; i<numcoeffs; i++){
       new_coeffs_vector(i) = coeffs_matrix(i,i)*coeffs_vector(i);
     }
   }
   else{
-    for(CoeffsBase::index_t i=0; i<numcoeffs; i++){
-      for(CoeffsBase::index_t j=0; j<numcoeffs; j++){
+    for(size_t i=0; i<numcoeffs; i++){
+      for(size_t j=0; j<numcoeffs; j++){
         new_coeffs_vector(i) = coeffs_matrix(i,j)*coeffs_vector(j);
       }
     }
@@ -224,7 +224,7 @@ CoeffsVector operator*(const CoeffsVector& coeffs_vector, const CoeffsMatrix& co
 }
 
 
-void CoeffsMatrix::addToValue(const index_t index1, const index_t index2, const double value) {
+void CoeffsMatrix::addToValue(const size_t index1, const size_t index2, const double value) {
   data[getMatrixIndex(index1,index2)]+=value;
 }
 
@@ -235,21 +235,21 @@ void CoeffsMatrix::addToValue(const std::vector<unsigned int>& indices1, const s
 
 
 void CoeffsMatrix::scaleAllValues(const double scalef) {
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]*=scalef;
   }
 }
 
 
 void CoeffsMatrix::setValues(const double value) {
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=value;
   }
 }
 
 
 void CoeffsMatrix::addToValues(const double value) {
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]+=value;
   }
 }
@@ -257,7 +257,7 @@ void CoeffsMatrix::addToValues(const double value) {
 
 double CoeffsMatrix::getMinValue() const {
   double min_value=DBL_MAX;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
 	  if(data[i]<min_value){
       min_value=data[i];
     }
@@ -268,7 +268,7 @@ double CoeffsMatrix::getMinValue() const {
 
 double CoeffsMatrix::getMaxValue() const {
   double max_value=DBL_MIN;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
 	  if(data[i]>max_value){
       max_value=data[i];
     }
@@ -281,7 +281,7 @@ void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
   Random rnd;
   if (randomSeed<0){randomSeed = -randomSeed;}
   rnd.setSeed(-randomSeed);
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=rnd.Gaussian();
   }
 }
@@ -337,7 +337,7 @@ void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
     ilabels[k]=field_indices_prefix+getDimensionLabel(k);
   }
   //
-  for(index_t i=0; i<numberOfCoeffs(); i++){
+  for(size_t i=0; i<numberOfCoeffs(); i++){
     indices=getIndices(i);
     for(unsigned int k=0; k<numberOfDimensions(); k++){
       sprintf(s1,int_fmt.c_str(),indices[k]);
@@ -367,8 +367,8 @@ void CoeffsMatrix::writeDataToFile(OFile& ofile) {
   //
   char* s1 = new char[20];
   //
-  for(index_t i=0; i<nrows_; i++){
-    for(index_t j=0; j<ncolumns_; j++){
+  for(size_t i=0; i<nrows_; i++){
+    for(size_t j=0; j<ncolumns_; j++){
       sprintf(s1,int_fmt.c_str(),i);
       ofile.printField(field_index_row,s1);
       sprintf(s1,int_fmt.c_str(),j);

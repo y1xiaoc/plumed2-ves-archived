@@ -114,7 +114,7 @@ void Optimizer::update() {
 void Optimizer::updateOutputComponents() {
   getPntrToComponent("stepsize")->set( getCurrentStepSize() );
   getPntrToComponent("grad_rms")->set( Gradient().getRMS() );
-  CoeffsBase::index_t gradient_maxabs_idx=0;
+  size_t gradient_maxabs_idx=0;
   getPntrToComponent("grad_max")->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
   getPntrToComponent("grad_maxidx")->set( gradient_maxabs_idx );
 }

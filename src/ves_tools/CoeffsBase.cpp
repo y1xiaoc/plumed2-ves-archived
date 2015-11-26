@@ -185,7 +185,7 @@ unsigned int CoeffsBase::shapeOfIndices(const unsigned int dim_index) const {
 }
 
 
-CoeffsBase::index_t CoeffsBase::numberOfCoeffs() const {
+size_t CoeffsBase::numberOfCoeffs() const {
   return ncoeffs_;
 }
 
@@ -196,7 +196,7 @@ unsigned int CoeffsBase::numberOfDimensions() const {
 
 
 // we are flattening arrays using a column-major order
-CoeffsBase::index_t CoeffsBase::getIndex(const std::vector<unsigned int>& indices) const {
+size_t CoeffsBase::getIndex(const std::vector<unsigned int>& indices) const {
   plumed_dbg_assert(indices.size()==ndimensions_);
   for(unsigned int i=0; i<ndimensions_; i++){
     if(indices[i]>=indices_shape_[i]){
@@ -206,7 +206,7 @@ CoeffsBase::index_t CoeffsBase::getIndex(const std::vector<unsigned int>& indice
       plumed_merror(msg);
     }
   }
-  index_t index=indices[ndimensions_-1];
+  size_t index=indices[ndimensions_-1];
   for(unsigned int i=ndimensions_-1; i>0; --i){
     index=index*indices_shape_[i-1]+indices[i-1];
   }
@@ -215,9 +215,9 @@ CoeffsBase::index_t CoeffsBase::getIndex(const std::vector<unsigned int>& indice
 
 
 // we are flattening arrays using a column-major order
-std::vector<unsigned int> CoeffsBase::getIndices(const CoeffsBase::index_t index) const {
+std::vector<unsigned int> CoeffsBase::getIndices(const size_t index) const {
   std::vector<unsigned int> indices(ndimensions_);
-  index_t kk=index;
+  size_t kk=index;
   indices[0]=(index%indices_shape_[0]);
   for(unsigned int i=1; i<ndimensions_-1; ++i){
     kk=(kk-indices[i-1])/indices_shape_[i-1];
@@ -241,7 +241,7 @@ bool CoeffsBase::indicesExist(const std::vector<unsigned int>& indices) const {
 }
 
 
-std::string CoeffsBase::getCoeffDescription(const index_t index) const {
+std::string CoeffsBase::getCoeffDescription(const size_t index) const {
   return coeffs_descriptions_[index];
 }
 
@@ -256,7 +256,7 @@ std::vector<std::string> CoeffsBase::getAllCoeffsDescriptions() const {
 }
 
 
-void CoeffsBase::setCoeffDescription(const index_t index, const std::string description) {
+void CoeffsBase::setCoeffDescription(const size_t index, const std::string description) {
   coeffs_descriptions_[index]=description;
 }
 
@@ -267,7 +267,7 @@ void CoeffsBase::setCoeffDescription(const std::vector<unsigned int>& indices, c
 
 
 void CoeffsBase::setAllCoeffsDescriptions(const std::string description_prefix) {
-  for(index_t i=0;i<numberOfCoeffs();i++){
+  for(size_t i=0;i<numberOfCoeffs();i++){
     std::vector<unsigned int> indices=getIndices(i);
     std::string is; Tools::convert(indices[0],is);
     std::string desc=description_prefix+"("+is;
@@ -282,7 +282,7 @@ void CoeffsBase::setAllCoeffsDescriptions(const std::string description_prefix) 
 
 void CoeffsBase::setAllCoeffsDescriptions(const std::vector<std::string>& coeffs_descriptions) {
   plumed_massert(coeffs_descriptions.size()==numberOfCoeffs(),"The coeffs description vector doesn't match the number of coeffs");
-  for(index_t i=0; i<numberOfCoeffs(); i++){
+  for(size_t i=0; i<numberOfCoeffs(); i++){
     coeffs_descriptions_[i]=coeffs_descriptions[i];
   }
 }
@@ -351,7 +351,7 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_in
   unsigned int ndimensions_f=(unsigned int) int_tmp;
   // total number of coeffs
   ifile.scanField(field_ncoeffs_total,int_tmp);
-  index_t ncoeffs_total_f=(index_t) int_tmp;
+  size_t ncoeffs_total_f=(size_t) int_tmp;
   // shape of indices
   std::vector<unsigned int> indices_shape_f(numberOfDimensions());
   for(unsigned int k=0; k<numberOfDimensions(); k++) {
@@ -365,7 +365,7 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_in
 }
 
 
-void CoeffsBase::checkCoeffsInfo(const std::string msg_header, const std::string coeffs_type_f, const unsigned int ndimensions_f, const index_t ncoeffs_total_f, const std::vector<unsigned int> indices_shape_f){
+void CoeffsBase::checkCoeffsInfo(const std::string msg_header, const std::string coeffs_type_f, const unsigned int ndimensions_f, const size_t ncoeffs_total_f, const std::vector<unsigned int> indices_shape_f){
 
   if(coeffs_type_f != getTypeStr()){
     std::string msg = msg_header + " coeffs type " + coeffs_type_f + " from file doesn't match the defined value " + getTypeStr();

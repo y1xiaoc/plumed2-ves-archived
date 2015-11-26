@@ -49,9 +49,9 @@ private:
   //
   Communicator& mycomm;
   //
-  index_t size_;
-  index_t nrows_;
-  index_t ncolumns_;
+  size_t size_;
+  size_t nrows_;
+  size_t ncolumns_;
   //
   std::vector<double> data;
   //
@@ -87,7 +87,7 @@ public:
   //
   ~CoeffsMatrix(){}
   //
-  index_t getSize() const;
+  size_t getSize() const;
   //
   bool isSymmetric() const;
   bool isDiagonal() const;
@@ -97,25 +97,25 @@ public:
   //
   void gatherMultipleWalkerMPI(Communicator&);
   //
-  index_t getMatrixIndex(const index_t, const index_t) const;
+  size_t getMatrixIndex(const size_t, const size_t) const;
   //
   // clear coeffs
   void clear();
   // get value
-  double getValue(const index_t, const index_t) const;
+  double getValue(const size_t, const size_t) const;
   double getValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&) const;
   // set value
-  void setValue(const index_t, const index_t, const double);
+  void setValue(const size_t, const size_t, const double);
   void setValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&, const double);
-  double& operator()(const index_t, const index_t);
-  const double& operator()(const index_t, const index_t) const;
+  double& operator()(const size_t, const size_t);
+  const double& operator()(const size_t, const size_t) const;
   double& operator()(const std::vector<unsigned int>&, const std::vector<unsigned int>&);
   const double& operator()(const std::vector<unsigned int>&, const std::vector<unsigned int>&) const;
   //
   friend CoeffsVector operator*(const CoeffsMatrix&, const CoeffsVector&);
   friend CoeffsVector operator*(const CoeffsVector&, const CoeffsMatrix&);
   // add to value
-  void addToValue(const index_t, const index_t, const double);
+  void addToValue(const size_t, const size_t, const double);
   void addToValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&, const double);
   // scale all values
   void scaleAllValues(const double);

@@ -68,14 +68,14 @@ output_fmt_("%30.16e")
 }
 
 
-CoeffsBase::index_t CoeffsVector::getSize() const {
+size_t CoeffsVector::getSize() const {
   return numberOfCoeffs();
 }
 
 
 void CoeffsVector::clear() {
   data.resize(getSize());
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=0.0;
   }
 }
@@ -133,7 +133,7 @@ void CoeffsVector::gatherMultipleWalkerMPI(Communicator& multi_sim_cc) {
 }
 
 
-double CoeffsVector::getValue(const index_t index) const {
+double CoeffsVector::getValue(const size_t index) const {
   plumed_dbg_assert(index<data.size());
   return data[index];
 }
@@ -144,13 +144,13 @@ double CoeffsVector::getValue(const std::vector<unsigned int>& indices) const {
 }
 
 
-double& CoeffsVector::operator[](const index_t index) {
+double& CoeffsVector::operator[](const size_t index) {
   plumed_dbg_assert(index<data.size());
   return data[index];
 }
 
 
-const double& CoeffsVector::operator[](const index_t index) const {
+const double& CoeffsVector::operator[](const size_t index) const {
   plumed_dbg_assert(index<data.size());
   return data[index];
 }
@@ -166,13 +166,13 @@ const double& CoeffsVector::operator[](const std::vector<unsigned int>& indices)
 }
 
 
-double& CoeffsVector::operator()(const index_t index) {
+double& CoeffsVector::operator()(const size_t index) {
   plumed_dbg_assert(index<data.size());
   return data[index];
 }
 
 
-const double& CoeffsVector::operator()(const index_t index) const {
+const double& CoeffsVector::operator()(const size_t index) const {
   plumed_dbg_assert(index<data.size());
   return data[index];
 }
@@ -188,7 +188,7 @@ const double& CoeffsVector::operator()(const std::vector<unsigned int>& indices)
 }
 
 
-void CoeffsVector::setValue(const index_t index, const double value) {
+void CoeffsVector::setValue(const size_t index, const double value) {
   plumed_dbg_assert(index<data.size());
   data[index]=value;
 }
@@ -199,7 +199,7 @@ void CoeffsVector::setValue(const std::vector<unsigned int>& indices, const doub
 }
 
 
-void CoeffsVector::addToValue(const index_t index, const double value) {
+void CoeffsVector::addToValue(const size_t index, const double value) {
   plumed_dbg_assert(index<data.size());
   data[index]+=value;
 }
@@ -211,7 +211,7 @@ void CoeffsVector::addToValue(const std::vector<unsigned int>& indices, const do
 
 
 void CoeffsVector::scaleAllValues(const double scalef) {
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]*=scalef;
   }
 }
@@ -235,7 +235,7 @@ CoeffsVector operator*(const CoeffsVector& coeffsvector, const double scalef) {
 
 CoeffsVector& CoeffsVector::operator*=(const CoeffsVector& other_coeffsvector) {
   plumed_massert(data.size()==other_coeffsvector.getSize(),"Coeffs vectors do not have the same size");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]*=other_coeffsvector.data[i];
   }
   return *this;
@@ -248,7 +248,7 @@ CoeffsVector CoeffsVector::operator*(const CoeffsVector& other_coeffsvector) con
 
 
 void CoeffsVector::setValues(const double value) {
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=value;
   }
 }
@@ -256,7 +256,7 @@ void CoeffsVector::setValues(const double value) {
 
 void CoeffsVector::setValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=values[i];
   }
 }
@@ -264,7 +264,7 @@ void CoeffsVector::setValues(const std::vector<double>& values) {
 
 void CoeffsVector::setValues(const CoeffsVector& other_coeffsvector) {
   plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=other_coeffsvector.data[i];
   }
 }
@@ -299,7 +299,7 @@ CoeffsVector CoeffsVector::operator-() const {
 
 
 void CoeffsVector::addToValues(const double value) {
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]+=value;
   }
 }
@@ -307,7 +307,7 @@ void CoeffsVector::addToValues(const double value) {
 
 void CoeffsVector::addToValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]+=values[i];
   }
 }
@@ -315,14 +315,14 @@ void CoeffsVector::addToValues(const std::vector<double>& values) {
 
 void CoeffsVector::addToValues(const CoeffsVector& other_coeffsvector) {
   plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]+=other_coeffsvector.data[i];
   }
 }
 
 
 void CoeffsVector::subtractFromValues(const double value) {
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]-=value;
   }
 }
@@ -330,7 +330,7 @@ void CoeffsVector::subtractFromValues(const double value) {
 
 void CoeffsVector::subtractFromValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]-=values[i];
   }
 }
@@ -338,7 +338,7 @@ void CoeffsVector::subtractFromValues(const std::vector<double>& values) {
 
 void CoeffsVector::subtractFromValues(const CoeffsVector& other_coeffsvector) {
   plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]-=other_coeffsvector.data[i];
   }
 }
@@ -432,10 +432,10 @@ CoeffsVector CoeffsVector::operator-(const CoeffsVector& other_coeffsvector) con
 
 void CoeffsVector::setValuesFromDifferentShape(const CoeffsVector& other_coeffsvector) {
   plumed_massert(numberOfDimensions()==other_coeffsvector.numberOfDimensions(),"both coeffs vector need to have the same dimension");
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     std::vector<unsigned int> indices=getIndices(i);
     if(other_coeffsvector.indicesExist(indices)){
-      index_t oidx = other_coeffsvector.getIndex(indices);
+      size_t oidx = other_coeffsvector.getIndex(indices);
       data[i] = other_coeffsvector.data[oidx];
     }
   }
@@ -443,15 +443,15 @@ void CoeffsVector::setValuesFromDifferentShape(const CoeffsVector& other_coeffsv
 
 
 double CoeffsVector::getMinValue() const {
-  index_t min_index=0;
+  size_t min_index=0;
   return getMinValue(min_index);
 }
 
 
-double CoeffsVector::getMinValue(index_t& min_index) const {
+double CoeffsVector::getMinValue(size_t& min_index) const {
   min_index=0;
   double min_value=DBL_MAX;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
 	  if(data[i]<min_value){
       min_value=data[i];
       min_index=i;
@@ -462,15 +462,15 @@ double CoeffsVector::getMinValue(index_t& min_index) const {
 
 
 double CoeffsVector::getMinAbsValue() const {
-  index_t min_index=0;
+  size_t min_index=0;
   return getMinAbsValue(min_index);
 }
 
 
-double CoeffsVector::getMinAbsValue(index_t& min_index) const {
+double CoeffsVector::getMinAbsValue(size_t& min_index) const {
   min_index=0;
   double min_value=DBL_MAX;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
 	  if(std::abs(data[i])<min_value){
       min_value=std::abs(data[i]);
       min_index=i;
@@ -481,15 +481,15 @@ double CoeffsVector::getMinAbsValue(index_t& min_index) const {
 
 
 double CoeffsVector::getMaxValue() const {
-  index_t max_index=0;
+  size_t max_index=0;
   return getMaxValue(max_index);
 }
 
 
-double CoeffsVector::getMaxValue(index_t& max_index) const {
+double CoeffsVector::getMaxValue(size_t& max_index) const {
   max_index=0;
   double max_value=DBL_MIN;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
 	  if(data[i]>max_value){
       max_value=data[i];
       max_index=i;
@@ -500,15 +500,15 @@ double CoeffsVector::getMaxValue(index_t& max_index) const {
 
 
 double CoeffsVector::getMaxAbsValue() const {
-  index_t max_index=0;
+  size_t max_index=0;
   return getMaxAbsValue(max_index);
 }
 
 
-double CoeffsVector::getMaxAbsValue(index_t& max_index) const {
+double CoeffsVector::getMaxAbsValue(size_t& max_index) const {
   max_index=0;
   double max_value=0.0;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
 	  if(std::abs(data[i])>max_value){
       max_value=std::abs(data[i]);
       max_index=i;
@@ -525,7 +525,7 @@ double CoeffsVector::getNorm() const {
 
 double CoeffsVector::getL1Norm() const {
   double norm;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     norm=std::abs(data[i]);
   }
   return norm;
@@ -534,7 +534,7 @@ double CoeffsVector::getL1Norm() const {
 
 double CoeffsVector::getL2Norm() const {
   double norm;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     norm=data[i]*data[i];
   }
   norm=sqrt(norm);
@@ -544,7 +544,7 @@ double CoeffsVector::getL2Norm() const {
 
 double CoeffsVector::getLpNorm(const double p) const {
   double norm;
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     norm=pow(data[i],p);
   }
   norm=pow(norm,(1.0/p));
@@ -567,7 +567,7 @@ void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
   Random rnd;
   if (randomSeed<0){randomSeed = -randomSeed;}
   rnd.setSeed(-randomSeed);
-  for(index_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++){
     data[i]=rnd.Gaussian();
   }
 }
@@ -644,7 +644,7 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector>
     ilabels[k]=field_indices_prefix+CoeffsSet[0].getDimensionLabel(k);
   }
   //
-  for(index_t i=0; i<numcoeffs; i++){
+  for(size_t i=0; i<numcoeffs; i++){
     indices=CoeffsSet[0].getIndices(i);
     for(unsigned int k=0; k<numdim; k++){
       sprintf(s1,int_fmt.c_str(),indices[k]);

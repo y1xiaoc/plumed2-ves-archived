@@ -64,7 +64,7 @@ public:
     const bool use_counter=false);
   ~CoeffsVector(){}
   //
-  index_t getSize() const;
+  size_t getSize() const;
     // clear coeffs
   void clear();
   //
@@ -78,21 +78,21 @@ public:
   //
   void gatherMultipleWalkerMPI(Communicator&);
   // get value
-  double getValue(const index_t) const;
+  double getValue(const size_t) const;
   double getValue(const std::vector<unsigned int>&) const;
-  double& operator[](const index_t index);
-  const double& operator[](const index_t index) const;
+  double& operator[](const size_t index);
+  const double& operator[](const size_t index) const;
   double& operator[](const std::vector<unsigned int>&);
   const double& operator[](const std::vector<unsigned int>&) const;
-  double& operator()(const index_t index);
-  const double& operator()(const index_t index) const;
+  double& operator()(const size_t index);
+  const double& operator()(const size_t index) const;
   double& operator()(const std::vector<unsigned int>&);
   const double& operator()(const std::vector<unsigned int>&) const;
   // set value
-  void setValue(const index_t, const double);
+  void setValue(const size_t, const double);
   void setValue(const std::vector<unsigned int>&, const double);
     // add to value
-  void addToValue(const index_t, const double);
+  void addToValue(const size_t, const double);
   void addToValue(const std::vector<unsigned int>&, const double);
   // scale all values
   void scaleAllValues(const double);
@@ -138,14 +138,14 @@ public:
 
   //
   double getMinValue() const;
-  double getMinValue(index_t&) const;
+  double getMinValue(size_t&) const;
   double getMinAbsValue() const;
-  double getMinAbsValue(index_t&) const;
+  double getMinAbsValue(size_t&) const;
   //
   double getMaxValue() const;
-  double getMaxValue(index_t&) const;
+  double getMaxValue(size_t&) const;
   double getMaxAbsValue() const;
-  double getMaxAbsValue(index_t&) const;
+  double getMaxAbsValue(size_t&) const;
   //
   double getNorm() const;
   double getL1Norm() const;

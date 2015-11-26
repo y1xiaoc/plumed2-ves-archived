@@ -38,7 +38,7 @@ class CoeffsBase
 {
 public:
   // the type of 1D index
-  typedef size_t index_t;
+  // typedef size_t index_t;
   // typedef unsigned int index_t;
 private:
   std::string label_;
@@ -49,7 +49,7 @@ private:
   } coeffs_type_;
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
-  index_t ncoeffs_;
+  size_t ncoeffs_;
   std::vector<std::string> coeffs_descriptions_;
   std::vector<std::string> dimension_labels_;
   // Labels for field in output/input files
@@ -82,17 +82,17 @@ public:
   //
   std::vector<unsigned int> shapeOfIndices() const;
   unsigned int shapeOfIndices(const unsigned int) const;
-  index_t numberOfCoeffs() const;
+  size_t numberOfCoeffs() const;
   unsigned int numberOfDimensions() const;
   //
-  index_t getIndex(const std::vector<unsigned int>&) const;
-  std::vector<unsigned int> getIndices(const index_t) const;
+  size_t getIndex(const std::vector<unsigned int>&) const;
+  std::vector<unsigned int> getIndices(const size_t) const;
   bool indicesExist(const std::vector<unsigned int>&) const;
   //
-  std::string getCoeffDescription(const index_t) const;
+  std::string getCoeffDescription(const size_t) const;
   std::string getCoeffDescription(const std::vector<unsigned int>&) const;
   std::vector<std::string> getAllCoeffsDescriptions() const;
-  void setCoeffDescription(const index_t, const std::string);
+  void setCoeffDescription(const size_t, const std::string);
   void setCoeffDescription(const std::vector<unsigned int>&, const std::string);
   void setAllCoeffsDescriptions(const std::string description_prefix="C");
   void setAllCoeffsDescriptions(const std::vector<std::string>&);
@@ -105,7 +105,7 @@ public:
   void setupFileFields();
   void writeCoeffsInfoToFile(OFile&) const;
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
-  void checkCoeffsInfo(const std::string, const std::string, const unsigned int, const index_t, const std::vector<unsigned int>);
+  void checkCoeffsInfo(const std::string, const std::string, const unsigned int, const size_t, const std::vector<unsigned int>);
 protected:
   void setupIndices(const std::vector<unsigned int>&);
   void setupBasisFunctionsInfo(std::vector<BasisFunctions*>&);
