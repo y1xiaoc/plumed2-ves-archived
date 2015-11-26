@@ -106,13 +106,19 @@ void Optimizer::turnOffHessian() {
 
 
 void Optimizer::update() {
-  bias_ptr->updateGradientAndHessian();
-  coeffsUpdate();
-  updateOutputComponents();
-  bias_ptr->clearGradientAndHessian();
-  Coeffs().writeToFile("coeffs.data",true,true);
-  AuxCoeffs().writeToFile("auxcoeffs.data",true,true);
-  Gradient().writeToFile("gradient.data",true,true);
+  if(onStep() && getStep()!=0){
+    bias_ptr->updateGradientAndHessian();
+    coeffsUpdate();
+    updateOutputComponents();
+    bias_ptr->clearGradientAndHessian();
+    Coeffs().writeToFile("coeffs.data",true,true);
+    AuxCoeffs().writeToFile("auxcoeffs.data",true,true);
+    Gradient().writeToFile("gradient.data",true,true);
+    Coeffs().increaseCounter();
+    AuxCoeffs().increaseCounter();
+    Gradient().increaseCounter();
+  }
+
 }
 
 

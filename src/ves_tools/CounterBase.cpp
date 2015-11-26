@@ -54,12 +54,12 @@ void CounterBase::resetCounter() {
 
 
 void CounterBase::increaseCounter() {
-  counter=+1;
+  counter+=1;
 }
 
 
 void CounterBase::addToCounter(const unsigned int value) {
-  counter=+value;
+  counter+=value;
 }
 
 

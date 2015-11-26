@@ -50,8 +50,9 @@ beta_(0.0)
   hessian_diagonal_ = !full_hessian;
   //
   parseFlag("MULTIPLE_WALKERS",use_mwalkers_);
+  std::cerr << use_mwalkers_;
   if(use_mwalkers_){
-   log.printf("  Using multiple walkers:");
+   log.printf("  Using multiple walkers:\n");
    log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
    log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
  }
@@ -73,8 +74,8 @@ VesBias::~VesBias(){
 
 void VesBias::registerKeywords( Keywords& keys ) {
   Bias::registerKeywords(keys);
-  keys.addFlag("FULL_HESSIAN","false","if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
-  keys.addFlag("MULTIPLE_WALKERS","false","if optimization is to be performed using multiple walkers connected via MPI");
+  keys.addFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
+  keys.addFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
   keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature");
 }
 
