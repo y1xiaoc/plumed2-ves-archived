@@ -22,10 +22,18 @@
 #ifndef __PLUMED_ves_biases_VesBias_h
 #define __PLUMED_ves_biases_VesBias_h
 
+#include "ves_tools/CoeffsVector.h"
+#include "ves_tools/CoeffsMatrix.h"
+
 #include "core/ActionPilot.h"
 #include "core/ActionWithValue.h"
 #include "core/ActionWithArguments.h"
 #include "bias/Bias.h"
+
+#include <vector>
+#include <string>
+#include <cmath>
+
 
 #define PLUMED_VARIATIONALBIAS_INIT(ao) Action(ao),VesBias(ao)
 
@@ -49,31 +57,56 @@ public Bias
 {
 private:
   CoeffsVector* coeffs_ptr;
+  CoeffsVector* coeffderivs_aver_ps_ptr;
   CoeffsVector* gradient_ptr;
   CoeffsMatrix* hessian_ptr;
+  std::vector<double> coeffderivs_aver_sampled;
+  std::vector<double> coeffderivs_cov_sampled;
+  //
+  bool hessian_diagonal_;
+  bool use_mwalkers_;
+  //
+  double aver_counter;
 private:
   void initializeGradientAndHessian();
 protected:
-  void initializeCoeffs(const std::vector<std::string>&,const std::vector<unsigned int>&);
-  void initializeCoeffs(std::vector<Value*>&,std::vector<BasisFunctions*>&);
+  void initializeCoeffs(const std::vector<std::string>&, const std::vector<unsigned int>&);
+  void initializeCoeffs(std::vector<Value*>&, std::vector<BasisFunctions*>&);
+  void linkCoeffs(CoeffsVector*);
+  void linkCoeffs(CoeffsVector&);
+  void setCoeffsDerivs(const std::vector<double>&);
 public:
   static void registerKeywords(Keywords&);
   VesBias(const ActionOptions&ao);
   ~VesBias();
   //
   CoeffsVector* getCoeffsPtr() const {return coeffs_ptr;}
+  CoeffsVector* getCoeffDerivsAverTargetDistPtr() const {return coeffderivs_aver_ps_ptr;}
   CoeffsVector* getGradientPtr()const {return gradient_ptr;}
   CoeffsMatrix* getHessianPtr() const {return hessian_ptr;}
   //
+  size_t numberOfCoeffs() const;
+  //
   CoeffsVector& Coeffs() const;
+  CoeffsVector& CoeffDerivsAverTargetDist() const;
   CoeffsVector& Gradient() const;
   CoeffsMatrix& Hessian() const;
+  //
+  bool diagonalHessian() const {return hessian_diagonal_;}
+  bool useMultipleWalkers() const {return use_mwalkers_;}
+  //
   void updateGradientAndHessian();
   void clearGradientAndHessian();
 };
 
 inline
+size_t VesBias::numberOfCoeffs() const {return coeffs_ptr->numberOfCoeffs();}
+
+inline
 CoeffsVector& VesBias::Coeffs() const {return *coeffs_ptr;}
+
+inline
+CoeffsVector& VesBias::CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_ptr;}
 
 inline
 CoeffsVector& VesBias::Gradient() const {return *gradient_ptr;}
