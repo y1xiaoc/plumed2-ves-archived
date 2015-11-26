@@ -51,7 +51,7 @@ beta_(0.0)
   //
   parseFlag("MULTIPLE_WALKERS",use_mwalkers_);
   if(use_mwalkers_){
-   log.printf("  Using multiple walkers");
+   log.printf("  Using multiple walkers:");
    log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
    log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
  }

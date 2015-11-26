@@ -57,7 +57,7 @@ public:
 PLUMED_REGISTER_ACTION(TestVesBias,"TEST_VES_BIAS")
 
 void TestVesBias::registerKeywords( Keywords& keys ){
-  Bias::registerKeywords(keys);
+  VesBias::registerKeywords(keys);
   keys.use("ARG");
   keys.add("compulsory","BASIS_SET","the label of the basis set that you want to use");
 }

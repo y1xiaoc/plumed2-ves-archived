@@ -85,6 +85,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.add("compulsory","STEP_SIZE","the step size used for the optimization");
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
+  keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
   //
   keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
   keys.addOutputComponent("grad_rms","default","the root mean square value of the coefficent gradient");
@@ -109,6 +110,9 @@ void Optimizer::update() {
   coeffsUpdate();
   updateOutputComponents();
   bias_ptr->clearGradientAndHessian();
+  Coeffs().writeToFile("coeffs.data",true,true);
+  AuxCoeffs().writeToFile("auxcoeffs.data",true,true);
+  Gradient().writeToFile("gradient.data",true,true);
 }
 
 
