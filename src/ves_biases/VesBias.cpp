@@ -162,6 +162,10 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
   aver_counter += 1.0;
 }
 
+void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderivs_aver_ps) {
+  CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
+}
+
 
 }
 }

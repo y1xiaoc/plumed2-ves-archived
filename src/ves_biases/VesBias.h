@@ -75,6 +75,7 @@ protected:
   void linkCoeffs(CoeffsVector*);
   void linkCoeffs(CoeffsVector&);
   void setCoeffsDerivs(const std::vector<double>&);
+  void setCoeffsDerivsOverTargetDist(const std::vector<double>&);
 public:
   static void registerKeywords(Keywords&);
   VesBias(const ActionOptions&ao);
