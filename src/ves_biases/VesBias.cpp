@@ -165,7 +165,7 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
     coeffderivs_cov_sampled[midx] = coeffderivs_cov_sampled[midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
   }
   comm.Sum(deltas);
-  // update off diagonal part of Hessian
+  // update off-diagonal part of the Hessian
   if(!hessian_diagonal_){
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
