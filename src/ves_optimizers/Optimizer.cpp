@@ -27,6 +27,8 @@
 #include "tools/Exception.h"
 #include "core/PlumedMain.h"
 #include "core/ActionSet.h"
+#include "tools/Communicator.h"
+
 
 
 namespace PLMD{
@@ -96,6 +98,13 @@ bias_ptr(NULL)
   //
   if(coeffs_fname_.size()>0){
     coeffsOfile_.link(*this);
+    if(bias_ptr->useMultipleWalkers()){
+      unsigned int r=0;
+      if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+      comm.Bcast(r,0);
+      if(r>0){coeffs_fname_="/dev/null";}
+      coeffsOfile_.enforceSuffix("");
+    }
     coeffsOfile_.open(coeffs_fname_);
     coeffsOfile_.setHeavyFlush();
     Coeffs().writeToFile(coeffsOfile_,aux_coeffs_ptr,false,getTimeStep()*getStep());
@@ -104,6 +113,13 @@ bias_ptr(NULL)
   //
   if(gradient_fname_.size()>0){
     gradientOfile_.link(*this);
+    if(bias_ptr->useMultipleWalkers()){
+      unsigned int r=0;
+      if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+      comm.Bcast(r,0);
+      if(r>0){gradient_fname_="/dev/null";}
+      gradientOfile_.enforceSuffix("");
+    }
     gradientOfile_.open(gradient_fname_);
     gradientOfile_.setHeavyFlush();
     Gradient().writeToFile(gradientOfile_,false,getTimeStep()*getStep());
@@ -112,11 +128,19 @@ bias_ptr(NULL)
   //
   if(hessian_fname_.size()>0){
     hessianOfile_.link(*this);
+    if(bias_ptr->useMultipleWalkers()){
+      unsigned int r=0;
+      if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+      comm.Bcast(r,0);
+      if(r>0){hessian_fname_="/dev/null";}
+      hessianOfile_.enforceSuffix("");
+    }
     hessianOfile_.open(hessian_fname_);
     hessianOfile_.setHeavyFlush();
     Hessian().writeToFile(hessianOfile_,getTimeStep()*getStep());
     log.printf("  DEBUG OPTION: Hessian will be written out to file %s every %d bias iterations\n",hessian_fname_.c_str(),hessian_wstride_);
   }
+  //
 }
 
 
