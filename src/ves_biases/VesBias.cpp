@@ -57,9 +57,15 @@ beta_(0.0)
  }
  double temp=0.0;
  parse("TEMP",temp);
- if(temp>0.0) kbt_=plumed.getAtoms().getKBoltzmann()*temp;
- else kbt_=plumed.getAtoms().getKbT();
- if(kbt_==0.0) error("the MD engine does not pass the temperature to plumed so you need to give with the TEMP keyword");
+ if(temp>0.0){
+   kbt_=plumed.getAtoms().getKBoltzmann()*temp;
+ }
+ else {
+   kbt_=plumed.getAtoms().getKbT();
+ }
+ if(kbt_==0.0){
+   error("the MD engine does not pass the temperature to plumed so you need to give with the TEMP keyword");
+ }
  beta_=1.0/kbt_;
 }
 
