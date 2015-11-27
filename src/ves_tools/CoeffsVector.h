@@ -158,13 +158,14 @@ public:
   void randomizeValuesGaussian(int);
 
   // file input/output stuff
-  void writeToFile(const std::string&, const bool print_description=false, const bool append_file=false);
-  void writeToFile(OFile&,const bool print_description=false);
-  static void writeToFile(const std::string&, const std::vector<CoeffsVector>&, Communicator&, const bool print_description=false, const bool append_file=false);
-  static void writeToFile(OFile&, const std::vector<CoeffsVector>&, const bool print_description=false);
+  void writeToFile(const std::string&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false);
+  void writeToFile(OFile&, const bool print_description=false, const double current_time=-1.0);
+  void writeToFile(OFile& ofile, CoeffsVector*, const bool print_coeffs_descriptions=false, const double current_time=-1.0);
+  static void writeToFile(const std::string&, const std::vector<CoeffsVector*>&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false);
+  static void writeToFile(OFile&, const std::vector<CoeffsVector*>&, const bool print_description=false, const double current_time=-1.0);
 private:
-  void writeHeaderToFile(OFile&) const;
-  static void writeDataToFile(OFile&, const std::vector<CoeffsVector>&, const bool print_description=false);
+  void writeHeaderToFile(OFile&, const double current_time=-1.0) const;
+  static void writeDataToFile(OFile&, const std::vector<CoeffsVector*>&, const bool print_description=false);
 public:
   unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
   unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);

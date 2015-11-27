@@ -97,6 +97,10 @@ public:
   CoeffsVector& Gradient() const;
   CoeffsMatrix& Hessian() const;
   //
+  size_t getCoeffsIndex(const std::vector<unsigned int>& indices) const;
+  std::vector<unsigned int> getCoeffsIndices(const size_t index) const;
+  size_t getHessianIndex(const size_t index1, const size_t index2) const;
+  //
   bool diagonalHessian() const {return hessian_diagonal_;}
   bool useMultipleWalkers() const {return use_mwalkers_;}
   //
@@ -124,6 +128,16 @@ double VesBias::getKbT() const {return kbt_;}
 
 inline
 double VesBias::getBeta() const {return beta_;}
+
+inline
+size_t VesBias::getCoeffsIndex(const std::vector<unsigned int>& indices) const {return coeffs_ptr->getIndex(indices);}
+
+inline
+std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index) const {return coeffs_ptr->getIndices(index);}
+
+inline
+size_t VesBias::getHessianIndex(const size_t index1, const size_t index2) const {return hessian_ptr->getMatrixIndex(index1,index2);}
+
 
 }
 }

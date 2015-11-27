@@ -40,6 +40,7 @@ Abstract base class for implenting new optimization methods
 
 class CoeffsVector;
 class VesBias;
+class OFile;
 
 class Optimizer :
  public ActionPilot,
@@ -51,6 +52,20 @@ private:
   std::string type_;
   double step_size_;
   double current_step_size_;
+  //
+  unsigned int iter_counter;
+  //
+  unsigned int coeffs_wstride_;
+  std::string coeffs_fname_;
+  OFile coeffsOfile_;
+  //
+  unsigned int gradient_wstride_;
+  std::string gradient_fname_;
+  OFile gradientOfile_;
+  //
+  unsigned int hessian_wstride_;
+  std::string hessian_fname_;
+  OFile hessianOfile_;
   //
   CoeffsVector* coeffs_ptr;
   CoeffsVector* aux_coeffs_ptr;
@@ -81,6 +96,11 @@ public:
   double getStepSize() const;
   double getCurrentStepSize() const;
   void setStepSize(const double step_size_in){step_size_ = step_size_in;}
+  //
+  unsigned int getIterationCounter() const;
+  double getIterationCounterDbl() const;
+  void setIterationCounter(const unsigned int);
+  void increaseIterationCounter();
   //
   void apply(){};
   void calculate(){};
@@ -116,6 +136,15 @@ double Optimizer::getStepSize() const {return step_size_;}
 
 inline
 double Optimizer::getCurrentStepSize() const {return current_step_size_;}
+
+inline
+unsigned int Optimizer::getIterationCounter() const {return iter_counter;}
+
+inline
+double Optimizer::getIterationCounterDbl() const {return (double) iter_counter;}
+
+inline
+void Optimizer::increaseIterationCounter() {iter_counter++;}
 
 
 }

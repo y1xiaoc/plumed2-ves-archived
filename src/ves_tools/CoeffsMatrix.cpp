@@ -219,11 +219,6 @@ CoeffsVector operator*(const CoeffsMatrix& coeffs_matrix, const CoeffsVector& co
 }
 
 
-CoeffsVector operator*(const CoeffsVector& coeffs_vector, const CoeffsMatrix& coeffs_matrix) {
-  return coeffs_matrix*coeffs_vector;
-}
-
-
 void CoeffsMatrix::addToValue(const size_t index1, const size_t index2, const double value) {
   data[getMatrixIndex(index1,index2)]+=value;
 }
@@ -486,23 +481,18 @@ void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
 }
 
 
-void CoeffsMatrix::writeToFile(OFile& ofile) {
-  writeHeaderToFile(ofile);
-  if(diagonal_){
-    writeDataDiagonalToFile(ofile);
-  }
-  else{
-    writeDataToFile(ofile);
-  }
+void CoeffsMatrix::writeToFile(OFile& ofile, const double current_time) {
+  writeHeaderToFile(ofile, current_time);
+  writeDataToFile(ofile);
 }
 
 
-void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_file) {
+void CoeffsMatrix::writeToFile(const std::string& filepath, const double current_time, const bool append_file) {
   OFile file;
   if(append_file){ file.enforceRestart(); }
   file.link(mycomm);
   file.open(filepath);
-  writeToFile(file);
+  writeToFile(file, current_time);
   file.close();
 }
 
@@ -513,10 +503,22 @@ void CoeffsMatrix::writeMatrixInfoToFile(OFile& ofile) {
 }
 
 
-void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
-  writeCounterFieldToFile(ofile);
+void CoeffsMatrix::writeHeaderToFile(OFile& ofile, const double current_time) {
+  ofile.clearFields();
+  if(current_time >= 0.0){writeTimeInfoToFile(ofile,current_time);}
+  writeCounterInfoToFile(ofile);
   writeCoeffsInfoToFile(ofile);
   writeMatrixInfoToFile(ofile);
+}
+
+
+void CoeffsMatrix::writeDataToFile(OFile& ofile) {
+  if(diagonal_){
+    writeDataDiagonalToFile(ofile);
+  }
+  else{
+    writeDataFullToFile(ofile);
+  }
 }
 
 
@@ -555,7 +557,7 @@ void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
 }
 
 
-void CoeffsMatrix::writeDataToFile(OFile& ofile) {
+void CoeffsMatrix::writeDataFullToFile(OFile& ofile) {
   //
   std::string field_index_row = "idx_row";
   std::string field_index_column = "idx_column";

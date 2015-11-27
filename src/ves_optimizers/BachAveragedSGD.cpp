@@ -30,7 +30,6 @@ namespace PLMD{
 
 class BachAveragedSGD : public Optimizer {
 private:
-  unsigned iter_counter;
 public:
   static void registerKeywords(Keywords&);
   BachAveragedSGD(const ActionOptions&);
@@ -47,18 +46,16 @@ void BachAveragedSGD::registerKeywords(Keywords& keys){
 
 
 BachAveragedSGD::BachAveragedSGD(const ActionOptions&ao):
-PLUMED_OPTIMIZER_INIT(ao),
-iter_counter(0)
+PLUMED_OPTIMIZER_INIT(ao)
 {
   turnOnHessian();
 }
 
 
 void BachAveragedSGD::coeffsUpdate() {
-  double aver_decay = 1.0 / ( (double) iter_counter + 1.0 );
+  double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
   AuxCoeffs() = AuxCoeffs() - StepSize()*( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
   Coeffs() += aver_decay * ( AuxCoeffs()-Coeffs() );
-  iter_counter += 1;
 }
 
 

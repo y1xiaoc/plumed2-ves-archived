@@ -334,11 +334,11 @@ void CoeffsBase::setupFileFields() {
   field_ndimensions = "ndimensions";
   field_ncoeffs_total = "ncoeffs_total";
   field_shape_prefix = "shape_";
+  field_time_ = "time";
 }
 
 
 void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) const {
-  //
   ofile.addConstantField(field_type).printField(field_type,getTypeStr());
   ofile.addConstantField(field_ndimensions).printField(field_ndimensions,(int) numberOfDimensions());
   ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) numberOfCoeffs());
@@ -346,6 +346,13 @@ void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) const {
     ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
     ofile.printField(field_shape_prefix+getDimensionLabel(k),(int) shapeOfIndices(k));
   }
+}
+
+
+void CoeffsBase::writeTimeInfoToFile(OFile& ofile, const double current_time) const {
+  ofile.fmtField("%f");
+  ofile.addConstantField(field_time_).printField(field_time_,current_time);
+  ofile.fmtField();
 }
 
 

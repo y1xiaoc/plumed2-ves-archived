@@ -50,7 +50,6 @@ beta_(0.0)
   hessian_diagonal_ = !full_hessian;
   //
   parseFlag("MULTIPLE_WALKERS",use_mwalkers_);
-  std::cerr << use_mwalkers_;
   if(use_mwalkers_){
    log.printf("  Using multiple walkers:\n");
    log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
@@ -112,7 +111,7 @@ void VesBias::initializeGradientAndHessian() {
   gradient_ptr = new CoeffsVector(*coeffs_ptr);
   gradient_ptr->setLabels("gradient");
   //
-  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,hessian_diagonal_,false);
+  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,hessian_diagonal_,true);
   //
   coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
   coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
@@ -154,7 +153,7 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
   size_t rank = comm.Get_rank();
   // update average and diagonal part of Hessian
   for(size_t i=rank; i<ncoeffs;i+=stride){
-    size_t midx = hessian_ptr->getMatrixIndex(i,i);
+    size_t midx = getHessianIndex(i,i);
     deltas[i] = (coeffderivs[i]-coeffderivs_aver_sampled[i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
     coeffderivs_aver_sampled[i] += deltas[i];
     coeffderivs_cov_sampled[midx] = coeffderivs_cov_sampled[midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
@@ -164,7 +163,7 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
   if(!hessian_diagonal_){
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
-        size_t midx = hessian_ptr->getMatrixIndex(i,j);
+        size_t midx = getHessianIndex(i,j);
         coeffderivs_cov_sampled[midx] = coeffderivs_cov_sampled[midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
       }
     }

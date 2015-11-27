@@ -33,10 +33,11 @@ class OFile;
 class CounterBase{
 private:
   unsigned int counter;
-  std::string field_name_;
+  std::string field_name_counter_;
+  std::string field_name_time_;
   bool isActive;
 public:
-  CounterBase(const bool counter_active=true);
+  CounterBase(const bool active=true);
   ~CounterBase() {}
   //
   void turnOnCounter();
@@ -50,12 +51,14 @@ public:
   unsigned int getCounter() const;
   double getCounterDbl() const;
   //
-  void setFieldName(const std::string);
-  std::string getFieldName() const;
+  void setCounterFieldName(const std::string);
+  std::string getCounterFieldName() const;
+  void setTimeFieldName(const std::string);
+  std::string getTimeFieldName() const;
   //
   bool getCounterFieldFromFile(IFile&);
   bool isCounterFieldInFile(IFile&);
-  void writeCounterFieldToFile(OFile&) const;
+  void writeCounterInfoToFile(OFile&) const;
   //
 };
 }

@@ -57,6 +57,7 @@ private:
   std::string field_ndimensions;
   std::string field_ncoeffs_total;
   std::string field_shape_prefix;
+  std::string field_time_;
 public:
   CoeffsBase();
   CoeffsBase(
@@ -106,6 +107,7 @@ public:
   void setAllDimensionLabels(const std::vector<std::string>&);
   void setupFileFields();
   void writeCoeffsInfoToFile(OFile&) const;
+  void writeTimeInfoToFile(OFile&, const double) const;
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
   void checkCoeffsInfo(const std::string, const std::string, const unsigned int, const size_t, const std::vector<unsigned int>);
 protected:

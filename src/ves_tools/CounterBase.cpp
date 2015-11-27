@@ -26,10 +26,11 @@
 
 namespace PLMD{
 
-CounterBase::CounterBase(const bool counter_active):
+CounterBase::CounterBase(const bool active):
 counter(0),
-field_name_("iteration"),
-isActive(counter_active) {
+field_name_counter_("iteration"),
+field_name_time_("time_"),
+isActive(active) {
 }
 
 
@@ -54,7 +55,7 @@ void CounterBase::resetCounter() {
 
 
 void CounterBase::increaseCounter() {
-  counter+=1;
+  counter++;
 }
 
 
@@ -78,22 +79,33 @@ double CounterBase::getCounterDbl() const {
 }
 
 
-void CounterBase::setFieldName(const std::string field_name) {
-  field_name_=field_name;
+void CounterBase::setCounterFieldName(const std::string field_name_counter) {
+  field_name_counter_=field_name_counter;
 }
 
 
-std::string CounterBase::getFieldName() const {
-  return field_name_;
+std::string CounterBase::getCounterFieldName() const {
+  return field_name_counter_;
 }
+
+
+void CounterBase::setTimeFieldName(const std::string field_name_time) {
+  field_name_time_=field_name_time;
+}
+
+
+std::string CounterBase::getTimeFieldName() const {
+  return field_name_time_;
+}
+
 
 
 bool CounterBase::getCounterFieldFromFile(IFile& ifile) {
   bool field_found=false;
-  if(ifile.FieldExist(field_name_)){
+  if(ifile.FieldExist(field_name_counter_)){
     field_found=true;
     int int_tmp;
-    ifile.scanField(field_name_,int_tmp);
+    ifile.scanField(field_name_counter_,int_tmp);
     counter=(unsigned int) int_tmp;
   }
   return field_found;
@@ -101,13 +113,14 @@ bool CounterBase::getCounterFieldFromFile(IFile& ifile) {
 
 
 bool CounterBase::isCounterFieldInFile(IFile& ifile) {
-  return ifile.FieldExist(field_name_);
+  return ifile.FieldExist(field_name_counter_);
 }
 
 
-void CounterBase::writeCounterFieldToFile(OFile& ofile) const {
+void CounterBase::writeCounterInfoToFile(OFile& ofile) const {
   if(isActive){
-    ofile.addConstantField(field_name_).printField(field_name_,(int) counter);
+    // ofile.addConstantField(field_name_time_).printField(field_name_time_,getTimeStep()*getStep());
+    ofile.addConstantField(field_name_counter_).printField(field_name_counter_,(int) counter);
   }
 }
 

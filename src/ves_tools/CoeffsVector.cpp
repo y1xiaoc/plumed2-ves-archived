@@ -573,7 +573,7 @@ void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const bool append_file) {
+void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const double current_time, const bool append_file) {
   OFile file;
   if(append_file){ file.enforceRestart(); }
   file.link(mycomm);
@@ -583,42 +583,53 @@ void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coe
 }
 
 
-void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_descriptions) {
-  std::vector<CoeffsVector> CoeffsSetTmp;
-  CoeffsSetTmp.push_back(*this);
-  writeHeaderToFile(ofile);
+void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_descriptions, const double current_time) {
+  std::vector<CoeffsVector*> CoeffsSetTmp;
+  CoeffsSetTmp.push_back(this);
+  writeHeaderToFile(ofile,current_time);
   writeDataToFile(ofile,CoeffsSetTmp,print_coeffs_descriptions);
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector>& CoeffsSet, Communicator& cc, const bool print_coeffs_descriptions, const bool append_file) {
+void CoeffsVector::writeToFile(OFile& ofile, CoeffsVector* aux_coeffsvector, const bool print_coeffs_descriptions, const double current_time) {
+  std::vector<CoeffsVector*> CoeffsSetTmp;
+  CoeffsSetTmp.push_back(this);
+  CoeffsSetTmp.push_back(aux_coeffsvector);
+  writeHeaderToFile(ofile,current_time);
+  writeDataToFile(ofile,CoeffsSetTmp,print_coeffs_descriptions);
+}
+
+
+void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file) {
   OFile file;
   if(append_file){ file.enforceRestart(); }
-  file.link(cc);
+  file.link(CoeffsSet[0]->getCommunicator());
   file.open(filepath);
   writeToFile(file,CoeffsSet,print_coeffs_descriptions);
   file.close();
 }
 
 
-void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector>& CoeffsSet, const bool print_coeffs_descriptions) {
+void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions, const double current_time) {
   for(unsigned int k=1; k<CoeffsSet.size(); k++){
-    if(!CoeffsSet[k].sameShape(CoeffsSet[0])){
+    if(!CoeffsSet[k]->sameShape(*CoeffsSet[0])){
       plumed_merror("Error in writing a set of coeffs to file: The coeffs do not have the same shape and size");
     }
   }
-  CoeffsSet[0].writeHeaderToFile(ofile);
+  CoeffsSet[0]->writeHeaderToFile(ofile,current_time);
   writeDataToFile(ofile,CoeffsSet, print_coeffs_descriptions);
 }
 
 
-void CoeffsVector::writeHeaderToFile(OFile& ofile) const {
-  writeCounterFieldToFile(ofile);
+void CoeffsVector::writeHeaderToFile(OFile& ofile, const double current_time) const {
+  ofile.clearFields();
+  if(current_time >= 0.0){writeTimeInfoToFile(ofile,current_time);}
+  writeCounterInfoToFile(ofile);
   writeCoeffsInfoToFile(ofile);
 }
 
 
-void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector>& CoeffsSet, const bool print_coeffs_descriptions) {
+void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions) {
   //
   std::string field_indices_prefix = "idx_";
   std::string field_index = "index";
@@ -628,30 +639,30 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector>
   std::string str_seperate = "#!-------------------";
   //
   unsigned int numvec = CoeffsSet.size();
-  unsigned int numdim = CoeffsSet[0].numberOfDimensions();
-  unsigned int numcoeffs = CoeffsSet[0].getSize();
-  std::vector<std::string> coeffs_descriptions = CoeffsSet[0].getAllCoeffsDescriptions();
-  std::string output_fmt = CoeffsSet[0].getOutputFmt();
+  unsigned int numdim = CoeffsSet[0]->numberOfDimensions();
+  unsigned int numcoeffs = CoeffsSet[0]->getSize();
+  std::vector<std::string> coeffs_descriptions = CoeffsSet[0]->getAllCoeffsDescriptions();
+  std::string output_fmt = CoeffsSet[0]->getOutputFmt();
   std::vector<std::string> coeffs_datalabels(numvec);
   for(unsigned int k=0; k<numvec; k++){
-    coeffs_datalabels[k] = CoeffsSet[k].getDataLabel();
+    coeffs_datalabels[k] = CoeffsSet[k]->getDataLabel();
   }
   //
   char* s1 = new char[20];
   std::vector<unsigned int> indices(numdim);
   std::vector<std::string> ilabels(numdim);
   for(unsigned int k=0; k<numdim; k++){
-    ilabels[k]=field_indices_prefix+CoeffsSet[0].getDimensionLabel(k);
+    ilabels[k]=field_indices_prefix+CoeffsSet[0]->getDimensionLabel(k);
   }
   //
   for(size_t i=0; i<numcoeffs; i++){
-    indices=CoeffsSet[0].getIndices(i);
+    indices=CoeffsSet[0]->getIndices(i);
     for(unsigned int k=0; k<numdim; k++){
       sprintf(s1,int_fmt.c_str(),indices[k]);
       ofile.printField(ilabels[k],s1);
     }
     for(unsigned int l=0; l<numvec; l++){
-      ofile.fmtField(" "+output_fmt).printField(coeffs_datalabels[l],CoeffsSet[l].getValue(i));
+      ofile.fmtField(" "+output_fmt).printField(coeffs_datalabels[l],CoeffsSet[l]->getValue(i));
     }
     sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
     if(print_coeffs_descriptions){ ofile.printField(field_description,"  "+coeffs_descriptions[i]);}
