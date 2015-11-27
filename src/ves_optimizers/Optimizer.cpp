@@ -178,8 +178,7 @@ void Optimizer::update() {
       Coeffs().writeToFile(coeffsOfile_,aux_coeffs_ptr,false,getTimeStep()*getStep());
     }
     if(gradient_fname_.size()>0 && iter_counter%gradient_wstride_==0){
-      // Gradient().writeToFile(gradientOfile_,false,getTimeStep()*getStep());
-      Gradient().writeToFile(gradientOfile_);
+      Gradient().writeToFile(gradientOfile_,false,getTimeStep()*getStep());
     }
     if(hessian_fname_.size()>0 && iter_counter%hessian_wstride_==0){
       Hessian().writeToFile(hessianOfile_,getTimeStep()*getStep());
