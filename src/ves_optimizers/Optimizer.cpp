@@ -133,6 +133,11 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   ActionPilot::registerKeywords(keys);
   ActionWithValue::registerKeywords(keys);
   //
+  keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
+  keys.addOutputComponent("grad_rms","default","the root mean square value of the coefficent gradient");
+  keys.addOutputComponent("grad_max","default","the maximum absolute value of the gradient");
+  keys.addOutputComponent("grad_maxidx","default","the index of the maximum absolute value of the gradient");
+  //
   keys.add("compulsory","STEP_SIZE","the step size used for the optimization");
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
@@ -144,11 +149,6 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
   keys.add("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.add("hidden","HESSIAN_OUTPUT_STRIDE","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
-  //
-  keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
-  keys.addOutputComponent("grad_rms","default","the root mean square value of the coefficent gradient");
-  keys.addOutputComponent("grad_max","default","the maximum absolute value of the gradient");
-  keys.addOutputComponent("grad_maxidx","default","the index of the maximum absolute value of the gradient");
 }
 
 
