@@ -202,7 +202,9 @@ const double& CoeffsMatrix::operator()(const std::vector<unsigned int>& indices1
 
 CoeffsVector operator*(const CoeffsMatrix& coeffs_matrix, const CoeffsVector& coeffs_vector) {
   CoeffsVector new_coeffs_vector(coeffs_vector);
-  size_t numcoeffs = coeffs_vector.getSize();
+  new_coeffs_vector.clear();
+  plumed_massert(coeffs_vector.numberOfCoeffs()==coeffs_matrix.numberOfCoeffs(),"CoeffsMatrix and CoeffsVector are of the wrong size");
+  size_t numcoeffs = coeffs_vector.numberOfCoeffs();
   if(coeffs_matrix.isDiagonal()){
     for(size_t i=0; i<numcoeffs; i++){
       new_coeffs_vector(i) = coeffs_matrix(i,i)*coeffs_vector(i);
@@ -211,7 +213,7 @@ CoeffsVector operator*(const CoeffsMatrix& coeffs_matrix, const CoeffsVector& co
   else{
     for(size_t i=0; i<numcoeffs; i++){
       for(size_t j=0; j<numcoeffs; j++){
-        new_coeffs_vector(i) = coeffs_matrix(i,j)*coeffs_vector(j);
+        new_coeffs_vector(i) += coeffs_matrix(i,j)*coeffs_vector(j);
       }
     }
   }
