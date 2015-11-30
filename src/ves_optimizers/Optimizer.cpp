@@ -88,6 +88,8 @@ bias_ptr(NULL)
   bias_ptr=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_label);
   if(!bias_ptr){plumed_merror("VES bias "+bias_label+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
   //
+  bias_ptr->linkOptimizer(this);
+  //
   coeffs_ptr = bias_ptr->getCoeffsPtr();
   plumed_massert(coeffs_ptr != NULL,"coeffs are not linked correctly");
   aux_coeffs_ptr = new CoeffsVector(*coeffs_ptr);
@@ -98,11 +100,6 @@ bias_ptr(NULL)
   hessian_ptr = bias_ptr->getHessianPtr();
   //
   turnOffHessian();
-  //
-  addComponent("stepsize"); componentIsNotPeriodic("stepsize");
-  addComponent("grad_rms"); componentIsNotPeriodic("grad_rms");
-  addComponent("grad_max"); componentIsNotPeriodic("grad_max");
-  addComponent("grad_maxidx"); componentIsNotPeriodic("grad_maxidx");
   //
   bool mw_seperate_files = false;
   parseFlag("MW_SEPERATE_FILES",mw_seperate_files);
@@ -150,6 +147,11 @@ bias_ptr(NULL)
     Hessian().writeToFile(hessianOfile_,getTimeStep()*getStep());
     log.printf("  DEBUG OPTION: Hessian will be written out to file %s every %d bias iterations\n",hessian_fname_.c_str(),hessian_wstride_);
   }
+  //
+  addComponent("stepsize"); componentIsNotPeriodic("stepsize");
+  addComponent("grad_rms"); componentIsNotPeriodic("grad_rms");
+  addComponent("grad_max"); componentIsNotPeriodic("grad_max");
+  addComponent("grad_maxidx"); componentIsNotPeriodic("grad_maxidx");
   //
 }
 

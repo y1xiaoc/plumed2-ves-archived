@@ -23,6 +23,7 @@
 #include "ves_basisfunctions/BasisFunctions.h"
 #include "ves_tools/CoeffsVector.h"
 #include "ves_tools/CoeffsMatrix.h"
+#include "ves_optimizers/Optimizer.h"
 
 #include "tools/Communicator.h"
 #include "core/PlumedMain.h"
@@ -39,28 +40,25 @@ coeffderivs_aver_ps_ptr(NULL),
 gradient_ptr(NULL),
 hessian_ptr(NULL),
 coeffderivs_aver_sampled(0),
+coeffderivs_cov_sampled(0),
+optimizer_ptr(NULL),
+optimize_coeffs_(false),
 hessian_diagonal_(true),
 aver_counter(0.0),
-kbt_(0.0),
-beta_(0.0)
+kbt_(0.0)
 {
   bool full_hessian=false;
   parseFlag("FULL_HESSIAN",full_hessian);
   hessian_diagonal_ = !full_hessian;
-  //
-
- double temp=0.0;
- parse("TEMP",temp);
- if(temp>0.0){
-   kbt_=plumed.getAtoms().getKBoltzmann()*temp;
- }
- else {
-   kbt_=plumed.getAtoms().getKbT();
- }
- if(kbt_==0.0){
-   error("the MD engine does not pass the temperature to PLUMED so it needs to be given using the TEMP keyword");
- }
- beta_=1.0/kbt_;
+  double temp=0.0;
+  parse("TEMP",temp);
+  if(temp>0.0){
+    kbt_=plumed.getAtoms().getKBoltzmann()*temp;
+  }
+  else {
+    kbt_=plumed.getAtoms().getKbT();
+  }
+  // NOTE: the check for that the temperature is given is done when linking the optimizer later on.
 }
 
 VesBias::~VesBias(){
@@ -169,6 +167,25 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
 
 void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderivs_aver_ps) {
   CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
+}
+
+
+void VesBias::linkOptimizer(Optimizer* optimizer_ptr_in) {
+  //
+  if(optimizer_ptr==NULL){
+    optimizer_ptr = optimizer_ptr_in;
+  }
+  else {
+    std::string err_msg = "VES bias " + getName() + " with label " + getLabel() + " has already been linked with optimizer " + optimizer_ptr->getName() + " with label " + optimizer_ptr->getLabel() + ". You cannot link two optimizer to the same VES bias.";
+    plumed_merror(err_msg);
+  }
+  //
+  if(kbt_==0.0){
+    std::string err_msg = "VES bias " + getName() + " with label " + getLabel() + ": if you want to optimize this bias you need to give the temperature using the TEMP keyword as the MD engine does not pass it to PLUMED";
+    plumed_merror(err_msg);
+  }
+  //
+  optimize_coeffs_ = true;
 }
 
 

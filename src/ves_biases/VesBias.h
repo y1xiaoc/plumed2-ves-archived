@@ -43,6 +43,7 @@ namespace PLMD{
   class CoeffsMatrix;
   class BasisFunctions;
   class Value;
+  class Optimizer;
 
 namespace bias{
 
@@ -63,11 +64,13 @@ private:
   std::vector<double> coeffderivs_aver_sampled;
   std::vector<double> coeffderivs_cov_sampled;
   //
+  Optimizer* optimizer_ptr;
+  bool optimize_coeffs_;
+  //
   bool hessian_diagonal_;
   //
   double aver_counter;
   double kbt_;
-  double beta_;
 private:
   void initializeGradientAndHessian();
 protected:
@@ -101,9 +104,12 @@ public:
   size_t getHessianIndex(const size_t index1, const size_t index2) const;
   //
   bool diagonalHessian() const {return hessian_diagonal_;}
+  bool optimizeCoeffs() const {return optimize_coeffs_;}
   //
   void updateGradientAndHessian();
   void clearGradientAndHessian();
+  //
+  void linkOptimizer(Optimizer*);
 };
 
 inline
@@ -125,7 +131,7 @@ inline
 double VesBias::getKbT() const {return kbt_;}
 
 inline
-double VesBias::getBeta() const {return beta_;}
+double VesBias::getBeta() const {return 1.0/kbt_;}
 
 inline
 size_t VesBias::getCoeffsIndex(const std::vector<unsigned int>& indices) const {return coeffs_ptr->getIndex(indices);}
