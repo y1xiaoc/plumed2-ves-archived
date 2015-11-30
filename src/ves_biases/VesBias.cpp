@@ -40,7 +40,6 @@ gradient_ptr(NULL),
 hessian_ptr(NULL),
 coeffderivs_aver_sampled(0),
 hessian_diagonal_(true),
-use_mwalkers_(false),
 aver_counter(0.0),
 kbt_(0.0),
 beta_(0.0)
@@ -49,12 +48,7 @@ beta_(0.0)
   parseFlag("FULL_HESSIAN",full_hessian);
   hessian_diagonal_ = !full_hessian;
   //
-  parseFlag("MULTIPLE_WALKERS",use_mwalkers_);
-  if(use_mwalkers_){
-   log.printf("  Using multiple walkers:\n");
-   log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
-   log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
- }
+
  double temp=0.0;
  parse("TEMP",temp);
  if(temp>0.0){
@@ -80,7 +74,6 @@ VesBias::~VesBias(){
 void VesBias::registerKeywords( Keywords& keys ) {
   Bias::registerKeywords(keys);
   keys.addFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
-  keys.addFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
   keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature");
 }
 
@@ -131,10 +124,6 @@ void VesBias::updateGradientAndHessian() {
   Gradient() = CoeffDerivsAverTargetDist() - coeffderivs_aver_sampled;
   Hessian() = coeffderivs_cov_sampled;
   Hessian() *= getBeta();
-  if(use_mwalkers_){
-    Gradient().sumMultiSimCommMPI(multi_sim_comm);
-    Hessian().sumMultiSimCommMPI(multi_sim_comm);
-  }
   //
   coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
   coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);

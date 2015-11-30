@@ -47,11 +47,13 @@ class Optimizer :
  public ActionWithValue
 {
 private:
-  bool usehessian_;
   std::string description_;
   std::string type_;
   double step_size_;
   double current_step_size_;
+  //
+  bool use_hessian_;
+  bool use_mwalkers_mpi_;
   //
   unsigned int iter_counter;
   //
@@ -76,6 +78,7 @@ private:
   //
 private:
   void updateOutputComponents();
+  void writeOutputFiles();
 protected:
   void turnOnHessian();
   void turnOffHessian();
@@ -107,7 +110,8 @@ public:
   void update();
   unsigned int getNumberOfDerivatives(){return 0;}
   //
-  bool useHessian() const {return usehessian_;}  ;
+  bool useHessian() const {return use_hessian_;}
+  bool useMultipleWalkers() const {return use_mwalkers_mpi_;}
   };
 
 inline

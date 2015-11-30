@@ -64,7 +64,6 @@ private:
   std::vector<double> coeffderivs_cov_sampled;
   //
   bool hessian_diagonal_;
-  bool use_mwalkers_;
   //
   double aver_counter;
   double kbt_;
@@ -102,7 +101,6 @@ public:
   size_t getHessianIndex(const size_t index1, const size_t index2) const;
   //
   bool diagonalHessian() const {return hessian_diagonal_;}
-  bool useMultipleWalkers() const {return use_mwalkers_;}
   //
   void updateGradientAndHessian();
   void clearGradientAndHessian();

@@ -37,11 +37,12 @@ Optimizer::Optimizer(const ActionOptions&ao):
 Action(ao),
 ActionPilot(ao),
 ActionWithValue(ao),
-usehessian_(false),
 description_("Undefined"),
 type_("Undefined"),
 step_size_(0.0),
 current_step_size_(0.0),
+use_hessian_(false),
+use_mwalkers_mpi_(false),
 iter_counter(0),
 coeffs_wstride_(100),
 coeffs_fname_("COEFFS"),
@@ -77,6 +78,13 @@ bias_ptr(NULL)
   parse("HESSIAN_FILE",hessian_fname_);
   parse("HESSIAN_OUTPUT_STRIDE",hessian_wstride_);
   //
+  parseFlag("MULTIPLE_WALKERS",use_mwalkers_mpi_);
+  if(use_mwalkers_mpi_){
+    log.printf("  optimization performed using multiple walkers connected via MPI:\n");
+    log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
+    log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
+  }
+  //
   bias_ptr=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_label);
   if(!bias_ptr){plumed_merror("VES bias "+bias_label+" does not exist");}
   //
@@ -96,9 +104,11 @@ bias_ptr(NULL)
   addComponent("grad_max"); componentIsNotPeriodic("grad_max");
   addComponent("grad_maxidx"); componentIsNotPeriodic("grad_maxidx");
   //
+  bool mw_seperate_files = false;
+  parseFlag("MW_SEPERATE_FILES",mw_seperate_files);
   if(coeffs_fname_.size()>0){
     coeffsOfile_.link(*this);
-    if(bias_ptr->useMultipleWalkers()){
+    if(use_mwalkers_mpi_ && !mw_seperate_files){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
@@ -113,7 +123,7 @@ bias_ptr(NULL)
   //
   if(gradient_fname_.size()>0){
     gradientOfile_.link(*this);
-    if(bias_ptr->useMultipleWalkers()){
+    if(use_mwalkers_mpi_ && !mw_seperate_files){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
@@ -128,7 +138,7 @@ bias_ptr(NULL)
   //
   if(hessian_fname_.size()>0){
     hessianOfile_.link(*this);
-    if(bias_ptr->useMultipleWalkers()){
+    if(use_mwalkers_mpi_ && !mw_seperate_files){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
@@ -169,6 +179,10 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.add("compulsory","FILE","COEFFS","the name of output file for the coefficients");
   keys.add("compulsory","OUTPUT_STRIDE","100","how often the coefficients should be written to file. This parameter is given as the number of bias iterations.");
   //
+  keys.addFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
+  //
+  keys.addFlag("MW_SEPERATE_FILES",false,"DEBUG OPTION: write out seperate files when using multiple walkers. By default only one file is written out as they should all be identical.");
+    //
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
   keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
   keys.add("hidden","HESSIAN_FILE","the name of output file for the Hessian");
@@ -177,40 +191,33 @@ void Optimizer::registerKeywords( Keywords& keys ) {
 
 
 void Optimizer::turnOnHessian() {
-  usehessian_=true;
+  use_hessian_=true;
   plumed_massert(hessian_ptr != NULL,"Hessian is needed but not linked correctly");
 }
 
 
 void Optimizer::turnOffHessian() {
-  usehessian_=false;
+  use_hessian_=false;
 }
 
 
 void Optimizer::update() {
   if(onStep() && getStep()!=0){
     bias_ptr->updateGradientAndHessian();
+    if(use_mwalkers_mpi_){
+      gradient_ptr->sumMultiSimCommMPI(multi_sim_comm);
+      hessian_ptr->sumMultiSimCommMPI(multi_sim_comm);
+    }
     coeffsUpdate();
     updateOutputComponents();
-    //
     increaseIterationCounter();
-    Coeffs().increaseCounter();
-    AuxCoeffs().increaseCounter();
-    Gradient().increaseCounter();
-    //
-    if(coeffs_fname_.size()>0 && iter_counter%coeffs_wstride_==0){
-      Coeffs().writeToFile(coeffsOfile_,aux_coeffs_ptr,false,getTimeStep()*getStep());
-    }
-    if(gradient_fname_.size()>0 && iter_counter%gradient_wstride_==0){
-      Gradient().writeToFile(gradientOfile_,false,getTimeStep()*getStep());
-    }
-    if(hessian_fname_.size()>0 && iter_counter%hessian_wstride_==0){
-      Hessian().writeToFile(hessianOfile_,getTimeStep()*getStep());
-    }
-    //
+    coeffs_ptr->increaseCounter();
+    aux_coeffs_ptr->increaseCounter();
+    gradient_ptr->increaseCounter();
+    hessian_ptr->increaseCounter();
+    writeOutputFiles();
     bias_ptr->clearGradientAndHessian();
   }
-
 }
 
 
@@ -220,6 +227,19 @@ void Optimizer::updateOutputComponents() {
   size_t gradient_maxabs_idx=0;
   getPntrToComponent("grad_max")->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
   getPntrToComponent("grad_maxidx")->set( gradient_maxabs_idx );
+}
+
+
+void Optimizer::writeOutputFiles() {
+  if(coeffs_fname_.size()>0 && iter_counter%coeffs_wstride_==0){
+    coeffs_ptr->writeToFile(coeffsOfile_,aux_coeffs_ptr,false,getTimeStep()*getStep());
+  }
+  if(gradient_fname_.size()>0 && iter_counter%gradient_wstride_==0){
+    gradient_ptr->writeToFile(gradientOfile_,false,getTimeStep()*getStep());
+  }
+  if(hessian_fname_.size()>0 && iter_counter%hessian_wstride_==0){
+    hessian_ptr->writeToFile(hessianOfile_,getTimeStep()*getStep());
+  }
 }
 
 
