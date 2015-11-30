@@ -86,7 +86,7 @@ bias_ptr(NULL)
   }
   //
   bias_ptr=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_label);
-  if(!bias_ptr){plumed_merror("VES bias "+bias_label+" does not exist");}
+  if(!bias_ptr){plumed_merror("VES bias "+bias_label+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
   //
   coeffs_ptr = bias_ptr->getCoeffsPtr();
   plumed_massert(coeffs_ptr != NULL,"coeffs are not linked correctly");
