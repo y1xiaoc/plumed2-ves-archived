@@ -41,13 +41,13 @@ PLUMED_REGISTER_ACTION(SteepestDecent,"STEEPEST_DECENT")
 
 void SteepestDecent::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
+  keys.use("STEP_SIZE");
 }
 
 
 SteepestDecent::SteepestDecent(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
-  turnOffHessian();
 }
 
 

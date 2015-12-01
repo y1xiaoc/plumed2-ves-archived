@@ -67,7 +67,8 @@ private:
   Optimizer* optimizer_ptr;
   bool optimize_coeffs_;
   //
-  bool hessian_diagonal_;
+  bool compute_hessian_;
+  bool diagonal_hessian_;
   //
   double aver_counter;
   double kbt_;
@@ -103,13 +104,17 @@ public:
   std::vector<unsigned int> getCoeffsIndices(const size_t index) const;
   size_t getHessianIndex(const size_t index1, const size_t index2) const;
   //
-  bool diagonalHessian() const {return hessian_diagonal_;}
+  bool computeHessian() const {return compute_hessian_;}
+  bool diagonalHessian() const {return diagonal_hessian_;}
+  //
   bool optimizeCoeffs() const {return optimize_coeffs_;}
   //
   void updateGradientAndHessian();
   void clearGradientAndHessian();
   //
   void linkOptimizer(Optimizer*);
+  void turnOnHessian(const bool diagonal_hessian=true);
+  void turnOffHessian();
 };
 
 inline

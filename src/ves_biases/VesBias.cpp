@@ -29,6 +29,8 @@
 #include "core/PlumedMain.h"
 #include "core/Atoms.h"
 
+#include <iostream>
+
 
 namespace PLMD{
 namespace bias{
@@ -43,13 +45,11 @@ coeffderivs_aver_sampled(0),
 coeffderivs_cov_sampled(0),
 optimizer_ptr(NULL),
 optimize_coeffs_(false),
-hessian_diagonal_(true),
+compute_hessian_(false),
+diagonal_hessian_(true),
 aver_counter(0.0),
 kbt_(0.0)
 {
-  bool full_hessian=false;
-  parseFlag("FULL_HESSIAN",full_hessian);
-  hessian_diagonal_ = !full_hessian;
   double temp=0.0;
   parse("TEMP",temp);
   if(temp>0.0){
@@ -71,8 +71,7 @@ VesBias::~VesBias(){
 
 void VesBias::registerKeywords( Keywords& keys ) {
   Bias::registerKeywords(keys);
-  keys.addFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
-  keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature");
+  keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature to PLUMED");
 }
 
 
@@ -108,7 +107,7 @@ void VesBias::initializeGradientAndHessian() {
   gradient_ptr = new CoeffsVector(*coeffs_ptr);
   gradient_ptr->setLabels("gradient");
   //
-  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,hessian_diagonal_,true);
+  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,diagonal_hessian_,true);
   //
   coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
   coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
@@ -153,7 +152,7 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
   }
   comm.Sum(deltas);
   // update off-diagonal part of the Hessian
-  if(!hessian_diagonal_){
+  if(!diagonal_hessian_){
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
         size_t midx = getHessianIndex(i,j);
@@ -186,6 +185,26 @@ void VesBias::linkOptimizer(Optimizer* optimizer_ptr_in) {
   }
   //
   optimize_coeffs_ = true;
+}
+
+
+void VesBias::turnOnHessian(const bool diagonal_hessian) {
+  compute_hessian_=true;
+  diagonal_hessian_=diagonal_hessian;
+  delete hessian_ptr;
+  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,diagonal_hessian_,true);
+  coeffderivs_cov_sampled.clear();
+  coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
+}
+
+
+void VesBias::turnOffHessian() {
+  compute_hessian_=false;
+  diagonal_hessian_=true;
+  delete hessian_ptr;
+  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,diagonal_hessian_,true);
+  coeffderivs_cov_sampled.clear();
+  coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
 }
 
 

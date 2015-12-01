@@ -53,6 +53,8 @@ private:
   double current_step_size_;
   //
   bool use_hessian_;
+  bool diagonal_hessian_;
+  //
   bool use_mwalkers_mpi_;
   //
   unsigned int iter_counter;
@@ -82,6 +84,8 @@ private:
 protected:
   void turnOnHessian();
   void turnOffHessian();
+  void switchToDiagonalHessian();
+  void switchToFullHessian();
   CoeffsVector& Coeffs() const;
   CoeffsVector& AuxCoeffs() const;
   CoeffsVector& Gradient() const;
@@ -89,6 +93,7 @@ protected:
   double StepSize() const;
   virtual void coeffsUpdate()=0;
   void setCurrentStepSize(const double);
+
 public:
   static void registerKeywords(Keywords&);
   Optimizer(const ActionOptions&ao);
@@ -111,6 +116,8 @@ public:
   unsigned int getNumberOfDerivatives(){return 0;}
   //
   bool useHessian() const {return use_hessian_;}
+  bool diagonalHessian() const {return diagonal_hessian_;}
+  //
   bool useMultipleWalkers() const {return use_mwalkers_mpi_;}
   };
 
@@ -133,7 +140,10 @@ inline
 CoeffsVector& Optimizer::Gradient() const {return *gradient_ptr;}
 
 inline
-CoeffsMatrix& Optimizer::Hessian() const {return *hessian_ptr;}
+CoeffsMatrix& Optimizer::Hessian() const {
+  plumed_massert(use_hessian_,"You cannot use the Hessian without asking for before");
+  return *hessian_ptr;
+}
 
 inline
 double Optimizer::getStepSize() const {return step_size_;}
