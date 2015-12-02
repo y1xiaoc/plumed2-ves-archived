@@ -61,11 +61,14 @@ bias_ptr(NULL)
   parse("BIAS",bias_label);
   bias_ptr=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_label);
   if(!bias_ptr){plumed_merror("VES bias "+bias_label+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
-  log.printf("  optimizing VES bias %s with label %s \n",bias_ptr->getName().c_str(),bias_ptr->getLabel().c_str());
   //
+  bias_ptr->linkOptimizer(this);
   coeffs_ptr = bias_ptr->getCoeffsPtr();
   plumed_massert(coeffs_ptr != NULL,"coeffs are not linked correctly");
-  log.printf("  optimizing %d coefficients\n",coeffs_ptr->numberOfCoeffs());
+  //
+  log.printf("  optimizing VES bias %s with label %s: \n",bias_ptr->getName().c_str(),bias_ptr->getLabel().c_str());
+  log.printf("  number of coefficients: %d\n",coeffs_ptr->numberOfCoeffs());
+  log.printf("  KbT: %f\n",bias_ptr->getKbT());
   //
   aux_coeffs_ptr = new CoeffsVector(*coeffs_ptr);
   aux_coeffs_ptr->setLabels("aux_"+coeffs_ptr->getLabel());
@@ -76,12 +79,12 @@ bias_ptr(NULL)
   if(keywords.exists("STEP_SIZE")){
     plumed_assert(!keywords.exists("INITIAL_STEP_SIZE"));
     parse("STEP_SIZE",step_size_);
-    log.printf("  using a step size of %f\n",step_size_);
+    log.printf("  using a constant step size of %f\n",step_size_);
   }
   if(keywords.exists("INITIAL_STEP_SIZE")){
     plumed_assert(!keywords.exists("STEP_SIZE"));
     parse("INITIAL_STEP_SIZE",step_size_);
-    log.printf("  using a intial step size of %f\n",step_size_);
+    log.printf("  using a initial step size of %f\n",step_size_);
   }
   setCurrentStepSize(step_size_);
   //
@@ -154,7 +157,7 @@ bias_ptr(NULL)
     parse("HESSIAN_OUTPUT_STRIDE",hessian_wstride_);
   }
   //
-  bias_ptr->linkOptimizer(this);
+
 }
 
 

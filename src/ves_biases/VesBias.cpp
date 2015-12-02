@@ -58,6 +58,9 @@ kbt_(0.0)
   else {
     kbt_=plumed.getAtoms().getKbT();
   }
+  if(kbt_>0.0){
+    log.printf("  KbT: %f\n",kbt_);
+  }
   // NOTE: the check for that the temperature is given is done when linking the optimizer later on.
 }
 

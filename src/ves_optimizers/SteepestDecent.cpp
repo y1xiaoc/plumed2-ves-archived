@@ -48,6 +48,7 @@ void SteepestDecent::registerKeywords(Keywords& keys){
 SteepestDecent::SteepestDecent(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
+  checkRead();
 }
 
 

@@ -53,6 +53,7 @@ BachAveragedSGD::BachAveragedSGD(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
   turnOnHessian();
+  checkRead();
 }
 
 
