@@ -67,8 +67,9 @@ bias_ptr(NULL)
   plumed_massert(coeffs_ptr != NULL,"coeffs are not linked correctly");
   //
   log.printf("  optimizing VES bias %s with label %s: \n",bias_ptr->getName().c_str(),bias_ptr->getLabel().c_str());
+  log.printf("   KbT: %f\n",bias_ptr->getKbT());
   log.printf("  number of coefficients: %d\n",coeffs_ptr->numberOfCoeffs());
-  log.printf("  KbT: %f\n",bias_ptr->getKbT());
+
   //
   aux_coeffs_ptr = new CoeffsVector(*coeffs_ptr);
   aux_coeffs_ptr->setLabels("aux_"+coeffs_ptr->getLabel());
@@ -105,9 +106,9 @@ bias_ptr(NULL)
   }
   //
   addComponent("stepsize"); componentIsNotPeriodic("stepsize");
-  addComponent("grad_rms"); componentIsNotPeriodic("grad_rms");
-  addComponent("grad_max"); componentIsNotPeriodic("grad_max");
-  addComponent("grad_maxidx"); componentIsNotPeriodic("grad_maxidx");
+  addComponent("gradrms"); componentIsNotPeriodic("gradrms");
+  addComponent("gradmax"); componentIsNotPeriodic("gradmax");
+  // addComponent("gradmaxidx"); componentIsNotPeriodic("gradmaxidx");
   //
   std::string coeffs_wstride_tmpstr="";
   parse("FILE",coeffs_fname_);
@@ -175,9 +176,9 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   ActionWithValue::registerKeywords(keys);
   //
   keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
-  keys.addOutputComponent("grad_rms","default","the root mean square value of the coefficent gradient");
-  keys.addOutputComponent("grad_max","default","the maximum absolute value of the gradient");
-  keys.addOutputComponent("grad_maxidx","default","the index of the maximum absolute value of the gradient");
+  keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient");
+  keys.addOutputComponent("gradmax","default","the maximum absolute value of the gradient");
+  // keys.addOutputComponent("gradmaxidx","default","the index of the maximum absolute value of the gradient");
   //
   keys.reserve("compulsory","STEP_SIZE","the step size used for the optimization");
   keys.reserve("compulsory","INITIAL_STEP_SIZE","the initial step size used for the optimization");
@@ -196,6 +197,13 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.reserve("hidden","HESSIAN_OUTPUT_STRIDE","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
+}
+
+
+void Optimizer::activateHessianKeywords(Keywords& keys) {
+  keys.use("FULL_HESSIAN");
+  keys.use("HESSIAN_FILE");
+  keys.use("HESSIAN_OUTPUT_STRIDE");
 }
 
 
@@ -259,10 +267,10 @@ void Optimizer::update() {
 
 void Optimizer::updateOutputComponents() {
   getPntrToComponent("stepsize")->set( getCurrentStepSize() );
-  getPntrToComponent("grad_rms")->set( Gradient().getRMS() );
+  getPntrToComponent("gradrms")->set( Gradient().getRMS() );
   size_t gradient_maxabs_idx=0;
-  getPntrToComponent("grad_max")->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
-  getPntrToComponent("grad_maxidx")->set( gradient_maxabs_idx );
+  getPntrToComponent("gradmax")->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
+  // getPntrToComponent("gradmaxidx")->set( gradient_maxabs_idx );
 }
 
 

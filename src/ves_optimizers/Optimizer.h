@@ -96,6 +96,8 @@ protected:
 
 public:
   static void registerKeywords(Keywords&);
+  static void activateHessianKeywords(Keywords&);
+  //
   Optimizer(const ActionOptions&ao);
   ~Optimizer();
   std::string getType() const;
