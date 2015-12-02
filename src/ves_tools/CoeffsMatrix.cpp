@@ -85,8 +85,7 @@ mycomm(cc),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
 {
-  setLabel(label);
-  setDataLabel(label);
+  setLabels(label);
   setupMatrix();
 }
 
