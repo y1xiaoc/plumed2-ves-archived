@@ -311,9 +311,4 @@ void Optimizer::switchToFullHessian() {
 }
 
 
-
-
-
-
-
 }
