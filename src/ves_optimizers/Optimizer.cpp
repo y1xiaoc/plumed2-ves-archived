@@ -44,6 +44,7 @@ current_step_size_(0.0),
 use_hessian_(false),
 diagonal_hessian_(true),
 use_mwalkers_mpi_(false),
+mwalkers_mpi_single_files_(true),
 iter_counter(0),
 coeffs_wstride_(100),
 coeffs_fname_("COEFFS"),
@@ -90,7 +91,6 @@ bias_ptr(NULL)
   setCurrentStepSize(step_size_);
   //
   if(keywords.exists("FULL_HESSIAN")){
-    use_hessian_=true;
     bool full_hessian=false;
     parseFlag("FULL_HESSIAN",full_hessian);
     diagonal_hessian_ = !full_hessian;
@@ -99,6 +99,12 @@ bias_ptr(NULL)
   if(keywords.exists("MULTIPLE_WALKERS")){
     parseFlag("MULTIPLE_WALKERS",use_mwalkers_mpi_);
   }
+  if(keywords.exists("MWALKERS_SEPERATE_FILES")){
+    bool mw_seperate_files = false;
+    parseFlag("MWALKERS_SEPERATE_FILES",mw_seperate_files);
+    mwalkers_mpi_single_files_ = !mw_seperate_files;
+  }
+
   if(use_mwalkers_mpi_){
     log.printf("  optimization performed using multiple walkers connected via MPI:\n");
     log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
@@ -121,7 +127,7 @@ bias_ptr(NULL)
   }
   if(coeffs_fname_.size()>0){
     coeffsOfile_.link(*this);
-    if(use_mwalkers_mpi_){
+    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
@@ -137,8 +143,9 @@ bias_ptr(NULL)
   parse("GRADIENT_FILE",gradient_fname_);
   parse("GRADIENT_OUTPUT_STRIDE",gradient_wstride_);
   if(gradient_fname_.size()>0){
+    plumed_massert(gradient_fname_!=coeffs_fname_,"FILE and GRADIENT_FILE cannot be the same");
     gradientOfile_.link(*this);
-    if(use_mwalkers_mpi_){
+    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
@@ -153,6 +160,8 @@ bias_ptr(NULL)
   //
   if(keywords.exists("HESSIAN_FILE")){
     parse("HESSIAN_FILE",hessian_fname_);
+    plumed_massert(hessian_fname_!=coeffs_fname_,"FILE and HESSIAN_FILE cannot be the same");
+    plumed_massert(hessian_fname_!=gradient_fname_,"GRADIENT_FILE and HESSIAN_FILE cannot be the same");    
   }
   if(keywords.exists("HESSIAN_OUTPUT_STRIDE")){
     parse("HESSIAN_OUTPUT_STRIDE",hessian_wstride_);
@@ -191,6 +200,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
   //
   keys.addFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
+  keys.addFlag("MWALKERS_SEPERATE_FILES",false,"DEBUG OPTION: if seperate files should be outputted to file when using MPI multiple walkers");
   //
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
   keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
@@ -223,7 +233,7 @@ void Optimizer::turnOnHessian() {
   //
   if(hessian_fname_.size()>0){
     hessianOfile_.link(*this);
-    if(use_mwalkers_mpi_){
+    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);

@@ -56,6 +56,7 @@ private:
   bool diagonal_hessian_;
   //
   bool use_mwalkers_mpi_;
+  bool mwalkers_mpi_single_files_;
   //
   unsigned int iter_counter;
   //
@@ -121,6 +122,11 @@ public:
   bool diagonalHessian() const {return diagonal_hessian_;}
   //
   bool useMultipleWalkers() const {return use_mwalkers_mpi_;}
+  //
+  CoeffsVector* getCoeffsPtr() const {return coeffs_ptr;}
+  CoeffsVector* getAuxCoeffsPtr() const {return aux_coeffs_ptr;}
+  CoeffsVector* getGradientPtr()const {return gradient_ptr;}
+  CoeffsMatrix* getHessianPtr() const {return hessian_ptr;}
   };
 
 inline
