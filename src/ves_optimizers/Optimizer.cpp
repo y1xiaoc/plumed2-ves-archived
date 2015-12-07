@@ -39,13 +39,14 @@ ActionPilot(ao),
 ActionWithValue(ao),
 description_("Undefined"),
 type_("Undefined"),
-step_size_(0.0),
-current_step_size_(0.0),
+stepsize_(0.0),
+current_stepsize_(0.0),
+fixed_stepsize_(true),
+iter_counter(0),
 use_hessian_(false),
 diagonal_hessian_(true),
 use_mwalkers_mpi_(false),
 mwalkers_mpi_single_files_(true),
-iter_counter(0),
 coeffs_wstride_(100),
 coeffs_fname_("COEFFS"),
 gradient_wstride_(100),
@@ -78,17 +79,18 @@ bias_ptr(NULL)
   gradient_ptr = bias_ptr->getGradientPtr();
   plumed_massert(gradient_ptr != NULL,"gradient is not linked correctly");
   //
-  if(keywords.exists("STEP_SIZE")){
-    plumed_assert(!keywords.exists("INITIAL_STEP_SIZE"));
-    parse("STEP_SIZE",step_size_);
-    log.printf("  using a constant step size of %f\n",step_size_);
+  if(keywords.exists("STEPSIZE")){
+    plumed_assert(!keywords.exists("INITIAL_STEPSIZE"));
+    parse("STEPSIZE",stepsize_);
+    log.printf("  using a constant step size of %f\n",stepsize_);
   }
-  if(keywords.exists("INITIAL_STEP_SIZE")){
-    plumed_assert(!keywords.exists("STEP_SIZE"));
-    parse("INITIAL_STEP_SIZE",step_size_);
-    log.printf("  using a initial step size of %f\n",step_size_);
+  if(keywords.exists("INITIAL_STEPSIZE")){
+    fixed_stepsize_=false;
+    plumed_assert(!keywords.exists("STEPSIZE"));
+    parse("INITIAL_STEPSIZE",stepsize_);
+    log.printf("  using a initial step size of %f\n",stepsize_);
   }
-  setCurrentStepSize(step_size_);
+  setCurrentStepSize(stepsize_);
   //
   if(keywords.exists("FULL_HESSIAN")){
     bool full_hessian=false;
@@ -110,11 +112,6 @@ bias_ptr(NULL)
     log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
     log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
   }
-  //
-  addComponent("stepsize"); componentIsNotPeriodic("stepsize");
-  addComponent("gradrms"); componentIsNotPeriodic("gradrms");
-  addComponent("gradmax"); componentIsNotPeriodic("gradmax");
-  // addComponent("gradmaxidx"); componentIsNotPeriodic("gradmaxidx");
   //
   std::string coeffs_wstride_tmpstr="";
   parse("FILE",coeffs_fname_);
@@ -161,12 +158,19 @@ bias_ptr(NULL)
   if(keywords.exists("HESSIAN_FILE")){
     parse("HESSIAN_FILE",hessian_fname_);
     plumed_massert(hessian_fname_!=coeffs_fname_,"FILE and HESSIAN_FILE cannot be the same");
-    plumed_massert(hessian_fname_!=gradient_fname_,"GRADIENT_FILE and HESSIAN_FILE cannot be the same");    
+    plumed_massert(hessian_fname_!=gradient_fname_,"GRADIENT_FILE and HESSIAN_FILE cannot be the same");
   }
   if(keywords.exists("HESSIAN_OUTPUT_STRIDE")){
     parse("HESSIAN_OUTPUT_STRIDE",hessian_wstride_);
   }
   //
+  addComponent("gradrms"); componentIsNotPeriodic("gradrms");
+  addComponent("gradmax"); componentIsNotPeriodic("gradmax");
+  if(!fixed_stepsize_){
+    addComponent("stepsize"); componentIsNotPeriodic("stepsize");
+  }
+  // addComponent("gradmaxidx"); componentIsNotPeriodic("gradmaxidx");
+
 
 }
 
@@ -184,13 +188,13 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   ActionPilot::registerKeywords(keys);
   ActionWithValue::registerKeywords(keys);
   //
-  keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
+
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient");
   keys.addOutputComponent("gradmax","default","the maximum absolute value of the gradient");
   // keys.addOutputComponent("gradmaxidx","default","the index of the maximum absolute value of the gradient");
   //
-  keys.reserve("compulsory","STEP_SIZE","the step size used for the optimization");
-  keys.reserve("compulsory","INITIAL_STEP_SIZE","the initial step size used for the optimization");
+  keys.reserve("compulsory","STEPSIZE","the step size used for the optimization");
+  keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
   //
@@ -210,10 +214,21 @@ void Optimizer::registerKeywords( Keywords& keys ) {
 }
 
 
-void Optimizer::activateHessianKeywords(Keywords& keys) {
+void Optimizer::useHessianKeywords(Keywords& keys) {
   keys.use("FULL_HESSIAN");
   keys.use("HESSIAN_FILE");
   keys.use("HESSIAN_OUTPUT_STRIDE");
+}
+
+
+void Optimizer::useFixedStepSizeKeywords(Keywords& keys) {
+  keys.use("STEPSIZE");
+}
+
+
+void Optimizer::useChangingStepSizeKeywords(Keywords& keys) {
+  keys.use("INITIAL_STEPSIZE");
+  keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
 }
 
 
@@ -276,7 +291,9 @@ void Optimizer::update() {
 
 
 void Optimizer::updateOutputComponents() {
-  getPntrToComponent("stepsize")->set( getCurrentStepSize() );
+  if(!fixed_stepsize_){
+    getPntrToComponent("stepsize")->set( getCurrentStepSize() );
+  }
   getPntrToComponent("gradrms")->set( Gradient().getRMS() );
   size_t gradient_maxabs_idx=0;
   getPntrToComponent("gradmax")->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
@@ -297,8 +314,8 @@ void Optimizer::writeOutputFiles() {
 }
 
 
-void Optimizer::setCurrentStepSize(const double current_step_size) {
-  current_step_size_ = current_step_size;
+void Optimizer::setCurrentStepSize(const double current_stepsize_in) {
+  current_stepsize_ = current_stepsize_in;
 }
 
 

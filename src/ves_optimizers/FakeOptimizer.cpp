@@ -41,7 +41,8 @@ PLUMED_REGISTER_ACTION(FakeOptimizer,"FAKE_OPTIMIZER")
 
 void FakeOptimizer::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
-  Optimizer::activateHessianKeywords(keys);
+  //
+  Optimizer::useHessianKeywords(keys);
   keys.addFlag("MONITOR_HESSIAN",false,"also monitor the Hessian");
 }
 
@@ -50,7 +51,7 @@ FakeOptimizer::FakeOptimizer(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
   log.printf("  fake optimizer that does not update coefficients\n");
-  log.printf("  can be used to monitor gradient and Hessian\n");
+  log.printf("  can be used to monitor gradient and Hessian for debugging purposes\n");
   bool monitor_hessian = false;
   parseFlag("MONITOR_HESSIAN",monitor_hessian);
   if(monitor_hessian){turnOnHessian();}

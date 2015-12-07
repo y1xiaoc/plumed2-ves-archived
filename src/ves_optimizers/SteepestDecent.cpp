@@ -41,7 +41,8 @@ PLUMED_REGISTER_ACTION(SteepestDecent,"STEEPEST_DECENT")
 
 void SteepestDecent::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
-  keys.use("STEP_SIZE");
+  // 
+  Optimizer::useFixedStepSizeKeywords(keys);
 }
 
 

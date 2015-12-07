@@ -42,8 +42,9 @@ PLUMED_REGISTER_ACTION(BachAveragedSGD,"AVERAGED_SGD")
 
 void BachAveragedSGD::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
-  keys.use("STEP_SIZE");
-  Optimizer::activateHessianKeywords(keys);
+  //
+  Optimizer::useFixedStepSizeKeywords(keys);
+  Optimizer::useHessianKeywords(keys);
 }
 
 

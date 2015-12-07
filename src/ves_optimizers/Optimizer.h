@@ -49,16 +49,18 @@ class Optimizer :
 private:
   std::string description_;
   std::string type_;
-  double step_size_;
-  double current_step_size_;
+  //
+  double stepsize_;
+  double current_stepsize_;
+  bool fixed_stepsize_;
+  //
+  unsigned int iter_counter;
   //
   bool use_hessian_;
   bool diagonal_hessian_;
   //
   bool use_mwalkers_mpi_;
   bool mwalkers_mpi_single_files_;
-  //
-  unsigned int iter_counter;
   //
   unsigned int coeffs_wstride_;
   std::string coeffs_fname_;
@@ -97,7 +99,9 @@ protected:
 
 public:
   static void registerKeywords(Keywords&);
-  static void activateHessianKeywords(Keywords&);
+  static void useHessianKeywords(Keywords&);
+  static void useFixedStepSizeKeywords(Keywords&);
+  static void useChangingStepSizeKeywords(Keywords&);
   //
   Optimizer(const ActionOptions&ao);
   ~Optimizer();
@@ -106,7 +110,7 @@ public:
   //
   double getStepSize() const;
   double getCurrentStepSize() const;
-  void setStepSize(const double step_size_in){step_size_ = step_size_in;}
+  void setStepSize(const double stepsize_in){stepsize_ = stepsize_in;}
   //
   unsigned int getIterationCounter() const;
   double getIterationCounterDbl() const;
@@ -117,6 +121,8 @@ public:
   void calculate(){};
   void update();
   unsigned int getNumberOfDerivatives(){return 0;}
+  //
+  bool fixedStepSize() const {return fixed_stepsize_;}
   //
   bool useHessian() const {return use_hessian_;}
   bool diagonalHessian() const {return diagonal_hessian_;}
@@ -136,7 +142,7 @@ inline
 std::string Optimizer::getDescription() const {return description_;}
 
 inline
-double Optimizer::StepSize() const {return step_size_;}
+double Optimizer::StepSize() const {return stepsize_;}
 
 inline
 CoeffsVector& Optimizer::Coeffs() const {return *coeffs_ptr;}
@@ -154,10 +160,10 @@ CoeffsMatrix& Optimizer::Hessian() const {
 }
 
 inline
-double Optimizer::getStepSize() const {return step_size_;}
+double Optimizer::getStepSize() const {return stepsize_;}
 
 inline
-double Optimizer::getCurrentStepSize() const {return current_step_size_;}
+double Optimizer::getCurrentStepSize() const {return current_stepsize_;}
 
 inline
 unsigned int Optimizer::getIterationCounter() const {return iter_counter;}
