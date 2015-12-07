@@ -50,13 +50,13 @@ private:
   std::string output_fmt_; // format for output
   //
 public:
-  CoeffsVector(
+  explicit CoeffsVector(
     const std::string&,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&,
     Communicator&,
     const bool use_counter=false);
-  CoeffsVector(
+  explicit CoeffsVector(
     const std::string&,
     std::vector<Value*>&,
     std::vector<BasisFunctions*>&,

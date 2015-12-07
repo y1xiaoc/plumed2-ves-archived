@@ -62,7 +62,7 @@ private:
   void setupMatrix();
   //
 public:
-  CoeffsMatrix(
+  explicit CoeffsMatrix(
     const std::string&,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&,
@@ -70,7 +70,7 @@ public:
     const bool diagonal=true,
     const bool use_counter=false);
   //
-  CoeffsMatrix(
+  explicit CoeffsMatrix(
     const std::string&,
     std::vector<Value*>&,
     std::vector<BasisFunctions*>&,
@@ -78,7 +78,7 @@ public:
     const bool diagonal=true,
     const bool use_counter=false);
   //
-  CoeffsMatrix(
+  explicit CoeffsMatrix(
     const std::string&,
     CoeffsVector*,
     Communicator& cc,

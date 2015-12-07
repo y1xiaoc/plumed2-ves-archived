@@ -30,7 +30,7 @@ class FourierBF_OLD : public BasisFunctions {
   virtual void setupBFIntegrals();
 public:
   static void registerKeywords(Keywords&);
-  FourierBF_OLD(const ActionOptions&);
+  explicit FourierBF_OLD(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&);
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
 };

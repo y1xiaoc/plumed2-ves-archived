@@ -36,7 +36,7 @@ class DistributionFromGrid : public TargetDistributionBase {
   std::vector<double> maxima;
 public:
   static void registerKeywords( Keywords&);
-  DistributionFromGrid( const TargetDistributionOptions& to );
+  explicit DistributionFromGrid( const TargetDistributionOptions& to );
   double getValue(const std::vector<double> argument) const ;
 };
 

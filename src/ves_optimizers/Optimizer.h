@@ -103,7 +103,7 @@ public:
   static void useFixedStepSizeKeywords(Keywords&);
   static void useChangingStepSizeKeywords(Keywords&);
   //
-  Optimizer(const ActionOptions&ao);
+  explicit Optimizer(const ActionOptions&ao);
   ~Optimizer();
   std::string getType() const;
   std::string getDescription() const;

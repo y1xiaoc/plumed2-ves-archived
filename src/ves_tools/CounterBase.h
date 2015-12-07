@@ -37,7 +37,7 @@ private:
   std::string field_name_time_;
   bool isActive;
 public:
-  CounterBase(const bool active=true);
+  explicit CounterBase(const bool active=true);
   ~CounterBase() {}
   //
   void turnOnCounter();

@@ -67,7 +67,7 @@ protected:
 public:
 /// keywords
   static void registerKeywords( Keywords&);
-  TargetDistributionBase( const TargetDistributionOptions& to );
+  explicit TargetDistributionBase( const TargetDistributionOptions& to );
   virtual ~TargetDistributionBase();
 /// Check everything was read in
   void checkRead() const ;

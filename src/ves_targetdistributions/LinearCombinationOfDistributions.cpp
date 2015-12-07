@@ -39,7 +39,7 @@ class LinearCombinationOfDistributions: public TargetDistributionBase {
   unsigned int ndist;
 public:
   static void registerKeywords(Keywords&);
-  LinearCombinationOfDistributions(const TargetDistributionOptions& to);
+  explicit LinearCombinationOfDistributions(const TargetDistributionOptions& to);
   ~LinearCombinationOfDistributions();
   double getValue(const std::vector<double>) const;
 };

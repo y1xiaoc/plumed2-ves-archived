@@ -91,7 +91,7 @@ protected:
   void addKeywordToList(const std::string, const bool);
 public:
   static void registerKeywords(Keywords&);
-  BasisFunctions(const ActionOptions&ao);
+  explicit BasisFunctions(const ActionOptions&ao);
   bool hasBeenSet();
   std::string getType();
   std::string getDescription();

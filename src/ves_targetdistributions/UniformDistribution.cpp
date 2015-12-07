@@ -33,7 +33,7 @@ class UniformDistribution : public TargetDistributionBase {
   std::vector<double> maxima;
 public:
   static void registerKeywords( Keywords&);
-  UniformDistribution( const TargetDistributionOptions& to );
+  explicit UniformDistribution( const TargetDistributionOptions& to );
   double getValue(const std::vector<double> argument) const;
   double getNormalization() const;
 };

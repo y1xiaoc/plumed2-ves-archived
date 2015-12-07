@@ -32,7 +32,7 @@ class BachAveragedSGD : public Optimizer {
 private:
 public:
   static void registerKeywords(Keywords&);
-  BachAveragedSGD(const ActionOptions&);
+  explicit BachAveragedSGD(const ActionOptions&);
   void coeffsUpdate();
 };
 

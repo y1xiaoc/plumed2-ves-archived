@@ -45,7 +45,7 @@ class GaussianDistribution: public TargetDistributionBase {
   double Gaussian2D(const std::vector<double>, const std::vector<double>, const std::vector<double>, const std::vector<double>, const bool normalize=true) const;
 public:
   static void registerKeywords(Keywords&);
-  GaussianDistribution(const TargetDistributionOptions& to);
+  explicit GaussianDistribution(const TargetDistributionOptions& to);
   double getValue(const std::vector<double>) const;
 };
 

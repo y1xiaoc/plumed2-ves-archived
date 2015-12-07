@@ -31,7 +31,7 @@ class FakeOptimizer : public Optimizer {
 
 public:
   static void registerKeywords(Keywords&);
-  FakeOptimizer(const ActionOptions&);
+  explicit FakeOptimizer(const ActionOptions&);
   void coeffsUpdate();
 };
 

@@ -59,12 +59,12 @@ private:
   std::string field_shape_prefix;
   std::string field_time_;
 public:
-  CoeffsBase();
-  CoeffsBase(
+  explicit CoeffsBase();
+  explicit CoeffsBase(
     const std::string&,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&);
-  CoeffsBase(
+  explicit CoeffsBase(
     const std::string&,
     std::vector<Value*>& args,
     std::vector<BasisFunctions*>& basisf);

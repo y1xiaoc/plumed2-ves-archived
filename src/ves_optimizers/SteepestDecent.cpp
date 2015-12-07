@@ -31,7 +31,7 @@ class SteepestDecent : public Optimizer {
 
 public:
   static void registerKeywords(Keywords&);
-  SteepestDecent(const ActionOptions&);
+  explicit SteepestDecent(const ActionOptions&);
   void coeffsUpdate();
 };
 
@@ -41,7 +41,7 @@ PLUMED_REGISTER_ACTION(SteepestDecent,"STEEPEST_DECENT")
 
 void SteepestDecent::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
-  // 
+  //
   Optimizer::useFixedStepSizeKeywords(keys);
 }
 

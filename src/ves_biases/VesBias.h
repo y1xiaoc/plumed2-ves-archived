@@ -83,7 +83,7 @@ protected:
   void setCoeffsDerivsOverTargetDist(const std::vector<double>&);
 public:
   static void registerKeywords(Keywords&);
-  VesBias(const ActionOptions&ao);
+  explicit VesBias(const ActionOptions&ao);
   ~VesBias();
   //
   CoeffsVector* getCoeffsPtr() const {return coeffs_ptr;}

@@ -31,7 +31,7 @@ class CubicBsplineBF : public BasisFunctions {
   double spline(const double, double&);
 public:
   static void registerKeywords( Keywords&);
-  CubicBsplineBF(const ActionOptions&);
+  explicit CubicBsplineBF(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&);
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
 };

@@ -29,7 +29,7 @@ class ChebyshevBF : public BasisFunctions {
   virtual void setupBFIntegrals();
 public:
   static void registerKeywords(Keywords&);
-  ChebyshevBF(const ActionOptions&);
+  explicit ChebyshevBF(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&);
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
 };

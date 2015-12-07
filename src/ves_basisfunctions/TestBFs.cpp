@@ -55,7 +55,7 @@ class TestBFs :
   LinearBiasExpansion* bias_expansion;
   unsigned int bf_order_;
 public:
-  TestBFs(const ActionOptions&);
+  explicit TestBFs(const ActionOptions&);
   void calculate();
   static void registerKeywords(Keywords& keys);
 };
