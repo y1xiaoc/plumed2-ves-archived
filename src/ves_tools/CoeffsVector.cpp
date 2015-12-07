@@ -573,6 +573,16 @@ void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
 }
 
 
+size_t CoeffsVector::countValues(const double value) const {
+  size_t numvalue=0;
+  for(size_t i=0; i<data.size(); i++){
+    if(data[i]==value){
+      numvalue++;
+    }
+  }
+}
+
+
 void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const double current_time, const bool append_file) {
   OFile file;
   if(append_file){ file.enforceRestart(); }
@@ -677,20 +687,19 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
 }
 
 
-unsigned int CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs, const bool ignore_coeffs_info) {
+size_t CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs, const bool ignore_header) {
   ifile.allowIgnoredFields();
-  readHeaderFromFile(ifile, ignore_coeffs_info);
-  unsigned int ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
+  if(!ignore_header){readHeaderFromFile(ifile);}
+  size_t ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
   return ncoeffs_read;
 }
 
 
-unsigned int CoeffsVector::readFromFile(const std::string& filepath, const bool ignore_missing_coeffs, const bool ignore_coeffs_info) {
+size_t CoeffsVector::readFromFile(const std::string& filepath, const bool ignore_missing_coeffs, const bool ignore_header) {
   IFile file;
   file.link(mycomm);
   file.open(filepath);
-
-  unsigned int ncoeffs_read=readFromFile(file,ignore_missing_coeffs, ignore_coeffs_info);
+  size_t ncoeffs_read=readFromFile(file,ignore_missing_coeffs, ignore_header);
   return ncoeffs_read;
   file.close();
 }
@@ -702,7 +711,7 @@ void CoeffsVector::readHeaderFromFile(IFile& ifile, const bool ignore_coeffs_inf
 }
 
 
-unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_coeffs) {
+size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_coeffs) {
   //
   std::string field_indices_prefix = "idx_";
   std::string field_coeffs = getDataLabel();
@@ -717,7 +726,7 @@ unsigned int CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_miss
   std::vector<unsigned int> indices(numberOfDimensions());
   double coeff_tmp=0.0;
   std::string str_tmp;
-  unsigned int ncoeffs_read=0;
+  size_t ncoeffs_read=0;
   //
   while(ifile.scanField(field_coeffs,coeff_tmp)){
     int idx_tmp;

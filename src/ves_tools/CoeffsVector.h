@@ -156,6 +156,8 @@ public:
   void normalizeCoeffs();
   // Random values
   void randomizeValuesGaussian(int);
+  //
+  size_t countValues(const double) const;
 
   // file input/output stuff
   void writeToFile(const std::string&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false);
@@ -167,11 +169,11 @@ private:
   void writeHeaderToFile(OFile&, const double current_time=-1.0) const;
   static void writeDataToFile(OFile&, const std::vector<CoeffsVector*>&, const bool print_description=false);
 public:
-  unsigned int readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
-  unsigned int readFromFile(const std::string&, const bool ignore_missing_coeffs=false, const bool ignore_coeffs_info=false);
+  size_t readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_header=false);
+  size_t readFromFile(const std::string&, const bool ignore_missing_coeffs=false, const bool ignore_header=false);
 private:
   void readHeaderFromFile(IFile&, const bool ignore_coeffs_info=false);
-  unsigned int readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
+  size_t readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
 public:
   // set output format
   void setOutputFmt(std::string ss){output_fmt_=ss;}
