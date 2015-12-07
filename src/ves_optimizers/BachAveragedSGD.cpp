@@ -45,6 +45,7 @@ void BachAveragedSGD::registerKeywords(Keywords& keys){
   //
   Optimizer::useFixedStepSizeKeywords(keys);
   Optimizer::useHessianKeywords(keys);
+  keys.use("MASK_FILE");
 }
 
 
@@ -58,7 +59,8 @@ PLUMED_OPTIMIZER_INIT(ao)
 
 void BachAveragedSGD::coeffsUpdate() {
   double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
-  AuxCoeffs() = AuxCoeffs() - StepSize()*( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
+  AuxCoeffs() = AuxCoeffs() - StepSize()*CoeffsMask() * ( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
+  //AuxCoeffs() = AuxCoeffs() - StepSize() * ( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
   Coeffs() += aver_decay * ( AuxCoeffs()-Coeffs() );
 }
 

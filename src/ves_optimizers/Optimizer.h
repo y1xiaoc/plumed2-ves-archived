@@ -78,6 +78,7 @@ private:
   CoeffsVector* aux_coeffs_ptr;
   CoeffsVector* gradient_ptr;
   CoeffsMatrix* hessian_ptr;
+  CoeffsVector* coeffs_mask_ptr;
   //
   bias::VesBias* bias_ptr;
   //
@@ -93,6 +94,7 @@ protected:
   CoeffsVector& AuxCoeffs() const;
   CoeffsVector& Gradient() const;
   CoeffsMatrix& Hessian() const;
+  CoeffsVector& CoeffsMask() const;
   double StepSize() const;
   virtual void coeffsUpdate()=0;
   void setCurrentStepSize(const double);
@@ -133,6 +135,7 @@ public:
   CoeffsVector* getAuxCoeffsPtr() const {return aux_coeffs_ptr;}
   CoeffsVector* getGradientPtr()const {return gradient_ptr;}
   CoeffsMatrix* getHessianPtr() const {return hessian_ptr;}
+  CoeffsVector* getCoeffsMaskPtr() const {return coeffs_mask_ptr;}
   };
 
 inline
@@ -158,6 +161,9 @@ CoeffsMatrix& Optimizer::Hessian() const {
   plumed_massert(use_hessian_,"You cannot use the Hessian without asking for before");
   return *hessian_ptr;
 }
+
+inline
+CoeffsVector& Optimizer::CoeffsMask() const {return *coeffs_mask_ptr;}
 
 inline
 double Optimizer::getStepSize() const {return stepsize_;}

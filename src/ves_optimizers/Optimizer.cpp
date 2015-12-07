@@ -57,6 +57,7 @@ coeffs_ptr(NULL),
 aux_coeffs_ptr(NULL),
 gradient_ptr(NULL),
 hessian_ptr(NULL),
+coeffs_mask_ptr(NULL),
 bias_ptr(NULL)
 {
   std::string bias_label="";
@@ -164,6 +165,23 @@ bias_ptr(NULL)
     parse("HESSIAN_OUTPUT_STRIDE",hessian_wstride_);
   }
   //
+  if(keywords.exists("MASK_FILE")){
+    std::string mask_fname="";
+    parse("MASK_FILE",mask_fname);
+    coeffs_mask_ptr = new CoeffsVector(*coeffs_ptr);
+    coeffs_mask_ptr->setLabels("mask");
+    coeffs_mask_ptr->setValues(1.0);
+    coeffs_mask_ptr->setOutputFmt("%f");
+    if(mask_fname.size()>0){
+      size_t nread = coeffs_mask_ptr->readFromFile(mask_fname,true,true);
+      log.printf("  read %d values from mask file %s\n",nread,mask_fname.c_str());
+    }
+    size_t ndeactived = coeffs_mask_ptr->countValues(0.0);
+    log.printf("  deactived optimization of %d coefficients\n",ndeactived);
+    coeffs_mask_ptr->writeToFile("mask.out",true,getTimeStep()*getStep(),false);
+  }
+
+  //
   addComponent("gradrms"); componentIsNotPeriodic("gradrms");
   addComponent("gradmax"); componentIsNotPeriodic("gradmax");
   if(!fixed_stepsize_){
@@ -211,6 +229,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.reserve("hidden","HESSIAN_OUTPUT_STRIDE","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
+  //
+  keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). The resulting mask will be written out to file called mask.out");
 }
 
 
