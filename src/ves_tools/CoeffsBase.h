@@ -61,18 +61,22 @@ private:
   std::string field_time_;
 public:
   explicit CoeffsBase();
+  //
   explicit CoeffsBase(
     const std::string&,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&);
+  //
   explicit CoeffsBase(
     const std::string&,
     std::vector<Value*>&,
     std::vector<BasisFunctions*>&);
+  //
   explicit CoeffsBase(
       const std::string& label,
       std::vector<std::vector<Value*> >&,
       std::vector<std::vector<BasisFunctions*> >&);
+  //    
   ~CoeffsBase() {}
   //
   std::string getLabel() const;
