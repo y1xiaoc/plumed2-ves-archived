@@ -54,10 +54,10 @@ private:
   std::vector<std::string> coeffs_descriptions_;
   std::vector<std::string> dimension_labels_;
   // Labels for field in output/input files
-  std::string field_type;
-  std::string field_ndimensions;
-  std::string field_ncoeffs_total;
-  std::string field_shape_prefix;
+  std::string field_type_;
+  std::string field_ndimensions_;
+  std::string field_ncoeffs_total_;
+  std::string field_shape_prefix_;
   std::string field_time_;
 public:
   explicit CoeffsBase();
@@ -76,7 +76,7 @@ public:
       const std::string& label,
       std::vector<std::vector<Value*> >&,
       std::vector<std::vector<BasisFunctions*> >&);
-  //    
+  //
   ~CoeffsBase() {}
   //
   std::string getLabel() const;

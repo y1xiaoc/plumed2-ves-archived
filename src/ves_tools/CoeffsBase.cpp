@@ -72,11 +72,11 @@ CoeffsBase::CoeffsBase(
 
 CoeffsBase::CoeffsBase(
   const std::string& label,
-  std::vector<std::vector<Value*> >& argsv,
-  std::vector<std::vector<BasisFunctions*> >& basisfv)
+  std::vector<std::vector<Value*> >& args,
+  std::vector<std::vector<BasisFunctions*> >& basisf)
 {
-  plumed_massert(argsv.size()==basisfv.size(),"Multi Bias Coeffs: number of arguments vectors does not match number of basis functions vectors");
-  unsigned int num_args = argsv[0].size();
+  plumed_massert(args.size()==basisf.size(),"Multi Bias Coeffs: number of arguments vectors does not match number of basis functions vectors");
+  unsigned int num_args = args[0].size();
   unsigned int dim = num_args+1;
   std::vector<std::string> dimension_labels(dim);
   std::vector<unsigned int> indices_shape(dim);
@@ -84,14 +84,14 @@ CoeffsBase::CoeffsBase(
     std::string ip;
     Tools::convert(i+1,ip);
     dimension_labels[i] = "ind" + ip;
-    indices_shape[i] = basisfv[0][i]->getNumberOfBasisFunctions();
+    indices_shape[i] = basisf[0][i]->getNumberOfBasisFunctions();
   }
-  indices_shape[dim-1] = argsv.size();
+  indices_shape[dim-1] = args.size();
   dimension_labels[dim-1] = "bias";
-  for(unsigned int k=0;k<argsv.size();k++){
-    plumed_massert(argsv[k].size()==num_args && basisfv[k].size()==num_args,"Multi Bias Coeffs: arguments and basis functions vectors for each bias should be of the same size");
+  for(unsigned int k=0;k<args.size();k++){
+    plumed_massert(args[k].size()==num_args && basisf[k].size()==num_args,"Multi Bias Coeffs: arguments and basis functions vectors for each bias should be of the same size");
     for(unsigned int i=0;i<num_args;i++){
-      plumed_massert(indices_shape[i]==basisfv[k][i]->getNumberOfBasisFunctions(),"Multi Bias Coeffs: the coeffs shape for each bias should be identical");
+      plumed_massert(indices_shape[i]==basisf[k][i]->getNumberOfBasisFunctions(),"Multi Bias Coeffs: the coeffs shape for each bias should be identical");
     }
   }
   setupIndices(indices_shape);
@@ -365,21 +365,21 @@ void CoeffsBase::setAllDimensionLabels(const std::vector<std::string>& labels) {
 
 
 void CoeffsBase::setupFileFields() {
-  field_type = "type";
-  field_ndimensions = "ndimensions";
-  field_ncoeffs_total = "ncoeffs_total";
-  field_shape_prefix = "shape_";
+  field_type_ = "type";
+  field_ndimensions_ = "ndimensions";
+  field_ncoeffs_total_ = "ncoeffs_total";
+  field_shape_prefix_ = "shape_";
   field_time_ = "time";
 }
 
 
 void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) const {
-  ofile.addConstantField(field_type).printField(field_type,getTypeStr());
-  ofile.addConstantField(field_ndimensions).printField(field_ndimensions,(int) numberOfDimensions());
-  ofile.addConstantField(field_ncoeffs_total).printField(field_ncoeffs_total,(int) numberOfCoeffs());
+  ofile.addConstantField(field_type_).printField(field_type_,getTypeStr());
+  ofile.addConstantField(field_ndimensions_).printField(field_ndimensions_,(int) numberOfDimensions());
+  ofile.addConstantField(field_ncoeffs_total_).printField(field_ncoeffs_total_,(int) numberOfCoeffs());
   for(unsigned int k=0; k<numberOfDimensions(); k++){
-    ofile.addConstantField(field_shape_prefix+getDimensionLabel(k));
-    ofile.printField(field_shape_prefix+getDimensionLabel(k),(int) shapeOfIndices(k));
+    ofile.addConstantField(field_shape_prefix_+getDimensionLabel(k));
+    ofile.printField(field_shape_prefix_+getDimensionLabel(k),(int) shapeOfIndices(k));
   }
 }
 
@@ -396,17 +396,17 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_in
   int int_tmp;
   // label
   std::string coeffs_type_f;
-  ifile.scanField(field_type,coeffs_type_f);
+  ifile.scanField(field_type_,coeffs_type_f);
   // number of dimensions
-  ifile.scanField(field_ndimensions,int_tmp);
+  ifile.scanField(field_ndimensions_,int_tmp);
   unsigned int ndimensions_f=(unsigned int) int_tmp;
   // total number of coeffs
-  ifile.scanField(field_ncoeffs_total,int_tmp);
+  ifile.scanField(field_ncoeffs_total_,int_tmp);
   size_t ncoeffs_total_f=(size_t) int_tmp;
   // shape of indices
   std::vector<unsigned int> indices_shape_f(numberOfDimensions());
   for(unsigned int k=0; k<numberOfDimensions(); k++) {
-    ifile.scanField(field_shape_prefix+getDimensionLabel(k),int_tmp);
+    ifile.scanField(field_shape_prefix_+getDimensionLabel(k),int_tmp);
     indices_shape_f[k]=(unsigned int) int_tmp;
   }
   if(!ignore_coeffs_info){
