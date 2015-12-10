@@ -70,6 +70,38 @@ CoeffsBase::CoeffsBase(
 }
 
 
+CoeffsBase::CoeffsBase(
+  const std::string& label,
+  std::vector<std::vector<Value*> >& argsv,
+  std::vector<std::vector<BasisFunctions*> >& basisfv)
+{
+  plumed_massert(argsv.size()==basisfv.size(),"Multi Bias Coeffs: number of arguments vectors does not match number of basis functions vectors");
+  unsigned int num_args = argsv[0].size();
+  unsigned int dim = num_args+1;
+  std::vector<std::string> dimension_labels(dim);
+  std::vector<unsigned int> indices_shape(dim);
+  for(unsigned int i=0;i<num_args;i++){
+    std::string ip;
+    Tools::convert(i+1,ip);
+    dimension_labels[i] = "ind" + ip;
+    indices_shape[i] = basisfv[0][i]->getNumberOfBasisFunctions();
+  }
+  indices_shape[dim-1] = argsv.size();
+  dimension_labels[dim-1] = "bias";
+  for(unsigned int k=0;k<argsv.size();k++){
+    plumed_massert(argsv[k].size()==num_args && basisfv[k].size()==num_args,"Multi Bias Coeffs: arguments and basis functions vectors for each bias should be of the same size");
+    for(unsigned int i=0;i<num_args;i++){
+      plumed_massert(indices_shape[i]==basisfv[k][i]->getNumberOfBasisFunctions(),"Multi Bias Coeffs: the coeffs shape for each bias should be identical");
+    }
+  }
+  setupIndices(indices_shape);
+  setLabels(label);
+  setType(MultiBias_LinearBasisSet);
+  setAllDimensionLabels(dimension_labels);
+  setupFileFields();
+}
+
+
 void CoeffsBase::setupIndices(const std::vector<unsigned int>& indices_shape) {
   ndimensions_=indices_shape.size();
   indices_shape_=indices_shape;
@@ -164,6 +196,9 @@ std::string CoeffsBase::getTypeStr() const {
   }
   else if(coeffs_type_==LinearBasisSet) {
     type_str = "LinearBasisSet";
+  }
+  else if(coeffs_type_==MultiBias_LinearBasisSet) {
+    type_str = "MultiBias_LinearBasisSet";
   }
   return type_str;
 }

@@ -75,6 +75,23 @@ output_fmt_("%30.16e")
 
 CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
+  std::vector<std::vector<Value*> >& argsv,
+  std::vector<std::vector<BasisFunctions*> >& basisfv,
+  Communicator& cc,
+  const bool diagonal,
+  const bool use_counter):
+CounterBase(use_counter),
+CoeffsBase(label,argsv,basisfv),
+mycomm(cc),
+diagonal_(diagonal),
+output_fmt_("%30.16e")
+{
+  setupMatrix();
+}
+
+
+CoeffsMatrix::CoeffsMatrix(
+  const std::string& label,
   CoeffsVector* coeffsVec,
   Communicator& cc,
   const bool diagonal,

@@ -27,6 +27,7 @@
 #include <cfloat>
 
 #include "CoeffsVector.h"
+#include "CoeffsMatrix.h"
 #include "ves_basisfunctions/BasisFunctions.h"
 
 #include "tools/Tools.h"
@@ -61,6 +62,35 @@ CoeffsVector::CoeffsVector(
   const bool use_counter):
 CounterBase(use_counter),
 CoeffsBase(label,args,basisf),
+mycomm(cc),
+output_fmt_("%30.16e")
+{
+  clear();
+}
+
+
+CoeffsVector::CoeffsVector(
+  const std::string& label,
+  std::vector<std::vector<Value*> >& argsv,
+  std::vector<std::vector<BasisFunctions*> >& basisfv,
+  Communicator& cc,
+  const bool use_counter):
+CounterBase(use_counter),
+CoeffsBase(label,argsv,basisfv),
+mycomm(cc),
+output_fmt_("%30.16e")
+{
+  clear();
+}
+
+
+CoeffsVector::CoeffsVector(
+  const std::string& label,
+  CoeffsMatrix* coeffsMat,
+  Communicator& cc,
+  const bool use_counter):
+CounterBase(use_counter),
+CoeffsBase( *(static_cast<CoeffsBase*>(coeffsMat)) ),
 mycomm(cc),
 output_fmt_("%30.16e")
 {

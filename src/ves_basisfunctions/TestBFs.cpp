@@ -104,6 +104,22 @@ Function(ao)
   coeffsM.randomizeValuesGaussian(1);
   coeffsM.writeToFile("coeffsM.data");
 
+  CoeffsVector coeffsM2V = CoeffsVector("coeffsM2V",&coeffsM,comm);
+  coeffsM2V = 3.0; coeffsM2V[4]=414.0;
+  coeffsM2V.writeToFile("coeffsM2V.data");
+
+
+  std::vector<std::vector<BasisFunctions*> > bfv(2);
+  bfv[0]=bf; bfv[1]=bf2;
+  std::vector<std::vector<Value*> > argsv(2);
+  argsv[0]=args; argsv[1]=args;
+  CoeffsVector mcoeffsV1 = CoeffsVector("mcoeffsV1",argsv,bfv,comm,true);
+  mcoeffsV1.randomizeValuesGaussian(3);
+  mcoeffsV1.writeToFile("mcoeffsV1.data");
+
+  CoeffsMatrix mcoeffsM1 = CoeffsMatrix("mcoeffsM1",&mcoeffsV1,comm);
+  mcoeffsM1.randomizeValuesGaussian(1);
+  mcoeffsM1.writeToFile("mcoeffsM1.data");
 
   CoeffsVector coeffsV1 = CoeffsVector("coeffsV1",args,bf,comm,true);
   CoeffsVector coeffsV2 = CoeffsVector("coeffsV2",args,bf2,comm,true);

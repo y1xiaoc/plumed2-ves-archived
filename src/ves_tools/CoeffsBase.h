@@ -45,7 +45,8 @@ private:
   std::string data_label_;
   enum CoeffsType {
     Generic,
-    LinearBasisSet
+    LinearBasisSet,
+    MultiBias_LinearBasisSet
   } coeffs_type_;
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
@@ -66,8 +67,12 @@ public:
     const std::vector<unsigned int>&);
   explicit CoeffsBase(
     const std::string&,
-    std::vector<Value*>& args,
-    std::vector<BasisFunctions*>& basisf);
+    std::vector<Value*>&,
+    std::vector<BasisFunctions*>&);
+  explicit CoeffsBase(
+      const std::string& label,
+      std::vector<std::vector<Value*> >&,
+      std::vector<std::vector<BasisFunctions*> >&);
   ~CoeffsBase() {}
   //
   std::string getLabel() const;

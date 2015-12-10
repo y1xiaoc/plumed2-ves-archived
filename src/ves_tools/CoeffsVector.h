@@ -37,6 +37,7 @@ class IFile;
 class OFile;
 class BasisFunctions;
 class Communicator;
+class CoeffsMatrix;
 
 /// \ingroup TOOLBOX
 class CoeffsVector:
@@ -56,12 +57,27 @@ public:
     const std::vector<unsigned int>&,
     Communicator&,
     const bool use_counter=false);
+  //
   explicit CoeffsVector(
     const std::string&,
     std::vector<Value*>&,
     std::vector<BasisFunctions*>&,
     Communicator&,
     const bool use_counter=false);
+  //
+  explicit CoeffsVector(
+    const std::string&,
+    std::vector<std::vector<Value*> >&,
+    std::vector<std::vector<BasisFunctions*> >&,
+    Communicator&,
+    const bool use_counter=false);
+  //
+  explicit CoeffsVector(
+    const std::string&,
+    CoeffsMatrix*,
+    Communicator&,
+    const bool use_counter=false);
+  //
   ~CoeffsVector(){}
   //
   size_t getSize() const;

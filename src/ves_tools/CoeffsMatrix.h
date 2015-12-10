@@ -80,6 +80,14 @@ public:
   //
   explicit CoeffsMatrix(
     const std::string&,
+    std::vector<std::vector<Value*> >& argsv,
+    std::vector<std::vector<BasisFunctions*> >& basisfv,
+    Communicator& cc,
+    const bool diagonal=true,
+    const bool use_counter=false);
+  //
+  explicit CoeffsMatrix(
+    const std::string&,
     CoeffsVector*,
     Communicator& cc,
     const bool diagonal=true,
