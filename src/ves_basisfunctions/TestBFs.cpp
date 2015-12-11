@@ -115,7 +115,7 @@ Function(ao)
   argsv[0]=args; argsv[1]=args;
   CoeffsVector mcoeffsV1 = CoeffsVector("mcoeffsV1",argsv,bfv,comm,true);
   mcoeffsV1.randomizeValuesGaussian(3);
-  mcoeffsV1.writeToFile("mcoeffsV1.data");
+  mcoeffsV1.writeToFile("mcoeffsV1.data",true);
 
   CoeffsMatrix mcoeffsM1 = CoeffsMatrix("mcoeffsM1",&mcoeffsV1,comm);
   mcoeffsM1.randomizeValuesGaussian(1);

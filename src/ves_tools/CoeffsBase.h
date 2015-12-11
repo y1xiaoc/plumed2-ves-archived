@@ -46,36 +46,47 @@ private:
   enum CoeffsType {
     Generic,
     LinearBasisSet,
-    MultiBias_LinearBasisSet
+    MultiCoeffs_LinearBasisSet
   } coeffs_type_;
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
   size_t ncoeffs_;
   std::vector<std::string> coeffs_descriptions_;
   std::vector<std::string> dimension_labels_;
+  //
+  std::vector<Value*> args_;
+  std::vector<BasisFunctions*> basisf_;
+  //
+  bool multicoeffs_;
+  std::vector<std::vector<Value*> > multicoeffs_args_;
+  std::vector<std::vector<BasisFunctions*> >multicoeffs_basisf_;
   // Labels for field in output/input files
   std::string field_type_;
   std::string field_ndimensions_;
   std::string field_ncoeffs_total_;
   std::string field_shape_prefix_;
   std::string field_time_;
+  //
+  void initializeIndices(const std::vector<unsigned int>&, const std::vector<std::string>&);
+  void reinitializeIndices(const std::vector<unsigned int>&);
 public:
   explicit CoeffsBase();
   //
   explicit CoeffsBase(
-    const std::string&,
+    const std::string,
     const std::vector<std::string>&,
     const std::vector<unsigned int>&);
   //
   explicit CoeffsBase(
-    const std::string&,
+    const std::string,
     std::vector<Value*>&,
     std::vector<BasisFunctions*>&);
   //
   explicit CoeffsBase(
-      const std::string& label,
+      const std::string,
       std::vector<std::vector<Value*> >&,
-      std::vector<std::vector<BasisFunctions*> >&);
+      std::vector<std::vector<BasisFunctions*> >&,
+      const std::string multicoeffs_label="bias");
   //
   ~CoeffsBase() {}
   //
@@ -91,6 +102,7 @@ public:
   void setType(const CoeffsType coeffs_type);
   bool isGenericCoeffs() const;
   bool isLinearBasisSetCoeffs() const;
+  bool isMultiLinearBasisSetCoeffs() const;
   //
   std::vector<unsigned int> shapeOfIndices() const;
   unsigned int shapeOfIndices(const unsigned int) const;
@@ -120,8 +132,7 @@ public:
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
   void checkCoeffsInfo(const std::string, const std::string, const unsigned int, const size_t, const std::vector<unsigned int>);
 protected:
-  void setupIndices(const std::vector<unsigned int>&);
-  void setupBasisFunctionsInfo(std::vector<BasisFunctions*>&);
+  void setupBasisFunctionsInfo();
   void resizeIndices(const std::vector<unsigned int>&);
   void resizeIndices(std::vector<BasisFunctions*>&);
 };

@@ -34,121 +34,163 @@
 namespace PLMD{
 
 CoeffsBase::CoeffsBase(
-  const std::string& label,
+  const std::string label,
   const std::vector<std::string>& dimension_labels,
-  const std::vector<unsigned int>& indices_shape)
+  const std::vector<unsigned int>& indices_shape):
+label_(label),
+data_label_(label),
+coeffs_type_(Generic),
+args_(0),
+basisf_(0),
+multicoeffs_(false),
+multicoeffs_args_(0),
+multicoeffs_basisf_(0)
 {
-  plumed_massert(indices_shape.size()==dimension_labels.size(),"CoeffsBase: dimensions of vectors in Init(...) don't match");
-  //
-  setupIndices(indices_shape);
-  setLabels(label);
-  setType(Generic);
-  setAllDimensionLabels(dimension_labels);
+  initializeIndices(indices_shape,dimension_labels);
   setAllCoeffsDescriptions();
-  setupFileFields();
 }
 
 
 CoeffsBase::CoeffsBase(
-  const std::string& label,
+  const std::string label,
   std::vector<Value*>& args,
-  std::vector<BasisFunctions*>& basisf)
+  std::vector<BasisFunctions*>& basisf):
+label_(label),
+data_label_(label),
+coeffs_type_(LinearBasisSet),
+args_(args),
+basisf_(basisf),
+multicoeffs_(false),
+multicoeffs_args_(0),
+multicoeffs_basisf_(0)
 {
-  plumed_massert(args.size()==basisf.size(),"CoeffsBase: number of arguments do not match number of basis functions");
-  std::vector<std::string> dimension_labels(args.size());
-  std::vector<unsigned int> indices_shape(args.size());
-  for(unsigned int i=0;i<args.size();i++){
-    dimension_labels[i]=args[i]->getName();
-    indices_shape[i]=basisf[i]->getNumberOfBasisFunctions();
+  plumed_massert(args_.size()==basisf_.size(),"CoeffsBase: number of arguments do not match number of basis functions");
+  std::vector<std::string> dimension_labels(args_.size());
+  std::vector<unsigned int> indices_shape(args_.size());
+  for(unsigned int i=0;i<args_.size();i++){
+    dimension_labels[i]=args_[i]->getName();
+    indices_shape[i]=basisf_[i]->getNumberOfBasisFunctions();
   }
-  setupIndices(indices_shape);
-  setLabels(label);
-  setType(LinearBasisSet);
-  setAllDimensionLabels(dimension_labels);
-  setupBasisFunctionsInfo(basisf);
-  setupFileFields();
+  initializeIndices(indices_shape,dimension_labels);
+  setupBasisFunctionsInfo();
 }
 
 
 CoeffsBase::CoeffsBase(
-  const std::string& label,
-  std::vector<std::vector<Value*> >& args,
-  std::vector<std::vector<BasisFunctions*> >& basisf)
+  const std::string label,
+  std::vector<std::vector<Value*> >& multicoeffs_args,
+  std::vector<std::vector<BasisFunctions*> >& multicoeffs_basisf,
+  const std::string multicoeffs_label):
+label_(label),
+data_label_(label),
+coeffs_type_(MultiCoeffs_LinearBasisSet),
+args_(0),
+basisf_(0),
+multicoeffs_(true),
+multicoeffs_args_(multicoeffs_args),
+multicoeffs_basisf_(multicoeffs_basisf)
 {
-  plumed_massert(args.size()==basisf.size(),"Multi Bias Coeffs: number of arguments vectors does not match number of basis functions vectors");
-  unsigned int num_args = args[0].size();
+  plumed_massert(multicoeffs_args.size()==multicoeffs_basisf.size(),"Multi Coeffs: number of arguments vectors does not match number of basis functions vectors");
+  unsigned int num_args = multicoeffs_args[0].size();
   unsigned int dim = num_args+1;
   std::vector<std::string> dimension_labels(dim);
   std::vector<unsigned int> indices_shape(dim);
   for(unsigned int i=0;i<num_args;i++){
     std::string ip;
     Tools::convert(i+1,ip);
-    dimension_labels[i] = "ind" + ip;
-    indices_shape[i] = basisf[0][i]->getNumberOfBasisFunctions();
+    dimension_labels[i] = "bf" + ip;
+    indices_shape[i] = multicoeffs_basisf[0][i]->getNumberOfBasisFunctions();
   }
-  indices_shape[dim-1] = args.size();
-  dimension_labels[dim-1] = "bias";
-  for(unsigned int k=0;k<args.size();k++){
-    plumed_massert(args[k].size()==num_args && basisf[k].size()==num_args,"Multi Bias Coeffs: arguments and basis functions vectors for each bias should be of the same size");
+  indices_shape[dim-1] = multicoeffs_args.size();
+  dimension_labels[dim-1] = multicoeffs_label;
+  for(unsigned int k=0;k<multicoeffs_args.size();k++){
+    plumed_massert(multicoeffs_args[k].size()==num_args && multicoeffs_basisf[k].size()==num_args,"Multi Coeffs: arguments and basis functions vectors for each bias should be of the same size");
     for(unsigned int i=0;i<num_args;i++){
-      plumed_massert(indices_shape[i]==basisf[k][i]->getNumberOfBasisFunctions(),"Multi Bias Coeffs: the coeffs shape for each bias should be identical");
+      plumed_massert(indices_shape[i]==multicoeffs_basisf[k][i]->getNumberOfBasisFunctions(),"Multi Coeffs: the coeffs shape for each bias should be identical");
     }
   }
-  setupIndices(indices_shape);
-  setLabels(label);
-  setType(MultiBias_LinearBasisSet);
-  setAllDimensionLabels(dimension_labels);
-  setupFileFields();
+  initializeIndices(indices_shape,dimension_labels);
+  setupBasisFunctionsInfo();
 }
 
 
-void CoeffsBase::setupIndices(const std::vector<unsigned int>& indices_shape) {
+void CoeffsBase::initializeIndices(const std::vector<unsigned int>& indices_shape, const std::vector<std::string>& dimension_labels) {
+  plumed_massert(indices_shape.size()==dimension_labels.size(),"indices shape and dimension labels must be of the same size");
   ndimensions_=indices_shape.size();
   indices_shape_=indices_shape;
+  dimension_labels_=dimension_labels;
   ncoeffs_=1;
   for(unsigned int i=0; i<ndimensions_; i++){
     ncoeffs_*=indices_shape_[i];
   }
   coeffs_descriptions_.resize(ncoeffs_);
-  dimension_labels_.resize(ndimensions_);
+  setupFileFields();
 }
 
 
-void CoeffsBase::setupBasisFunctionsInfo(std::vector<BasisFunctions*>& basisf) {
-  plumed_massert(basisf.size()==numberOfDimensions(),"setupBasisFunctionsInfo: wrong number of basis functions given.");
-  // basisf_keywords_.resize(numberOfDimensions());
-  // for(unsigned int k=0; k<numberOfDimensions(); k++){
-  //   basisf_keywords_[k]=basisf[k]->getKeywordString();
-  // }
-  for(unsigned int i=0; i<numberOfCoeffs();i++){
-    std::vector<unsigned int> indices=getIndices(i);
-    std::string desc;
-    desc=basisf[0]->getBasisFunctionDescription(indices[0]);
-    for(unsigned int k=1; k<numberOfDimensions(); k++){
-      desc+="*"+basisf[k]->getBasisFunctionDescription(indices[k]);
+void CoeffsBase::reinitializeIndices(const std::vector<unsigned int>& indices_shape_new) {
+  plumed_massert(indices_shape_.size()>0,"indices must have been previously initialized before using this function");
+  plumed_massert(dimension_labels_.size()>0,"indices must have been previously initialized before using this function");
+  plumed_massert(indices_shape_new.size()==numberOfDimensions(),"when resizeing Coeffs the dimension must be constant");
+  indices_shape_=indices_shape_new;
+  ncoeffs_=1;
+  for(unsigned int i=0; i<ndimensions_; i++){
+    ncoeffs_*=indices_shape_[i];
+  }
+  coeffs_descriptions_.clear();
+  coeffs_descriptions_.resize(ncoeffs_);
+}
+
+
+void CoeffsBase::setupBasisFunctionsInfo() {
+  plumed_massert(indices_shape_.size()>0,"indices must be initialized before running this function");
+  if(coeffs_type_==LinearBasisSet){
+    for(unsigned int i=0; i<numberOfCoeffs();i++){
+      std::vector<unsigned int> indices=getIndices(i);
+      std::string desc;
+      desc=basisf_[0]->getBasisFunctionDescription(indices[0]);
+      for(unsigned int k=1; k<numberOfDimensions(); k++){
+        desc+="*"+basisf_[k]->getBasisFunctionDescription(indices[k]);
+      }
+      setCoeffDescription(i,desc);
     }
-    setCoeffDescription(i,desc);
+  }
+  else if(coeffs_type_==MultiCoeffs_LinearBasisSet){
+    for(unsigned int i=0; i<numberOfCoeffs();i++){
+      std::vector<unsigned int> indices=getIndices(i);
+      unsigned int mc_id = indices[ndimensions_-1];
+      std::string mc_idstr;
+      Tools::convert(mc_id,mc_idstr);
+      std::string mc_label = getDimensionLabel(ndimensions_-1);
+      std::string postfix = ":" + mc_idstr;
+      std::string desc ="";
+      desc+=multicoeffs_basisf_[mc_id][0]->getBasisFunctionDescription(indices[0]);
+      for(unsigned int k=1; k<(numberOfDimensions()-1); k++){
+        desc+="*"+multicoeffs_basisf_[mc_id][k]->getBasisFunctionDescription(indices[k]);
+      }
+      desc+=postfix;
+      setCoeffDescription(i,desc);
+    }
   }
 }
 
 
 void CoeffsBase::resizeIndices(const std::vector<unsigned int>& indices_shape_new) {
-  plumed_massert(indices_shape_new.size()==numberOfDimensions(),"when resizeing Coeffs the dimension must be constant");
-
-  setupIndices(indices_shape_new);
+  plumed_massert(coeffs_type_==Generic,"Coeffs type must be Generic when resizeing based on a new indices shape vector");
+  reinitializeIndices(indices_shape_new);
   setAllCoeffsDescriptions();
 }
 
 
 void CoeffsBase::resizeIndices(std::vector<BasisFunctions*>& basisf_new) {
-  plumed_massert(basisf_new.size()==numberOfDimensions(),"when resizeing Coeffs the dimension must be constant");
-
+  plumed_massert(coeffs_type_==LinearBasisSet,"Coeffs type must be LinearBasisSet when resizeing based on a new basis function set");
+  basisf_=basisf_new;
   std::vector<unsigned int> indices_shape_new(basisf_new.size());
   for(unsigned int i=0;i<basisf_new.size();i++){
     indices_shape_new[i]=basisf_new[i]->getNumberOfBasisFunctions();
   }
-  setupIndices(indices_shape_new);
-  setupBasisFunctionsInfo(basisf_new);
+  reinitializeIndices(indices_shape_new);
+  setupBasisFunctionsInfo();
 }
 
 
@@ -197,8 +239,8 @@ std::string CoeffsBase::getTypeStr() const {
   else if(coeffs_type_==LinearBasisSet) {
     type_str = "LinearBasisSet";
   }
-  else if(coeffs_type_==MultiBias_LinearBasisSet) {
-    type_str = "MultiBias_LinearBasisSet";
+  else if(coeffs_type_==MultiCoeffs_LinearBasisSet) {
+    type_str = "MultiCoeffs_LinearBasisSet";
   }
   return type_str;
 }
@@ -216,6 +258,11 @@ bool CoeffsBase::isGenericCoeffs() const {
 
 bool CoeffsBase::isLinearBasisSetCoeffs() const {
   return coeffs_type_==LinearBasisSet;
+}
+
+
+bool CoeffsBase::isMultiLinearBasisSetCoeffs() const {
+  return coeffs_type_==MultiCoeffs_LinearBasisSet;
 }
 
 
