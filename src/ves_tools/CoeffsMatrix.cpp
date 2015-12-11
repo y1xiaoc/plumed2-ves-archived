@@ -130,6 +130,17 @@ bool CoeffsMatrix::isDiagonal() const {
 }
 
 
+bool CoeffsMatrix::sameShape(CoeffsVector& coeffsvector_in) const {
+  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsvector_in)) );
+}
+
+
+bool CoeffsMatrix::sameShape(CoeffsMatrix& coeffsmat_in) const {
+  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsmat_in)) );
+}
+
+
+
 void CoeffsMatrix::sumCommMPI() {
   mycomm.Sum(data);
 }

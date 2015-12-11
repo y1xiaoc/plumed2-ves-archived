@@ -84,7 +84,8 @@ public:
     // clear coeffs
   void clear();
   //
-  bool sameShape(const CoeffsVector& other_coeffsvector) const;
+  bool sameShape(CoeffsVector&) const;
+  bool sameShape(CoeffsMatrix&) const;
   //
   void resizeCoeffs(const std::vector<unsigned int>&);
   void resizeCoeffs(std::vector<BasisFunctions*>&);

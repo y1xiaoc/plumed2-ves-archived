@@ -111,19 +111,13 @@ void CoeffsVector::clear() {
 }
 
 
-bool CoeffsVector::sameShape(const CoeffsVector& other_coeffsvector) const {
-  if(numberOfDimensions()!=other_coeffsvector.numberOfDimensions()){
-    return false;
-  }
-  if(numberOfCoeffs()!=other_coeffsvector.numberOfCoeffs()){
-    return false;
-  }
-  for(unsigned int k=0; k<numberOfDimensions(); k++){
-    if(shapeOfIndices(k)!=other_coeffsvector.shapeOfIndices(k)){
-      return false;
-    }
-  }
-  return true;
+bool CoeffsVector::sameShape(CoeffsVector& coeffsvector_in) const {
+  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsvector_in)) );
+}
+
+
+bool CoeffsVector::sameShape(CoeffsMatrix& coeffsmat_in) const {
+  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsmat_in)) );
 }
 
 

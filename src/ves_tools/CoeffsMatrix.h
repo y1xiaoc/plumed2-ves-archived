@@ -100,6 +100,9 @@ public:
   bool isSymmetric() const;
   bool isDiagonal() const;
   //
+  bool sameShape(CoeffsVector&) const;
+  bool sameShape(CoeffsMatrix&) const;
+  //
   void sumCommMPI();
   void sumCommMPI(Communicator&);
   //

@@ -194,6 +194,22 @@ void CoeffsBase::resizeIndices(std::vector<BasisFunctions*>& basisf_new) {
 }
 
 
+bool CoeffsBase::sameShape(CoeffsBase* coeffsbase_in) const {
+  if(numberOfDimensions()!=coeffsbase_in->numberOfDimensions()){
+    return false;
+  }
+  if(numberOfCoeffs()!=coeffsbase_in->numberOfCoeffs()){
+    return false;
+  }
+  for(unsigned int k=0; k<numberOfDimensions(); k++){
+    if(shapeOfIndices(k)!=coeffsbase_in->shapeOfIndices(k)){
+      return false;
+    }
+  }
+  return true;
+}
+
+
 std::string CoeffsBase::getLabel() const {
   return label_;
 }
