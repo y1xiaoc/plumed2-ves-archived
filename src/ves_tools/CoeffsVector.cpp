@@ -604,12 +604,13 @@ void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
 
 
 size_t CoeffsVector::countValues(const double value) const {
-  size_t numvalue=0;
+  size_t numvalues=0;
   for(size_t i=0; i<data.size(); i++){
     if(data[i]==value){
-      numvalue++;
+      numvalues++;
     }
   }
+  return numvalues;
 }
 
 
