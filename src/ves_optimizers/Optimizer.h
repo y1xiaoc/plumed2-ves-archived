@@ -104,6 +104,7 @@ public:
   static void useHessianKeywords(Keywords&);
   static void useFixedStepSizeKeywords(Keywords&);
   static void useChangingStepSizeKeywords(Keywords&);
+  static void useMaskKeywords(Keywords&);
   //
   explicit Optimizer(const ActionOptions&ao);
   ~Optimizer();

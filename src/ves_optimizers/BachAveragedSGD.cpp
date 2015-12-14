@@ -45,8 +45,8 @@ void BachAveragedSGD::registerKeywords(Keywords& keys){
   //
   Optimizer::useFixedStepSizeKeywords(keys);
   Optimizer::useHessianKeywords(keys);
-  keys.use("MASK_FILE");
-}
+  Optimizer::useMaskKeywords(keys);
+  }
 
 
 BachAveragedSGD::BachAveragedSGD(const ActionOptions&ao):

@@ -166,19 +166,35 @@ bias_ptr(NULL)
   }
   //
   if(keywords.exists("MASK_FILE")){
-    std::string mask_fname="";
-    parse("MASK_FILE",mask_fname);
+    std::string mask_fname_in="";
+    parse("MASK_FILE",mask_fname_in);
     coeffs_mask_ptr = new CoeffsVector(*coeffs_ptr);
     coeffs_mask_ptr->setLabels("mask");
     coeffs_mask_ptr->setValues(1.0);
     coeffs_mask_ptr->setOutputFmt("%f");
-    if(mask_fname.size()>0){
-      size_t nread = coeffs_mask_ptr->readFromFile(mask_fname,true,true);
-      log.printf("  read %d values from mask file %s\n",nread,mask_fname.c_str());
+    if(mask_fname_in.size()>0){
+      size_t nread = coeffs_mask_ptr->readFromFile(mask_fname_in,true,true);
+      log.printf("  read %d values from mask file %s\n",nread,mask_fname_in.c_str());
     }
     size_t ndeactived = coeffs_mask_ptr->countValues(0.0);
     log.printf("  deactived optimization of %d coefficients\n",ndeactived);
-    coeffs_mask_ptr->writeToFile("mask.out",true,getTimeStep()*getStep(),false);
+    std::string mask_fname_out="";
+    parse("MASK_FILE_OUT",mask_fname_out);
+    plumed_massert(mask_fname_out!=mask_fname_in,"MASK_FILE and MASK_FILE_OUT cannot be the same");
+    if(mask_fname_out.size()>0){
+      OFile maskOfile;
+      maskOfile.link(*this);
+      if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
+        unsigned int r=0;
+        if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+        comm.Bcast(r,0);
+        if(r>0){mask_fname_out="/dev/null";}
+        maskOfile.enforceSuffix("");
+      }
+      maskOfile.open(mask_fname_out);
+      coeffs_mask_ptr->writeToFile(maskOfile,true,getTimeStep()*getStep());
+      maskOfile.close();
+    }
   }
 
   //
@@ -230,7 +246,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.reserve("hidden","HESSIAN_OUTPUT_STRIDE","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
   //
-  keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). The resulting mask will be written out to file called mask.out");
+  keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). One can write out the resulting mask by using the MASK_FILE_OUT keyword.");
+  keys.reserve("optional","MASK_FILE_OUT","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
 }
 
 
@@ -250,6 +267,13 @@ void Optimizer::useChangingStepSizeKeywords(Keywords& keys) {
   keys.use("INITIAL_STEPSIZE");
   keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
 }
+
+
+void Optimizer::useMaskKeywords(Keywords& keys) {
+  keys.use("MASK_FILE");
+  keys.use("MASK_FILE_OUT");
+}
+
 
 
 void Optimizer::turnOnHessian() {
