@@ -608,10 +608,15 @@ size_t CoeffsVector::countValues(const double value) const {
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const double current_time, const bool append_file) {
+void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_ptr) {
   OFile file;
+  if(action_ptr!=NULL){
+    file.link(*action_ptr);
+  }
+  else{
+    file.link(mycomm);
+  }
   if(append_file){ file.enforceRestart(); }
-  file.link(mycomm);
   file.open(filepath);
   writeToFile(file,print_coeffs_descriptions);
   file.close();
@@ -635,10 +640,15 @@ void CoeffsVector::writeToFile(OFile& ofile, CoeffsVector* aux_coeffsvector, con
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file) {
+void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_ptr) {
   OFile file;
+  if(action_ptr!=NULL){
+    file.link(*action_ptr);
+  }
+  else{
+    file.link(CoeffsSet[0]->getCommunicator());
+  }
   if(append_file){ file.enforceRestart(); }
-  file.link(CoeffsSet[0]->getCommunicator());
   file.open(filepath);
   writeToFile(file,CoeffsSet,print_coeffs_descriptions);
   file.close();

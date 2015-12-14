@@ -516,10 +516,15 @@ void CoeffsMatrix::writeToFile(OFile& ofile, const double current_time) {
 }
 
 
-void CoeffsMatrix::writeToFile(const std::string& filepath, const double current_time, const bool append_file) {
+void CoeffsMatrix::writeToFile(const std::string& filepath, const double current_time, const bool append_file, Action* action_ptr) {
   OFile file;
+  if(action_ptr!=NULL){
+    file.link(*action_ptr);
+  }
+  else{
+    file.link(mycomm);
+  }
   if(append_file){ file.enforceRestart(); }
-  file.link(mycomm);
   file.open(filepath);
   writeToFile(file, current_time);
   file.close();

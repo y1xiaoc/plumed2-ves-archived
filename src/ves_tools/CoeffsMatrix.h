@@ -31,13 +31,14 @@
 
 namespace PLMD{
 
-
+class Action;
 class Value;
 class IFile;
 class OFile;
+class Communicator;
 class BasisFunctions;
 class CoeffsVector;
-class Communicator;
+
 
 /// \ingroup TOOLBOX
 class CoeffsMatrix:
@@ -174,7 +175,7 @@ public:
   //
   // file input/output stuff
   void writeToFile(OFile&, const double current_time=-1.0);
-  void writeToFile(const std::string&, const double current_time=-1.0, const bool append_file=false);
+  void writeToFile(const std::string&, const double current_time=-1.0, const bool append_file=false, Action* action_ptr=NULL);
 private:
   void writeDataToFile(OFile&);
   void writeMatrixInfoToFile(OFile&);
