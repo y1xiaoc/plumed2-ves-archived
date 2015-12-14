@@ -149,7 +149,7 @@ void CoeffsVector::sumCommMPI(Communicator& cc) {
 
 void CoeffsVector::sumMultiSimCommMPI(Communicator& multi_sim_cc) {
   if(mycomm.Get_rank()==0){
-    double nwalkers = (double) multi_sim_cc.Get_size();
+    double nwalkers = static_cast<double>(multi_sim_cc.Get_size());
     multi_sim_cc.Sum(data);
     scaleAllValues(1.0/nwalkers);
   }

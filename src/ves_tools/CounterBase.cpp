@@ -75,7 +75,7 @@ unsigned int CounterBase::getCounter() const {
 
 
 double CounterBase::getCounterDbl() const {
-  return (double) counter;
+  return static_cast<double>(counter);
 }
 
 
