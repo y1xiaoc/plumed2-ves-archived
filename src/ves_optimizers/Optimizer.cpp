@@ -179,9 +179,9 @@ bias_ptr(NULL)
     size_t ndeactived = coeffs_mask_ptr->countValues(0.0);
     log.printf("  deactived optimization of %d coefficients\n",ndeactived);
     std::string mask_fname_out="";
-    parse("MASK_FILE_OUT",mask_fname_out);
-    plumed_massert(mask_fname_out!=mask_fname_in,"MASK_FILE and MASK_FILE_OUT cannot be the same");
+    parse("OUTPUT_MASK_FILE",mask_fname_out);
     if(mask_fname_out.size()>0){
+      plumed_massert(mask_fname_out!=mask_fname_in,"MASK_FILE and OUTPUT_MASK_FILE cannot be the same");
       OFile maskOfile;
       maskOfile.link(*this);
       if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
@@ -221,33 +221,32 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   Action::registerKeywords(keys);
   ActionPilot::registerKeywords(keys);
   ActionWithValue::registerKeywords(keys);
-  //
-
-  keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient");
-  keys.addOutputComponent("gradmax","default","the maximum absolute value of the gradient");
-  // keys.addOutputComponent("gradmaxidx","default","the index of the maximum absolute value of the gradient");
-  //
-  keys.reserve("compulsory","STEPSIZE","the step size used for the optimization");
-  keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
+  // Default always active keywords
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
-  //
   keys.add("compulsory","FILE","COEFFS","the name of output file for the coefficients");
   keys.add("compulsory","OUTPUT_STRIDE","100","how often the coefficients should be written to file. This parameter is given as the number of bias iterations.");
-  //
-  keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
-  //
-  keys.addFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
-  keys.addFlag("MWALKERS_SEPERATE_FILES",false,"DEBUG OPTION: if seperate files should be outputted to file when using MPI multiple walkers");
-  //
+  // Hidden keywords to output the gradient to a file.
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
   keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
-  //
+  // Either use a fixed stepsize (useFixedStepSizeKeywords) or changing stepsize (useChangingStepSizeKeywords)
+  keys.reserve("compulsory","STEPSIZE","the step size used for the optimization");
+  keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
+  // Keywords related to the Hessian, actived with the useHessianKeywords function
+  keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.reserve("hidden","HESSIAN_OUTPUT_STRIDE","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
+  // Keywords related to the multiple walkers, actived with the useMultipleWalkersKeywords function
+  keys.reserveFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
+  keys.reserveFlag("MWALKERS_SEPERATE_FILES",false,"DEBUG OPTION: if seperate files should be outputted to file when using MPI multiple walkers");
+  // Keywords related to the mask file, actived with the useMaskKeywords function
+  keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). One can write out the resulting mask by using the OUTPUT_MASK_FILE keyword.");
+  keys.reserve("optional","OUTPUT_MASK_FILE","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
   //
-  keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). One can write out the resulting mask by using the MASK_FILE_OUT keyword.");
-  keys.reserve("optional","MASK_FILE_OUT","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
+  // Components that are always active
+  keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient");
+  keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient");
+  // keys.addOutputComponent("gradmaxidx","default","the index of the maximum absolute value of the gradient");
 }
 
 
@@ -255,6 +254,12 @@ void Optimizer::useHessianKeywords(Keywords& keys) {
   keys.use("FULL_HESSIAN");
   keys.use("HESSIAN_FILE");
   keys.use("HESSIAN_OUTPUT_STRIDE");
+}
+
+
+void Optimizer::useMultipleWalkersKeywords(Keywords& keys) {
+  keys.use("MULTIPLE_WALKERS");
+  keys.use("MWALKERS_SEPERATE_FILES");
 }
 
 
@@ -271,7 +276,7 @@ void Optimizer::useChangingStepSizeKeywords(Keywords& keys) {
 
 void Optimizer::useMaskKeywords(Keywords& keys) {
   keys.use("MASK_FILE");
-  keys.use("MASK_FILE_OUT");
+  keys.use("OUTPUT_MASK_FILE");
 }
 
 

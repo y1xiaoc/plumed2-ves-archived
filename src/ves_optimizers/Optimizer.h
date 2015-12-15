@@ -101,6 +101,7 @@ protected:
 
 public:
   static void registerKeywords(Keywords&);
+  static void useMultipleWalkersKeywords(Keywords&);
   static void useHessianKeywords(Keywords&);
   static void useFixedStepSizeKeywords(Keywords&);
   static void useChangingStepSizeKeywords(Keywords&);
