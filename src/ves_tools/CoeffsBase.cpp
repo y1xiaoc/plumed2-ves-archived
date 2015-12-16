@@ -44,7 +44,12 @@ args_(0),
 basisf_(0),
 multicoeffs_(false),
 multicoeffs_args_(0),
-multicoeffs_basisf_(0)
+multicoeffs_basisf_(0),
+field_type_("type"),
+field_ndimensions_("ndimensions"),
+field_ncoeffs_total_("ncoeffs_total"),
+field_shape_prefix_("shape_"),
+field_time_("time")
 {
   initializeIndices(indices_shape,dimension_labels);
   setAllCoeffsDescriptions();
@@ -62,7 +67,12 @@ args_(args),
 basisf_(basisf),
 multicoeffs_(false),
 multicoeffs_args_(0),
-multicoeffs_basisf_(0)
+multicoeffs_basisf_(0),
+field_type_("type"),
+field_ndimensions_("ndimensions"),
+field_ncoeffs_total_("ncoeffs_total"),
+field_shape_prefix_("shape_"),
+field_time_("time")
 {
   plumed_massert(args_.size()==basisf_.size(),"CoeffsBase: number of arguments do not match number of basis functions");
   std::vector<std::string> dimension_labels(args_.size());
@@ -88,7 +98,12 @@ args_(0),
 basisf_(0),
 multicoeffs_(true),
 multicoeffs_args_(multicoeffs_args),
-multicoeffs_basisf_(multicoeffs_basisf)
+multicoeffs_basisf_(multicoeffs_basisf),
+field_type_("type"),
+field_ndimensions_("ndimensions"),
+field_ncoeffs_total_("ncoeffs_total"),
+field_shape_prefix_("shape_"),
+field_time_("time")
 {
   plumed_massert(multicoeffs_args.size()==multicoeffs_basisf.size(),"Multi Coeffs: number of arguments vectors does not match number of basis functions vectors");
   unsigned int num_args = multicoeffs_args[0].size();
@@ -124,7 +139,6 @@ void CoeffsBase::initializeIndices(const std::vector<unsigned int>& indices_shap
     ncoeffs_*=indices_shape_[i];
   }
   coeffs_descriptions_.resize(ncoeffs_);
-  setupFileFields();
 }
 
 
@@ -424,15 +438,6 @@ void CoeffsBase::setAllDimensionLabels(const std::vector<std::string>& labels) {
   for(unsigned int i=0; i<numberOfDimensions(); i++){
     dimension_labels_[i]=labels[i];
   }
-}
-
-
-void CoeffsBase::setupFileFields() {
-  field_type_ = "type";
-  field_ndimensions_ = "ndimensions";
-  field_ncoeffs_total_ = "ncoeffs_total";
-  field_shape_prefix_ = "shape_";
-  field_time_ = "time";
 }
 
 

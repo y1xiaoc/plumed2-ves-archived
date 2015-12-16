@@ -61,11 +61,13 @@ private:
   std::vector<std::vector<Value*> > multicoeffs_args_;
   std::vector<std::vector<BasisFunctions*> >multicoeffs_basisf_;
   // Labels for field in output/input files
-  std::string field_type_;
-  std::string field_ndimensions_;
-  std::string field_ncoeffs_total_;
-  std::string field_shape_prefix_;
-  std::string field_time_;
+  const std::string field_type_;
+  const std::string field_ndimensions_;
+  const std::string field_ncoeffs_total_;
+  const std::string field_shape_prefix_;
+  const std::string field_time_;
+  //
+
   //
   void initializeIndices(const std::vector<unsigned int>&, const std::vector<std::string>&);
   void reinitializeIndices(const std::vector<unsigned int>&);
@@ -126,7 +128,6 @@ public:
   void setDimensionLabel(const unsigned int, const std::string&);
   void setAllDimensionLabels(const std::string&);
   void setAllDimensionLabels(const std::vector<std::string>&);
-  void setupFileFields();
   void writeCoeffsInfoToFile(OFile&) const;
   void writeTimeInfoToFile(OFile&, const double) const;
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
