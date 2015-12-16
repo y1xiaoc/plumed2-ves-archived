@@ -127,8 +127,10 @@ void VesBias::updateGradientAndHessian() {
   Hessian() = coeffderivs_cov_sampled;
   Hessian() *= getBeta();
   //
-  coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
-  coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
+  // coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
+  // coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
+  std::fill(coeffderivs_aver_sampled.begin(), coeffderivs_aver_sampled.end(), 0.0);
+  std::fill(coeffderivs_cov_sampled.begin(), coeffderivs_cov_sampled.end(), 0.0);
   aver_counter=0.0;
 }
 
