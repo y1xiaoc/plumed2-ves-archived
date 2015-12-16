@@ -71,7 +71,7 @@ bias_ptr(NULL)
   //
   log.printf("  optimizing VES bias %s with label %s: \n",bias_ptr->getName().c_str(),bias_ptr->getLabel().c_str());
   log.printf("   KbT: %f\n",bias_ptr->getKbT());
-  log.printf("  number of coefficients: %d\n",coeffs_ptr->numberOfCoeffs());
+  log.printf("  number of coefficients: %d\n",static_cast<int>(coeffs_ptr->numberOfCoeffs()));
 
   //
   aux_coeffs_ptr = new CoeffsVector(*coeffs_ptr);
@@ -110,8 +110,8 @@ bias_ptr(NULL)
 
   if(use_mwalkers_mpi_){
     log.printf("  optimization performed using multiple walkers connected via MPI:\n");
-    log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
-    log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
+    log.printf("   number of walkers: %d\n",static_cast<int>(multi_sim_comm.Get_size()));
+    log.printf("   walker number: %d\n",static_cast<int>(multi_sim_comm.Get_rank()));
   }
   //
   std::string coeffs_wstride_tmpstr="";
@@ -135,7 +135,7 @@ bias_ptr(NULL)
     coeffsOfile_.open(coeffs_fname_);
     coeffsOfile_.setHeavyFlush();
     coeffs_ptr->writeToFile(coeffsOfile_,aux_coeffs_ptr,false,getTimeStep()*getStep());
-    log.printf("  Coefficients will be written out to file %s every %d bias iterations\n",coeffs_fname_.c_str(),coeffs_wstride_);
+    log.printf("  Coefficients will be written out to file %s every %d bias iterations\n",coeffs_fname_.c_str(),static_cast<int>(coeffs_wstride_));
   }
   //
   parse("GRADIENT_FILE",gradient_fname_);
@@ -153,7 +153,7 @@ bias_ptr(NULL)
     gradientOfile_.open(gradient_fname_);
     gradientOfile_.setHeavyFlush();
     gradient_ptr->writeToFile(gradientOfile_,false,getTimeStep()*getStep());
-    log.printf("  DEBUG OPTION: Gradient will be written out to file %s every %d bias iterations\n",gradient_fname_.c_str(),gradient_wstride_);
+    log.printf("  DEBUG OPTION: Gradient will be written out to file %s every %d bias iterations\n",gradient_fname_.c_str(),static_cast<int>(gradient_wstride_));
   }
   //
   if(keywords.exists("HESSIAN_FILE")){
@@ -174,10 +174,10 @@ bias_ptr(NULL)
     coeffs_mask_ptr->setOutputFmt("%f");
     if(mask_fname_in.size()>0){
       size_t nread = coeffs_mask_ptr->readFromFile(mask_fname_in,true,true);
-      log.printf("  read %d values from mask file %s\n",nread,mask_fname_in.c_str());
+      log.printf("  read %d values from mask file %s\n",static_cast<int>(nread),mask_fname_in.c_str());
     }
     size_t ndeactived = coeffs_mask_ptr->countValues(0.0);
-    log.printf("  deactived optimization of %d coefficients\n",ndeactived);
+    log.printf("  deactived optimization of %d coefficients\n",static_cast<int>(ndeactived));
     std::string mask_fname_out="";
     parse("OUTPUT_MASK_FILE",mask_fname_out);
     if(mask_fname_out.size()>0){
@@ -307,7 +307,7 @@ void Optimizer::turnOnHessian() {
     hessianOfile_.open(hessian_fname_);
     hessianOfile_.setHeavyFlush();
     hessian_ptr->writeToFile(hessianOfile_,getTimeStep()*getStep());
-    log.printf("  DEBUG OPTION: Hessian will be written out to file %s every %d bias iterations\n",hessian_fname_.c_str(),hessian_wstride_);
+    log.printf("  DEBUG OPTION: Hessian will be written out to file %s every %d bias iterations\n",hessian_fname_.c_str(),static_cast<int>(hessian_wstride_));
   }
 }
 
