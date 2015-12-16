@@ -52,11 +52,12 @@ class LinearBiasExpansion{
  public:
   static void registerKeywords( Keywords& keys );
   // Constructor
-  explicit LinearBiasExpansion(const std::string,
+  explicit LinearBiasExpansion(const std::string&,
                       std::vector<Value*>,
                       std::vector<BasisFunctions*>,
                       Communicator &cc);
   //
+  ~LinearBiasExpansion();
   std::vector<Value*> getPointerToArguments() const ;
   std::vector<BasisFunctions*> getPointerToBasisFunctions() const ;
   CoeffsVector* getPointerToBiasCoeffs() const ;
@@ -67,7 +68,7 @@ class LinearBiasExpansion{
   // Grid stuff
   void setupGrid(const std::vector<unsigned int>&);
   void updateBiasGrid();
-  void writeBiasGridToFile(const std::string, const bool);
+  void writeBiasGridToFile(const std::string&, const bool);
   // calculate bias and derivatives
   double getBiasAndDerivatives(const std::vector<double>&, std::vector<double>& derivatives);
 };

@@ -39,13 +39,19 @@ void LinearBiasExpansion::registerKeywords(Keywords& keys){
 }
 
 
-LinearBiasExpansion::LinearBiasExpansion(const std::string label,
+LinearBiasExpansion::LinearBiasExpansion(const std::string& label,
                     std::vector<Value*> args,
                     std::vector<BasisFunctions*> basisf,
                     Communicator& cc):
 mycomm(cc),
 serial_(false),
 bias_label_(label),
+bias_coeffs(NULL),
+wt_coeffs(NULL),
+basisf_norm(NULL),
+bias_grid(NULL),
+fes_grid(NULL),
+ps_grid(NULL),
 args_(args),
 basisf_(basisf)
 {
@@ -54,6 +60,12 @@ basisf_(basisf)
   ncv_=args_.size();
   num_bf_.resize(ncv_);
   for(unsigned int k=0;k<ncv_;k++){num_bf_[k]=basisf_[k]->getNumberOfBasisFunctions();}
+}
+
+LinearBiasExpansion::~LinearBiasExpansion() {
+  if(bias_grid!=NULL){
+    delete bias_grid;
+  }
 }
 
 
@@ -100,7 +112,7 @@ void LinearBiasExpansion::updateBiasGrid(){
 }
 
 
-void LinearBiasExpansion::writeBiasGridToFile(const std::string filepath, const bool append_file){
+void LinearBiasExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file){
   OFile file;
   if(append_file){file.enforceRestart();}
   file.open(filepath);
