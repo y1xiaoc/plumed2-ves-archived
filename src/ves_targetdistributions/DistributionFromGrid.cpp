@@ -37,7 +37,7 @@ class DistributionFromGrid : public TargetDistributionBase {
 public:
   static void registerKeywords( Keywords&);
   explicit DistributionFromGrid( const TargetDistributionOptions& to );
-  double getValue(const std::vector<double> argument) const ;
+  double getValue(const std::vector<double>&) const ;
 };
 
 
@@ -49,7 +49,7 @@ void DistributionFromGrid::registerKeywords(Keywords& keys) {
   keys.add("compulsory","FILE","the name of the file contaning the target distribtion");
   keys.add("compulsory","ARGS","the arguments given in the grid file");
   keys.add("compulsory","LABEL","the label given in the grid file");
-  keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
+  // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
   keys.addFlag("NORMALIZE",false,"specifies that the target distribtion should be normalized by integrating over it. Otherwise it is assumed that it is normalized.");
 }
 
@@ -66,9 +66,10 @@ TargetDistributionBase(to)
   setDimension(arglabels.size());
   bool normalize=false;
   parseFlag("NORMALIZE",normalize);
-  bool nospline=false;
-  parseFlag("NOSPLINE",nospline);
-  bool spline=!nospline;
+  // bool nospline=false;
+  // parseFlag("NOSPLINE",nospline);
+  // bool spline=!nospline;
+  bool spline = false;
   bool sparsegrid=false;
   checkRead();
 
@@ -78,7 +79,7 @@ TargetDistributionBase(to)
     arguments[i]->setNotPeriodic();
   }
   IFile gridfile; gridfile.open(filename);
-  distGrid=Grid::create(gridlabel,arguments,gridfile,sparsegrid,false,false);
+  distGrid=Grid::create(gridlabel,arguments,gridfile,sparsegrid,spline,false);
   plumed_massert(distGrid->getDimension()==getDimension(),"mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
 
   minima.resize(getDimension());
@@ -100,7 +101,7 @@ TargetDistributionBase(to)
 }
 
 
-double DistributionFromGrid::getValue(const std::vector<double> argument) const {
+double DistributionFromGrid::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
   for(unsigned int k=0; k<getDimension(); k++){
     if(argument[k] < minima[k] || argument[k] > maxima[k]){return outside;}

@@ -86,9 +86,9 @@ public:
 /// get type of distribution
   std::string getType()const{return type;};
 /// calculate the target distribution itself
-  virtual double getValue(const std::vector<double>) const =0;
+  virtual double getValue(const std::vector<double>&) const = 0;
 /// write the distribution out to file
-  static void writeDistributionToFile(const std::string, const std::string, const std::vector<std::string>, const std::vector<std::string>, const std::vector<unsigned int> );
+  static void writeDistributionToFile(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   void calculateDistributionOnGrid(Grid*);
 };
 

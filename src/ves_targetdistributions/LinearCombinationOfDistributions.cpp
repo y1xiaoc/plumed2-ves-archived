@@ -41,7 +41,7 @@ public:
   static void registerKeywords(Keywords&);
   explicit LinearCombinationOfDistributions(const TargetDistributionOptions& to);
   ~LinearCombinationOfDistributions();
-  double getValue(const std::vector<double>) const;
+  double getValue(const std::vector<double>&) const;
 };
 
 
@@ -98,7 +98,7 @@ LinearCombinationOfDistributions::~LinearCombinationOfDistributions(){
 }
 
 
-double LinearCombinationOfDistributions::getValue(const std::vector<double> argument) const {
+double LinearCombinationOfDistributions::getValue(const std::vector<double>& argument) const {
   double value=0.0;
   for(unsigned int i=0; i<ndist; i++){
     value += weights[i] * distributions[i]->getValue(argument);

@@ -78,7 +78,7 @@ std::string TargetDistributionBase::description() {
 }
 
 
-void TargetDistributionBase::writeDistributionToFile(const std::string filepath, const std::string keywords, const std::vector<std::string> min, const std::vector<std::string> max, const std::vector<unsigned int> nbins) {
+void TargetDistributionBase::writeDistributionToFile(const std::string& filepath, const std::string& keywords, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
   // create distribtion
   std::vector<std::string> words = Tools::getWords(keywords);
   TargetDistributionBase* distribution=targetDistributionRegister().create( (words) );

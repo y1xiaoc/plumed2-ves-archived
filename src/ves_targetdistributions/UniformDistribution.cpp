@@ -34,7 +34,7 @@ class UniformDistribution : public TargetDistributionBase {
 public:
   static void registerKeywords( Keywords&);
   explicit UniformDistribution( const TargetDistributionOptions& to );
-  double getValue(const std::vector<double> argument) const;
+  double getValue(const std::vector<double>&) const;
   double getNormalization() const;
 };
 
@@ -67,7 +67,7 @@ TargetDistributionBase(to)
 }
 
 
-double UniformDistribution::getValue(const std::vector<double> argument) const {
+double UniformDistribution::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
   double inside = inverse_normalization;
   for(unsigned int k=0; k<getDimension(); k++){
