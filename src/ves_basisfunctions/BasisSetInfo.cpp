@@ -26,7 +26,7 @@
 namespace PLMD{
 
 BasisSetInfo::BasisSetInfo(
-  const std::string basisset_label,
+  const std::string& basisset_label,
   std::vector<BasisFunctions*>& basisf):
 basisset_label_(basisset_label),
 basisf_(basisf),

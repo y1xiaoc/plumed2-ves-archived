@@ -58,7 +58,7 @@ private:
   //
   void initialize();
 public:
-  explicit BasisSetInfo(const std::string, std::vector<BasisFunctions*>&);
+  explicit BasisSetInfo(const std::string&, std::vector<BasisFunctions*>&);
   ~BasisSetInfo(){};
   //
   unsigned int getDimension() const;

@@ -86,10 +86,9 @@ void CubicBsplineBF::getAllValues(const double arg, double& argT, bool& inside_r
   values[0]=1.0;
   derivs[0]=0.0;
   //
-  double argx=0.0;
   for(unsigned int i=1; i < norder_;i++){
     double io=i;
-    argx = argT/spacing_-(io-1.0);
+    double argx = argT/spacing_-(io-1.0);
     values[i]  = spline(argx, derivs[i]);
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}

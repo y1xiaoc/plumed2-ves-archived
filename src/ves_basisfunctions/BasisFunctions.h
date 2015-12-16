@@ -87,8 +87,8 @@ protected:
   virtual void setupDescription();
   virtual void setupBFIntegrals();
   template<typename T>
-  void addKeywordToList(const std::string, const T);
-  void addKeywordToList(const std::string, const bool);
+  void addKeywordToList(const std::string&, const T);
+  void addKeywordToList(const std::string&, const bool);
 public:
   static void registerKeywords(Keywords&);
   explicit BasisFunctions(const ActionOptions&ao);

@@ -77,14 +77,12 @@ void FourierBF_OLD::getAllValues(const double arg, double& argT, bool& inside_ra
   if(values.size()!=nbasis_ || derivs.size()!=nbasis_){error("getAllValues: wrong size of values or derivs vectors");}
   inside_range=true;
   argT=translateArgument(arg, inside_range);
-  double cos_tmp=0;
-  double sin_tmp=0;
   values[0]=1.0;
   derivs[0]=0.0;
   for(unsigned int i=1; i < norder_+1;i++){
     double io = i;
-    cos_tmp = cos(io*argT);
-    sin_tmp = sin(io*argT);
+    double cos_tmp = cos(io*argT);
+    double sin_tmp = sin(io*argT);
     values[i] = cos_tmp;
     derivs[i] = -io*sin_tmp*argT_derivf_;
     values[i+norder_] = sin_tmp;
