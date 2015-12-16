@@ -735,8 +735,8 @@ size_t CoeffsVector::readFromFile(const std::string& filepath, const bool ignore
   file.link(mycomm);
   file.open(filepath);
   size_t ncoeffs_read=readFromFile(file,ignore_missing_coeffs, ignore_header);
-  return ncoeffs_read;
   file.close();
+  return ncoeffs_read;
 }
 
 

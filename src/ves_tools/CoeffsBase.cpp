@@ -34,7 +34,7 @@
 namespace PLMD{
 
 CoeffsBase::CoeffsBase(
-  const std::string label,
+  const std::string& label,
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape):
 label_(label),
@@ -52,7 +52,7 @@ multicoeffs_basisf_(0)
 
 
 CoeffsBase::CoeffsBase(
-  const std::string label,
+  const std::string& label,
   std::vector<Value*>& args,
   std::vector<BasisFunctions*>& basisf):
 label_(label),
@@ -77,10 +77,10 @@ multicoeffs_basisf_(0)
 
 
 CoeffsBase::CoeffsBase(
-  const std::string label,
+  const std::string& label,
   std::vector<std::vector<Value*> >& multicoeffs_args,
   std::vector<std::vector<BasisFunctions*> >& multicoeffs_basisf,
-  const std::string multicoeffs_label):
+  const std::string& multicoeffs_label):
 label_(label),
 data_label_(label),
 coeffs_type_(MultiCoeffs_LinearBasisSet),
@@ -161,7 +161,7 @@ void CoeffsBase::setupBasisFunctionsInfo() {
       unsigned int mc_id = indices[ndimensions_-1];
       std::string mc_idstr;
       Tools::convert(mc_id,mc_idstr);
-      std::string mc_label = getDimensionLabel(ndimensions_-1);
+      // std::string mc_label = getDimensionLabel(ndimensions_-1);
       std::string postfix = ":" + mc_idstr;
       std::string desc ="";
       desc+=multicoeffs_basisf_[mc_id][0]->getBasisFunctionDescription(indices[0]);
@@ -215,7 +215,7 @@ std::string CoeffsBase::getLabel() const {
 }
 
 
-void CoeffsBase::setLabel(const std::string label) {
+void CoeffsBase::setLabel(const std::string& label) {
   label_=label;
 }
 
@@ -225,18 +225,18 @@ std::string CoeffsBase::getDataLabel() const {
 }
 
 
-void CoeffsBase::setDataLabel(const std::string data_label) {
+void CoeffsBase::setDataLabel(const std::string& data_label) {
   data_label_=data_label;
 }
 
 
-void CoeffsBase::setLabels(const std::string label) {
+void CoeffsBase::setLabels(const std::string& label) {
   label_=label;
   data_label_=label;
 }
 
 
-void CoeffsBase::setLabels(const std::string label, const std::string data_label) {
+void CoeffsBase::setLabels(const std::string& label, const std::string& data_label) {
   label_=label;
   data_label_=data_label;
 }
@@ -363,17 +363,17 @@ std::vector<std::string> CoeffsBase::getAllCoeffsDescriptions() const {
 }
 
 
-void CoeffsBase::setCoeffDescription(const size_t index, const std::string description) {
+void CoeffsBase::setCoeffDescription(const size_t index, const std::string& description) {
   coeffs_descriptions_[index]=description;
 }
 
 
-void CoeffsBase::setCoeffDescription(const std::vector<unsigned int>& indices, const std::string description) {
+void CoeffsBase::setCoeffDescription(const std::vector<unsigned int>& indices, const std::string& description) {
   setCoeffDescription(getIndex(indices), description);
 }
 
 
-void CoeffsBase::setAllCoeffsDescriptions(const std::string description_prefix) {
+void CoeffsBase::setAllCoeffsDescriptions(const std::string& description_prefix) {
   for(size_t i=0;i<numberOfCoeffs();i++){
     std::vector<unsigned int> indices=getIndices(i);
     std::string is; Tools::convert(indices[0],is);
@@ -406,13 +406,13 @@ std::vector<std::string> CoeffsBase::getAllDimensionLabels() const {
 }
 
 
-void CoeffsBase::setDimensionLabel(const unsigned int dim_index, const std::string label) {
+void CoeffsBase::setDimensionLabel(const unsigned int dim_index, const std::string& label) {
   plumed_massert(dim_index<numberOfDimensions(),"Trying to set the label of a dimension outside the number of dimensions");
   dimension_labels_[dim_index]=label;
 }
 
 
-void CoeffsBase::setAllDimensionLabels(const std::string label_prefix) {
+void CoeffsBase::setAllDimensionLabels(const std::string& label_prefix) {
   for(unsigned int i=0; i<numberOfDimensions(); i++){
     std::string is; Tools::convert(i,is);
     dimension_labels_[i]=label_prefix + is;
@@ -479,7 +479,7 @@ void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_in
 }
 
 
-void CoeffsBase::checkCoeffsInfo(const std::string msg_header, const std::string coeffs_type_f, const unsigned int ndimensions_f, const size_t ncoeffs_total_f, const std::vector<unsigned int> indices_shape_f){
+void CoeffsBase::checkCoeffsInfo(const std::string& msg_header, const std::string& coeffs_type_f, const unsigned int ndimensions_f, const size_t ncoeffs_total_f, const std::vector<unsigned int>& indices_shape_f){
 
   if(coeffs_type_f != getTypeStr()){
     std::string msg = msg_header + " coeffs type " + coeffs_type_f + " from file doesn't match the defined value " + getTypeStr();

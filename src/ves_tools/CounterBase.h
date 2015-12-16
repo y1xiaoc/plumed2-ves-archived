@@ -51,9 +51,9 @@ public:
   unsigned int getCounter() const;
   double getCounterDbl() const;
   //
-  void setCounterFieldName(const std::string);
+  void setCounterFieldName(const std::string&);
   std::string getCounterFieldName() const;
-  void setTimeFieldName(const std::string);
+  void setTimeFieldName(const std::string&);
   std::string getTimeFieldName() const;
   //
   bool getCounterFieldFromFile(IFile&);

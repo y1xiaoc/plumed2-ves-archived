@@ -79,7 +79,7 @@ double CounterBase::getCounterDbl() const {
 }
 
 
-void CounterBase::setCounterFieldName(const std::string field_name_counter) {
+void CounterBase::setCounterFieldName(const std::string& field_name_counter) {
   field_name_counter_=field_name_counter;
 }
 
@@ -89,7 +89,7 @@ std::string CounterBase::getCounterFieldName() const {
 }
 
 
-void CounterBase::setTimeFieldName(const std::string field_name_time) {
+void CounterBase::setTimeFieldName(const std::string& field_name_time) {
   field_name_time_=field_name_time;
 }
 
