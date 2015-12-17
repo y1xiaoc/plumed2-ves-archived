@@ -136,8 +136,7 @@ protected:
   void setupBasisFunctionsInfo();
   void resizeIndices(const std::vector<unsigned int>&);
   void resizeIndices(std::vector<BasisFunctions*>&);
-  bool sameShape(CoeffsBase*) const;
-
+  bool sameShape(const CoeffsBase&) const;
 };
 }
 #endif

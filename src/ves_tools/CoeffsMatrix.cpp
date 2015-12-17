@@ -131,14 +131,28 @@ bool CoeffsMatrix::isDiagonal() const {
 
 
 bool CoeffsMatrix::sameShape(CoeffsVector& coeffsvector_in) const {
-  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsvector_in)) );
+  return CoeffsBase::sameShape( *(static_cast<CoeffsBase*>(&coeffsvector_in)) );
 }
 
 
 bool CoeffsMatrix::sameShape(CoeffsMatrix& coeffsmat_in) const {
-  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsmat_in)) );
+  return CoeffsBase::sameShape( *(static_cast<CoeffsBase*>(&coeffsmat_in)) );
 }
 
+
+bool CoeffsMatrix::sameShape(CoeffsMatrix& coeffsmat0, CoeffsMatrix& coeffsmat1) {
+  return coeffsmat0.sameShape(coeffsmat1);
+}
+
+
+bool CoeffsMatrix::sameShape(CoeffsVector& coeffsvec, CoeffsMatrix& coeffsmat) {
+  return coeffsmat.sameShape(coeffsvec);
+}
+
+
+bool CoeffsMatrix::sameShape(CoeffsMatrix& coeffsmat, CoeffsVector& coeffsvec) {
+  return coeffsmat.sameShape(coeffsvec);
+}
 
 
 void CoeffsMatrix::sumCommMPI() {
@@ -476,6 +490,33 @@ CoeffsMatrix& CoeffsMatrix::operator-=(const CoeffsMatrix& other_coeffsmatrix) {
 CoeffsMatrix CoeffsMatrix::operator-(const CoeffsMatrix& other_coeffsmatrix) const {
   return CoeffsMatrix(*this)-=other_coeffsmatrix;
 }
+
+
+void CoeffsMatrix::averageMatrices(CoeffsMatrix& coeffsmat0, CoeffsMatrix& coeffsmat1) {
+  plumed_massert(sameShape(coeffsmat0,coeffsmat1),"both CoeffsMatrix objects need to have the same shape");
+  for(size_t i=0; i<coeffsmat0.getSize(); i++){
+    coeffsmat0.data[i] = coeffsmat1.data[i] = 0.5 * (coeffsmat0.data[i]+coeffsmat1.data[i]);
+  }
+}
+
+
+void CoeffsMatrix::averageMatrices(const std::vector<CoeffsMatrix*>& coeffsmatSet) {
+  double norm_factor = 1.0/static_cast<double>(coeffsmatSet.size());
+  for(unsigned int k=1; k<coeffsmatSet.size(); k++){
+    plumed_massert(coeffsmatSet[0]->sameShape(*coeffsmatSet[k]),"All CoeffsMatrix objects need to have the same shape");
+  }
+  for(size_t i=0; i<coeffsmatSet[0]->getSize(); i++){
+    double value = 0.0;
+    for(unsigned int k=0; k<coeffsmatSet.size(); k++){
+      value += coeffsmatSet[k]->data[i];
+    }
+    value *= norm_factor;
+    for(unsigned int k=0; k<coeffsmatSet.size(); k++){
+      coeffsmatSet[k]->data[i] = value;
+    }
+  }
+}
+
 
 
 double CoeffsMatrix::getMinValue() const {

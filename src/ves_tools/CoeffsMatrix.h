@@ -103,6 +103,9 @@ public:
   //
   bool sameShape(CoeffsVector&) const;
   bool sameShape(CoeffsMatrix&) const;
+  static bool sameShape(CoeffsMatrix&, CoeffsMatrix&);
+  static bool sameShape(CoeffsVector&, CoeffsMatrix&);
+  static bool sameShape(CoeffsMatrix&, CoeffsVector&);
   //
   void sumCommMPI();
   void sumCommMPI(Communicator&);
@@ -167,6 +170,9 @@ public:
   CoeffsMatrix operator+(const CoeffsMatrix&) const;
   CoeffsMatrix& operator-=(const CoeffsMatrix&);
   CoeffsMatrix operator-(const CoeffsMatrix&) const;
+  //
+  static void averageMatrices(CoeffsMatrix&, CoeffsMatrix&);
+  static void averageMatrices(const std::vector<CoeffsMatrix*>&);
   //
   double getMinValue() const;
   double getMaxValue() const;

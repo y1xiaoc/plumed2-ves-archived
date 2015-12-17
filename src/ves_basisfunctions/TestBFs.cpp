@@ -151,6 +151,34 @@ Function(ao)
   coeffsM3 = values2;
   coeffsM3.writeToFile("coeffsM3.data");
 
+  CoeffsVector cV1 = CoeffsVector("cV1",args,bf,comm,true);
+  CoeffsVector cV2 = CoeffsVector("cV2",args,bf,comm,true);
+  cV1.randomizeValuesGaussian(1);
+  cV2.randomizeValuesGaussian(2);
+  cV1.writeToFile("cV1.1.data");
+  cV2.writeToFile("cV2.1.data");
+  std::vector<CoeffsVector*> cVv(2);
+  cVv[0]=&cV1; cVv[1]=&cV2;
+  CoeffsVector::averageVectors(cVv);
+  cV1->writeToFile("cV1.2.data");
+  cV1->writeToFile("cV2.2.data");
+
+
+
+
+  CoeffsMatrix cM1 = CoeffsMatrix("cM1",args,bf,comm,true,true);
+  CoeffsMatrix cM2 = CoeffsMatrix("cM2",args,bf,comm,true,true);
+  cM1.randomizeValuesGaussian(1);
+  cM2.randomizeValuesGaussian(2);
+  cM1.writeToFile("cM1.1.data");
+  cM2.writeToFile("cM2.1.data");
+  std::vector<CoeffsMatrix*> cMv(2);
+  cMv[0]=&cM1; cMv[1]=&cM2;
+  CoeffsMatrix::averageMatrices(cMv);
+  cM1.writeToFile("cM1.2.data");
+  cM2.writeToFile("cM2.2.data");
+
+
 
 
 

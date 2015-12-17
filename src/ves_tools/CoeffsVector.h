@@ -87,6 +87,7 @@ public:
   //
   bool sameShape(CoeffsVector&) const;
   bool sameShape(CoeffsMatrix&) const;
+  static bool sameShape(CoeffsVector&, CoeffsVector&);
   //
   void resizeCoeffs(const std::vector<unsigned int>&);
   void resizeCoeffs(std::vector<BasisFunctions*>&);
@@ -153,7 +154,9 @@ public:
   CoeffsVector operator-(const CoeffsVector&) const;
   //
   void setValuesFromDifferentShape(const CoeffsVector&);
-
+  //
+  static void averageVectors(CoeffsVector&, CoeffsVector&);
+  static void averageVectors(const std::vector<CoeffsVector*>&);
   //
   double getMinValue() const;
   double getMinValue(size_t&) const;

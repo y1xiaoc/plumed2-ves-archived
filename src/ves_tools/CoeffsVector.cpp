@@ -112,12 +112,17 @@ void CoeffsVector::clear() {
 
 
 bool CoeffsVector::sameShape(CoeffsVector& coeffsvector_in) const {
-  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsvector_in)) );
+  return CoeffsBase::sameShape( *(static_cast<CoeffsBase*>(&coeffsvector_in)) );
 }
 
 
 bool CoeffsVector::sameShape(CoeffsMatrix& coeffsmat_in) const {
-  return CoeffsBase::sameShape( (static_cast<CoeffsBase*>(&coeffsmat_in)) );
+  return CoeffsBase::sameShape( *(static_cast<CoeffsBase*>(&coeffsmat_in)) );
+}
+
+
+bool CoeffsVector::sameShape(CoeffsVector& coeffsvec0, CoeffsVector& coeffsvec1) {
+  return coeffsvec0.sameShape(coeffsvec1);
 }
 
 
@@ -466,6 +471,32 @@ void CoeffsVector::setValuesFromDifferentShape(const CoeffsVector& other_coeffsv
 }
 
 
+void CoeffsVector::averageVectors(CoeffsVector& coeffsvec0, CoeffsVector& coeffsvec1) {
+  plumed_massert(sameShape(coeffsvec0,coeffsvec1),"both CoeffsVector objects need to have the same shape");
+  for(size_t i=0; i<coeffsvec0.getSize(); i++){
+    coeffsvec0.data[i] = coeffsvec1.data[i] = 0.5 * (coeffsvec0.data[i]+coeffsvec1.data[i]);
+  }
+}
+
+
+void CoeffsVector::averageVectors(const std::vector<CoeffsVector*>& coeffsvecSet) {
+  const double norm_factor = 1.0/static_cast<double>(coeffsvecSet.size());
+  for(unsigned int k=1; k<coeffsvecSet.size(); k++){
+    plumed_massert(coeffsvecSet[0]->sameShape(*coeffsvecSet[k]),"All CoeffsVector objects need to have the same shape");
+  }
+  for(size_t i=0; i<coeffsvecSet[0]->getSize(); i++){
+    double value = 0.0;
+    for(unsigned int k=0; k<coeffsvecSet.size(); k++){
+      value += coeffsvecSet[k]->data[i];
+    }
+    value *= norm_factor;
+    for(unsigned int k=0; k<coeffsvecSet.size(); k++){
+      coeffsvecSet[k]->data[i] = value;
+    }
+  }
+}
+
+
 double CoeffsVector::getMinValue() const {
   size_t min_index=0;
   return getMinValue(min_index);
@@ -640,29 +671,27 @@ void CoeffsVector::writeToFile(OFile& ofile, CoeffsVector* aux_coeffsvector, con
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_ptr) {
+void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_ptr) {
   OFile file;
   if(action_ptr!=NULL){
     file.link(*action_ptr);
   }
   else{
-    file.link(CoeffsSet[0]->getCommunicator());
+    file.link(coeffsvecSet[0]->getCommunicator());
   }
   if(append_file){ file.enforceRestart(); }
   file.open(filepath);
-  writeToFile(file,CoeffsSet,print_coeffs_descriptions);
+  writeToFile(file,coeffsvecSet,print_coeffs_descriptions);
   file.close();
 }
 
 
-void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions, const double current_time) {
-  for(unsigned int k=1; k<CoeffsSet.size(); k++){
-    if(!CoeffsSet[k]->sameShape(*CoeffsSet[0])){
-      plumed_merror("Error in writing a set of coeffs to file: The coeffs do not have the same shape and size");
-    }
+void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const double current_time) {
+  for(unsigned int k=1; k<coeffsvecSet.size(); k++){
+    plumed_massert(coeffsvecSet[k]->sameShape(*coeffsvecSet[0]),"Error in writing a set of coeffs to file: The coeffs do not have the same shape and size");
   }
-  CoeffsSet[0]->writeHeaderToFile(ofile,current_time);
-  writeDataToFile(ofile,CoeffsSet, print_coeffs_descriptions);
+  coeffsvecSet[0]->writeHeaderToFile(ofile,current_time);
+  writeDataToFile(ofile,coeffsvecSet, print_coeffs_descriptions);
 }
 
 
@@ -674,7 +703,7 @@ void CoeffsVector::writeHeaderToFile(OFile& ofile, const double current_time) co
 }
 
 
-void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*>& CoeffsSet, const bool print_coeffs_descriptions) {
+void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions) {
   //
   std::string field_indices_prefix = "idx_";
   std::string field_index = "index";
@@ -683,31 +712,31 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
   std::string int_fmt = "%8d";
   std::string str_seperate = "#!-------------------";
   //
-  unsigned int numvec = CoeffsSet.size();
-  unsigned int numdim = CoeffsSet[0]->numberOfDimensions();
-  unsigned int numcoeffs = CoeffsSet[0]->getSize();
-  std::vector<std::string> coeffs_descriptions = CoeffsSet[0]->getAllCoeffsDescriptions();
-  std::string output_fmt = CoeffsSet[0]->getOutputFmt();
+  unsigned int numvec = coeffsvecSet.size();
+  unsigned int numdim = coeffsvecSet[0]->numberOfDimensions();
+  unsigned int numcoeffs = coeffsvecSet[0]->getSize();
+  std::vector<std::string> coeffs_descriptions = coeffsvecSet[0]->getAllCoeffsDescriptions();
+  std::string output_fmt = coeffsvecSet[0]->getOutputFmt();
   std::vector<std::string> coeffs_datalabels(numvec);
   for(unsigned int k=0; k<numvec; k++){
-    coeffs_datalabels[k] = CoeffsSet[k]->getDataLabel();
+    coeffs_datalabels[k] = coeffsvecSet[k]->getDataLabel();
   }
   //
   char* s1 = new char[20];
   std::vector<unsigned int> indices(numdim);
   std::vector<std::string> ilabels(numdim);
   for(unsigned int k=0; k<numdim; k++){
-    ilabels[k]=field_indices_prefix+CoeffsSet[0]->getDimensionLabel(k);
+    ilabels[k]=field_indices_prefix+coeffsvecSet[0]->getDimensionLabel(k);
   }
   //
   for(size_t i=0; i<numcoeffs; i++){
-    indices=CoeffsSet[0]->getIndices(i);
+    indices=coeffsvecSet[0]->getIndices(i);
     for(unsigned int k=0; k<numdim; k++){
       sprintf(s1,int_fmt.c_str(),indices[k]);
       ofile.printField(ilabels[k],s1);
     }
     for(unsigned int l=0; l<numvec; l++){
-      ofile.fmtField(" "+output_fmt).printField(coeffs_datalabels[l],CoeffsSet[l]->getValue(i));
+      ofile.fmtField(" "+output_fmt).printField(coeffs_datalabels[l],coeffsvecSet[l]->getValue(i));
     }
     sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
     if(print_coeffs_descriptions){ ofile.printField(field_description,"  "+coeffs_descriptions[i]);}
