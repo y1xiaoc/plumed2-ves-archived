@@ -160,8 +160,8 @@ Function(ao)
   std::vector<CoeffsVector*> cVv(2);
   cVv[0]=&cV1; cVv[1]=&cV2;
   CoeffsVector::averageVectors(cVv);
-  cV1->writeToFile("cV1.2.data");
-  cV1->writeToFile("cV2.2.data");
+  cV1.writeToFile("cV1.2.data");
+  cV1.writeToFile("cV2.2.data");
 
 
 
