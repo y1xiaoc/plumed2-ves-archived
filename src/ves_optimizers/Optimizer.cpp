@@ -373,25 +373,27 @@ void Optimizer::setIterationCounter(const unsigned int iter_counter_in) {
 }
 
 
-void Optimizer::switchToDiagonalHessian() {
+CoeffsMatrix* Optimizer::switchToDiagonalHessian(bias::VesBias* bias_ptr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=true;
-  bias_ptr->turnOnHessian(diagonal_hessian_);
-  hessian_ptr = bias_ptr->getHessianPtr();
-  plumed_massert(hessian_ptr != NULL,"Hessian is needed but not linked correctly");
+  bias_ptr_in->turnOnHessian(diagonal_hessian_);
+  CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
+  plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
   //
-  log.printf("  %s (with label %s): switching to a diagonal Hessian at time  %f\n",getName().c_str(),getLabel().c_str(),getTime());
+  log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_ptr_in->getName().c_str(),bias_ptr_in->getLabel().c_str(),getTime());
+  return hessian_ptr_out;
 }
 
 
-void Optimizer::switchToFullHessian() {
+CoeffsMatrix* Optimizer::switchToFullHessian(bias::VesBias* bias_ptr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=false;
-  bias_ptr->turnOnHessian(diagonal_hessian_);
-  hessian_ptr = bias_ptr->getHessianPtr();
-  plumed_massert(hessian_ptr != NULL,"Hessian is needed but not linked correctly");
+  bias_ptr_in->turnOnHessian(diagonal_hessian_);
+  CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
+  plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
   //
-  log.printf("  %s (with label %s): switching to a full Hessian at time  %f\n",getName().c_str(),getLabel().c_str(),getTime());
+  log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_ptr_in->getName().c_str(),bias_ptr_in->getLabel().c_str(),getTime());
+  return hessian_ptr_out;
 }
 
 

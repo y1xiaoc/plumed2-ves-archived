@@ -88,8 +88,9 @@ private:
 protected:
   void turnOnHessian();
   void turnOffHessian();
-  void switchToDiagonalHessian();
-  void switchToFullHessian();
+  CoeffsMatrix* switchToDiagonalHessian(bias::VesBias*);
+  CoeffsMatrix* switchToFullHessian(bias::VesBias*);
+  //
   CoeffsVector& Coeffs() const;
   CoeffsVector& AuxCoeffs() const;
   CoeffsVector& Gradient() const;
