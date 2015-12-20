@@ -484,8 +484,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","OUTPUT_MASK_FILE","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
   //
   // Components that are always active
-  keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-# ");
-  keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-# ");
+  keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
+  keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
   ActionWithValue::useCustomisableComponents(keys);
   // keys.addOutputComponent("gradmaxidx","default","the index of the maximum absolute value of the gradient");
 }
@@ -511,7 +511,7 @@ void Optimizer::useFixedStepSizeKeywords(Keywords& keys) {
 
 void Optimizer::useChangingStepSizeKeywords(Keywords& keys) {
   keys.use("INITIAL_STEPSIZE");
-  keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients");
+  keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients. For multiple biases this component is labeled using the number of the bias as stepsize-#.");
 }
 
 
