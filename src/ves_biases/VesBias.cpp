@@ -195,7 +195,7 @@ void VesBias::linkOptimizer(Optimizer* optimizer_ptr_in) {
 }
 
 
-void VesBias::turnOnHessian(const bool diagonal_hessian) {
+void VesBias::enableHessian(const bool diagonal_hessian) {
   compute_hessian_=true;
   diagonal_hessian_=diagonal_hessian;
   delete hessian_ptr;
@@ -205,7 +205,7 @@ void VesBias::turnOnHessian(const bool diagonal_hessian) {
 }
 
 
-void VesBias::turnOffHessian() {
+void VesBias::disableHessian() {
   compute_hessian_=false;
   diagonal_hessian_=true;
   delete hessian_ptr;

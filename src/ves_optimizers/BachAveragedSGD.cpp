@@ -33,7 +33,7 @@ private:
 public:
   static void registerKeywords(Keywords&);
   explicit BachAveragedSGD(const ActionOptions&);
-  void coeffsUpdate();
+  void coeffsUpdate(const unsigned int i);
 };
 
 
@@ -57,11 +57,11 @@ PLUMED_OPTIMIZER_INIT(ao)
 }
 
 
-void BachAveragedSGD::coeffsUpdate() {
+void BachAveragedSGD::coeffsUpdate(const unsigned int i) {
   double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
-  AuxCoeffs() = AuxCoeffs() - StepSize()*CoeffsMask() * ( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
+  AuxCoeffs(i) = AuxCoeffs(i) - StepSize(i)*CoeffsMask(i) * ( Gradient(i) + Hessian(i)*(AuxCoeffs(i)-Coeffs(i)) );
   //AuxCoeffs() = AuxCoeffs() - StepSize() * ( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
-  Coeffs() += aver_decay * ( AuxCoeffs()-Coeffs() );
+  Coeffs(i) += aver_decay * ( AuxCoeffs(i)-Coeffs(i) );
 }
 
 

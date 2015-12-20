@@ -39,8 +39,8 @@ ActionPilot(ao),
 ActionWithValue(ao),
 description_("Undefined"),
 type_("Undefined"),
-stepsize_(0.0),
-current_stepsize_(0.0),
+stepsizes_(0),
+current_stepsizes(0),
 fixed_stepsize_(true),
 iter_counter(0),
 use_hessian_(false),
@@ -48,50 +48,102 @@ diagonal_hessian_(true),
 use_mwalkers_mpi_(false),
 mwalkers_mpi_single_files_(true),
 coeffs_wstride_(100),
-coeffs_fname_("COEFFS"),
+coeffsOfiles_(0),
 gradient_wstride_(100),
-gradient_fname_(""),
+gradientOfiles_(0),
 hessian_wstride_(100),
-hessian_fname_(""),
-coeffs_ptr(NULL),
-aux_coeffs_ptr(NULL),
-gradient_ptr(NULL),
-hessian_ptr(NULL),
-coeffs_mask_ptr(NULL),
-bias_ptr(NULL)
+hessianOfiles_(0),
+nbiases_(0),
+bias_ptrs(0),
+coeffs_ptrs(0),
+aux_coeffs_ptrs(0),
+gradient_ptrs(0),
+hessian_ptrs(0),
+coeffs_mask_ptrs(0),
+identical_coeffs_shape_(true)
 {
-  std::string bias_label="";
-  parse("BIAS",bias_label);
-  bias_ptr=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_label);
-  if(!bias_ptr){plumed_merror("VES bias "+bias_label+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
+  std::vector<std::string> bias_labels(0);
+  parseVector("BIAS",bias_labels);
+  plumed_massert(bias_labels.size()>0,"problem with BIAS keyword");
+  nbiases_ = bias_labels.size();
   //
-  bias_ptr->linkOptimizer(this);
-  coeffs_ptr = bias_ptr->getCoeffsPtr();
-  plumed_massert(coeffs_ptr != NULL,"coeffs are not linked correctly");
+  bias_ptrs.resize(nbiases_);
+  coeffs_ptrs.resize(nbiases_);
+  aux_coeffs_ptrs.resize(nbiases_);
+  gradient_ptrs.resize(nbiases_);
+  coeffs_mask_ptrs.resize(nbiases_);
   //
-  log.printf("  optimizing VES bias %s with label %s: \n",bias_ptr->getName().c_str(),bias_ptr->getLabel().c_str());
-  log.printf("   KbT: %f\n",bias_ptr->getKbT());
-  log.printf("  number of coefficients: %d\n",static_cast<int>(coeffs_ptr->numberOfCoeffs()));
-
+  for(unsigned int i=0; i<nbiases_; i++) {
+    bias_ptrs[i]=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_labels[i]);
+    if(!bias_ptrs[i]){plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
+    //
+    bias_ptrs[i]->linkOptimizer(this);
+    coeffs_ptrs[i] = bias_ptrs[i]->getCoeffsPtr();
+    plumed_massert(coeffs_ptrs[i] != NULL,"coeffs are not linked correctly");
+    //
+    aux_coeffs_ptrs[i] = new CoeffsVector(*coeffs_ptrs[i]);
+    aux_coeffs_ptrs[i]->setLabels("aux_"+coeffs_ptrs[i]->getLabel());
+    //
+    gradient_ptrs[i] = bias_ptrs[i]->getGradientPtr();
+    plumed_massert(gradient_ptrs[i] != NULL,"gradient is not linked correctly");
+  }
   //
-  aux_coeffs_ptr = new CoeffsVector(*coeffs_ptr);
-  aux_coeffs_ptr->setLabels("aux_"+coeffs_ptr->getLabel());
-  //
-  gradient_ptr = bias_ptr->getGradientPtr();
-  plumed_massert(gradient_ptr != NULL,"gradient is not linked correctly");
+  identical_coeffs_shape_ = true;
+  for(unsigned int i=1; i<nbiases_; i++) {
+    if(!coeffs_ptrs[0]->sameShape(*coeffs_ptrs[i])){
+      identical_coeffs_shape_ = false;
+      break;
+    }
+  }
   //
   if(keywords.exists("STEPSIZE")){
     plumed_assert(!keywords.exists("INITIAL_STEPSIZE"));
-    parse("STEPSIZE",stepsize_);
-    log.printf("  using a constant step size of %f\n",stepsize_);
+    fixed_stepsize_=true;
+    parseVector("STEPSIZE",stepsizes_);
+    if(stepsizes_.size()==1){
+      stepsizes_.resize(nbiases_,stepsizes_[0]);
+    }
+    plumed_massert(stepsizes_.size()==nbiases_,"Error in STEPSIZE keyword: either give one value for all biases or a seperate value for each bias");
   }
   if(keywords.exists("INITIAL_STEPSIZE")){
-    fixed_stepsize_=false;
     plumed_assert(!keywords.exists("STEPSIZE"));
-    parse("INITIAL_STEPSIZE",stepsize_);
-    log.printf("  using a initial step size of %f\n",stepsize_);
+    fixed_stepsize_=false;
+    parseVector("INITIAL_STEPSIZE",stepsizes_);
+    if(stepsizes_.size()==1){
+      stepsizes_.resize(nbiases_,stepsizes_[0]);
+    }
+    plumed_massert(stepsizes_.size()==nbiases_,"Error in INITIAL_STEPSIZE keyword: either give one value for all biases or a seperate value for each bias");
   }
-  setCurrentStepSize(stepsize_);
+  setCurrentStepSizes(stepsizes_);
+  //
+  if(nbiases_==1){
+    log.printf("  optimizing VES bias %s with label %s: \n",bias_ptrs[0]->getName().c_str(),bias_ptrs[0]->getLabel().c_str());
+    log.printf("   KbT: %f\n",bias_ptrs[0]->getKbT());
+    log.printf("  number of coefficients: %d\n",static_cast<int>(coeffs_ptrs[0]->numberOfCoeffs()));
+    if(fixed_stepsize_){log.printf("  using a constant step size of %f\n",stepsizes_[0]);}
+    else{log.printf("  using an initial step size of %f\n",stepsizes_[0]);}
+  }
+  else {
+    log.printf("  optimizing %d VES biases:\n",static_cast<int>(nbiases_));
+    size_t tot_ncoeffs = 0;
+    for(unsigned int i=0; i<nbiases_; i++) {
+      log.printf("   bias %d: \n",static_cast<int>(i));
+      log.printf("    %s with label %s: \n",bias_ptrs[i]->getName().c_str(),bias_ptrs[i]->getLabel().c_str());
+      log.printf("    KbT: %f\n",bias_ptrs[i]->getKbT());
+      log.printf("    number of coefficients: %d\n",static_cast<int>(coeffs_ptrs[i]->numberOfCoeffs()));
+      if(fixed_stepsize_){log.printf("    using a constant step size of %f\n",stepsizes_[i]);}
+      else{log.printf("    using an initial step size of %f\n",stepsizes_[i]);}
+      tot_ncoeffs += coeffs_ptrs[i]->numberOfCoeffs();
+    }
+    log.printf("  total number of coefficients: %d\n",static_cast<int>(tot_ncoeffs));
+    if(identical_coeffs_shape_){
+      log.printf("  the coefficients indices shape is identical for all biases\n");
+    }
+    else{
+      log.printf("  the coefficients indices shape differs between biases\n");
+    }
+  }
+
   //
   if(keywords.exists("FULL_HESSIAN")){
     bool full_hessian=false;
@@ -108,112 +160,299 @@ bias_ptr(NULL)
     mwalkers_mpi_single_files_ = !mw_seperate_files;
   }
 
-  if(use_mwalkers_mpi_){
-    log.printf("  optimization performed using multiple walkers connected via MPI:\n");
-    log.printf("   number of walkers: %d\n",static_cast<int>(multi_sim_comm.Get_size()));
-    log.printf("   walker number: %d\n",static_cast<int>(multi_sim_comm.Get_rank()));
+  if(comm.Get_rank()==0){
+    if(use_mwalkers_mpi_ && multi_sim_comm.Get_size()==1){
+      plumed_merror("using the MULTIPLE_WALKERS keyword does not make sense if running the MD code with a single replica");
+    }
+    if(use_mwalkers_mpi_ ){
+      log.printf("  optimization performed using multiple walkers connected via MPI:\n");
+      log.printf("   number of walkers: %d\n",static_cast<int>(multi_sim_comm.Get_size()));
+      log.printf("   walker number: %d\n",static_cast<int>(multi_sim_comm.Get_rank()));
+    }
   }
-  //
+
+
+  std::vector<std::string> coeffs_fnames(0);
+  parseVector("FILE",coeffs_fnames);
+  std::string fname_prefix;
+
+  if(nbiases_>1){
+    fname_prefix="bias_";
+    parse("BIASID_SUFFIX",fname_prefix);
+    fname_prefix = "." + fname_prefix;
+  }
+  else{
+    fname_prefix="";
+    parse("BIASID_SUFFIX",fname_prefix);
+    if(fname_prefix.size()>0){
+      plumed_merror("BIASID_SUFFIX should only be given if optimizing multiple biases");
+    }
+  }
+
   std::string coeffs_wstride_tmpstr="";
-  parse("FILE",coeffs_fname_);
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
-  if(coeffs_wstride_tmpstr=="OFF"){
-    coeffs_fname_="";
+
+  if(coeffs_wstride_tmpstr=="OFF" && coeffs_fnames.size()>0){
+    plumed_merror("Error: specifying both OUTPUT_STRIDE=OFF and FILE does not make sense");
   }
-  else if (coeffs_wstride_tmpstr.size()>0){
+
+  if(coeffs_wstride_tmpstr!="OFF" && coeffs_wstride_tmpstr.size()>0){
     Tools::convert(coeffs_wstride_tmpstr,coeffs_wstride_);
   }
-  if(coeffs_fname_.size()>0){
-    coeffsOfile_.link(*this);
+
+  std::string coeffs_default_fname = "coeffs.data";
+  if(coeffs_wstride_tmpstr!="OFF" && coeffs_fnames.size()==0){
+    coeffs_fnames.resize(1,coeffs_default_fname);
+  }
+
+  if(coeffs_fnames.size()==1 && nbiases_>1){
+    coeffs_fnames.resize(nbiases_,coeffs_fnames[0]);
+    for(unsigned int i=0; i<nbiases_; i++){
+      std::string is=""; Tools::convert(i,is);
+      coeffs_fnames[i] = FileBase::appendSuffix(coeffs_fnames[i],fname_prefix+is);
+    }
+  }
+  if(coeffs_wstride_tmpstr!="OFF" && coeffs_fnames.size()!=nbiases_){
+    plumed_merror("Error in FILE keyword: either give one value for all biases or a seperate value for each bias");
+  }
+
+
+  coeffsOfiles_.resize(coeffs_fnames.size(),NULL);
+  for(unsigned int i=0; i<coeffs_fnames.size();i++){
+    coeffsOfiles_[i] = new OFile();
+    coeffsOfiles_[i]->link(*this);
     if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
-      if(r>0){coeffs_fname_="/dev/null";}
-      coeffsOfile_.enforceSuffix("");
+      if(r>0){coeffs_fnames[i]="/dev/null";}
+      coeffsOfiles_[i]->enforceSuffix("");
     }
-    coeffsOfile_.open(coeffs_fname_);
-    coeffsOfile_.setHeavyFlush();
-    coeffs_ptr->writeToFile(coeffsOfile_,aux_coeffs_ptr,false,getTimeStep()*getStep());
-    log.printf("  Coefficients will be written out to file %s every %d bias iterations\n",coeffs_fname_.c_str(),static_cast<int>(coeffs_wstride_));
+    coeffsOfiles_[i]->open(coeffs_fnames[i]);
+    coeffsOfiles_[i]->setHeavyFlush();
+    coeffs_ptrs[i]->writeToFile(*coeffsOfiles_[i],aux_coeffs_ptrs[i],false,getTimeStep()*getStep());
   }
-  //
-  parse("GRADIENT_FILE",gradient_fname_);
+
+  if(coeffs_fnames.size()>0){
+    if(nbiases_==1){
+      log.printf("  Coefficients will be written out to file %s every %d iterations\n",coeffsOfiles_[0]->getPath().c_str(),static_cast<int>(coeffs_wstride_));
+    }
+    else {
+      log.printf("  Coefficients will be written out to the following files every %d iterations:\n",static_cast<int>(coeffs_wstride_));
+      for(unsigned int i=0; i<coeffs_fnames.size(); i++){
+        log.printf("   bias %s: %s \n",bias_ptrs[i]->getLabel().c_str(),coeffsOfiles_[i]->getPath().c_str());
+      }
+    }
+  }
+  else {
+    log.printf("  Output of coefficients to file has been disabled\n");
+  }
+
+
+  std::vector<std::string> gradient_fnames;
+  parseVector("GRADIENT_FILE",gradient_fnames);
   parse("GRADIENT_OUTPUT_STRIDE",gradient_wstride_);
-  if(gradient_fname_.size()>0){
-    plumed_massert(gradient_fname_!=coeffs_fname_,"FILE and GRADIENT_FILE cannot be the same");
-    gradientOfile_.link(*this);
+
+  if(gradient_fnames.size()==1 && nbiases_>1){
+    gradient_fnames.resize(nbiases_,gradient_fnames[0]);
+    for(unsigned int i=0; i<nbiases_; i++){
+      std::string is=""; Tools::convert(i,is);
+      gradient_fnames[i] = FileBase::appendSuffix(gradient_fnames[i],fname_prefix+is);
+    }
+  }
+  if(gradient_fnames.size()>0 && gradient_fnames.size()!=nbiases_){
+    plumed_merror("Error in GRADIENT_FILE keyword: either give one value for all biases or a seperate value for each bias");
+  }
+
+  gradientOfiles_.resize(gradient_fnames.size(),NULL);
+  for(unsigned int i=0; i<gradient_fnames.size(); i++){
+    plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"FILE and GRADIENT_FILE cannot be the same");
+    gradientOfiles_[i] = new OFile();
+    gradientOfiles_[i]->link(*this);
     if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
-      if(r>0){gradient_fname_="/dev/null";}
-      gradientOfile_.enforceSuffix("");
+      if(r>0){gradient_fnames[i]="/dev/null";}
+      gradientOfiles_[i]->enforceSuffix("");
     }
-    gradientOfile_.open(gradient_fname_);
-    gradientOfile_.setHeavyFlush();
-    gradient_ptr->writeToFile(gradientOfile_,false,getTimeStep()*getStep());
-    log.printf("  DEBUG OPTION: Gradient will be written out to file %s every %d bias iterations\n",gradient_fname_.c_str(),static_cast<int>(gradient_wstride_));
+    gradientOfiles_[i]->open(gradient_fnames[i]);
+    gradientOfiles_[i]->setHeavyFlush();
+    gradient_ptrs[i]->writeToFile(*gradientOfiles_[i],false,getTimeStep()*getStep());
   }
-  //
+
+  if(gradient_fnames.size()>0){
+    if(nbiases_==1){
+      log.printf("  Gradient will be written out to file %s every %d iterations\n",gradientOfiles_[0]->getPath().c_str(),static_cast<int>(gradient_wstride_));
+    }
+    else {
+      log.printf("  Gradient will be written out to the following files every %d iterations:\n",static_cast<int>(gradient_wstride_));
+      for(unsigned int i=0; i<gradient_fnames.size(); i++){
+        log.printf("   bias %s: %s \n",bias_ptrs[i]->getLabel().c_str(),gradientOfiles_[i]->getPath().c_str());
+      }
+    }
+  }
+
+
   if(keywords.exists("HESSIAN_FILE")){
-    parse("HESSIAN_FILE",hessian_fname_);
-    plumed_massert(hessian_fname_!=coeffs_fname_,"FILE and HESSIAN_FILE cannot be the same");
-    plumed_massert(hessian_fname_!=gradient_fname_,"GRADIENT_FILE and HESSIAN_FILE cannot be the same");
-  }
-  if(keywords.exists("HESSIAN_OUTPUT_STRIDE")){
+    std::vector<std::string> hessian_fnames;
+    parseVector("HESSIAN_FILE",hessian_fnames);
     parse("HESSIAN_OUTPUT_STRIDE",hessian_wstride_);
+    if(hessian_fnames.size()==1 && nbiases_>1){
+      hessian_fnames.resize(nbiases_,hessian_fnames[0]);
+      for(unsigned int i=0; i<nbiases_; i++){
+        std::string is=""; Tools::convert(i,is);
+        hessian_fnames[i] = FileBase::appendSuffix(hessian_fnames[i],fname_prefix+is);
+      }
+    }
+    if(hessian_fnames.size()>0 && hessian_fnames.size()!=nbiases_){
+      plumed_merror("Error in HESSIAN_FILE keyword: either give one value for all biases or a seperate value for each bias");
+    }
+
+    hessianOfiles_.resize(hessian_fnames.size(),NULL);
+    for(unsigned int i=0; i<hessian_fnames.size(); i++){
+      hessianOfiles_[i] = new OFile();
+      plumed_massert(hessian_fnames[i]!=coeffs_fnames[i],"FILE and HESSIAN_FILE cannot be the same");
+      plumed_massert(hessian_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and HESSIAN_FILE cannot be the same");
+      hessianOfiles_[i]->link(*this);
+      if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
+        unsigned int r=0;
+        if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+        comm.Bcast(r,0);
+        if(r>0){hessian_fnames[i]="/dev/null";}
+        hessianOfiles_[i]->enforceSuffix("");
+      }
+      hessianOfiles_[i]->open(hessian_fnames[i]);
+      hessianOfiles_[i]->setHeavyFlush();
+    }
+
+    if(hessian_fnames.size()>0){
+      if(nbiases_==1){
+        log.printf("  Hessian will be written out to file %s every %d iterations\n",hessianOfiles_[0]->getPath().c_str(),static_cast<int>(hessian_wstride_));
+      }
+      else {
+        log.printf("  Gradient will be written out to the following files every %d iterations:\n",static_cast<int>(hessian_wstride_));
+        for(unsigned int i=0; i<hessian_fnames.size(); i++){
+          log.printf("   bias %s: %s \n",bias_ptrs[i]->getLabel().c_str(),hessianOfiles_[i]->getPath().c_str());
+        }
+      }
+    }
   }
+
   //
   if(keywords.exists("MASK_FILE")){
-    std::string mask_fname_in="";
-    parse("MASK_FILE",mask_fname_in);
-    coeffs_mask_ptr = new CoeffsVector(*coeffs_ptr);
-    coeffs_mask_ptr->setLabels("mask");
-    coeffs_mask_ptr->setValues(1.0);
-    coeffs_mask_ptr->setOutputFmt("%f");
-    if(mask_fname_in.size()>0){
-      size_t nread = coeffs_mask_ptr->readFromFile(mask_fname_in,true,true);
-      log.printf("  read %d values from mask file %s\n",static_cast<int>(nread),mask_fname_in.c_str());
+    std::vector<std::string> mask_fnames_in;
+    parseVector("MASK_FILE",mask_fnames_in);
+    if(mask_fnames_in.size()==1 && nbiases_>1){
+      if(identical_coeffs_shape_){mask_fnames_in.resize(nbiases_,mask_fnames_in[0]);}
+      else{plumed_merror("the coefficients indices shape differs between biases so you need to give a seperate file for each bias\n");}
     }
-    size_t ndeactived = coeffs_mask_ptr->countValues(0.0);
-    log.printf("  deactived optimization of %d coefficients\n",static_cast<int>(ndeactived));
-    std::string mask_fname_out="";
-    parse("OUTPUT_MASK_FILE",mask_fname_out);
-    if(mask_fname_out.size()>0){
-      plumed_massert(mask_fname_out!=mask_fname_in,"MASK_FILE and OUTPUT_MASK_FILE cannot be the same");
+    if(mask_fnames_in.size()>0 && mask_fnames_in.size()!=nbiases_){
+      plumed_merror("Error in MASK_FILE keyword: either give one value for all biases or a seperate value for each bias");
+    }
+
+    for(unsigned int i=0; i<nbiases_; i++){
+      coeffs_mask_ptrs[i] = new CoeffsVector(*coeffs_ptrs[i]);
+      coeffs_mask_ptrs[i]->setLabels("mask");
+      coeffs_mask_ptrs[i]->setValues(1.0);
+      coeffs_mask_ptrs[i]->setOutputFmt("%f");
+    }
+
+    if(mask_fnames_in.size()>0){
+      if(nbiases_==1){
+        size_t nread = coeffs_mask_ptrs[0]->readFromFile(mask_fnames_in[0],true,true);
+        log.printf("  read %d values from mask file %s\n",static_cast<int>(nread),mask_fnames_in[0].c_str());
+        size_t ndeactived = coeffs_mask_ptrs[0]->countValues(0.0);
+        log.printf("  deactived optimization of %d coefficients\n",static_cast<int>(ndeactived));
+      }
+      else{
+        for(unsigned int i=0; i<nbiases_; i++){
+          size_t nread = coeffs_mask_ptrs[i]->readFromFile(mask_fnames_in[i],true,true);
+          log.printf("  bias %s: read %d values from mask file %s\n",bias_ptrs[i]->getLabel().c_str(),static_cast<int>(nread),mask_fnames_in[i].c_str());
+          size_t ndeactived = coeffs_mask_ptrs[0]->countValues(0.0);
+          log.printf("  bias %s: deactived optimization of %d coefficients\n",bias_ptrs[i]->getLabel().c_str(),static_cast<int>(ndeactived));
+        }
+      }
+    }
+
+    std::vector<std::string> mask_fnames_out;
+    parseVector("OUTPUT_MASK_FILE",mask_fnames_out);
+    if(mask_fnames_out.size()==1 && nbiases_>1){
+      mask_fnames_out.resize(nbiases_,mask_fnames_out[0]);
+      for(unsigned int i=0; i<nbiases_; i++){
+        std::string is=""; Tools::convert(i,is);
+        mask_fnames_out[i] = FileBase::appendSuffix(mask_fnames_out[i],fname_prefix+is);
+      }
+    }
+    if(mask_fnames_out.size()>0 && mask_fnames_out.size()!=nbiases_){
+      plumed_merror("Error in OUTPUT_MASK_FILE keyword: either give one value for all biases or a seperate value for each bias");
+    }
+
+
+    for(unsigned int i=0; i<mask_fnames_out.size(); i++){
+      if(mask_fnames_in.size()>0){
+        plumed_massert(mask_fnames_out[i]!=mask_fnames_in[i],"MASK_FILE and OUTPUT_MASK_FILE cannot be the same");
+      }
       OFile maskOfile;
       maskOfile.link(*this);
       if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
         unsigned int r=0;
         if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
         comm.Bcast(r,0);
-        if(r>0){mask_fname_out="/dev/null";}
+        if(r>0){mask_fnames_out[i]="/dev/null";}
         maskOfile.enforceSuffix("");
       }
-      maskOfile.open(mask_fname_out);
-      coeffs_mask_ptr->writeToFile(maskOfile,true,getTimeStep()*getStep());
+      maskOfile.open(mask_fnames_out[i]);
+      coeffs_mask_ptrs[i]->writeToFile(maskOfile,true,getTimeStep()*getStep());
       maskOfile.close();
     }
   }
 
-  //
-  addComponent("gradrms"); componentIsNotPeriodic("gradrms");
-  addComponent("gradmax"); componentIsNotPeriodic("gradmax");
-  if(!fixed_stepsize_){
-    addComponent("stepsize"); componentIsNotPeriodic("stepsize");
+
+  if(nbiases_==1){
+    log.printf("  Output Components:\n");
+    log.printf(" ");
+    addComponent("gradrms"); componentIsNotPeriodic("gradrms");
+    log.printf(" ");
+    addComponent("gradmax"); componentIsNotPeriodic("gradmax");
+    if(!fixed_stepsize_){
+      log.printf(" ");
+      addComponent("stepsize"); componentIsNotPeriodic("stepsize");
+    }
   }
-  // addComponent("gradmaxidx"); componentIsNotPeriodic("gradmaxidx");
-
-
+  else {
+    for(unsigned int i=0; i<nbiases_; i++){
+      log.printf("  Output Components for bias %s:\n",bias_ptrs[i]->getLabel().c_str());
+      std::string is=""; Tools::convert(i,is); is = "-" + is;
+      log.printf(" ");
+      addComponent("gradrms"+is); componentIsNotPeriodic("gradrms"+is);
+      log.printf(" ");
+      addComponent("gradmax"+is); componentIsNotPeriodic("gradmax"+is);
+      if(!fixed_stepsize_){
+        log.printf(" ");
+        addComponent("stepsize"+is); componentIsNotPeriodic("stepsize"+is);
+      }
+    }
+  }
 }
 
 
 Optimizer::~Optimizer() {
-  delete aux_coeffs_ptr;
-  if(coeffs_fname_.size()>0){coeffsOfile_.close();}
-  if(gradient_fname_.size()>0){gradientOfile_.close();}
-  if(hessian_fname_.size()>0){hessianOfile_.close();}
+  for(unsigned int i=0; i<nbiases_; i++){
+    delete aux_coeffs_ptrs[i];
+  }
+  for(unsigned int i=0; i<coeffsOfiles_.size(); i++){
+    coeffsOfiles_[i]->close();
+    delete coeffsOfiles_[i];
+  }
+  for(unsigned int i=0; i<gradientOfiles_.size(); i++){
+    gradientOfiles_[i]->close();
+    delete gradientOfiles_[i];
+  }
+  for(unsigned int i=0; i<hessianOfiles_.size(); i++){
+    hessianOfiles_[i]->close();
+    delete hessianOfiles_[i];
+  }
 }
 
 
@@ -225,7 +464,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
   keys.add("compulsory","FILE","COEFFS","the name of output file for the coefficients");
-  keys.add("compulsory","OUTPUT_STRIDE","100","how often the coefficients should be written to file. This parameter is given as the number of bias iterations.");
+  keys.add("compulsory","OUTPUT_STRIDE","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
+  keys.add("optional","BIASID_SUFFIX","suffix to add to the filename given in FILE to identfy the bias, should only be given if a single filename is given in FILE when optimizing multiple biases.");
   // Hidden keywords to output the gradient to a file.
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
   keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
@@ -244,8 +484,9 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","OUTPUT_MASK_FILE","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
   //
   // Components that are always active
-  keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient");
-  keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient");
+  keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-# ");
+  keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-# ");
+  ActionWithValue::useCustomisableComponents(keys);
   // keys.addOutputComponent("gradmaxidx","default","the index of the maximum absolute value of the gradient");
 }
 
@@ -280,14 +521,13 @@ void Optimizer::useMaskKeywords(Keywords& keys) {
 }
 
 
-
 void Optimizer::turnOnHessian() {
-  plumed_massert(hessian_ptr==NULL,"turnOnHessian() should only be run during initialization");
+  plumed_massert(hessian_ptrs.size()==0,"turnOnHessian() should only be run during initialization");
   use_hessian_=true;
-  bias_ptr->turnOnHessian(diagonal_hessian_);
-  hessian_ptr = bias_ptr->getHessianPtr();
-  plumed_massert(hessian_ptr != NULL,"Hessian is needed but not linked correctly");
-  //
+  hessian_ptrs.resize(nbiases_);
+  for(unsigned int i=0; i<nbiases_; i++){
+    hessian_ptrs[i] = enableHessian(bias_ptrs[i],diagonal_hessian_);
+  }
   if(diagonal_hessian_){
     log.printf("  optimization performed using the diagonal part of the Hessian\n");
   }
@@ -295,88 +535,39 @@ void Optimizer::turnOnHessian() {
     log.printf("  optimization performed using the full Hessian\n");
   }
   //
-  if(hessian_fname_.size()>0){
-    hessianOfile_.link(*this);
-    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
-      unsigned int r=0;
-      if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
-      comm.Bcast(r,0);
-      if(r>0){hessian_fname_="/dev/null";}
-      hessianOfile_.enforceSuffix("");
-    }
-    hessianOfile_.open(hessian_fname_);
-    hessianOfile_.setHeavyFlush();
-    hessian_ptr->writeToFile(hessianOfile_,getTimeStep()*getStep());
-    log.printf("  DEBUG OPTION: Hessian will be written out to file %s every %d bias iterations\n",hessian_fname_.c_str(),static_cast<int>(hessian_wstride_));
+  for(unsigned int i=0; i<hessianOfiles_.size(); i++){
+    hessian_ptrs[i]->writeToFile(*hessianOfiles_[i],getTimeStep()*getStep());
   }
 }
 
 
 void Optimizer::turnOffHessian() {
   use_hessian_=false;
-  bias_ptr->turnOffHessian();
-  hessian_ptr = NULL;
+  for(unsigned int i=0; i<nbiases_; i++){
+    bias_ptrs[i]->disableHessian();
+  }
+  hessian_ptrs.clear();
+  for(unsigned int i=0; i<hessianOfiles_.size(); i++){
+    hessianOfiles_[i]->close();
+    delete hessianOfiles_[i];
+  }
+  hessianOfiles_.clear();
 }
 
 
-void Optimizer::update() {
-  if(onStep() && getStep()!=0){
-    bias_ptr->updateGradientAndHessian();
-    if(use_mwalkers_mpi_){
-      gradient_ptr->sumMultiSimCommMPI(multi_sim_comm);
-      if(use_hessian_){hessian_ptr->sumMultiSimCommMPI(multi_sim_comm);}
-    }
-    coeffsUpdate();
-    updateOutputComponents();
-    increaseIterationCounter();
-    coeffs_ptr->increaseCounter();
-    aux_coeffs_ptr->increaseCounter();
-    gradient_ptr->increaseCounter();
-    if(use_hessian_){hessian_ptr->increaseCounter();}
-    writeOutputFiles();
-    bias_ptr->clearGradientAndHessian();
-  }
-}
-
-
-void Optimizer::updateOutputComponents() {
-  if(!fixed_stepsize_){
-    getPntrToComponent("stepsize")->set( getCurrentStepSize() );
-  }
-  getPntrToComponent("gradrms")->set( Gradient().getRMS() );
-  size_t gradient_maxabs_idx=0;
-  getPntrToComponent("gradmax")->set( Gradient().getMaxAbsValue(gradient_maxabs_idx) );
-  // getPntrToComponent("gradmaxidx")->set( gradient_maxabs_idx );
-}
-
-
-void Optimizer::writeOutputFiles() {
-  if(coeffs_fname_.size()>0 && iter_counter%coeffs_wstride_==0){
-    coeffs_ptr->writeToFile(coeffsOfile_,aux_coeffs_ptr,false,getTimeStep()*getStep());
-  }
-  if(gradient_fname_.size()>0 && iter_counter%gradient_wstride_==0){
-    gradient_ptr->writeToFile(gradientOfile_,false,getTimeStep()*getStep());
-  }
-  if(use_hessian_ && hessian_fname_.size()>0 && iter_counter%hessian_wstride_==0){
-    hessian_ptr->writeToFile(hessianOfile_,getTimeStep()*getStep());
-  }
-}
-
-
-void Optimizer::setCurrentStepSize(const double current_stepsize_in) {
-  current_stepsize_ = current_stepsize_in;
-}
-
-
-void Optimizer::setIterationCounter(const unsigned int iter_counter_in) {
-  iter_counter = iter_counter_in;
+CoeffsMatrix* Optimizer::enableHessian(bias::VesBias* bias_ptr_in, const bool diagonal_hessian) {
+  plumed_massert(use_hessian_,"the Hessian should not be used");
+  bias_ptr_in->enableHessian(diagonal_hessian);
+  CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
+  plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
+  return hessian_ptr_out;
 }
 
 
 CoeffsMatrix* Optimizer::switchToDiagonalHessian(bias::VesBias* bias_ptr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=true;
-  bias_ptr_in->turnOnHessian(diagonal_hessian_);
+  bias_ptr_in->enableHessian(diagonal_hessian_);
   CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
   plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
   //
@@ -388,12 +579,84 @@ CoeffsMatrix* Optimizer::switchToDiagonalHessian(bias::VesBias* bias_ptr_in) {
 CoeffsMatrix* Optimizer::switchToFullHessian(bias::VesBias* bias_ptr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=false;
-  bias_ptr_in->turnOnHessian(diagonal_hessian_);
+  bias_ptr_in->enableHessian(diagonal_hessian_);
   CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
   plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
   //
   log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_ptr_in->getName().c_str(),bias_ptr_in->getLabel().c_str(),getTime());
   return hessian_ptr_out;
+}
+
+
+void Optimizer::update() {
+  if(onStep() && getStep()!=0){
+    for(unsigned int i=0; i<nbiases_; i++){
+      bias_ptrs[i]->updateGradientAndHessian();
+      if(use_mwalkers_mpi_){
+        gradient_ptrs[i]->sumMultiSimCommMPI(multi_sim_comm);
+        if(use_hessian_){hessian_ptrs[i]->sumMultiSimCommMPI(multi_sim_comm);}
+      }
+      coeffsUpdate(i);
+      coeffs_ptrs[i]->increaseCounter();
+      aux_coeffs_ptrs[i]->increaseCounter();
+      gradient_ptrs[i]->increaseCounter();
+      if(use_hessian_){hessian_ptrs[i]->increaseCounter();}
+    }
+    increaseIterationCounter();
+    updateOutputComponents();
+    writeOutputFiles();
+  }
+}
+
+
+void Optimizer::updateOutputComponents() {
+  if(nbiases_==1){
+    if(!fixed_stepsize_){
+      getPntrToComponent("stepsize")->set( getCurrentStepSize(0) );
+    }
+    getPntrToComponent("gradrms")->set( gradient_ptrs[0]->getRMS() );
+    size_t gradient_maxabs_idx=0;
+    getPntrToComponent("gradmax")->set( gradient_ptrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
+  }
+  else {
+    for(unsigned int i=0; i<nbiases_; i++){
+      std::string is=""; Tools::convert(i,is); is = "-" + is;
+      if(!fixed_stepsize_){
+        getPntrToComponent("stepsize"+is)->set( getCurrentStepSize(i) );
+      }
+      getPntrToComponent("gradrms"+is)->set( gradient_ptrs[i]->getRMS() );
+      size_t gradient_maxabs_idx=0;
+      getPntrToComponent("gradmax"+is)->set( gradient_ptrs[i]->getMaxAbsValue(gradient_maxabs_idx) );
+    }
+  }
+}
+
+
+void Optimizer::writeOutputFiles() {
+  for(unsigned int i=0; i<nbiases_; i++){
+    if(coeffsOfiles_.size()>0 && iter_counter%coeffs_wstride_==0){
+      coeffs_ptrs[i]->writeToFile(*coeffsOfiles_[i],aux_coeffs_ptrs[i],false,getTimeStep()*getStep());
+    }
+    if(gradientOfiles_.size()>0 && iter_counter%gradient_wstride_==0){
+      gradient_ptrs[i]->writeToFile(*gradientOfiles_[i],false,getTimeStep()*getStep());
+    }
+    if(hessianOfiles_.size()>0 && iter_counter%hessian_wstride_==0){
+      hessian_ptrs[i]->writeToFile(*hessianOfiles_[i],getTimeStep()*getStep());
+    }
+  }
+}
+
+
+void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
+  if(coeffsOfiles_.size()>0 && iter_counter%coeffs_wstride_==0){
+    coeffs_ptrs[coeffs_id]->writeToFile(*coeffsOfiles_[coeffs_id],aux_coeffs_ptrs[coeffs_id],false,getTimeStep()*getStep());
+  }
+  if(gradientOfiles_.size()>0 && iter_counter%gradient_wstride_==0){
+    gradient_ptrs[coeffs_id]->writeToFile(*gradientOfiles_[coeffs_id],false,getTimeStep()*getStep());
+  }
+  if(hessianOfiles_.size()>0 && iter_counter%hessian_wstride_==0){
+    hessian_ptrs[coeffs_id]->writeToFile(*hessianOfiles_[coeffs_id],getTimeStep()*getStep());
+  }
 }
 
 

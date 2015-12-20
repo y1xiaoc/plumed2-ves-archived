@@ -47,11 +47,11 @@ class Optimizer :
  public ActionWithValue
 {
 private:
-  std::string description_;
-  std::string type_;
+  const std::string description_;
+  const std::string type_;
   //
-  double stepsize_;
-  double current_stepsize_;
+  std::vector<double> stepsizes_;
+  std::vector<double> current_stepsizes;
   bool fixed_stepsize_;
   //
   unsigned int iter_counter;
@@ -63,43 +63,46 @@ private:
   bool mwalkers_mpi_single_files_;
   //
   unsigned int coeffs_wstride_;
-  std::string coeffs_fname_;
-  OFile coeffsOfile_;
+  std::vector<OFile*> coeffsOfiles_;
   //
   unsigned int gradient_wstride_;
-  std::string gradient_fname_;
-  OFile gradientOfile_;
+  std::vector<OFile*> gradientOfiles_;
   //
   unsigned int hessian_wstride_;
-  std::string hessian_fname_;
-  OFile hessianOfile_;
+  std::vector<OFile*> hessianOfiles_;
   //
-  CoeffsVector* coeffs_ptr;
-  CoeffsVector* aux_coeffs_ptr;
-  CoeffsVector* gradient_ptr;
-  CoeffsMatrix* hessian_ptr;
-  CoeffsVector* coeffs_mask_ptr;
+  unsigned int nbiases_;
+  std::vector<bias::VesBias*> bias_ptrs;
   //
-  bias::VesBias* bias_ptr;
+  std::vector<CoeffsVector*> coeffs_ptrs;
+  std::vector<CoeffsVector*> aux_coeffs_ptrs;
+  std::vector<CoeffsVector*> gradient_ptrs;
+  std::vector<CoeffsMatrix*> hessian_ptrs;
+  std::vector<CoeffsVector*> coeffs_mask_ptrs;
+  //
+  bool identical_coeffs_shape_;
   //
 private:
   void updateOutputComponents();
   void writeOutputFiles();
+  void writeOutputFiles(const unsigned int);
 protected:
   void turnOnHessian();
   void turnOffHessian();
+  CoeffsMatrix* enableHessian(bias::VesBias*, const bool diagonal_hessian=false);
   CoeffsMatrix* switchToDiagonalHessian(bias::VesBias*);
   CoeffsMatrix* switchToFullHessian(bias::VesBias*);
   //
-  CoeffsVector& Coeffs() const;
-  CoeffsVector& AuxCoeffs() const;
-  CoeffsVector& Gradient() const;
-  CoeffsMatrix& Hessian() const;
-  CoeffsVector& CoeffsMask() const;
-  double StepSize() const;
-  virtual void coeffsUpdate()=0;
-  void setCurrentStepSize(const double);
-
+  CoeffsVector& Coeffs(const unsigned int coeffs_id = 0) const;
+  CoeffsVector& AuxCoeffs(const unsigned int coeffs_id = 0) const;
+  CoeffsVector& Gradient(const unsigned int coeffs_id = 0) const;
+  CoeffsMatrix& Hessian(const unsigned int coeffs_id = 0) const;
+  CoeffsVector& CoeffsMask(const unsigned int coeffs_id = 0) const;
+  double StepSize(const unsigned int coeffs_id = 0) const;
+  virtual void coeffsUpdate(const unsigned int coeffs_id = 0) = 0;
+  void setCurrentStepSize(const double,const unsigned int i = 0);
+  void setCurrentStepSizes(const std::vector<double>);
+  //
 public:
   static void registerKeywords(Keywords&);
   static void useMultipleWalkersKeywords(Keywords&);
@@ -113,9 +116,12 @@ public:
   std::string getType() const;
   std::string getDescription() const;
   //
-  double getStepSize() const;
-  double getCurrentStepSize() const;
-  void setStepSize(const double stepsize_in){stepsize_ = stepsize_in;}
+  std::vector<double> getStepSizes() const;
+  std::vector<double> getCurrentStepSizes() const;
+  double getStepSize(const unsigned int coeffs_id = 0) const;
+  double getCurrentStepSize(const unsigned int coeffs_id = 0) const;
+  void setStepSizes(const std::vector<double>);
+  void setStepSize(const double, const unsigned int coeffs_id = 0);
   //
   unsigned int getIterationCounter() const;
   double getIterationCounterDbl() const;
@@ -134,11 +140,11 @@ public:
   //
   bool useMultipleWalkers() const {return use_mwalkers_mpi_;}
   //
-  CoeffsVector* getCoeffsPtr() const {return coeffs_ptr;}
-  CoeffsVector* getAuxCoeffsPtr() const {return aux_coeffs_ptr;}
-  CoeffsVector* getGradientPtr()const {return gradient_ptr;}
-  CoeffsMatrix* getHessianPtr() const {return hessian_ptr;}
-  CoeffsVector* getCoeffsMaskPtr() const {return coeffs_mask_ptr;}
+  std::vector<CoeffsVector*> getCoeffsPtrs() const {return coeffs_ptrs;}
+  std::vector<CoeffsVector*> getAuxCoeffsPtrs() const {return aux_coeffs_ptrs;}
+  std::vector<CoeffsVector*> getGradientPtrs()const {return gradient_ptrs;}
+  std::vector<CoeffsMatrix*> getHessianPtrs() const {return hessian_ptrs;}
+  std::vector<CoeffsVector*> getCoeffsMaskPtrs() const {return coeffs_mask_ptrs;}
   };
 
 inline
@@ -148,40 +154,72 @@ inline
 std::string Optimizer::getDescription() const {return description_;}
 
 inline
-double Optimizer::StepSize() const {return stepsize_;}
+double Optimizer::StepSize(const unsigned int coeffs_id) const {return stepsizes_[coeffs_id];}
 
 inline
-CoeffsVector& Optimizer::Coeffs() const {return *coeffs_ptr;}
+CoeffsVector& Optimizer::Coeffs(const unsigned int coeffs_id) const {return *coeffs_ptrs[coeffs_id];}
 
 inline
-CoeffsVector& Optimizer::AuxCoeffs() const {return *aux_coeffs_ptr;}
+CoeffsVector& Optimizer::AuxCoeffs(const unsigned int coeffs_id) const {return *aux_coeffs_ptrs[coeffs_id];}
 
 inline
-CoeffsVector& Optimizer::Gradient() const {return *gradient_ptr;}
+CoeffsVector& Optimizer::Gradient(const unsigned int coeffs_id) const {return *gradient_ptrs[coeffs_id];}
 
 inline
-CoeffsMatrix& Optimizer::Hessian() const {
+CoeffsMatrix& Optimizer::Hessian(const unsigned int coeffs_id) const {
   plumed_massert(use_hessian_,"You cannot use the Hessian without asking for before");
-  return *hessian_ptr;
+  return *hessian_ptrs[coeffs_id];
 }
 
 inline
-CoeffsVector& Optimizer::CoeffsMask() const {return *coeffs_mask_ptr;}
+CoeffsVector& Optimizer::CoeffsMask(const unsigned int coeffs_id) const {return *coeffs_mask_ptrs[coeffs_id];}
 
 inline
-double Optimizer::getStepSize() const {return stepsize_;}
+std::vector<double> Optimizer::getStepSizes() const {return stepsizes_;}
 
 inline
-double Optimizer::getCurrentStepSize() const {return current_stepsize_;}
+std::vector<double> Optimizer::getCurrentStepSizes() const {return current_stepsizes;}
+
+inline
+double Optimizer::getStepSize(const unsigned int coeffs_id) const {return stepsizes_[coeffs_id];}
+
+inline
+double Optimizer::getCurrentStepSize(const unsigned int coeffs_id) const {return current_stepsizes[coeffs_id];}
+
+inline
+void Optimizer::setStepSizes(const std::vector<double> stepsizes_in) {
+  plumed_assert(stepsizes_in.size()==nbiases_);
+  stepsizes_ = stepsizes_in;
+}
+
+inline
+void Optimizer::setStepSize(const double stepsize_in, const unsigned int coeffs_id) {
+  stepsizes_[coeffs_id] = stepsize_in;
+}
+
+inline
+void Optimizer::setCurrentStepSize(const double current_stepsize_in, const unsigned int coeffs_id) {
+  current_stepsizes[coeffs_id] = current_stepsize_in;
+}
+
+inline
+void Optimizer::setCurrentStepSizes(const std::vector<double> current_stepsizes_in) {
+  plumed_assert(current_stepsizes_in.size()==nbiases_);
+  current_stepsizes = current_stepsizes_in;
+}
 
 inline
 unsigned int Optimizer::getIterationCounter() const {return iter_counter;}
 
 inline
-double Optimizer::getIterationCounterDbl() const {return (double) iter_counter;}
+double Optimizer::getIterationCounterDbl() const {return static_cast<double>(iter_counter);}
 
 inline
 void Optimizer::increaseIterationCounter() {iter_counter++;}
+
+inline
+void Optimizer::setIterationCounter(const unsigned int iter_counter_in) {iter_counter = iter_counter_in;}
+
 
 
 }

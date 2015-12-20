@@ -113,8 +113,8 @@ public:
   void clearGradientAndHessian();
   //
   void linkOptimizer(Optimizer*);
-  void turnOnHessian(const bool diagonal_hessian=true);
-  void turnOffHessian();
+  void enableHessian(const bool diagonal_hessian=true);
+  void disableHessian();
 };
 
 inline

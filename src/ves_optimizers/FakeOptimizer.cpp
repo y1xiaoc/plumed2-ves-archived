@@ -32,7 +32,7 @@ class FakeOptimizer : public Optimizer {
 public:
   static void registerKeywords(Keywords&);
   explicit FakeOptimizer(const ActionOptions&);
-  void coeffsUpdate();
+  void coeffsUpdate(const unsigned int i = 0);
 };
 
 
@@ -54,14 +54,17 @@ PLUMED_OPTIMIZER_INIT(ao)
   log.printf("  can be used to monitor gradient and Hessian for debugging purposes\n");
   bool monitor_hessian = false;
   parseFlag("MONITOR_HESSIAN",monitor_hessian);
-  if(monitor_hessian){turnOnHessian();}
+  if(monitor_hessian){
+    turnOnHessian();
+  }
+  else{
+    turnOffHessian();
+  }
   checkRead();
 }
 
 
-void FakeOptimizer::coeffsUpdate() {
-
-}
+void FakeOptimizer::coeffsUpdate(const unsigned int i) {}
 
 
 }
