@@ -30,6 +30,7 @@
 
 namespace PLMD{
 
+class Action;
 class Value;
 class IFile;
 class OFile;
@@ -57,7 +58,8 @@ private:
     MultiCoeffs_LinearBasisSet
   } coeffs_type_;
   //
-  bias::VesBias* bias_ptr;
+  Action* action_pntr;
+  bias::VesBias* bias_pntr;
   //
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
@@ -114,7 +116,9 @@ public:
   std::string getTypeStr() const;
   void setType(const CoeffsType coeffs_type);
   void linkVesBias(bias::VesBias*);
-  bias::VesBias* getBiasPtr(){return bias_ptr;}
+  void linkAction(Action*);
+  bias::VesBias* getPntrToBias(){return bias_pntr;}
+  Action* getPntrToAction(){return action_pntr;}
   bool isGenericCoeffs() const;
   bool isLinearBasisSetCoeffs() const;
   bool isMultiLinearBasisSetCoeffs() const;

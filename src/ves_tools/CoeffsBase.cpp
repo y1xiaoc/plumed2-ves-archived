@@ -24,6 +24,7 @@
 
 #include "CoeffsBase.h"
 #include "ves_basisfunctions/BasisFunctions.h"
+#include "ves_biases/VesBias.h"
 
 #include "tools/Tools.h"
 #include "tools/File.h"
@@ -40,7 +41,8 @@ CoeffsBase::CoeffsBase(
 label_(label),
 data_label_(label),
 coeffs_type_(Generic),
-bias_ptr(NULL),
+action_pntr(NULL),
+bias_pntr(NULL),
 args_(0),
 basisf_(0),
 multicoeffs_(false),
@@ -64,7 +66,8 @@ CoeffsBase::CoeffsBase(
 label_(label),
 data_label_(label),
 coeffs_type_(LinearBasisSet),
-bias_ptr(NULL),
+action_pntr(NULL),
+bias_pntr(NULL),
 args_(args),
 basisf_(basisf),
 multicoeffs_(false),
@@ -96,7 +99,8 @@ CoeffsBase::CoeffsBase(
 label_(label),
 data_label_(label),
 coeffs_type_(MultiCoeffs_LinearBasisSet),
-bias_ptr(NULL),
+action_pntr(NULL),
+bias_pntr(NULL),
 args_(0),
 basisf_(0),
 multicoeffs_(true),
@@ -284,8 +288,14 @@ void CoeffsBase::setType(const CoeffsType coeffs_type) {
 }
 
 
-void CoeffsBase::linkVesBias(bias::VesBias* bias_ptr_in){
-  bias_ptr = bias_ptr_in;
+void CoeffsBase::linkVesBias(bias::VesBias* bias_pntr_in){
+  bias_pntr = bias_pntr_in;
+  action_pntr = static_cast<Action*>(bias_pntr_in);
+}
+
+
+void CoeffsBase::linkAction(Action* action_pntr_in){
+  action_pntr = action_pntr_in;
 }
 
 
