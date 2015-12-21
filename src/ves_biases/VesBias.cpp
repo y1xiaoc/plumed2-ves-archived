@@ -82,24 +82,28 @@ void VesBias::registerKeywords( Keywords& keys ) {
 
 void VesBias::initializeCoeffs(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {
   coeffs_ptr = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
+  coeffs_ptr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 
 
 void VesBias::initializeCoeffs(std::vector<Value*>& args,std::vector<BasisFunctions*>& basisf) {
   coeffs_ptr = new CoeffsVector("coeffs",args,basisf,comm,true);
+  coeffs_ptr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 
 
 void VesBias::linkCoeffs(CoeffsVector* coeffs_ptr_in) {
   coeffs_ptr = coeffs_ptr_in;
+  coeffs_ptr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 
 
 void VesBias::linkCoeffs(CoeffsVector& coeffs_in) {
   coeffs_ptr = &coeffs_in;
+  coeffs_ptr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 

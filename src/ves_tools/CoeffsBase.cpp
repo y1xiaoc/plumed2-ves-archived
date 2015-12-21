@@ -40,6 +40,7 @@ CoeffsBase::CoeffsBase(
 label_(label),
 data_label_(label),
 coeffs_type_(Generic),
+bias_ptr(NULL),
 args_(0),
 basisf_(0),
 multicoeffs_(false),
@@ -63,6 +64,7 @@ CoeffsBase::CoeffsBase(
 label_(label),
 data_label_(label),
 coeffs_type_(LinearBasisSet),
+bias_ptr(NULL),
 args_(args),
 basisf_(basisf),
 multicoeffs_(false),
@@ -94,6 +96,7 @@ CoeffsBase::CoeffsBase(
 label_(label),
 data_label_(label),
 coeffs_type_(MultiCoeffs_LinearBasisSet),
+bias_ptr(NULL),
 args_(0),
 basisf_(0),
 multicoeffs_(true),
@@ -278,6 +281,11 @@ std::string CoeffsBase::getTypeStr() const {
 
 void CoeffsBase::setType(const CoeffsType coeffs_type) {
   coeffs_type_=coeffs_type;
+}
+
+
+void CoeffsBase::linkVesBias(bias::VesBias* bias_ptr_in){
+  bias_ptr = bias_ptr_in;
 }
 
 

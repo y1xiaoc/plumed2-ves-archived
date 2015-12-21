@@ -25,12 +25,20 @@
 #include <vector>
 #include <string>
 
+
+
+
 namespace PLMD{
 
 class Value;
 class IFile;
 class OFile;
 class BasisFunctions;
+
+namespace bias{
+  class VesBias;
+}
+
 
 
 /// \ingroup TOOLBOX
@@ -48,6 +56,9 @@ private:
     LinearBasisSet,
     MultiCoeffs_LinearBasisSet
   } coeffs_type_;
+  //
+  bias::VesBias* bias_ptr;
+  //
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
   size_t ncoeffs_;
@@ -102,6 +113,8 @@ public:
   CoeffsType getType() const;
   std::string getTypeStr() const;
   void setType(const CoeffsType coeffs_type);
+  void linkVesBias(bias::VesBias*);
+  bias::VesBias* getBiasPtr(){return bias_ptr;}
   bool isGenericCoeffs() const;
   bool isLinearBasisSetCoeffs() const;
   bool isMultiLinearBasisSetCoeffs() const;
