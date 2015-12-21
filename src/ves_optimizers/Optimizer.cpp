@@ -54,12 +54,12 @@ gradientOfiles_(0),
 hessian_wstride_(100),
 hessianOfiles_(0),
 nbiases_(0),
-bias_ptrs(0),
-coeffs_ptrs(0),
-aux_coeffs_ptrs(0),
-gradient_ptrs(0),
-hessian_ptrs(0),
-coeffs_mask_ptrs(0),
+bias_pntrs(0),
+coeffs_pntrs(0),
+aux_coeffs_pntrs(0),
+gradient_pntrs(0),
+hessian_pntrs(0),
+coeffs_mask_pntrs(0),
 identical_coeffs_shape_(true)
 {
   std::vector<std::string> bias_labels(0);
@@ -67,30 +67,30 @@ identical_coeffs_shape_(true)
   plumed_massert(bias_labels.size()>0,"problem with BIAS keyword");
   nbiases_ = bias_labels.size();
   //
-  bias_ptrs.resize(nbiases_);
-  coeffs_ptrs.resize(nbiases_);
-  aux_coeffs_ptrs.resize(nbiases_);
-  gradient_ptrs.resize(nbiases_);
-  coeffs_mask_ptrs.resize(nbiases_);
+  bias_pntrs.resize(nbiases_);
+  coeffs_pntrs.resize(nbiases_);
+  aux_coeffs_pntrs.resize(nbiases_);
+  gradient_pntrs.resize(nbiases_);
+  coeffs_mask_pntrs.resize(nbiases_);
   //
   for(unsigned int i=0; i<nbiases_; i++) {
-    bias_ptrs[i]=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_labels[i]);
-    if(!bias_ptrs[i]){plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
+    bias_pntrs[i]=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_labels[i]);
+    if(!bias_pntrs[i]){plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
     //
-    bias_ptrs[i]->linkOptimizer(this);
-    coeffs_ptrs[i] = bias_ptrs[i]->getCoeffsPtr();
-    plumed_massert(coeffs_ptrs[i] != NULL,"coeffs are not linked correctly");
+    bias_pntrs[i]->linkOptimizer(this);
+    coeffs_pntrs[i] = bias_pntrs[i]->getCoeffsPtr();
+    plumed_massert(coeffs_pntrs[i] != NULL,"coeffs are not linked correctly");
     //
-    aux_coeffs_ptrs[i] = new CoeffsVector(*coeffs_ptrs[i]);
-    aux_coeffs_ptrs[i]->setLabels("aux_"+coeffs_ptrs[i]->getLabel());
+    aux_coeffs_pntrs[i] = new CoeffsVector(*coeffs_pntrs[i]);
+    aux_coeffs_pntrs[i]->setLabels("aux_"+coeffs_pntrs[i]->getLabel());
     //
-    gradient_ptrs[i] = bias_ptrs[i]->getGradientPtr();
-    plumed_massert(gradient_ptrs[i] != NULL,"gradient is not linked correctly");
+    gradient_pntrs[i] = bias_pntrs[i]->getGradientPtr();
+    plumed_massert(gradient_pntrs[i] != NULL,"gradient is not linked correctly");
   }
   //
   identical_coeffs_shape_ = true;
   for(unsigned int i=1; i<nbiases_; i++) {
-    if(!coeffs_ptrs[0]->sameShape(*coeffs_ptrs[i])){
+    if(!coeffs_pntrs[0]->sameShape(*coeffs_pntrs[i])){
       identical_coeffs_shape_ = false;
       break;
     }
@@ -117,9 +117,9 @@ identical_coeffs_shape_(true)
   setCurrentStepSizes(stepsizes_);
   //
   if(nbiases_==1){
-    log.printf("  optimizing VES bias %s with label %s: \n",bias_ptrs[0]->getName().c_str(),bias_ptrs[0]->getLabel().c_str());
-    log.printf("   KbT: %f\n",bias_ptrs[0]->getKbT());
-    log.printf("  number of coefficients: %d\n",static_cast<int>(coeffs_ptrs[0]->numberOfCoeffs()));
+    log.printf("  optimizing VES bias %s with label %s: \n",bias_pntrs[0]->getName().c_str(),bias_pntrs[0]->getLabel().c_str());
+    log.printf("   KbT: %f\n",bias_pntrs[0]->getKbT());
+    log.printf("  number of coefficients: %d\n",static_cast<int>(coeffs_pntrs[0]->numberOfCoeffs()));
     if(fixed_stepsize_){log.printf("  using a constant step size of %f\n",stepsizes_[0]);}
     else{log.printf("  using an initial step size of %f\n",stepsizes_[0]);}
   }
@@ -128,12 +128,12 @@ identical_coeffs_shape_(true)
     size_t tot_ncoeffs = 0;
     for(unsigned int i=0; i<nbiases_; i++) {
       log.printf("   bias %d: \n",static_cast<int>(i));
-      log.printf("    %s with label %s: \n",bias_ptrs[i]->getName().c_str(),bias_ptrs[i]->getLabel().c_str());
-      log.printf("    KbT: %f\n",bias_ptrs[i]->getKbT());
-      log.printf("    number of coefficients: %d\n",static_cast<int>(coeffs_ptrs[i]->numberOfCoeffs()));
+      log.printf("    %s with label %s: \n",bias_pntrs[i]->getName().c_str(),bias_pntrs[i]->getLabel().c_str());
+      log.printf("    KbT: %f\n",bias_pntrs[i]->getKbT());
+      log.printf("    number of coefficients: %d\n",static_cast<int>(coeffs_pntrs[i]->numberOfCoeffs()));
       if(fixed_stepsize_){log.printf("    using a constant step size of %f\n",stepsizes_[i]);}
       else{log.printf("    using an initial step size of %f\n",stepsizes_[i]);}
-      tot_ncoeffs += coeffs_ptrs[i]->numberOfCoeffs();
+      tot_ncoeffs += coeffs_pntrs[i]->numberOfCoeffs();
     }
     log.printf("  total number of coefficients: %d\n",static_cast<int>(tot_ncoeffs));
     if(identical_coeffs_shape_){
@@ -230,7 +230,7 @@ identical_coeffs_shape_(true)
     }
     coeffsOfiles_[i]->open(coeffs_fnames[i]);
     coeffsOfiles_[i]->setHeavyFlush();
-    coeffs_ptrs[i]->writeToFile(*coeffsOfiles_[i],aux_coeffs_ptrs[i],false,getTimeStep()*getStep());
+    coeffs_pntrs[i]->writeToFile(*coeffsOfiles_[i],aux_coeffs_pntrs[i],false,getTimeStep()*getStep());
   }
 
   if(coeffs_fnames.size()>0){
@@ -240,7 +240,7 @@ identical_coeffs_shape_(true)
     else {
       log.printf("  Coefficients will be written out to the following files every %d iterations:\n",static_cast<int>(coeffs_wstride_));
       for(unsigned int i=0; i<coeffs_fnames.size(); i++){
-        log.printf("   bias %s: %s \n",bias_ptrs[i]->getLabel().c_str(),coeffsOfiles_[i]->getPath().c_str());
+        log.printf("   bias %s: %s \n",bias_pntrs[i]->getLabel().c_str(),coeffsOfiles_[i]->getPath().c_str());
       }
     }
   }
@@ -278,7 +278,7 @@ identical_coeffs_shape_(true)
     }
     gradientOfiles_[i]->open(gradient_fnames[i]);
     gradientOfiles_[i]->setHeavyFlush();
-    gradient_ptrs[i]->writeToFile(*gradientOfiles_[i],false,getTimeStep()*getStep());
+    gradient_pntrs[i]->writeToFile(*gradientOfiles_[i],false,getTimeStep()*getStep());
   }
 
   if(gradient_fnames.size()>0){
@@ -288,7 +288,7 @@ identical_coeffs_shape_(true)
     else {
       log.printf("  Gradient will be written out to the following files every %d iterations:\n",static_cast<int>(gradient_wstride_));
       for(unsigned int i=0; i<gradient_fnames.size(); i++){
-        log.printf("   bias %s: %s \n",bias_ptrs[i]->getLabel().c_str(),gradientOfiles_[i]->getPath().c_str());
+        log.printf("   bias %s: %s \n",bias_pntrs[i]->getLabel().c_str(),gradientOfiles_[i]->getPath().c_str());
       }
     }
   }
@@ -333,7 +333,7 @@ identical_coeffs_shape_(true)
       else {
         log.printf("  Gradient will be written out to the following files every %d iterations:\n",static_cast<int>(hessian_wstride_));
         for(unsigned int i=0; i<hessian_fnames.size(); i++){
-          log.printf("   bias %s: %s \n",bias_ptrs[i]->getLabel().c_str(),hessianOfiles_[i]->getPath().c_str());
+          log.printf("   bias %s: %s \n",bias_pntrs[i]->getLabel().c_str(),hessianOfiles_[i]->getPath().c_str());
         }
       }
     }
@@ -352,25 +352,25 @@ identical_coeffs_shape_(true)
     }
 
     for(unsigned int i=0; i<nbiases_; i++){
-      coeffs_mask_ptrs[i] = new CoeffsVector(*coeffs_ptrs[i]);
-      coeffs_mask_ptrs[i]->setLabels("mask");
-      coeffs_mask_ptrs[i]->setValues(1.0);
-      coeffs_mask_ptrs[i]->setOutputFmt("%f");
+      coeffs_mask_pntrs[i] = new CoeffsVector(*coeffs_pntrs[i]);
+      coeffs_mask_pntrs[i]->setLabels("mask");
+      coeffs_mask_pntrs[i]->setValues(1.0);
+      coeffs_mask_pntrs[i]->setOutputFmt("%f");
     }
 
     if(mask_fnames_in.size()>0){
       if(nbiases_==1){
-        size_t nread = coeffs_mask_ptrs[0]->readFromFile(mask_fnames_in[0],true,true);
+        size_t nread = coeffs_mask_pntrs[0]->readFromFile(mask_fnames_in[0],true,true);
         log.printf("  read %d values from mask file %s\n",static_cast<int>(nread),mask_fnames_in[0].c_str());
-        size_t ndeactived = coeffs_mask_ptrs[0]->countValues(0.0);
+        size_t ndeactived = coeffs_mask_pntrs[0]->countValues(0.0);
         log.printf("  deactived optimization of %d coefficients\n",static_cast<int>(ndeactived));
       }
       else{
         for(unsigned int i=0; i<nbiases_; i++){
-          size_t nread = coeffs_mask_ptrs[i]->readFromFile(mask_fnames_in[i],true,true);
-          log.printf("  bias %s: read %d values from mask file %s\n",bias_ptrs[i]->getLabel().c_str(),static_cast<int>(nread),mask_fnames_in[i].c_str());
-          size_t ndeactived = coeffs_mask_ptrs[0]->countValues(0.0);
-          log.printf("  bias %s: deactived optimization of %d coefficients\n",bias_ptrs[i]->getLabel().c_str(),static_cast<int>(ndeactived));
+          size_t nread = coeffs_mask_pntrs[i]->readFromFile(mask_fnames_in[i],true,true);
+          log.printf("  bias %s: read %d values from mask file %s\n",bias_pntrs[i]->getLabel().c_str(),static_cast<int>(nread),mask_fnames_in[i].c_str());
+          size_t ndeactived = coeffs_mask_pntrs[0]->countValues(0.0);
+          log.printf("  bias %s: deactived optimization of %d coefficients\n",bias_pntrs[i]->getLabel().c_str(),static_cast<int>(ndeactived));
         }
       }
     }
@@ -403,7 +403,7 @@ identical_coeffs_shape_(true)
         maskOfile.enforceSuffix("");
       }
       maskOfile.open(mask_fnames_out[i]);
-      coeffs_mask_ptrs[i]->writeToFile(maskOfile,true,getTimeStep()*getStep());
+      coeffs_mask_pntrs[i]->writeToFile(maskOfile,true,getTimeStep()*getStep());
       maskOfile.close();
     }
   }
@@ -422,7 +422,7 @@ identical_coeffs_shape_(true)
   }
   else {
     for(unsigned int i=0; i<nbiases_; i++){
-      log.printf("  Output Components for bias %s:\n",bias_ptrs[i]->getLabel().c_str());
+      log.printf("  Output Components for bias %s:\n",bias_pntrs[i]->getLabel().c_str());
       std::string is=""; Tools::convert(i,is); is = "-" + is;
       log.printf(" ");
       addComponent("gradrms"+is); componentIsNotPeriodic("gradrms"+is);
@@ -439,7 +439,7 @@ identical_coeffs_shape_(true)
 
 Optimizer::~Optimizer() {
   for(unsigned int i=0; i<nbiases_; i++){
-    delete aux_coeffs_ptrs[i];
+    delete aux_coeffs_pntrs[i];
   }
   for(unsigned int i=0; i<coeffsOfiles_.size(); i++){
     coeffsOfiles_[i]->close();
@@ -522,11 +522,11 @@ void Optimizer::useMaskKeywords(Keywords& keys) {
 
 
 void Optimizer::turnOnHessian() {
-  plumed_massert(hessian_ptrs.size()==0,"turnOnHessian() should only be run during initialization");
+  plumed_massert(hessian_pntrs.size()==0,"turnOnHessian() should only be run during initialization");
   use_hessian_=true;
-  hessian_ptrs.resize(nbiases_);
+  hessian_pntrs.resize(nbiases_);
   for(unsigned int i=0; i<nbiases_; i++){
-    hessian_ptrs[i] = enableHessian(bias_ptrs[i],diagonal_hessian_);
+    hessian_pntrs[i] = enableHessian(bias_pntrs[i],diagonal_hessian_);
   }
   if(diagonal_hessian_){
     log.printf("  optimization performed using the diagonal part of the Hessian\n");
@@ -536,7 +536,7 @@ void Optimizer::turnOnHessian() {
   }
   //
   for(unsigned int i=0; i<hessianOfiles_.size(); i++){
-    hessian_ptrs[i]->writeToFile(*hessianOfiles_[i],getTimeStep()*getStep());
+    hessian_pntrs[i]->writeToFile(*hessianOfiles_[i],getTimeStep()*getStep());
   }
 }
 
@@ -544,9 +544,9 @@ void Optimizer::turnOnHessian() {
 void Optimizer::turnOffHessian() {
   use_hessian_=false;
   for(unsigned int i=0; i<nbiases_; i++){
-    bias_ptrs[i]->disableHessian();
+    bias_pntrs[i]->disableHessian();
   }
-  hessian_ptrs.clear();
+  hessian_pntrs.clear();
   for(unsigned int i=0; i<hessianOfiles_.size(); i++){
     hessianOfiles_[i]->close();
     delete hessianOfiles_[i];
@@ -555,52 +555,52 @@ void Optimizer::turnOffHessian() {
 }
 
 
-CoeffsMatrix* Optimizer::enableHessian(bias::VesBias* bias_ptr_in, const bool diagonal_hessian) {
+CoeffsMatrix* Optimizer::enableHessian(bias::VesBias* bias_pntr_in, const bool diagonal_hessian) {
   plumed_massert(use_hessian_,"the Hessian should not be used");
-  bias_ptr_in->enableHessian(diagonal_hessian);
-  CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
-  plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
-  return hessian_ptr_out;
+  bias_pntr_in->enableHessian(diagonal_hessian);
+  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPtr();
+  plumed_massert(hessian_pntr_out != NULL,"Hessian is needed but not linked correctly");
+  return hessian_pntr_out;
 }
 
 
-CoeffsMatrix* Optimizer::switchToDiagonalHessian(bias::VesBias* bias_ptr_in) {
+CoeffsMatrix* Optimizer::switchToDiagonalHessian(bias::VesBias* bias_pntr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=true;
-  bias_ptr_in->enableHessian(diagonal_hessian_);
-  CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
-  plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
+  bias_pntr_in->enableHessian(diagonal_hessian_);
+  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPtr();
+  plumed_massert(hessian_pntr_out != NULL,"Hessian is needed but not linked correctly");
   //
-  log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_ptr_in->getName().c_str(),bias_ptr_in->getLabel().c_str(),getTime());
-  return hessian_ptr_out;
+  log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_pntr_in->getName().c_str(),bias_pntr_in->getLabel().c_str(),getTime());
+  return hessian_pntr_out;
 }
 
 
-CoeffsMatrix* Optimizer::switchToFullHessian(bias::VesBias* bias_ptr_in) {
+CoeffsMatrix* Optimizer::switchToFullHessian(bias::VesBias* bias_pntr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=false;
-  bias_ptr_in->enableHessian(diagonal_hessian_);
-  CoeffsMatrix* hessian_ptr_out = bias_ptr_in->getHessianPtr();
-  plumed_massert(hessian_ptr_out != NULL,"Hessian is needed but not linked correctly");
+  bias_pntr_in->enableHessian(diagonal_hessian_);
+  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPtr();
+  plumed_massert(hessian_pntr_out != NULL,"Hessian is needed but not linked correctly");
   //
-  log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_ptr_in->getName().c_str(),bias_ptr_in->getLabel().c_str(),getTime());
-  return hessian_ptr_out;
+  log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_pntr_in->getName().c_str(),bias_pntr_in->getLabel().c_str(),getTime());
+  return hessian_pntr_out;
 }
 
 
 void Optimizer::update() {
   if(onStep() && getStep()!=0){
     for(unsigned int i=0; i<nbiases_; i++){
-      bias_ptrs[i]->updateGradientAndHessian();
+      bias_pntrs[i]->updateGradientAndHessian();
       if(use_mwalkers_mpi_){
-        gradient_ptrs[i]->sumMultiSimCommMPI(multi_sim_comm);
-        if(use_hessian_){hessian_ptrs[i]->sumMultiSimCommMPI(multi_sim_comm);}
+        gradient_pntrs[i]->sumMultiSimCommMPI(multi_sim_comm);
+        if(use_hessian_){hessian_pntrs[i]->sumMultiSimCommMPI(multi_sim_comm);}
       }
       coeffsUpdate(i);
-      coeffs_ptrs[i]->increaseCounter();
-      aux_coeffs_ptrs[i]->increaseCounter();
-      gradient_ptrs[i]->increaseCounter();
-      if(use_hessian_){hessian_ptrs[i]->increaseCounter();}
+      coeffs_pntrs[i]->increaseCounter();
+      aux_coeffs_pntrs[i]->increaseCounter();
+      gradient_pntrs[i]->increaseCounter();
+      if(use_hessian_){hessian_pntrs[i]->increaseCounter();}
     }
     increaseIterationCounter();
     updateOutputComponents();
@@ -614,9 +614,9 @@ void Optimizer::updateOutputComponents() {
     if(!fixed_stepsize_){
       getPntrToComponent("stepsize")->set( getCurrentStepSize(0) );
     }
-    getPntrToComponent("gradrms")->set( gradient_ptrs[0]->getRMS() );
+    getPntrToComponent("gradrms")->set( gradient_pntrs[0]->getRMS() );
     size_t gradient_maxabs_idx=0;
-    getPntrToComponent("gradmax")->set( gradient_ptrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
+    getPntrToComponent("gradmax")->set( gradient_pntrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
   }
   else {
     for(unsigned int i=0; i<nbiases_; i++){
@@ -624,9 +624,9 @@ void Optimizer::updateOutputComponents() {
       if(!fixed_stepsize_){
         getPntrToComponent("stepsize"+is)->set( getCurrentStepSize(i) );
       }
-      getPntrToComponent("gradrms"+is)->set( gradient_ptrs[i]->getRMS() );
+      getPntrToComponent("gradrms"+is)->set( gradient_pntrs[i]->getRMS() );
       size_t gradient_maxabs_idx=0;
-      getPntrToComponent("gradmax"+is)->set( gradient_ptrs[i]->getMaxAbsValue(gradient_maxabs_idx) );
+      getPntrToComponent("gradmax"+is)->set( gradient_pntrs[i]->getMaxAbsValue(gradient_maxabs_idx) );
     }
   }
 }
@@ -635,13 +635,13 @@ void Optimizer::updateOutputComponents() {
 void Optimizer::writeOutputFiles() {
   for(unsigned int i=0; i<nbiases_; i++){
     if(coeffsOfiles_.size()>0 && iter_counter%coeffs_wstride_==0){
-      coeffs_ptrs[i]->writeToFile(*coeffsOfiles_[i],aux_coeffs_ptrs[i],false,getTimeStep()*getStep());
+      coeffs_pntrs[i]->writeToFile(*coeffsOfiles_[i],aux_coeffs_pntrs[i],false,getTimeStep()*getStep());
     }
     if(gradientOfiles_.size()>0 && iter_counter%gradient_wstride_==0){
-      gradient_ptrs[i]->writeToFile(*gradientOfiles_[i],false,getTimeStep()*getStep());
+      gradient_pntrs[i]->writeToFile(*gradientOfiles_[i],false,getTimeStep()*getStep());
     }
     if(hessianOfiles_.size()>0 && iter_counter%hessian_wstride_==0){
-      hessian_ptrs[i]->writeToFile(*hessianOfiles_[i],getTimeStep()*getStep());
+      hessian_pntrs[i]->writeToFile(*hessianOfiles_[i],getTimeStep()*getStep());
     }
   }
 }
@@ -649,13 +649,13 @@ void Optimizer::writeOutputFiles() {
 
 void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
   if(coeffsOfiles_.size()>0 && iter_counter%coeffs_wstride_==0){
-    coeffs_ptrs[coeffs_id]->writeToFile(*coeffsOfiles_[coeffs_id],aux_coeffs_ptrs[coeffs_id],false,getTimeStep()*getStep());
+    coeffs_pntrs[coeffs_id]->writeToFile(*coeffsOfiles_[coeffs_id],aux_coeffs_pntrs[coeffs_id],false,getTimeStep()*getStep());
   }
   if(gradientOfiles_.size()>0 && iter_counter%gradient_wstride_==0){
-    gradient_ptrs[coeffs_id]->writeToFile(*gradientOfiles_[coeffs_id],false,getTimeStep()*getStep());
+    gradient_pntrs[coeffs_id]->writeToFile(*gradientOfiles_[coeffs_id],false,getTimeStep()*getStep());
   }
   if(hessianOfiles_.size()>0 && iter_counter%hessian_wstride_==0){
-    hessian_ptrs[coeffs_id]->writeToFile(*hessianOfiles_[coeffs_id],getTimeStep()*getStep());
+    hessian_pntrs[coeffs_id]->writeToFile(*hessianOfiles_[coeffs_id],getTimeStep()*getStep());
   }
 }
 
