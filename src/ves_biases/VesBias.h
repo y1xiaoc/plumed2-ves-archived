@@ -64,6 +64,7 @@ private:
   std::vector<CoeffsMatrix*> hessian_pntrs;
   std::vector<std::vector<double> > coeffderivs_aver_sampled;
   std::vector<std::vector<double> >coeffderivs_cov_sampled;
+  bool use_multiple_coeffssets_;
   //
   size_t ncoeffs_total_;
   //
@@ -77,6 +78,7 @@ private:
   double kbt_;
 private:
   void initializeCoeffs(CoeffsVector*);
+  std::string labelString(const std::string&, const unsigned int cid = 0);
 protected:
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
@@ -119,7 +121,6 @@ public:
   bool diagonalHessian() const {return diagonal_hessian_;}
   //
   bool optimizeCoeffs() const {return optimize_coeffs_;}
-  //
 
   void updateGradientAndHessian();
   void clearGradientAndHessian();
@@ -127,6 +128,8 @@ public:
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);
   void disableHessian();
+  //
+  void enableMultipleCoeffsSets() {use_multiple_coeffssets_=true;}
 };
 
 inline

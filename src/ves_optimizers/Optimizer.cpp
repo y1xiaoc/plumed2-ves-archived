@@ -86,7 +86,11 @@ identical_coeffs_shape_(true)
       coeffs_pntrs.push_back(pntrs_coeffs[k]);
       gradient_pntrs.push_back(pntrs_gradient[k]);
       CoeffsVector* aux_coeffs_tmp = new CoeffsVector(*pntrs_coeffs[k]);
-      aux_coeffs_tmp->setLabels("aux_"+pntrs_coeffs[k]->getLabel());
+      //
+      std::string aux_label = pntrs_coeffs[k]->getLabel();
+      aux_label.replace(aux_label.find("coeffs"), std::string("coeffs").length(), "aux_coeffs");
+      aux_coeffs_tmp->setLabels(aux_label);
+      //
       aux_coeffs_pntrs.push_back(aux_coeffs_tmp);
     }
   }
