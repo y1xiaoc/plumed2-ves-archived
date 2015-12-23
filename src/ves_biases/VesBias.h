@@ -86,10 +86,10 @@ public:
   explicit VesBias(const ActionOptions&ao);
   ~VesBias();
   //
-  CoeffsVector* getCoeffsPtr() const {return coeffs_pntr;}
-  CoeffsVector* getCoeffDerivsAverTargetDistPtr() const {return coeffderivs_aver_ps_pntr;}
-  CoeffsVector* getGradientPtr()const {return gradient_pntr;}
-  CoeffsMatrix* getHessianPtr() const {return hessian_pntr;}
+  CoeffsVector* getCoeffsPntr() const {return coeffs_pntr;}
+  CoeffsVector* getCoeffDerivsAverTargetDistPntr() const {return coeffderivs_aver_ps_pntr;}
+  CoeffsVector* getGradientPntr()const {return gradient_pntr;}
+  CoeffsMatrix* getHessianPntr() const {return hessian_pntr;}
   //
   size_t numberOfCoeffs() const;
   double getKbT() const;

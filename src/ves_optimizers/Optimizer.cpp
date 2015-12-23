@@ -78,13 +78,13 @@ identical_coeffs_shape_(true)
     if(!bias_pntrs[i]){plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES bias.");}
     //
     bias_pntrs[i]->linkOptimizer(this);
-    coeffs_pntrs[i] = bias_pntrs[i]->getCoeffsPtr();
+    coeffs_pntrs[i] = bias_pntrs[i]->getCoeffsPntr();
     plumed_massert(coeffs_pntrs[i] != NULL,"coeffs are not linked correctly");
     //
     aux_coeffs_pntrs[i] = new CoeffsVector(*coeffs_pntrs[i]);
     aux_coeffs_pntrs[i]->setLabels("aux_"+coeffs_pntrs[i]->getLabel());
     //
-    gradient_pntrs[i] = bias_pntrs[i]->getGradientPtr();
+    gradient_pntrs[i] = bias_pntrs[i]->getGradientPntr();
     plumed_massert(gradient_pntrs[i] != NULL,"gradient is not linked correctly");
   }
   //
@@ -558,7 +558,7 @@ void Optimizer::turnOffHessian() {
 CoeffsMatrix* Optimizer::enableHessian(bias::VesBias* bias_pntr_in, const bool diagonal_hessian) {
   plumed_massert(use_hessian_,"the Hessian should not be used");
   bias_pntr_in->enableHessian(diagonal_hessian);
-  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPtr();
+  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPntr();
   plumed_massert(hessian_pntr_out != NULL,"Hessian is needed but not linked correctly");
   return hessian_pntr_out;
 }
@@ -568,7 +568,7 @@ CoeffsMatrix* Optimizer::switchToDiagonalHessian(bias::VesBias* bias_pntr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=true;
   bias_pntr_in->enableHessian(diagonal_hessian_);
-  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPtr();
+  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPntr();
   plumed_massert(hessian_pntr_out != NULL,"Hessian is needed but not linked correctly");
   //
   log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_pntr_in->getName().c_str(),bias_pntr_in->getLabel().c_str(),getTime());
@@ -580,7 +580,7 @@ CoeffsMatrix* Optimizer::switchToFullHessian(bias::VesBias* bias_pntr_in) {
   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
   diagonal_hessian_=false;
   bias_pntr_in->enableHessian(diagonal_hessian_);
-  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPtr();
+  CoeffsMatrix* hessian_pntr_out = bias_pntr_in->getHessianPntr();
   plumed_massert(hessian_pntr_out != NULL,"Hessian is needed but not linked correctly");
   //
   log.printf("  %s (with label %s): switching to a diagonal Hessian for VES bias %s (with label %s) at time  %f\n",getName().c_str(),getLabel().c_str(),bias_pntr_in->getName().c_str(),bias_pntr_in->getLabel().c_str(),getTime());
