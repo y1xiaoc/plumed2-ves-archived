@@ -104,13 +104,13 @@ void TargetDistributionBase::writeDistributionToFile(const std::string& filepath
 }
 
 
-void TargetDistributionBase::calculateDistributionOnGrid(Grid* grid_ptr){
-  plumed_massert(grid_ptr->getDimension()==dimension_,"Grid is of the wrong dimension");
-  for(unsigned int l=0; l<grid_ptr->getSize(); l++)
+void TargetDistributionBase::calculateDistributionOnGrid(Grid* grid_pntr){
+  plumed_massert(grid_pntr->getDimension()==dimension_,"Grid is of the wrong dimension");
+  for(unsigned int l=0; l<grid_pntr->getSize(); l++)
   {
-   std::vector<double> argument=grid_ptr->getPoint(l);
+   std::vector<double> argument=grid_pntr->getPoint(l);
    double value=getValue(argument);
-   grid_ptr->setValue(l,value);
+   grid_pntr->setValue(l,value);
   }
 }
 

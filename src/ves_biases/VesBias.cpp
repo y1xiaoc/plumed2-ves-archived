@@ -37,13 +37,13 @@ namespace bias{
 
 VesBias::VesBias(const ActionOptions&ao):
 Bias(ao),
-coeffs_ptr(NULL),
-coeffderivs_aver_ps_ptr(NULL),
-gradient_ptr(NULL),
-hessian_ptr(NULL),
+coeffs_pntr(NULL),
+coeffderivs_aver_ps_pntr(NULL),
+gradient_pntr(NULL),
+hessian_pntr(NULL),
 coeffderivs_aver_sampled(0),
 coeffderivs_cov_sampled(0),
-optimizer_ptr(NULL),
+optimizer_pntr(NULL),
 optimize_coeffs_(false),
 compute_hessian_(false),
 diagonal_hessian_(true),
@@ -65,10 +65,10 @@ kbt_(0.0)
 }
 
 VesBias::~VesBias(){
-  delete coeffs_ptr;
-  delete coeffderivs_aver_ps_ptr;
-  delete gradient_ptr;
-  delete hessian_ptr;
+  delete coeffs_pntr;
+  delete coeffderivs_aver_ps_pntr;
+  delete gradient_pntr;
+  delete hessian_pntr;
 }
 
 
@@ -81,44 +81,44 @@ void VesBias::registerKeywords( Keywords& keys ) {
 
 
 void VesBias::initializeCoeffs(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {
-  coeffs_ptr = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
-  coeffs_ptr->linkVesBias(this);
+  coeffs_pntr = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
+  coeffs_pntr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 
 
 void VesBias::initializeCoeffs(std::vector<Value*>& args,std::vector<BasisFunctions*>& basisf) {
-  coeffs_ptr = new CoeffsVector("coeffs",args,basisf,comm,true);
-  coeffs_ptr->linkVesBias(this);
+  coeffs_pntr = new CoeffsVector("coeffs",args,basisf,comm,true);
+  coeffs_pntr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 
 
-void VesBias::linkCoeffs(CoeffsVector* coeffs_ptr_in) {
-  coeffs_ptr = coeffs_ptr_in;
-  coeffs_ptr->linkVesBias(this);
+void VesBias::linkCoeffs(CoeffsVector* coeffs_pntr_in) {
+  coeffs_pntr = coeffs_pntr_in;
+  coeffs_pntr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 
 
 void VesBias::linkCoeffs(CoeffsVector& coeffs_in) {
-  coeffs_ptr = &coeffs_in;
-  coeffs_ptr->linkVesBias(this);
+  coeffs_pntr = &coeffs_in;
+  coeffs_pntr->linkVesBias(this);
   initializeGradientAndHessian();
 }
 
 
 void VesBias::initializeGradientAndHessian() {
   //
-  coeffderivs_aver_ps_ptr = new CoeffsVector(*coeffs_ptr);
-  coeffderivs_aver_ps_ptr->setLabels("average-over-ps");
+  coeffderivs_aver_ps_pntr = new CoeffsVector(*coeffs_pntr);
+  coeffderivs_aver_ps_pntr->setLabels("average-over-ps");
   //
-  gradient_ptr = new CoeffsVector(*coeffs_ptr);
-  gradient_ptr->setLabels("gradient");
+  gradient_pntr = new CoeffsVector(*coeffs_pntr);
+  gradient_pntr->setLabels("gradient");
   //
-  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,diagonal_hessian_,true);
+  hessian_pntr = new CoeffsMatrix("hessian",coeffs_pntr,comm,diagonal_hessian_,true);
   //
-  coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
+  coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
   coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
   aver_counter=0.0;
 }
@@ -132,7 +132,7 @@ void VesBias::updateGradientAndHessian() {
   Hessian() *= getBeta();
   //
   // coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
-  // coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
+  // coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
   std::fill(coeffderivs_aver_sampled.begin(), coeffderivs_aver_sampled.end(), 0.0);
   std::fill(coeffderivs_cov_sampled.begin(), coeffderivs_cov_sampled.end(), 0.0);
   aver_counter=0.0;
@@ -180,13 +180,13 @@ void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderi
 }
 
 
-void VesBias::linkOptimizer(Optimizer* optimizer_ptr_in) {
+void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
   //
-  if(optimizer_ptr==NULL){
-    optimizer_ptr = optimizer_ptr_in;
+  if(optimizer_pntr==NULL){
+    optimizer_pntr = optimizer_pntr_in;
   }
   else {
-    std::string err_msg = "VES bias " + getName() + " with label " + getLabel() + " has already been linked with optimizer " + optimizer_ptr->getName() + " with label " + optimizer_ptr->getLabel() + ". You cannot link two optimizer to the same VES bias.";
+    std::string err_msg = "VES bias " + getName() + " with label " + getLabel() + " has already been linked with optimizer " + optimizer_pntr->getName() + " with label " + optimizer_pntr->getLabel() + ". You cannot link two optimizer to the same VES bias.";
     plumed_merror(err_msg);
   }
   //
@@ -202,20 +202,20 @@ void VesBias::linkOptimizer(Optimizer* optimizer_ptr_in) {
 void VesBias::enableHessian(const bool diagonal_hessian) {
   compute_hessian_=true;
   diagonal_hessian_=diagonal_hessian;
-  delete hessian_ptr;
-  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,diagonal_hessian_,true);
+  delete hessian_pntr;
+  hessian_pntr = new CoeffsMatrix("hessian",coeffs_pntr,comm,diagonal_hessian_,true);
   coeffderivs_cov_sampled.clear();
-  coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
+  coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
 }
 
 
 void VesBias::disableHessian() {
   compute_hessian_=false;
   diagonal_hessian_=true;
-  delete hessian_ptr;
-  hessian_ptr = new CoeffsMatrix("hessian",coeffs_ptr,comm,diagonal_hessian_,true);
+  delete hessian_pntr;
+  hessian_pntr = new CoeffsMatrix("hessian",coeffs_pntr,comm,diagonal_hessian_,true);
   coeffderivs_cov_sampled.clear();
-  coeffderivs_cov_sampled.assign(hessian_ptr->getSize(),0.0);
+  coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
 }
 
 

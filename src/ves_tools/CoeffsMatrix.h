@@ -181,7 +181,7 @@ public:
   //
   // file input/output stuff
   void writeToFile(OFile&, const double current_time=-1.0);
-  void writeToFile(const std::string&, const double current_time=-1.0, const bool append_file=false, Action* action_ptr=NULL);
+  void writeToFile(const std::string&, const double current_time=-1.0, const bool append_file=false, Action* action_pntr=NULL);
 private:
   void writeDataToFile(OFile&);
   void writeMatrixInfoToFile(OFile&);

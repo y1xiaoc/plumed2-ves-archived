@@ -639,10 +639,10 @@ size_t CoeffsVector::countValues(const double value) const {
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_ptr) {
+void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_pntr) {
   OFile file;
-  if(action_ptr!=NULL){
-    file.link(*action_ptr);
+  if(action_pntr!=NULL){
+    file.link(*action_pntr);
   }
   else{
     file.link(mycomm);
@@ -671,10 +671,10 @@ void CoeffsVector::writeToFile(OFile& ofile, CoeffsVector* aux_coeffsvector, con
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_ptr) {
+void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_pntr) {
   OFile file;
-  if(action_ptr!=NULL){
-    file.link(*action_ptr);
+  if(action_pntr!=NULL){
+    file.link(*action_pntr);
   }
   else{
     file.link(coeffsvecSet[0]->getCommunicator());

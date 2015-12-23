@@ -181,10 +181,10 @@ public:
   size_t countValues(const double) const;
 
   // file input/output stuff
-  void writeToFile(const std::string&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false, Action* action_ptr=NULL);
+  void writeToFile(const std::string&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false, Action* action_pntr=NULL);
   void writeToFile(OFile&, const bool print_description=false, const double current_time=-1.0);
   void writeToFile(OFile& ofile, CoeffsVector*, const bool print_coeffs_descriptions=false, const double current_time=-1.0);
-  static void writeToFile(const std::string&, const std::vector<CoeffsVector*>&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false, Action* action_ptr=NULL);
+  static void writeToFile(const std::string&, const std::vector<CoeffsVector*>&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false, Action* action_pntr=NULL);
   static void writeToFile(OFile&, const std::vector<CoeffsVector*>&, const bool print_description=false, const double current_time=-1.0);
 private:
   void writeHeaderToFile(OFile&, const double current_time=-1.0) const;
