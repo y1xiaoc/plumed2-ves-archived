@@ -63,6 +63,7 @@ hessian_pntrs(0),
 coeffs_mask_pntrs(0),
 identical_coeffs_shape_(true)
 {
+  log.printf("hello 0\n");log.flush();
   std::vector<std::string> bias_labels(0);
   parseVector("BIAS",bias_labels);
   plumed_massert(bias_labels.size()>0,"problem with BIAS keyword");
@@ -76,10 +77,8 @@ identical_coeffs_shape_(true)
     //
     bias_pntrs[i]->linkOptimizer(this);
     //
-    std::vector<CoeffsVector*> pntrs_coeffs(1);
-    std::vector<CoeffsVector*> pntrs_gradient(1);
-    pntrs_coeffs[0] = bias_pntrs[i]->getCoeffsPntr();
-    pntrs_gradient[0] = bias_pntrs[i]->getGradientPntr();
+    std::vector<CoeffsVector*> pntrs_coeffs = bias_pntrs[i]->getCoeffsPntrs();
+    std::vector<CoeffsVector*> pntrs_gradient = bias_pntrs[i]->getGradientPntrs();
     plumed_massert(pntrs_coeffs.size()==pntrs_gradient.size(),"something wrong in the coefficients and gradient passed from VES bias");
     for(unsigned int k=0; k<pntrs_coeffs.size(); k++){
       plumed_massert(pntrs_coeffs[k] != NULL,"some coefficient is not linked correctly");
@@ -199,6 +198,7 @@ identical_coeffs_shape_(true)
       plumed_merror("BIASID_SUFFIX should only be given if optimizing multiple coefficent sets");
     }
   }
+
 
   std::string coeffs_wstride_tmpstr="";
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
@@ -575,8 +575,7 @@ void Optimizer::turnOffHessian() {
 std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in, const bool diagonal_hessian) {
   plumed_massert(use_hessian_,"the Hessian should not be used");
   bias_pntr_in->enableHessian(diagonal_hessian);
-  std::vector<CoeffsMatrix*> hessian_pntrs_out(1);
-  hessian_pntrs_out[0] = bias_pntr_in->getHessianPntr();
+  std::vector<CoeffsMatrix*> hessian_pntrs_out = bias_pntr_in->getHessianPntrs();
   for(unsigned int k=0; k<hessian_pntrs_out.size(); k++){
     plumed_massert(hessian_pntrs_out[k] != NULL,"Hessian is needed but not linked correctly");
   }

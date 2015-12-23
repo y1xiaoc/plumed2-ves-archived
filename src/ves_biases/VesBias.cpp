@@ -37,12 +37,14 @@ namespace bias{
 
 VesBias::VesBias(const ActionOptions&ao):
 Bias(ao),
-coeffs_pntr(NULL),
-coeffderivs_aver_ps_pntr(NULL),
-gradient_pntr(NULL),
-hessian_pntr(NULL),
+ncoeffssets_(0),
+coeffs_pntrs(0),
+coeffderivs_aver_ps_pntrs(0),
+gradient_pntrs(0),
+hessian_pntrs(0),
 coeffderivs_aver_sampled(0),
 coeffderivs_cov_sampled(0),
+ncoeffs_total_(0),
 optimizer_pntr(NULL),
 optimize_coeffs_(false),
 compute_hessian_(false),
@@ -65,10 +67,12 @@ kbt_(0.0)
 }
 
 VesBias::~VesBias(){
-  delete coeffs_pntr;
-  delete coeffderivs_aver_ps_pntr;
-  delete gradient_pntr;
-  delete hessian_pntr;
+  for(unsigned int i=0; i<ncoeffssets_; i++){
+    delete coeffs_pntrs[i];
+    delete coeffderivs_aver_ps_pntrs[i];
+    delete gradient_pntrs[i];
+    delete hessian_pntrs[i];
+  }
 }
 
 
@@ -80,61 +84,56 @@ void VesBias::registerKeywords( Keywords& keys ) {
 }
 
 
-void VesBias::initializeCoeffs(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {
-  coeffs_pntr = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
+void VesBias::addCoeffsSet(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {
+  CoeffsVector* coeffs_pntr = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
   coeffs_pntr->linkVesBias(this);
-  initializeGradientAndHessian();
+  initializeCoeffs(coeffs_pntr);
 }
 
 
-void VesBias::initializeCoeffs(std::vector<Value*>& args,std::vector<BasisFunctions*>& basisf) {
-  coeffs_pntr = new CoeffsVector("coeffs",args,basisf,comm,true);
-  coeffs_pntr->linkVesBias(this);
-  initializeGradientAndHessian();
+void VesBias::addCoeffsSet(std::vector<Value*>& args,std::vector<BasisFunctions*>& basisf) {
+  CoeffsVector* coeffs_pntr_tmp = new CoeffsVector("coeffs",args,basisf,comm,true);
+  coeffs_pntr_tmp->linkVesBias(this);
+  initializeCoeffs(coeffs_pntr_tmp);
 }
 
 
-void VesBias::linkCoeffs(CoeffsVector* coeffs_pntr_in) {
-  coeffs_pntr = coeffs_pntr_in;
-  coeffs_pntr->linkVesBias(this);
-  initializeGradientAndHessian();
-}
-
-
-void VesBias::linkCoeffs(CoeffsVector& coeffs_in) {
-  coeffs_pntr = &coeffs_in;
-  coeffs_pntr->linkVesBias(this);
-  initializeGradientAndHessian();
-}
-
-
-void VesBias::initializeGradientAndHessian() {
+void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   //
-  coeffderivs_aver_ps_pntr = new CoeffsVector(*coeffs_pntr);
-  coeffderivs_aver_ps_pntr->setLabels("average-over-ps");
+  coeffs_pntrs.push_back(coeffs_pntr_in);
+  CoeffsVector* aver_ps_tmp = new CoeffsVector(*coeffs_pntr_in);
+  aver_ps_tmp->setLabels("ps-aver");
+  coeffderivs_aver_ps_pntrs.push_back(aver_ps_tmp);
   //
-  gradient_pntr = new CoeffsVector(*coeffs_pntr);
-  gradient_pntr->setLabels("gradient");
+  CoeffsVector* gradient_tmp = new CoeffsVector(*coeffs_pntr_in);
+  gradient_tmp->setLabels("gradient");
+  gradient_pntrs.push_back(gradient_tmp);
   //
-  hessian_pntr = new CoeffsMatrix("hessian",coeffs_pntr,comm,diagonal_hessian_,true);
+  CoeffsMatrix* hessian_tmp = new CoeffsMatrix("hessian",coeffs_pntr_in,comm,diagonal_hessian_,true);
+  hessian_pntrs.push_back(hessian_tmp);
   //
-  coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
-  coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
-  aver_counter=0.0;
+  std::vector<double> cov_sampled_tmp;
+  cov_sampled_tmp.assign(hessian_tmp->getSize(),0.0);
+  coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
+  //
+  std::vector<double> aver_sampled_tmp;
+  aver_sampled_tmp.assign(coeffs_pntr_in->numberOfCoeffs(),0.0);
+  coeffderivs_aver_sampled.push_back(aver_sampled_tmp);
+  //
+  ncoeffssets_++;
 }
 
 
 void VesBias::updateGradientAndHessian() {
-  comm.Sum(coeffderivs_aver_sampled);
-  comm.Sum(coeffderivs_cov_sampled);
-  Gradient() = CoeffDerivsAverTargetDist() - coeffderivs_aver_sampled;
-  Hessian() = coeffderivs_cov_sampled;
-  Hessian() *= getBeta();
-  //
-  // coeffderivs_aver_sampled.assign(numberOfCoeffs(),0.0);
-  // coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
-  std::fill(coeffderivs_aver_sampled.begin(), coeffderivs_aver_sampled.end(), 0.0);
-  std::fill(coeffderivs_cov_sampled.begin(), coeffderivs_cov_sampled.end(), 0.0);
+  for(unsigned int i=0; i<ncoeffssets_; i++){
+    comm.Sum(coeffderivs_aver_sampled[i]);
+    comm.Sum(coeffderivs_cov_sampled[i]);
+    Gradient(i) = CoeffDerivsAverTargetDist(i) - coeffderivs_aver_sampled[i];
+    Hessian(i) = coeffderivs_cov_sampled[i];
+    Hessian(i) *= getBeta();
+    std::fill(coeffderivs_aver_sampled[i].begin(), coeffderivs_aver_sampled[i].end(), 0.0);
+    std::fill(coeffderivs_cov_sampled[i].begin(), coeffderivs_cov_sampled[i].end(), 0.0);
+  }
   aver_counter=0.0;
 }
 
@@ -142,7 +141,7 @@ void VesBias::updateGradientAndHessian() {
 void VesBias::clearGradientAndHessian() {}
 
 
-void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
+void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsigned cid) {
   /*
   use the following online equation to calculate the average and covariance (see wikipedia)
       xm[n+1] = xm[n] + (x[n+1]-xm[n])/(n+1)
@@ -150,33 +149,34 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs) {
                     = cov(x,y)[n]*(n/(n+1)) + ( n * (x[n+1]-xm[n])/(n+1) * (y[n+1]-ym[n])/(n+1) );
       n starts at 0.
   */
-  size_t ncoeffs = numberOfCoeffs();
+  size_t ncoeffs = numberOfCoeffs(cid);
   std::vector<double> deltas(ncoeffs,0.0);
   size_t stride = comm.Get_size();
   size_t rank = comm.Get_rank();
   // update average and diagonal part of Hessian
   for(size_t i=rank; i<ncoeffs;i+=stride){
-    size_t midx = getHessianIndex(i,i);
-    deltas[i] = (coeffderivs[i]-coeffderivs_aver_sampled[i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
-    coeffderivs_aver_sampled[i] += deltas[i];
-    coeffderivs_cov_sampled[midx] = coeffderivs_cov_sampled[midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
+    size_t midx = getHessianIndex(i,i,cid);
+    deltas[i] = (coeffderivs[i]-coeffderivs_aver_sampled[cid][i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
+    coeffderivs_aver_sampled[cid][i] += deltas[i];
+    coeffderivs_cov_sampled[cid][midx] = coeffderivs_cov_sampled[cid][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
   }
   comm.Sum(deltas);
   // update off-diagonal part of the Hessian
   if(!diagonal_hessian_){
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
-        size_t midx = getHessianIndex(i,j);
-        coeffderivs_cov_sampled[midx] = coeffderivs_cov_sampled[midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
+        size_t midx = getHessianIndex(i,j,cid);
+        coeffderivs_cov_sampled[cid][midx] = coeffderivs_cov_sampled[cid][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
       }
     }
   }
   // NOTE: the MPI sum for coeffderivs_aver_sampled and coeffderivs_cov_sampled is done later
-  aver_counter += 1.0;
+  //aver_counter += 1.0;
 }
 
-void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderivs_aver_ps) {
-  CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
+
+void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderivs_aver_ps, const unsigned cid) {
+  CoeffDerivsAverTargetDist(cid) = coeffderivs_aver_ps;
 }
 
 
@@ -202,20 +202,34 @@ void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
 void VesBias::enableHessian(const bool diagonal_hessian) {
   compute_hessian_=true;
   diagonal_hessian_=diagonal_hessian;
-  delete hessian_pntr;
-  hessian_pntr = new CoeffsMatrix("hessian",coeffs_pntr,comm,diagonal_hessian_,true);
   coeffderivs_cov_sampled.clear();
-  coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
+  for (unsigned int i=0; i<ncoeffssets_; i++){
+    delete hessian_pntrs[i];
+    hessian_pntrs[i] = new CoeffsMatrix("hessian",coeffs_pntrs[i],comm,diagonal_hessian_,true);
+    std::vector<double> cov_sampled_tmp;
+    cov_sampled_tmp.assign(hessian_pntrs[i]->getSize(),0.0);
+    coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
+  }
 }
 
 
 void VesBias::disableHessian() {
   compute_hessian_=false;
   diagonal_hessian_=true;
-  delete hessian_pntr;
-  hessian_pntr = new CoeffsMatrix("hessian",coeffs_pntr,comm,diagonal_hessian_,true);
   coeffderivs_cov_sampled.clear();
-  coeffderivs_cov_sampled.assign(hessian_pntr->getSize(),0.0);
+  for (unsigned int i=0; i<ncoeffssets_; i++){
+    delete hessian_pntrs[i];
+    hessian_pntrs[i] = new CoeffsMatrix("hessian",coeffs_pntrs[i],comm,diagonal_hessian_,true);
+    std::vector<double> cov_sampled_tmp;
+    cov_sampled_tmp.assign(hessian_pntrs[i]->getSize(),0.0);
+    coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
+  }
+}
+
+
+void VesBias::apply() {
+  Bias::apply();
+  aver_counter += 1.0;
 }
 
 

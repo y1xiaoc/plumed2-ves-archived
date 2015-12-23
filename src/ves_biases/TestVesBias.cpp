@@ -73,7 +73,7 @@ PLUMED_VESBIAS_INIT(ao)
   bf[0]=bf_pointer;
   std::vector<Value*> args(1);
   args[0]=getArguments()[0];
-  initializeCoeffs(args,bf);
+  addCoeffsSet(args,bf);
   setCoeffsDerivsOverTargetDist(bf_pointer->getBasisFunctionIntegrals());
   addComponent("bias"); componentIsNotPeriodic("bias");
   addComponent("force2"); componentIsNotPeriodic("force2");
