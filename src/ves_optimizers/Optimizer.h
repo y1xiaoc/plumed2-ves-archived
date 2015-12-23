@@ -74,6 +74,7 @@ private:
   unsigned int nbiases_;
   std::vector<bias::VesBias*> bias_pntrs;
   //
+  unsigned int ncoeffssets_;
   std::vector<CoeffsVector*> coeffs_pntrs;
   std::vector<CoeffsVector*> aux_coeffs_pntrs;
   std::vector<CoeffsVector*> gradient_pntrs;
@@ -89,9 +90,9 @@ private:
 protected:
   void turnOnHessian();
   void turnOffHessian();
-  CoeffsMatrix* enableHessian(bias::VesBias*, const bool diagonal_hessian=false);
-  CoeffsMatrix* switchToDiagonalHessian(bias::VesBias*);
-  CoeffsMatrix* switchToFullHessian(bias::VesBias*);
+  std::vector<CoeffsMatrix*> enableHessian(bias::VesBias*, const bool diagonal_hessian=false);
+  // CoeffsMatrix* switchToDiagonalHessian(bias::VesBias*);
+  // CoeffsMatrix* switchToFullHessian(bias::VesBias*);
   //
   CoeffsVector& Coeffs(const unsigned int coeffs_id = 0) const;
   CoeffsVector& AuxCoeffs(const unsigned int coeffs_id = 0) const;
@@ -113,8 +114,11 @@ public:
   //
   explicit Optimizer(const ActionOptions&ao);
   ~Optimizer();
-  std::string getType() const;
-  std::string getDescription() const;
+  std::string getType() const {return type_;}
+  std::string getDescription() const {return description_;}
+  //
+  unsigned int numberOfBiases() const {return nbiases_;}
+  unsigned int numberOfCoeffsSets() const {return ncoeffssets_;}
   //
   std::vector<double> getStepSizes() const;
   std::vector<double> getCurrentStepSizes() const;
@@ -146,12 +150,6 @@ public:
   std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs;}
   std::vector<CoeffsVector*> getCoeffsMaskPntrs() const {return coeffs_mask_pntrs;}
   };
-
-inline
-std::string Optimizer::getType() const {return type_;}
-
-inline
-std::string Optimizer::getDescription() const {return description_;}
 
 inline
 double Optimizer::StepSize(const unsigned int coeffs_id) const {return stepsizes_[coeffs_id];}
