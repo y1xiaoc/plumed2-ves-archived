@@ -85,9 +85,9 @@ void VesBias::registerKeywords( Keywords& keys ) {
 
 
 void VesBias::addCoeffsSet(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {
-  CoeffsVector* coeffs_pntr = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
-  coeffs_pntr->linkVesBias(this);
-  initializeCoeffs(coeffs_pntr);
+  CoeffsVector* coeffs_pntr_tmp = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
+  coeffs_pntr_tmp->linkVesBias(this);
+  initializeCoeffs(coeffs_pntr_tmp);
 }
 
 
@@ -112,13 +112,13 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   CoeffsMatrix* hessian_tmp = new CoeffsMatrix("hessian",coeffs_pntr_in,comm,diagonal_hessian_,true);
   hessian_pntrs.push_back(hessian_tmp);
   //
-  std::vector<double> cov_sampled_tmp;
-  cov_sampled_tmp.assign(hessian_tmp->getSize(),0.0);
-  coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
-  //
   std::vector<double> aver_sampled_tmp;
   aver_sampled_tmp.assign(coeffs_pntr_in->numberOfCoeffs(),0.0);
   coeffderivs_aver_sampled.push_back(aver_sampled_tmp);
+  //
+  std::vector<double> cov_sampled_tmp;
+  cov_sampled_tmp.assign(hessian_tmp->getSize(),0.0);
+  coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
   //
   ncoeffssets_++;
 }

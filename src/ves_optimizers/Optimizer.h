@@ -186,7 +186,7 @@ double Optimizer::getCurrentStepSize(const unsigned int coeffs_id) const {return
 
 inline
 void Optimizer::setStepSizes(const std::vector<double> stepsizes_in) {
-  plumed_assert(stepsizes_in.size()==nbiases_);
+  plumed_assert(stepsizes_in.size()==ncoeffssets_);
   stepsizes_ = stepsizes_in;
 }
 
@@ -202,7 +202,7 @@ void Optimizer::setCurrentStepSize(const double current_stepsize_in, const unsig
 
 inline
 void Optimizer::setCurrentStepSizes(const std::vector<double> current_stepsizes_in) {
-  plumed_assert(current_stepsizes_in.size()==nbiases_);
+  plumed_assert(current_stepsizes_in.size()==ncoeffssets_);
   current_stepsizes = current_stepsizes_in;
 }
 

@@ -265,7 +265,7 @@ identical_coeffs_shape_(true)
   parse("GRADIENT_OUTPUT_STRIDE",gradient_wstride_);
 
   if(gradient_fnames.size()==1 && ncoeffssets_>1){
-    gradient_fnames.resize(nbiases_,gradient_fnames[0]);
+    gradient_fnames.resize(ncoeffssets_,gradient_fnames[0]);
     for(unsigned int i=0; i<ncoeffssets_; i++){
       std::string is=""; Tools::convert(i,is);
       gradient_fnames[i] = FileBase::appendSuffix(gradient_fnames[i],fname_prefix+is);
@@ -391,8 +391,8 @@ identical_coeffs_shape_(true)
     std::vector<std::string> mask_fnames_out;
     parseVector("OUTPUT_MASK_FILE",mask_fnames_out);
     if(mask_fnames_out.size()==1 && ncoeffssets_>1){
-      mask_fnames_out.resize(nbiases_,mask_fnames_out[0]);
-      for(unsigned int i=0; i<nbiases_; i++){
+      mask_fnames_out.resize(ncoeffssets_,mask_fnames_out[0]);
+      for(unsigned int i=0; i<ncoeffssets_; i++){
         std::string is=""; Tools::convert(i,is);
         mask_fnames_out[i] = FileBase::appendSuffix(mask_fnames_out[i],fname_prefix+is);
       }
