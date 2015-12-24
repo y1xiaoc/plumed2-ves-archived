@@ -45,7 +45,7 @@ namespace bias{
 
 class TestVesBias : public VesBias{
 private:
-  BasisFunctions* bf_pointer;
+  std::vector<BasisFunctions*> bf_pointers;
   Value* valueBias;
   Value* valueForce2;
 public:
@@ -59,46 +59,63 @@ PLUMED_REGISTER_ACTION(TestVesBias,"TEST_VES_BIAS")
 void TestVesBias::registerKeywords( Keywords& keys ){
   VesBias::registerKeywords(keys);
   keys.use("ARG");
-  keys.add("compulsory","BASIS_SET","the label of the basis set that you want to use");
+  keys.add("compulsory","BASIS_SET","the label of the basis sets that you want to use");
 }
 
 TestVesBias::TestVesBias(const ActionOptions&ao):
-PLUMED_VESBIAS_INIT(ao)
+PLUMED_VESBIAS_INIT(ao),
+bf_pointers(getNumberOfArguments(),NULL)
 {
-  std::string basisset_label="";
-  parse("BASIS_SET",basisset_label);
+  std::vector<std::string> basisset_labels;
+  parseVector("BASIS_SET",basisset_labels);
+  plumed_massert(basisset_labels.size()==getNumberOfArguments(),"number of arguments should match the number of basis set labels");
   checkRead();
-  bf_pointer=plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_label);
-  std::vector<BasisFunctions*> bf(1);
-  bf[0]=bf_pointer;
-  std::vector<Value*> args(1);
-  args[0]=getArguments()[0];
-  addCoeffsSet(args,bf);
-  setCoeffsDerivsOverTargetDist(bf_pointer->getBasisFunctionIntegrals());
+
+  for(unsigned int i=0; i<basisset_labels.size(); i++){
+    bf_pointers[i] = plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_labels[i]);
+    plumed_massert(bf_pointers[i]!=NULL,"error in basis set");
+  }
+
+  if(getNumberOfArguments()>1){enableMultipleCoeffsSets();}
+
+  for(unsigned int i=0; i<getNumberOfArguments(); i++){
+    std::vector<Value*> arg(1);
+    arg[0]=getArguments()[i];
+    std::vector<BasisFunctions*> bf(1);
+    bf[0]=bf_pointers[i];
+    addCoeffsSet(arg,bf);
+  }
+
+  for(unsigned int i=0; i<numberOfCoeffsSets(); i++){
+    setCoeffsDerivsOverTargetDist(bf_pointers[i]->getBasisFunctionIntegrals(),i);
+  }
+
   addComponent("bias"); componentIsNotPeriodic("bias");
-  addComponent("force2"); componentIsNotPeriodic("force2");
   valueBias=getPntrToComponent("bias");
-  valueForce2=getPntrToComponent("force2");
+
 }
 
 
 void TestVesBias::calculate() {
-  std::vector<double> bf_values(bf_pointer->getSize());
-  std::vector<double> bf_derivs(bf_pointer->getSize());
-  bool inside=true;
-  double cv = getArgument(0);
-  double cvT=0.0;
-  bf_pointer->getAllValues(cv,cvT,inside,bf_values,bf_derivs);
-  double bias = 0.0;
-  double deriv = 0.0;
-  for(size_t i=0; i<numberOfCoeffs(); i++){
-    bias += Coeffs()[i]*bf_values[i];
-    deriv += -1.0*Coeffs()[i]*bf_derivs[i];
+  double total_bias = 0.0;
+  for(unsigned int k=0; k<getNumberOfArguments(); k++){
+    std::vector<double> bf_values(bf_pointers[k]->getSize());
+    std::vector<double> bf_derivs(bf_pointers[k]->getSize());
+    bool inside=true;
+    double cv = getArgument(k);
+    double cvT=0.0;
+    bf_pointers[k]->getAllValues(cv,cvT,inside,bf_values,bf_derivs);
+    double bias = 0.0;
+    double deriv = 0.0;
+    for(size_t i=0; i<numberOfCoeffs(k); i++){
+      bias += Coeffs(k)[i]*bf_values[i];
+      deriv += -1.0*Coeffs(k)[i]*bf_derivs[i];
+    }
+    total_bias += bias;
+    setOutputForce(k,deriv);
+    setCoeffsDerivs(bf_values,k);
   }
-  valueBias->set(bias);
-  valueForce2->set(deriv*deriv);
-  setOutputForce(0,deriv);
-  setCoeffsDerivs(bf_values);
+  valueBias->set(total_bias);
 }
 
 }
