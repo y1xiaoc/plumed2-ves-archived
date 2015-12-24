@@ -299,6 +299,18 @@ void CoeffsBase::linkAction(Action* action_pntr_in){
 }
 
 
+bias::VesBias* CoeffsBase::getPntrToVesBias() const {
+  plumed_massert(bias_pntr!=NULL,"the VES bias has not been linked");
+  return bias_pntr;
+}
+
+
+Action* CoeffsBase::getPntrToAction() const {
+  plumed_massert(action_pntr!=NULL,"the action has not been linked");
+  return action_pntr;
+}
+
+
 bool CoeffsBase::isGenericCoeffs() const {
   return coeffs_type_==Generic;
 }

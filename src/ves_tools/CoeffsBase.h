@@ -117,8 +117,8 @@ public:
   void setType(const CoeffsType coeffs_type);
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
-  bias::VesBias* getPntrToBias(){return bias_pntr;}
-  Action* getPntrToAction(){return action_pntr;}
+  bias::VesBias* getPntrToVesBias() const;
+  Action* getPntrToAction() const;
   bool isGenericCoeffs() const;
   bool isLinearBasisSetCoeffs() const;
   bool isMultiLinearBasisSetCoeffs() const;

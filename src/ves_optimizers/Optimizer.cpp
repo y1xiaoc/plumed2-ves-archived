@@ -143,7 +143,7 @@ identical_coeffs_shape_(true)
     size_t tot_ncoeffs = 0;
     for(unsigned int i=0; i<ncoeffssets_; i++) {
       log.printf("  coefficient set %d: \n",static_cast<int>(i));
-      log.printf("   used in bias %s (type %s)\n",coeffs_pntrs[i]->getPntrToBias()->getLabel().c_str(),coeffs_pntrs[i]->getPntrToBias()->getName().c_str());
+      log.printf("   used in bias %s (type %s)\n",coeffs_pntrs[i]->getPntrToAction()->getLabel().c_str(),coeffs_pntrs[i]->getPntrToAction()->getName().c_str());
       log.printf("   number of coefficients: %d\n",static_cast<int>(coeffs_pntrs[i]->numberOfCoeffs()));
       if(fixed_stepsize_){log.printf("   using a constant step size of %f\n",stepsizes_[i]);}
       else{log.printf("   using an initial step size of %f\n",stepsizes_[i]);}
