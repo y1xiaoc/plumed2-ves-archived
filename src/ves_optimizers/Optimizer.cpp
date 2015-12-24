@@ -151,10 +151,10 @@ identical_coeffs_shape_(true)
     }
     log.printf("  total number of coefficients: %d\n",static_cast<int>(tot_ncoeffs));
     if(identical_coeffs_shape_){
-      log.printf("  the coefficients indices shape is identical for all biases\n");
+      log.printf("  the indices shape is identical for all coefficient sets\n");
     }
     else{
-      log.printf("  the coefficients indices shape differs between biases\n");
+      log.printf("  the indices shape differs between coefficient sets\n");
     }
   }
 
