@@ -104,6 +104,7 @@ protected:
   void setCurrentStepSize(const double,const unsigned int i = 0);
   void setCurrentStepSizes(const std::vector<double>);
   //
+  void turnOffCoeffsOutputFiles();
 public:
   static void registerKeywords(Keywords&);
   static void useMultipleWalkersKeywords(Keywords&);

@@ -56,10 +56,12 @@ PLUMED_OPTIMIZER_INIT(ao)
   parseFlag("MONITOR_HESSIAN",monitor_hessian);
   if(monitor_hessian){
     turnOnHessian();
+    log.printf("  the Hessian will also be monitored\n");
   }
   else{
     turnOffHessian();
   }
+  turnOffCoeffsOutputFiles();
   checkRead();
 }
 

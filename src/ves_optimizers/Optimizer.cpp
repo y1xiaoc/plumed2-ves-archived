@@ -63,7 +63,6 @@ hessian_pntrs(0),
 coeffs_mask_pntrs(0),
 identical_coeffs_shape_(true)
 {
-  log.printf("hello 0\n");log.flush();
   std::vector<std::string> bias_labels(0);
   parseVector("BIAS",bias_labels);
   plumed_massert(bias_labels.size()>0,"problem with BIAS keyword");
@@ -119,6 +118,7 @@ identical_coeffs_shape_(true)
       stepsizes_.resize(ncoeffssets_,stepsizes_[0]);
     }
     plumed_massert(stepsizes_.size()==ncoeffssets_,"Error in STEPSIZE keyword: either give one value for all biases or a seperate value for each bias");
+    setCurrentStepSizes(stepsizes_);
   }
   if(keywords.exists("INITIAL_STEPSIZE")){
     plumed_assert(!keywords.exists("STEPSIZE"));
@@ -128,15 +128,17 @@ identical_coeffs_shape_(true)
       stepsizes_.resize(ncoeffssets_,stepsizes_[0]);
     }
     plumed_massert(stepsizes_.size()==ncoeffssets_,"Error in INITIAL_STEPSIZE keyword: either give one value for all biases or a seperate value for each bias");
+    setCurrentStepSizes(stepsizes_);
   }
-  setCurrentStepSizes(stepsizes_);
   //
   if(ncoeffssets_==1){
     log.printf("  optimizing VES bias %s with label %s: \n",bias_pntrs[0]->getName().c_str(),bias_pntrs[0]->getLabel().c_str());
     log.printf("   KbT: %f\n",bias_pntrs[0]->getKbT());
     log.printf("  number of coefficients: %d\n",static_cast<int>(coeffs_pntrs[0]->numberOfCoeffs()));
-    if(fixed_stepsize_){log.printf("  using a constant step size of %f\n",stepsizes_[0]);}
-    else{log.printf("  using an initial step size of %f\n",stepsizes_[0]);}
+    if(stepsizes_.size()>0){
+      if(fixed_stepsize_){log.printf("  using a constant step size of %f\n",stepsizes_[0]);}
+      else{log.printf("  using an initial step size of %f\n",stepsizes_[0]);}
+    }
   }
   else {
     log.printf("  optimizing %d coefficent sets from following %d VES biases:\n",static_cast<int>(ncoeffssets_),static_cast<int>(nbiases_));
@@ -148,8 +150,10 @@ identical_coeffs_shape_(true)
       log.printf("  coefficient set %d: \n",static_cast<int>(i));
       log.printf("   used in bias %s (type %s)\n",coeffs_pntrs[i]->getPntrToAction()->getLabel().c_str(),coeffs_pntrs[i]->getPntrToAction()->getName().c_str());
       log.printf("   number of coefficients: %d\n",static_cast<int>(coeffs_pntrs[i]->numberOfCoeffs()));
-      if(fixed_stepsize_){log.printf("   using a constant step size of %f\n",stepsizes_[i]);}
-      else{log.printf("   using an initial step size of %f\n",stepsizes_[i]);}
+      if(stepsizes_.size()>0){
+        if(fixed_stepsize_){log.printf("   using a constant step size of %f\n",stepsizes_[i]);}
+        else{log.printf("   using an initial step size of %f\n",stepsizes_[i]);}
+      }
       tot_ncoeffs += coeffs_pntrs[i]->numberOfCoeffs();
     }
     log.printf("  total number of coefficients: %d\n",static_cast<int>(tot_ncoeffs));
@@ -461,18 +465,22 @@ Optimizer::~Optimizer() {
   for(unsigned int i=0; i<aux_coeffs_pntrs.size(); i++){
     delete aux_coeffs_pntrs[i];
   }
+  aux_coeffs_pntrs.clear();
   for(unsigned int i=0; i<coeffsOfiles_.size(); i++){
     coeffsOfiles_[i]->close();
     delete coeffsOfiles_[i];
   }
+  coeffsOfiles_.clear();
   for(unsigned int i=0; i<gradientOfiles_.size(); i++){
     gradientOfiles_[i]->close();
     delete gradientOfiles_[i];
   }
+  gradientOfiles_.clear();
   for(unsigned int i=0; i<hessianOfiles_.size(); i++){
     hessianOfiles_[i]->close();
     delete hessianOfiles_[i];
   }
+  hessianOfiles_.clear();
 }
 
 
@@ -672,6 +680,15 @@ void Optimizer::writeOutputFiles() {
       hessian_pntrs[i]->writeToFile(*hessianOfiles_[i],getTimeStep()*getStep());
     }
   }
+}
+
+
+void Optimizer::turnOffCoeffsOutputFiles() {
+  for(unsigned int i=0; i<coeffsOfiles_.size(); i++){
+    coeffsOfiles_[i]->close();
+    delete coeffsOfiles_[i];
+  }
+  coeffsOfiles_.clear();
 }
 
 
