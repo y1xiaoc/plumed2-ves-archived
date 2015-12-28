@@ -32,7 +32,7 @@ class FakeOptimizer : public Optimizer {
 public:
   static void registerKeywords(Keywords&);
   explicit FakeOptimizer(const ActionOptions&);
-  void coeffsUpdate(const unsigned int i = 0);
+  void coeffsUpdate(const unsigned int c_id = 0);
 };
 
 
@@ -66,7 +66,7 @@ PLUMED_OPTIMIZER_INIT(ao)
 }
 
 
-void FakeOptimizer::coeffsUpdate(const unsigned int i) {}
+void FakeOptimizer::coeffsUpdate(const unsigned int c_id) {}
 
 
 }

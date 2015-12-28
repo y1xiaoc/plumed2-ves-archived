@@ -154,7 +154,7 @@ void VesBias::updateGradientAndHessian() {
 void VesBias::clearGradientAndHessian() {}
 
 
-void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsigned cid) {
+void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsigned c_id) {
   /*
   use the following online equation to calculate the average and covariance (see wikipedia)
       xm[n+1] = xm[n] + (x[n+1]-xm[n])/(n+1)
@@ -162,24 +162,24 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsi
                     = cov(x,y)[n]*(n/(n+1)) + ( n * (x[n+1]-xm[n])/(n+1) * (y[n+1]-ym[n])/(n+1) );
       n starts at 0.
   */
-  size_t ncoeffs = numberOfCoeffs(cid);
+  size_t ncoeffs = numberOfCoeffs(c_id);
   std::vector<double> deltas(ncoeffs,0.0);
   size_t stride = comm.Get_size();
   size_t rank = comm.Get_rank();
   // update average and diagonal part of Hessian
   for(size_t i=rank; i<ncoeffs;i+=stride){
-    size_t midx = getHessianIndex(i,i,cid);
-    deltas[i] = (coeffderivs[i]-coeffderivs_aver_sampled[cid][i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
-    coeffderivs_aver_sampled[cid][i] += deltas[i];
-    coeffderivs_cov_sampled[cid][midx] = coeffderivs_cov_sampled[cid][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
+    size_t midx = getHessianIndex(i,i,c_id);
+    deltas[i] = (coeffderivs[i]-coeffderivs_aver_sampled[c_id][i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
+    coeffderivs_aver_sampled[c_id][i] += deltas[i];
+    coeffderivs_cov_sampled[c_id][midx] = coeffderivs_cov_sampled[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
   }
   comm.Sum(deltas);
   // update off-diagonal part of the Hessian
   if(!diagonal_hessian_){
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
-        size_t midx = getHessianIndex(i,j,cid);
-        coeffderivs_cov_sampled[cid][midx] = coeffderivs_cov_sampled[cid][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
+        size_t midx = getHessianIndex(i,j,c_id);
+        coeffderivs_cov_sampled[c_id][midx] = coeffderivs_cov_sampled[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
       }
     }
   }
@@ -188,8 +188,8 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsi
 }
 
 
-void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderivs_aver_ps, const unsigned cid) {
-  CoeffDerivsAverTargetDist(cid) = coeffderivs_aver_ps;
+void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderivs_aver_ps, const unsigned coeffs_id) {
+  CoeffDerivsAverTargetDist(coeffs_id) = coeffderivs_aver_ps;
 }
 
 
@@ -248,11 +248,11 @@ void VesBias::apply() {
 }
 
 
-std::string VesBias::labelString(const std::string& type, const unsigned int cid) {
+std::string VesBias::labelString(const std::string& type, const unsigned int coeffs_id) {
   std::string label_prefix = getLabel() + ".";
   std::string label_postfix = "";
   if(use_multiple_coeffssets_){
-    Tools::convert(cid,label_postfix);
+    Tools::convert(coeffs_id,label_postfix);
     label_postfix = "-" + label_postfix;
   }
   return label_prefix+type+label_postfix;

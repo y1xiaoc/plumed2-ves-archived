@@ -32,7 +32,7 @@ class SteepestDecent : public Optimizer {
 public:
   static void registerKeywords(Keywords&);
   explicit SteepestDecent(const ActionOptions&);
-  void coeffsUpdate(const unsigned int i = 0);
+  void coeffsUpdate(const unsigned int c_id = 0);
 };
 
 
@@ -53,8 +53,8 @@ PLUMED_OPTIMIZER_INIT(ao)
 }
 
 
-void SteepestDecent::coeffsUpdate(const unsigned int i) {
-  Coeffs(i) = Coeffs(i) - StepSize(i)*Gradient(i);
+void SteepestDecent::coeffsUpdate(const unsigned int c_id) {
+  Coeffs(c_id) = Coeffs(c_id) - StepSize(c_id)*Gradient(c_id);
 }
 
 

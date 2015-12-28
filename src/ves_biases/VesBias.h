@@ -78,12 +78,12 @@ private:
   double kbt_;
 private:
   void initializeCoeffs(CoeffsVector*);
-  std::string labelString(const std::string&, const unsigned int cid = 0);
+  std::string labelString(const std::string&, const unsigned int coeffs_id = 0);
 protected:
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
-  void setCoeffsDerivs(const std::vector<double>&, const unsigned int cid = 0);
-  void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int cid = 0);
+  void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
+  void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
 public:
   static void registerKeywords(Keywords&);
   explicit VesBias(const ActionOptions&ao);
@@ -96,26 +96,26 @@ public:
   std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs;}
   std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs;}
   //
-  CoeffsVector* getCoeffsPntr(const unsigned int cid = 0) const {return coeffs_pntrs[cid];}
-  CoeffsVector* getCoeffDerivsAverTargetDistPntr(const unsigned int cid = 0) const {return coeffderivs_aver_ps_pntrs[cid];}
-  CoeffsVector* getGradientPntr(const unsigned int cid = 0)const {return gradient_pntrs[cid];}
-  CoeffsMatrix* getHessianPntr(const unsigned int cid = 0) const {return hessian_pntrs[cid];}
+  CoeffsVector* getCoeffsPntr(const unsigned int coeffs_id = 0) const {return coeffs_pntrs[coeffs_id];}
+  CoeffsVector* getCoeffDerivsAverTargetDistPntr(const unsigned int coeffs_id = 0) const {return coeffderivs_aver_ps_pntrs[coeffs_id];}
+  CoeffsVector* getGradientPntr(const unsigned int coeffs_id = 0)const {return gradient_pntrs[coeffs_id];}
+  CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs[coeffs_id];}
 
   //
-  size_t numberOfCoeffs(const unsigned int cid = 0) const;
+  size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const;
   size_t totalNumberOfCoeffs() const;
   unsigned int numberOfCoeffsSets() const;
   double getKbT() const;
   double getBeta() const;
   //
-  CoeffsVector& Coeffs(const unsigned int cid = 0) const;
-  CoeffsVector& CoeffDerivsAverTargetDist(const unsigned int cid = 0) const;
-  CoeffsVector& Gradient(const unsigned int cid = 0) const;
-  CoeffsMatrix& Hessian(const unsigned int cid = 0) const;
+  CoeffsVector& Coeffs(const unsigned int coeffs_id = 0) const;
+  CoeffsVector& CoeffDerivsAverTargetDist(const unsigned int coeffs_id = 0) const;
+  CoeffsVector& Gradient(const unsigned int coeffs_id = 0) const;
+  CoeffsMatrix& Hessian(const unsigned int coeffs_id = 0) const;
   //
-  size_t getCoeffsIndex(const std::vector<unsigned int>& indices, const unsigned int cid = 0) const;
-  std::vector<unsigned int> getCoeffsIndices(const size_t index, const unsigned int cid = 0) const;
-  size_t getHessianIndex(const size_t index1, const size_t index2, const unsigned int cid = 0) const;
+  size_t getCoeffsIndex(const std::vector<unsigned int>& indices, const unsigned int coeffs_id = 0) const;
+  std::vector<unsigned int> getCoeffsIndices(const size_t index, const unsigned int coeffs_id = 0) const;
+  size_t getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id = 0) const;
   //
   bool computeHessian() const {return compute_hessian_;}
   bool diagonalHessian() const {return diagonal_hessian_;}
@@ -133,7 +133,7 @@ public:
 };
 
 inline
-size_t VesBias::numberOfCoeffs(const unsigned int cid) const {return coeffs_pntrs[cid]->numberOfCoeffs();}
+size_t VesBias::numberOfCoeffs(const unsigned int coeffs_id) const {return coeffs_pntrs[coeffs_id]->numberOfCoeffs();}
 
 inline
 unsigned int VesBias::numberOfCoeffsSets() const {return ncoeffssets_;}
@@ -142,16 +142,16 @@ inline
 size_t VesBias::totalNumberOfCoeffs() const {return ncoeffs_total_;}
 
 inline
-CoeffsVector& VesBias::Coeffs(const unsigned int cid) const {return *coeffs_pntrs[cid];}
+CoeffsVector& VesBias::Coeffs(const unsigned int coeffs_id) const {return *coeffs_pntrs[coeffs_id];}
 
 inline
-CoeffsVector& VesBias::CoeffDerivsAverTargetDist(const unsigned int cid) const {return *coeffderivs_aver_ps_pntrs[cid];}
+CoeffsVector& VesBias::CoeffDerivsAverTargetDist(const unsigned int coeffs_id) const {return *coeffderivs_aver_ps_pntrs[coeffs_id];}
 
 inline
-CoeffsVector& VesBias::Gradient(const unsigned int cid) const {return *gradient_pntrs[cid];}
+CoeffsVector& VesBias::Gradient(const unsigned int coeffs_id) const {return *gradient_pntrs[coeffs_id];}
 
 inline
-CoeffsMatrix& VesBias::Hessian(const unsigned int cid) const {return *hessian_pntrs[cid];}
+CoeffsMatrix& VesBias::Hessian(const unsigned int coeffs_id) const {return *hessian_pntrs[coeffs_id];}
 
 inline
 double VesBias::getKbT() const {return kbt_;}
@@ -160,13 +160,13 @@ inline
 double VesBias::getBeta() const {return 1.0/kbt_;}
 
 inline
-size_t VesBias::getCoeffsIndex(const std::vector<unsigned int>& indices, const unsigned int cid) const {return coeffs_pntrs[cid]->getIndex(indices);}
+size_t VesBias::getCoeffsIndex(const std::vector<unsigned int>& indices, const unsigned int coeffs_id) const {return coeffs_pntrs[coeffs_id]->getIndex(indices);}
 
 inline
-std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const unsigned int cid) const {return coeffs_pntrs[cid]->getIndices(index);}
+std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const unsigned int coeffs_id) const {return coeffs_pntrs[coeffs_id]->getIndices(index);}
 
 inline
-size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int cid) const {return hessian_pntrs[cid]->getMatrixIndex(index1,index2);}
+size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id) const {return hessian_pntrs[coeffs_id]->getMatrixIndex(index1,index2);}
 
 
 }
