@@ -87,6 +87,7 @@ private:
   void updateOutputComponents();
   void writeOutputFiles();
   void writeOutputFiles(const unsigned int);
+  void setupOfiles(std::vector<std::string>&, std::vector<OFile*>&);
 protected:
   void turnOnHessian();
   void turnOffHessian();

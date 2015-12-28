@@ -239,19 +239,8 @@ identical_coeffs_shape_(true)
   }
 
 
-  coeffsOfiles_.resize(coeffs_fnames.size(),NULL);
-  for(unsigned int i=0; i<coeffs_fnames.size();i++){
-    coeffsOfiles_[i] = new OFile();
-    coeffsOfiles_[i]->link(*this);
-    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
-      unsigned int r=0;
-      if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
-      comm.Bcast(r,0);
-      if(r>0){coeffs_fnames[i]="/dev/null";}
-      coeffsOfiles_[i]->enforceSuffix("");
-    }
-    coeffsOfiles_[i]->open(coeffs_fnames[i]);
-    coeffsOfiles_[i]->setHeavyFlush();
+  setupOfiles(coeffs_fnames,coeffsOfiles_);
+  for(unsigned int i=0; i<coeffsOfiles_.size();i++){
     coeffs_pntrs[i]->writeToFile(*coeffsOfiles_[i],aux_coeffs_pntrs[i],false,getTimeStep()*getStep());
   }
 
@@ -286,20 +275,11 @@ identical_coeffs_shape_(true)
     plumed_merror("Error in GRADIENT_FILE keyword: either give one value for all biases or a seperate value for each coefficient set");
   }
 
-  gradientOfiles_.resize(gradient_fnames.size(),NULL);
   for(unsigned int i=0; i<gradient_fnames.size(); i++){
     plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"FILE and GRADIENT_FILE cannot be the same");
-    gradientOfiles_[i] = new OFile();
-    gradientOfiles_[i]->link(*this);
-    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
-      unsigned int r=0;
-      if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
-      comm.Bcast(r,0);
-      if(r>0){gradient_fnames[i]="/dev/null";}
-      gradientOfiles_[i]->enforceSuffix("");
-    }
-    gradientOfiles_[i]->open(gradient_fnames[i]);
-    gradientOfiles_[i]->setHeavyFlush();
+  }
+  setupOfiles(gradient_fnames,gradientOfiles_);
+  for(unsigned int i=0; i<gradientOfiles_.size(); i++){
     gradient_pntrs[i]->writeToFile(*gradientOfiles_[i],false,getTimeStep()*getStep());
   }
 
@@ -331,22 +311,11 @@ identical_coeffs_shape_(true)
       plumed_merror("Error in HESSIAN_FILE keyword: either give one value for all biases or a seperate value for each coefficient set");
     }
 
-    hessianOfiles_.resize(hessian_fnames.size(),NULL);
     for(unsigned int i=0; i<hessian_fnames.size(); i++){
-      hessianOfiles_[i] = new OFile();
       plumed_massert(hessian_fnames[i]!=coeffs_fnames[i],"FILE and HESSIAN_FILE cannot be the same");
       plumed_massert(hessian_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and HESSIAN_FILE cannot be the same");
-      hessianOfiles_[i]->link(*this);
-      if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
-        unsigned int r=0;
-        if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
-        comm.Bcast(r,0);
-        if(r>0){hessian_fnames[i]="/dev/null";}
-        hessianOfiles_[i]->enforceSuffix("");
-      }
-      hessianOfiles_[i]->open(hessian_fnames[i]);
-      hessianOfiles_[i]->setHeavyFlush();
     }
+    setupOfiles(hessian_fnames,hessianOfiles_);
 
     if(hessian_fnames.size()>0){
       if(ncoeffssets_==1){
@@ -701,6 +670,24 @@ void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
   }
   if(hessianOfiles_.size()>0 && iter_counter%hessian_wstride_==0){
     hessian_pntrs[coeffs_id]->writeToFile(*hessianOfiles_[coeffs_id],getTimeStep()*getStep());
+  }
+}
+
+
+void Optimizer::setupOfiles(std::vector<std::string>& fnames, std::vector<OFile*>& Ofiles) {
+  Ofiles.resize(fnames.size(),NULL);
+  for(unsigned int i=0; i<fnames.size();i++){
+    Ofiles[i] = new OFile();
+    Ofiles[i]->link(*this);
+    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
+      unsigned int r=0;
+      if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+      comm.Bcast(r,0);
+      if(r>0){fnames[i]="/dev/null";}
+      Ofiles[i]->enforceSuffix("");
+    }
+    Ofiles[i]->open(fnames[i]);
+    Ofiles[i]->setHeavyFlush();
   }
 }
 
