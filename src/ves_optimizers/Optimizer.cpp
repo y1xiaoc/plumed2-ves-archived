@@ -530,10 +530,10 @@ void Optimizer::turnOnHessian() {
   }
   plumed_massert(hessian_pntrs.size()==ncoeffssets_,"problems in linking Hessians");
   if(diagonal_hessian_){
-    log.printf("  optimization performed using the diagonal part of the Hessian\n");
+    log.printf("  Optimization performed using diagonal Hessian matrix\n");
   }
   else {
-    log.printf("  optimization performed using the full Hessian\n");
+    log.printf("  Optimization performed using full Hessian matrix\n");
   }
   //
   for(unsigned int i=0; i<hessianOfiles_.size(); i++){
