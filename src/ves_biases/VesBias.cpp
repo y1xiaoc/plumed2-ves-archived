@@ -199,12 +199,12 @@ void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
     optimizer_pntr = optimizer_pntr_in;
   }
   else {
-    std::string err_msg = "VES bias " + getName() + " with label " + getLabel() + " has already been linked with optimizer " + optimizer_pntr->getName() + " with label " + optimizer_pntr->getLabel() + ". You cannot link two optimizer to the same VES bias.";
+    std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + " has already been linked with optimizer " + optimizer_pntr->getLabel() + " of type " + optimizer_pntr->getName() + ". You cannot link two optimizer to the same VES bias.";
     plumed_merror(err_msg);
   }
   //
   if(kbt_==0.0){
-    std::string err_msg = "VES bias " + getName() + " with label " + getLabel() + ": if you want to optimize this bias you need to give the temperature using the TEMP keyword as the MD engine does not pass it to PLUMED";
+    std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + ": if you want to optimize this bias you need to give the temperature using the TEMP keyword as the MD engine does not pass it to PLUMED";
     plumed_merror(err_msg);
   }
   //
