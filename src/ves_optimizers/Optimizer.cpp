@@ -696,7 +696,7 @@ void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::stri
   }
   //
   if(fnames.size()>0 && fnames.size()!=ncoeffssets_){
-    plumed_merror("Error in " + keyword + " keyword: either give one value for all biases or a seperate value for each coefficient set");
+    plumed_merror("Error in " + keyword + " keyword: either give one common value for all coefficient sets or a seperate value for each set");
   }
 }
 
