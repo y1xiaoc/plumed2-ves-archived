@@ -116,21 +116,13 @@ identical_coeffs_shape_(true)
   if(keywords.exists("STEPSIZE")){
     plumed_assert(!keywords.exists("INITIAL_STEPSIZE"));
     fixed_stepsize_=true;
-    parseVector("STEPSIZE",stepsizes_);
-    if(stepsizes_.size()==1){
-      stepsizes_.resize(ncoeffssets_,stepsizes_[0]);
-    }
-    plumed_massert(stepsizes_.size()==ncoeffssets_,"Error in STEPSIZE keyword: either give one value for all biases or a seperate value for each bias");
+    parseValues("STEPSIZE",stepsizes_);
     setCurrentStepSizes(stepsizes_);
   }
   if(keywords.exists("INITIAL_STEPSIZE")){
     plumed_assert(!keywords.exists("STEPSIZE"));
     fixed_stepsize_=false;
-    parseVector("INITIAL_STEPSIZE",stepsizes_);
-    if(stepsizes_.size()==1){
-      stepsizes_.resize(ncoeffssets_,stepsizes_[0]);
-    }
-    plumed_massert(stepsizes_.size()==ncoeffssets_,"Error in INITIAL_STEPSIZE keyword: either give one value for all biases or a seperate value for each bias");
+    parseValues("INITIAL_STEPSIZE",stepsizes_);
     setCurrentStepSizes(stepsizes_);
   }
   //
