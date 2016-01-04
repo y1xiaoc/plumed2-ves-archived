@@ -753,8 +753,13 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
 
 size_t CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs, const bool ignore_header) {
   ifile.allowIgnoredFields();
-  if(!ignore_header){readHeaderFromFile(ifile);}
-  size_t ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
+  size_t ncoeffs_read;
+  while(ifile){
+    if(!ignore_header){readHeaderFromFile(ifile);}
+    if(ifile){
+      ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
+    }
+  }
   return ncoeffs_read;
 }
 
@@ -770,8 +775,12 @@ size_t CoeffsVector::readFromFile(const std::string& filepath, const bool ignore
 
 
 void CoeffsVector::readHeaderFromFile(IFile& ifile, const bool ignore_coeffs_info) {
-  getCoeffsInfoFromFile(ifile,ignore_coeffs_info);
-  getCounterFieldFromFile(ifile);
+  if(ifile){
+    getCoeffsInfoFromFile(ifile,ignore_coeffs_info);
+  }
+  if(ifile){
+    getCounterFieldFromFile(ifile);
+  }
 }
 
 
@@ -809,13 +818,14 @@ size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_co
     //
     ifile.scanField();
     ncoeffs_read++;
+    if(ncoeffs_read==numberOfCoeffs()){
+      plumed_massert(idx_tmp+1==numberOfCoeffs(),"something strange about the coefficent file, perhaps multiple entries and missing values");
+      break;
+    }
   }
   // checks on the coeffs read
   if(!ignore_missing_coeffs && ncoeffs_read < numberOfCoeffs()){
     plumed_merror("ERROR: missing coefficients when reading from file");
-  }
-  if(ncoeffs_read > numberOfCoeffs()){
-    plumed_merror("something wrong in the coefficients file, perhaps multiple entries");
   }
   //
   return ncoeffs_read;

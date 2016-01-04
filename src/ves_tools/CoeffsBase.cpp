@@ -490,22 +490,40 @@ void CoeffsBase::writeTimeInfoToFile(OFile& ofile, const double current_time) co
 
 
 void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_info) {
-
   int int_tmp;
   // label
   std::string coeffs_type_f;
-  ifile.scanField(field_type_,coeffs_type_f);
+  if(ifile.scanField(field_type_,coeffs_type_f)){
+    // empty for now
+  }
+  else{
+    return;
+  }
   // number of dimensions
-  ifile.scanField(field_ndimensions_,int_tmp);
-  unsigned int ndimensions_f=(unsigned int) int_tmp;
+  unsigned int ndimensions_f = 0;
+  if(ifile.scanField(field_ndimensions_,int_tmp)){
+    ndimensions_f=(unsigned int) int_tmp;
+  }
+  else{
+    return;
+  }
   // total number of coeffs
-  ifile.scanField(field_ncoeffs_total_,int_tmp);
-  size_t ncoeffs_total_f=(size_t) int_tmp;
+  size_t ncoeffs_total_f = 0;
+  if(ifile.scanField(field_ncoeffs_total_,int_tmp)){
+    ncoeffs_total_f=(size_t) int_tmp;
+  }
+  else{
+    return;
+  }
   // shape of indices
   std::vector<unsigned int> indices_shape_f(numberOfDimensions());
   for(unsigned int k=0; k<numberOfDimensions(); k++) {
-    ifile.scanField(field_shape_prefix_+getDimensionLabel(k),int_tmp);
-    indices_shape_f[k]=(unsigned int) int_tmp;
+    if(ifile.scanField(field_shape_prefix_+getDimensionLabel(k),int_tmp)){
+      indices_shape_f[k]=(unsigned int) int_tmp;
+    }
+    else{
+      return;
+    }
   }
   if(!ignore_coeffs_info){
     std::string msg_header="Error when reading in coeffs from file " + ifile.getPath() + ": ";
