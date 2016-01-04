@@ -88,6 +88,7 @@ private:
   void writeOutputFiles();
   void writeOutputFiles(const unsigned int);
   void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&);
+  void readCoeffsFromFiles(const std::vector<std::string>&);
 protected:
   void turnOnHessian();
   void turnOffHessian();

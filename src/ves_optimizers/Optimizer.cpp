@@ -28,6 +28,7 @@
 #include "core/PlumedMain.h"
 #include "core/ActionSet.h"
 #include "tools/Communicator.h"
+#include "tools/File.h"
 
 
 
@@ -94,6 +95,7 @@ identical_coeffs_shape_(true)
       }
       aux_coeffs_tmp->setLabels(aux_label);
       aux_coeffs_pntrs.push_back(aux_coeffs_tmp);
+      AuxCoeffs(i) = Coeffs(i);
     }
   }
   ncoeffssets_ = coeffs_pntrs.size();
@@ -192,11 +194,7 @@ identical_coeffs_shape_(true)
     }
   }
 
-
-  std::vector<std::string> coeffs_fnames(0);
-  parseVector("FILE",coeffs_fnames);
   std::string fname_prefix;
-
   if(ncoeffssets_>1){
     fname_prefix="c-";
     parse("BIASID_SUFFIX",fname_prefix);
@@ -210,10 +208,30 @@ identical_coeffs_shape_(true)
     }
   }
 
+  if(keywords.exists("INITIAL_COEFFS")){
+    std::vector<std::string> initial_coeffs_fnames;
+    parseVector("INITIAL_COEFFS",initial_coeffs_fnames);
+    if(initial_coeffs_fnames.size()>0){
+      if(initial_coeffs_fnames.size()==1 && ncoeffssets_>1){
+        initial_coeffs_fnames.resize(ncoeffssets_,initial_coeffs_fnames[0]);
+        for(unsigned int i=0; i<ncoeffssets_; i++){
+          std::string is=""; Tools::convert(i,is);
+          initial_coeffs_fnames[i] = FileBase::appendSuffix(initial_coeffs_fnames[i],fname_prefix+is);
+        }
+      }
+      if(initial_coeffs_fnames.size()!=ncoeffssets_){
+        plumed_merror("Error in INITIAL_COEFFS keyword: either give one value for all biases or a seperate value for each coefficient set");
+      }
+      readCoeffsFromFiles(initial_coeffs_fnames);
+    }
+  }
+  //
 
+
+  std::vector<std::string> coeffs_fnames(0);
+  parseVector("FILE",coeffs_fnames);
   std::string coeffs_wstride_tmpstr="";
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
-
   if(coeffs_wstride_tmpstr=="OFF" && coeffs_fnames.size()>0){
     plumed_merror("Error: specifying both OUTPUT_STRIDE=OFF and FILE does not make sense");
   }
@@ -463,6 +481,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.add("compulsory","FILE","COEFFS","the name of output file for the coefficients");
   keys.add("compulsory","OUTPUT_STRIDE","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
   keys.add("optional","BIASID_SUFFIX","suffix to add to the filename given in FILE to identfy the bias, should only be given if a single filename is given in FILE when optimizing multiple biases.");
+  //
+  keys.add("optional","INITIAL_COEFFS","the name(s) of file(s) with the initial coefficents");
   // Hidden keywords to output the gradient to a file.
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
   keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
@@ -688,6 +708,34 @@ void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*
     }
     OFiles[i]->open(fnames[i]);
     OFiles[i]->setHeavyFlush();
+  }
+}
+
+
+void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames) {
+  plumed_assert(ncoeffssets_>0);
+  plumed_assert(fnames.size()==ncoeffssets_);
+  for(unsigned int i=0; i<ncoeffssets_; i++){
+    IFile ifile;
+    ifile.link(*this);
+    ifile.open(fnames[i]);
+    if(!ifile.FieldExist(coeffs_pntrs[i]->getDataLabel())){
+      std::string error_msg = "Reading of initial coefficents: no field with name " + coeffs_pntrs[i]->getDataLabel() + "in file " + fnames[i] + "\n";
+      plumed_merror(error_msg);
+    }
+    size_t ncoeffs_read = coeffs_pntrs[i]->readFromFile(ifile,false,false);
+    ifile.close();
+    ifile.open(fnames[i]);
+    if(ifile.FieldExist(aux_coeffs_pntrs[i]->getDataLabel())){
+      size_t nauxcoeffs_read = aux_coeffs_pntrs[i]->readFromFile(ifile,false,false);
+    }
+    else{
+      // to avoid warning
+      ifile.allowIgnoredFields();
+      ifile.scanField();
+      AuxCoeffs(i) = Coeffs(i);
+    }
+    ifile.close();
   }
 }
 
