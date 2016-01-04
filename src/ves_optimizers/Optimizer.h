@@ -63,13 +63,13 @@ private:
   bool mwalkers_mpi_single_files_;
   //
   unsigned int coeffs_wstride_;
-  std::vector<OFile*> coeffsOfiles_;
+  std::vector<OFile*> coeffsOFiles_;
   //
   unsigned int gradient_wstride_;
-  std::vector<OFile*> gradientOfiles_;
+  std::vector<OFile*> gradientOFiles_;
   //
   unsigned int hessian_wstride_;
-  std::vector<OFile*> hessianOfiles_;
+  std::vector<OFile*> hessianOFiles_;
   //
   unsigned int nbiases_;
   std::vector<bias::VesBias*> bias_pntrs;
@@ -87,7 +87,7 @@ private:
   void updateOutputComponents();
   void writeOutputFiles();
   void writeOutputFiles(const unsigned int);
-  void setupOfiles(std::vector<std::string>&, std::vector<OFile*>&);
+  void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&);
 protected:
   void turnOnHessian();
   void turnOffHessian();
