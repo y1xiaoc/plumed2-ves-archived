@@ -111,7 +111,7 @@ public:
   static void useMultipleWalkersKeywords(Keywords&);
   static void useHessianKeywords(Keywords&);
   static void useFixedStepSizeKeywords(Keywords&);
-  static void useChangingStepSizeKeywords(Keywords&);
+  static void useDynamicStepSizeKeywords(Keywords&);
   static void useMaskKeywords(Keywords&);
   //
   explicit Optimizer(const ActionOptions&ao);
@@ -140,6 +140,7 @@ public:
   unsigned int getNumberOfDerivatives(){return 0;}
   //
   bool fixedStepSize() const {return fixed_stepsize_;}
+  bool dynamicStepSize() const {return !fixed_stepsize_;}
   //
   bool useHessian() const {return use_hessian_;}
   bool diagonalHessian() const {return diagonal_hessian_;}

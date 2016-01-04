@@ -466,7 +466,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   // Hidden keywords to output the gradient to a file.
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
   keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
-  // Either use a fixed stepsize (useFixedStepSizeKeywords) or changing stepsize (useChangingStepSizeKeywords)
+  // Either use a fixed stepsize (useFixedStepSizeKeywords) or changing stepsize (useDynamicsStepSizeKeywords)
   keys.reserve("compulsory","STEPSIZE","the step size used for the optimization");
   keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
   // Keywords related to the Hessian, actived with the useHessianKeywords function
@@ -506,7 +506,7 @@ void Optimizer::useFixedStepSizeKeywords(Keywords& keys) {
 }
 
 
-void Optimizer::useChangingStepSizeKeywords(Keywords& keys) {
+void Optimizer::useDynamicStepSizeKeywords(Keywords& keys) {
   keys.use("INITIAL_STEPSIZE");
   keys.addOutputComponent("stepsize","default","the current value of step size used to update the coefficients. For multiple biases this component is labeled using the number of the bias as stepsize-#.");
 }
