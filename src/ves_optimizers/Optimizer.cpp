@@ -48,6 +48,7 @@ use_hessian_(false),
 diagonal_hessian_(true),
 use_mwalkers_mpi_(false),
 mwalkers_mpi_single_files_(true),
+fname_prefix_(""),
 coeffs_wstride_(100),
 coeffsOFiles_(0),
 gradient_wstride_(100),
@@ -194,34 +195,23 @@ identical_coeffs_shape_(true)
     }
   }
 
-  std::string fname_prefix;
   if(ncoeffssets_>1){
-    fname_prefix="c-";
-    parse("BIASID_SUFFIX",fname_prefix);
-    fname_prefix = "." + fname_prefix;
+    fname_prefix_="c-";
+    parse("BIASID_SUFFIX",fname_prefix_);
+    fname_prefix_ = "." + fname_prefix_;
   }
   else{
-    fname_prefix="";
-    parse("BIASID_SUFFIX",fname_prefix);
-    if(fname_prefix.size()>0){
+    fname_prefix_="";
+    parse("BIASID_SUFFIX",fname_prefix_);
+    if(fname_prefix_.size()>0){
       plumed_merror("BIASID_SUFFIX should only be given if optimizing multiple coefficent sets");
     }
   }
 
   if(keywords.exists("INITIAL_COEFFS")){
     std::vector<std::string> initial_coeffs_fnames;
-    parseVector("INITIAL_COEFFS",initial_coeffs_fnames);
+    parseFilenames("INITIAL_COEFFS",initial_coeffs_fnames);
     if(initial_coeffs_fnames.size()>0){
-      if(initial_coeffs_fnames.size()==1 && ncoeffssets_>1){
-        initial_coeffs_fnames.resize(ncoeffssets_,initial_coeffs_fnames[0]);
-        for(unsigned int i=0; i<ncoeffssets_; i++){
-          std::string is=""; Tools::convert(i,is);
-          initial_coeffs_fnames[i] = FileBase::appendSuffix(initial_coeffs_fnames[i],fname_prefix+is);
-        }
-      }
-      if(initial_coeffs_fnames.size()!=ncoeffssets_){
-        plumed_merror("Error in INITIAL_COEFFS keyword: either give one value for all biases or a seperate value for each coefficient set");
-      }
       readCoeffsFromFiles(initial_coeffs_fnames);
     }
   }
@@ -229,34 +219,15 @@ identical_coeffs_shape_(true)
 
 
   std::vector<std::string> coeffs_fnames(0);
-  parseVector("FILE",coeffs_fnames);
+  parseFilenames("FILE",coeffs_fnames,"coeffs.data");
   std::string coeffs_wstride_tmpstr="";
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
-  if(coeffs_wstride_tmpstr=="OFF" && coeffs_fnames.size()>0){
-    plumed_merror("Error: specifying both OUTPUT_STRIDE=OFF and FILE does not make sense");
-  }
-
   if(coeffs_wstride_tmpstr!="OFF" && coeffs_wstride_tmpstr.size()>0){
     Tools::convert(coeffs_wstride_tmpstr,coeffs_wstride_);
   }
-
-  std::string coeffs_default_fname = "coeffs.data";
-  if(coeffs_wstride_tmpstr!="OFF" && coeffs_fnames.size()==0){
-    coeffs_fnames.resize(1,coeffs_default_fname);
+  if(coeffs_wstride_tmpstr=="OFF"){
+    coeffs_fnames.clear();
   }
-
-  if(coeffs_fnames.size()==1 && ncoeffssets_>1){
-    coeffs_fnames.resize(ncoeffssets_,coeffs_fnames[0]);
-    for(unsigned int i=0; i<ncoeffssets_; i++){
-      std::string is=""; Tools::convert(i,is);
-      coeffs_fnames[i] = FileBase::appendSuffix(coeffs_fnames[i],fname_prefix+is);
-    }
-  }
-  if(coeffs_wstride_tmpstr!="OFF" && coeffs_fnames.size()!=ncoeffssets_){
-    plumed_merror("Error in FILE keyword: either give one value for all biases or a seperate value for each coefficient set");
-  }
-
-
   setupOFiles(coeffs_fnames,coeffsOFiles_);
   for(unsigned int i=0; i<coeffsOFiles_.size();i++){
     coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false,getTimeStep()*getStep());
@@ -279,19 +250,8 @@ identical_coeffs_shape_(true)
 
 
   std::vector<std::string> gradient_fnames;
-  parseVector("GRADIENT_FILE",gradient_fnames);
+  parseFilenames("GRADIENT_FILE",gradient_fnames);
   parse("GRADIENT_OUTPUT_STRIDE",gradient_wstride_);
-
-  if(gradient_fnames.size()==1 && ncoeffssets_>1){
-    gradient_fnames.resize(ncoeffssets_,gradient_fnames[0]);
-    for(unsigned int i=0; i<ncoeffssets_; i++){
-      std::string is=""; Tools::convert(i,is);
-      gradient_fnames[i] = FileBase::appendSuffix(gradient_fnames[i],fname_prefix+is);
-    }
-  }
-  if(gradient_fnames.size()>0 && gradient_fnames.size()!=ncoeffssets_){
-    plumed_merror("Error in GRADIENT_FILE keyword: either give one value for all biases or a seperate value for each coefficient set");
-  }
 
   for(unsigned int i=0; i<gradient_fnames.size(); i++){
     plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"FILE and GRADIENT_FILE cannot be the same");
@@ -316,18 +276,7 @@ identical_coeffs_shape_(true)
 
   if(keywords.exists("HESSIAN_FILE")){
     std::vector<std::string> hessian_fnames;
-    parseVector("HESSIAN_FILE",hessian_fnames);
-    parse("HESSIAN_OUTPUT_STRIDE",hessian_wstride_);
-    if(hessian_fnames.size()==1 && ncoeffssets_>1){
-      hessian_fnames.resize(ncoeffssets_,hessian_fnames[0]);
-      for(unsigned int i=0; i<ncoeffssets_; i++){
-        std::string is=""; Tools::convert(i,is);
-        hessian_fnames[i] = FileBase::appendSuffix(hessian_fnames[i],fname_prefix+is);
-      }
-    }
-    if(hessian_fnames.size()>0 && hessian_fnames.size()!=ncoeffssets_){
-      plumed_merror("Error in HESSIAN_FILE keyword: either give one value for all biases or a seperate value for each coefficient set");
-    }
+    parseFilenames("HESSIAN_FILE",hessian_fnames);
 
     for(unsigned int i=0; i<hessian_fnames.size(); i++){
       plumed_massert(hessian_fnames[i]!=coeffs_fnames[i],"FILE and HESSIAN_FILE cannot be the same");
@@ -387,18 +336,7 @@ identical_coeffs_shape_(true)
     }
 
     std::vector<std::string> mask_fnames_out;
-    parseVector("OUTPUT_MASK_FILE",mask_fnames_out);
-    if(mask_fnames_out.size()==1 && ncoeffssets_>1){
-      mask_fnames_out.resize(ncoeffssets_,mask_fnames_out[0]);
-      for(unsigned int i=0; i<ncoeffssets_; i++){
-        std::string is=""; Tools::convert(i,is);
-        mask_fnames_out[i] = FileBase::appendSuffix(mask_fnames_out[i],fname_prefix+is);
-      }
-    }
-    if(mask_fnames_out.size()>0 && mask_fnames_out.size()!=ncoeffssets_){
-      plumed_merror("Error in OUTPUT_MASK_FILE keyword: either give one value for all biases or a seperate value for each coefficient set");
-    }
-
+    parseFilenames("OUTPUT_MASK_FILE",mask_fnames_out);
 
     for(unsigned int i=0; i<mask_fnames_out.size(); i++){
       if(mask_fnames_in.size()>0){
@@ -695,6 +633,7 @@ void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
 
 
 void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*>& OFiles) {
+  plumed_assert(ncoeffssets_>0);
   OFiles.resize(fnames.size(),NULL);
   for(unsigned int i=0; i<fnames.size();i++){
     OFiles[i] = new OFile();
@@ -736,6 +675,28 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames) {
       AuxCoeffs(i) = Coeffs(i);
     }
     ifile.close();
+  }
+}
+
+
+void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames, const std::string& default_fname) {
+  plumed_assert(ncoeffssets_>0);
+  parseVector(keyword,fnames);
+  //
+  if(default_fname.size()>0 && fnames.size()==0){
+    fnames.resize(1,default_fname);
+  }
+  //
+  if(fnames.size()==1 && ncoeffssets_>1){
+    fnames.resize(ncoeffssets_,fnames[0]);
+    for(unsigned int i=0; i<ncoeffssets_; i++){
+      std::string is=""; Tools::convert(i,is);
+      fnames[i] = FileBase::appendSuffix(fnames[i],fname_prefix_+is);
+    }
+  }
+  //
+  if(fnames.size()>0 && fnames.size()!=ncoeffssets_){
+    plumed_merror("Error in " + keyword + " keyword: either give one value for all biases or a seperate value for each coefficient set");
   }
 }
 

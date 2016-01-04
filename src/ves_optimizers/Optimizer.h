@@ -62,6 +62,8 @@ private:
   bool use_mwalkers_mpi_;
   bool mwalkers_mpi_single_files_;
   //
+  std::string fname_prefix_;
+  //
   unsigned int coeffs_wstride_;
   std::vector<OFile*> coeffsOFiles_;
   //
@@ -107,6 +109,8 @@ protected:
   void setCurrentStepSizes(const std::vector<double>);
   //
   void turnOffCoeffsOutputFiles();
+  //
+  void parseFilenames(const std::string&, std::vector<std::string>&, const std::string& default_fname="");
 public:
   static void registerKeywords(Keywords&);
   static void useMultipleWalkersKeywords(Keywords&);
