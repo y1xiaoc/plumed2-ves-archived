@@ -99,7 +99,6 @@ std::string CounterBase::getTimeFieldName() const {
 }
 
 
-
 bool CounterBase::getCounterFieldFromFile(IFile& ifile) {
   bool field_found=false;
   if(ifile.FieldExist(field_name_counter_)){
