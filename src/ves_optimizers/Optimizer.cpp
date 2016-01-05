@@ -210,8 +210,9 @@ identical_coeffs_shape_(true)
   //
 
 
-  std::vector<std::string> coeffs_fnames(0);
+  std::vector<std::string> coeffs_fnames;
   parseFilenames("FILE",coeffs_fnames,"coeffs.data");
+
   std::string coeffs_wstride_tmpstr="";
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
   if(coeffs_wstride_tmpstr!="OFF" && coeffs_wstride_tmpstr.size()>0){
@@ -671,24 +672,17 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames) {
 }
 
 
-void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames, const std::string& default_fname) {
-  plumed_assert(ncoeffssets_>0);
-  parseVector(keyword,fnames);
+void Optimizer::addCoeffsIDsToFilenames(std::vector<std::string>& fnames, std::string& fname_prefix) {
+  if(ncoeffssets_==1){return;}
   //
-  if(default_fname.size()>0 && fnames.size()==0){
-    fnames.resize(1,default_fname);
-  }
-  //
-  if(fnames.size()==1 && ncoeffssets_>1){
+  if(fnames.size()==1){
     fnames.resize(ncoeffssets_,fnames[0]);
-    for(unsigned int i=0; i<ncoeffssets_; i++){
-      std::string is=""; Tools::convert(i,is);
-      fnames[i] = FileBase::appendSuffix(fnames[i],fname_prefix_+is);
-    }
   }
+  plumed_assert(fnames.size()==ncoeffssets_);
   //
-  if(fnames.size()>0 && fnames.size()!=ncoeffssets_){
-    plumed_merror("Error in " + keyword + " keyword: either give one common value for all coefficient sets or a seperate value for each set");
+  for(unsigned int i=0; i<ncoeffssets_; i++){
+    std::string is=""; Tools::convert(i,is);
+    fnames[i] = FileBase::appendSuffix(fnames[i],fname_prefix_+is);
   }
 }
 

@@ -110,9 +110,13 @@ protected:
   //
   void turnOffCoeffsOutputFiles();
   //
-  void parseFilenames(const std::string&, std::vector<std::string>&, const std::string& default_fname="");
   template<class T>
-  void parseValues(const std::string& keyword, std::vector<T>& values);
+  bool parseValues(const std::string&, std::vector<T>&);
+  template<class T>
+  bool parseValues(const std::string&, std::vector<T>&, const T&);
+  void parseFilenames(const std::string&, std::vector<std::string>&, const std::string&);
+  void parseFilenames(const std::string&, std::vector<std::string>&);
+  void addCoeffsIDsToFilenames(std::vector<std::string>&, std::string&);
 public:
   static void registerKeywords(Keywords&);
   static void useMultipleWalkersKeywords(Keywords&);
@@ -230,14 +234,45 @@ void Optimizer::setIterationCounter(const unsigned int iter_counter_in) {iter_co
 
 
 template<class T>
-void Optimizer::parseValues(const std::string& keyword, std::vector<T>& values) {
+bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values) {
   plumed_assert(ncoeffssets_>0);
+  plumed_assert(values.size()==0);
+  bool identical_values=false;
+  //
   parseVector(keyword,values);
-  if(values.size()==1){
+  if(values.size()==1 && ncoeffssets_>1){
     values.resize(ncoeffssets_,values[0]);
+    identical_values=true;
   }
-  plumed_massert(values.size()==ncoeffssets_,"Error in " + keyword + " keyword: either give one common value for all coefficient sets or a seperate value for each set");
+  if(values.size()>0 && values.size()!=ncoeffssets_){
+    plumed_merror("Error in " + keyword + " keyword: either give one common value for all coefficient sets or a seperate value for each set");
+  }
+  return identical_values;
 }
+
+template<class T>
+bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values, const T& default_value) {
+  bool identical_values = parseValues(keyword,values);
+  if(values.size()==0){
+    values.resize(ncoeffssets_,default_value);
+  }
+  return identical_values;
+}
+
+inline
+void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames, const std::string& default_fname) {
+  if(parseValues<std::string>(keyword,fnames,default_fname)){
+    addCoeffsIDsToFilenames(fnames,fname_prefix_);
+  }
+}
+
+inline
+void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames) {
+  if(parseValues<std::string>(keyword,fnames)){
+    addCoeffsIDsToFilenames(fnames,fname_prefix_);
+  }
+}
+
 
 }
 
