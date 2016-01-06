@@ -255,6 +255,7 @@ bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values, 
   bool identical_values = parseValues(keyword,values);
   if(values.size()==0){
     values.resize(ncoeffssets_,default_value);
+    identical_values=true;
   }
   return identical_values;
 }
