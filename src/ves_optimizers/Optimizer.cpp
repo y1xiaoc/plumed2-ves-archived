@@ -212,6 +212,9 @@ identical_coeffs_shape_(true)
 
   std::vector<std::string> coeffs_fnames;
   parseFilenames("FILE",coeffs_fnames,"coeffs.data");
+  if(getRestart()){
+    readCoeffsFromFiles(coeffs_fnames);
+  }
 
   std::string coeffs_wstride_tmpstr="";
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
