@@ -647,15 +647,30 @@ void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*
 void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames) {
   plumed_assert(ncoeffssets_>0);
   plumed_assert(fnames.size()==ncoeffssets_);
+  if(ncoeffssets_==1){
+    log.printf("  Reading initial coefficents from file ");
+  }
+  else{
+    log.printf("  Reading initial coefficents from files:\n");
+  }
   for(unsigned int i=0; i<ncoeffssets_; i++){
     IFile ifile;
     ifile.link(*this);
+    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
+      ifile.enforceSuffix("");
+    }
     ifile.open(fnames[i]);
     if(!ifile.FieldExist(coeffs_pntrs[i]->getDataLabel())){
       std::string error_msg = "Reading of initial coefficents: no field with name " + coeffs_pntrs[i]->getDataLabel() + "in file " + fnames[i] + "\n";
       plumed_merror(error_msg);
     }
     size_t ncoeffs_read = coeffs_pntrs[i]->readFromFile(ifile,false,false);
+    if(ncoeffssets_==1){
+      log.printf("%s (read %zu of %zu values)\n", ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+    }
+    else{
+      log.printf("   coefficent set %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+    }
     ifile.close();
     ifile.open(fnames[i]);
     if(ifile.FieldExist(aux_coeffs_pntrs[i]->getDataLabel())){
