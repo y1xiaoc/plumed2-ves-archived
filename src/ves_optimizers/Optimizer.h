@@ -91,7 +91,7 @@ private:
   void writeOutputFiles(const unsigned int);
   void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&);
   void readCoeffsFromFiles(const std::vector<std::string>&, const bool);
-  void setAllIterationCounters();
+  void setAllCoeffsSetIterationCounters();
 protected:
   void turnOnHessian();
   void turnOffHessian();
@@ -125,6 +125,7 @@ public:
   static void useFixedStepSizeKeywords(Keywords&);
   static void useDynamicStepSizeKeywords(Keywords&);
   static void useMaskKeywords(Keywords&);
+  static void useRestartKeywords(Keywords&);
   //
   explicit Optimizer(const ActionOptions&ao);
   ~Optimizer();

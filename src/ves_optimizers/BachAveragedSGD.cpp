@@ -46,6 +46,7 @@ void BachAveragedSGD::registerKeywords(Keywords& keys){
   Optimizer::useMultipleWalkersKeywords(keys);
   Optimizer::useHessianKeywords(keys);
   Optimizer::useMaskKeywords(keys);
+  Optimizer::useRestartKeywords(keys);
   }
 
 

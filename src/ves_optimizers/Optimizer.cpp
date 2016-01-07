@@ -206,6 +206,7 @@ identical_coeffs_shape_(true)
     parseFilenames("INITIAL_COEFFS",initial_coeffs_fnames);
     if(initial_coeffs_fnames.size()>0){
       readCoeffsFromFiles(initial_coeffs_fnames,false);
+      setAllCoeffsSetIterationCounters();
     }
   }
   //
@@ -213,10 +214,33 @@ identical_coeffs_shape_(true)
 
   std::vector<std::string> coeffs_fnames;
   parseFilenames("FILE",coeffs_fnames,"coeffs.data");
+  bool start_opt_afresh=false;
+  if(keywords.exists("START_OPTIMIZATION_AFRESH")){
+    parseFlag("START_OPTIMIZATION_AFRESH",start_opt_afresh);
+    if(start_opt_afresh && !getRestart()){
+      plumed_merror("the START_OPTIMIZATION_AFRESH keyword should only be used when a restart has been triggered by the RESTART keyword or the MD code");
+    }
+  }
   if(getRestart()){
     readCoeffsFromFiles(coeffs_fnames,true);
+    unsigned int iter_opt_tmp = coeffs_pntrs[0]->getIterationCounter();
+    for(unsigned int i=1; i<ncoeffssets_; i++){
+      plumed_massert(coeffs_pntrs[i]->getIterationCounter()==iter_opt_tmp,"the iteraton counter should be the same for all files when restarting from previous coefficient files\n");
+    }
+    if(start_opt_afresh){
+      setIterationCounter(0);
+      log.printf("  Optimization started afresh at iteration %u\n",getIterationCounter());
+      for(unsigned int i=0; i<ncoeffssets_; i++){
+        AuxCoeffs(i) = Coeffs(i);
+      }
+    }
+    else{
+      setIterationCounter(coeffs_pntrs[0]->getIterationCounter());
+      log.printf("  Optimization restarted at iteration %u\n",getIterationCounter());
+    }
+    setAllCoeffsSetIterationCounters();
   }
-  setAllIterationCounters();
+
 
   std::string coeffs_wstride_tmpstr="";
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
@@ -436,6 +460,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). One can write out the resulting mask by using the OUTPUT_MASK_FILE keyword.");
   keys.reserve("optional","OUTPUT_MASK_FILE","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
   //
+  //
+  keys.reserveFlag("START_OPTIMIZATION_AFRESH",false,"if the iterations should be started afresh when a restart has been triggered by the RESTART keyword or the MD code.");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
@@ -471,6 +497,11 @@ void Optimizer::useDynamicStepSizeKeywords(Keywords& keys) {
 void Optimizer::useMaskKeywords(Keywords& keys) {
   keys.use("MASK_FILE");
   keys.use("OUTPUT_MASK_FILE");
+}
+
+
+void Optimizer::useRestartKeywords(Keywords& keys) {
+  keys.use("START_OPTIMIZATION_AFRESH");
 }
 
 
@@ -656,10 +687,10 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames, cons
   plumed_assert(ncoeffssets_>0);
   plumed_assert(fnames.size()==ncoeffssets_);
   if(ncoeffssets_==1){
-    log.printf("  Reading initial coefficents from file ");
+    log.printf("  Read in coefficents from file ");
   }
   else{
-    log.printf("  Reading initial coefficents from files:\n");
+    log.printf("  Read in coefficents from files:\n");
   }
   for(unsigned int i=0; i<ncoeffssets_; i++){
     IFile ifile;
@@ -669,7 +700,7 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames, cons
     }
     ifile.open(fnames[i]);
     if(!ifile.FieldExist(coeffs_pntrs[i]->getDataLabel())){
-      std::string error_msg = "Reading of initial coefficents: no field with name " + coeffs_pntrs[i]->getDataLabel() + "in file " + fnames[i] + "\n";
+      std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + coeffs_pntrs[i]->getDataLabel() + "\n";
       plumed_merror(error_msg);
     }
     size_t ncoeffs_read = coeffs_pntrs[i]->readFromFile(ifile,false,false);
@@ -683,10 +714,10 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames, cons
     if(read_aux_coeffs){
       ifile.open(fnames[i]);
       if(!ifile.FieldExist(aux_coeffs_pntrs[i]->getDataLabel())){
-        std::string error_msg = "Reading of initial coefficents: no field with name " + aux_coeffs_pntrs[i]->getDataLabel() + "in file " + fnames[i] + "\n";
+        std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + aux_coeffs_pntrs[i]->getDataLabel() + "\n";
         plumed_merror(error_msg);
       }
-      size_t nauxcoeffs_read = aux_coeffs_pntrs[i]->readFromFile(ifile,false,false);
+      aux_coeffs_pntrs[i]->readFromFile(ifile,false,false);
       ifile.close();
     }
     else{
@@ -711,7 +742,7 @@ void Optimizer::addCoeffsSetIDsToFilenames(std::vector<std::string>& fnames, std
 }
 
 
-void Optimizer::setAllIterationCounters(){
+void Optimizer::setAllCoeffsSetIterationCounters(){
   for(unsigned int i=0; i<ncoeffssets_; i++){
     coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     aux_coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
