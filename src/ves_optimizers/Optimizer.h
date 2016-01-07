@@ -62,7 +62,7 @@ private:
   bool use_mwalkers_mpi_;
   bool mwalkers_mpi_single_files_;
   //
-  std::string fname_prefix_;
+  std::string coeffssetid_prefix_;
   //
   unsigned int coeffs_wstride_;
   std::vector<OFile*> coeffsOFiles_;
@@ -116,7 +116,7 @@ protected:
   bool parseValues(const std::string&, std::vector<T>&, const T&);
   void parseFilenames(const std::string&, std::vector<std::string>&, const std::string&);
   void parseFilenames(const std::string&, std::vector<std::string>&);
-  void addCoeffsIDsToFilenames(std::vector<std::string>&, std::string&);
+  void addCoeffsSetIDsToFilenames(std::vector<std::string>&, std::string&);
 public:
   static void registerKeywords(Keywords&);
   static void useMultipleWalkersKeywords(Keywords&);
@@ -263,14 +263,14 @@ bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values, 
 inline
 void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames, const std::string& default_fname) {
   if(parseValues<std::string>(keyword,fnames,default_fname)){
-    addCoeffsIDsToFilenames(fnames,fname_prefix_);
+    addCoeffsSetIDsToFilenames(fnames,coeffssetid_prefix_);
   }
 }
 
 inline
 void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames) {
   if(parseValues<std::string>(keyword,fnames)){
-    addCoeffsIDsToFilenames(fnames,fname_prefix_);
+    addCoeffsSetIDsToFilenames(fnames,coeffssetid_prefix_);
   }
 }
 
