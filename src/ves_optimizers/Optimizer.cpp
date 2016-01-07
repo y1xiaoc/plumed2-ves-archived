@@ -190,7 +190,6 @@ identical_coeffs_shape_(true)
   if(ncoeffssets_>1){
     fname_prefix_="c-";
     parse("BIASID_SUFFIX",fname_prefix_);
-    fname_prefix_ = "." + fname_prefix_;
   }
   else{
     fname_prefix_="";
@@ -368,7 +367,7 @@ identical_coeffs_shape_(true)
   else {
     for(unsigned int i=0; i<ncoeffssets_; i++){
       log.printf("  Output Components for coefficent set %d:\n",static_cast<int>(i));
-      std::string is=""; Tools::convert(i,is); is = "-" + is;
+      std::string is=""; Tools::convert(i,is); is = "_" + fname_prefix_ + is;
       log.printf(" ");
       addComponent("gradrms"+is); componentIsNotPeriodic("gradrms"+is);
       log.printf(" ");
@@ -579,7 +578,7 @@ void Optimizer::updateOutputComponents() {
   }
   else {
     for(unsigned int i=0; i<ncoeffssets_; i++){
-      std::string is=""; Tools::convert(i,is); is = "-" + is;
+      std::string is=""; Tools::convert(i,is); is = "_" + fname_prefix_ + is;
       if(!fixed_stepsize_){
         getPntrToComponent("stepsize"+is)->set( getCurrentStepSize(i) );
       }
@@ -700,7 +699,7 @@ void Optimizer::addCoeffsIDsToFilenames(std::vector<std::string>& fnames, std::s
   //
   for(unsigned int i=0; i<ncoeffssets_; i++){
     std::string is=""; Tools::convert(i,is);
-    fnames[i] = FileBase::appendSuffix(fnames[i],fname_prefix_+is);
+    fnames[i] = FileBase::appendSuffix(fnames[i],"."+fname_prefix_+is);
   }
 }
 
