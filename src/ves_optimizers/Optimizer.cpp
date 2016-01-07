@@ -205,7 +205,7 @@ identical_coeffs_shape_(true)
     std::vector<std::string> initial_coeffs_fnames;
     parseFilenames("INITIAL_COEFFS",initial_coeffs_fnames);
     if(initial_coeffs_fnames.size()>0){
-      readCoeffsFromFiles(initial_coeffs_fnames);
+      readCoeffsFromFiles(initial_coeffs_fnames,false);
     }
   }
   //
@@ -214,7 +214,7 @@ identical_coeffs_shape_(true)
   std::vector<std::string> coeffs_fnames;
   parseFilenames("FILE",coeffs_fnames,"coeffs.data");
   if(getRestart()){
-    readCoeffsFromFiles(coeffs_fnames);
+    readCoeffsFromFiles(coeffs_fnames,true);
   }
   setAllIterationCounters();
 
@@ -652,7 +652,7 @@ void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*
 }
 
 
-void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames) {
+void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames, const bool read_aux_coeffs) {
   plumed_assert(ncoeffssets_>0);
   plumed_assert(fnames.size()==ncoeffssets_);
   if(ncoeffssets_==1){
@@ -680,17 +680,18 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames) {
       log.printf("   coefficent set %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
     }
     ifile.close();
-    ifile.open(fnames[i]);
-    if(ifile.FieldExist(aux_coeffs_pntrs[i]->getDataLabel())){
+    if(read_aux_coeffs){
+      ifile.open(fnames[i]);
+      if(!ifile.FieldExist(aux_coeffs_pntrs[i]->getDataLabel())){
+        std::string error_msg = "Reading of initial coefficents: no field with name " + aux_coeffs_pntrs[i]->getDataLabel() + "in file " + fnames[i] + "\n";
+        plumed_merror(error_msg);
+      }
       size_t nauxcoeffs_read = aux_coeffs_pntrs[i]->readFromFile(ifile,false,false);
+      ifile.close();
     }
     else{
-      // to avoid warning
-      ifile.allowIgnoredFields();
-      ifile.scanField();
       AuxCoeffs(i) = Coeffs(i);
     }
-    ifile.close();
   }
 }
 
