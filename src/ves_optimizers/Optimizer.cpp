@@ -189,13 +189,13 @@ identical_coeffs_shape_(true)
 
   if(ncoeffssets_>1){
     coeffssetid_prefix_="c-";
-    parse("BIASID_SUFFIX",coeffssetid_prefix_);
+    parse("COEFFS_SET_ID_PREFIX",coeffssetid_prefix_);
   }
   else{
     coeffssetid_prefix_="";
-    parse("BIASID_SUFFIX",coeffssetid_prefix_);
+    parse("COEFFS_SET_ID_PREFIX",coeffssetid_prefix_);
     if(coeffssetid_prefix_.size()>0){
-      plumed_merror("BIASID_SUFFIX should only be given if optimizing multiple coefficent sets");
+      plumed_merror("COEFFS_SET_ID_PREFIX should only be given if optimizing multiple coefficent sets");
     }
   }
 
@@ -413,7 +413,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
   keys.add("compulsory","FILE","COEFFS","the name of output file for the coefficients");
   keys.add("compulsory","OUTPUT_STRIDE","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
-  keys.add("optional","BIASID_SUFFIX","suffix to add to the filename given in FILE to identfy the bias, should only be given if a single filename is given in FILE when optimizing multiple biases.");
+  keys.add("optional","COEFFS_SET_ID_PREFIX","suffix to add to the filename given in FILE to identfy the bias, should only be given if a single filename is given in FILE when optimizing multiple biases.");
   //
   keys.add("optional","INITIAL_COEFFS","the name(s) of file(s) with the initial coefficents");
   // Hidden keywords to output the gradient to a file.
