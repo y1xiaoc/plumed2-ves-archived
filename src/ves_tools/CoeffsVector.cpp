@@ -44,9 +44,8 @@ CoeffsVector::CoeffsVector(
   const std::vector<std::string>& dimension_labels,
   const std::vector<unsigned int>& indices_shape,
   Communicator& cc,
-  const bool use_counter):
-CounterBase(use_counter),
-CoeffsBase(label,dimension_labels,indices_shape),
+  const bool use_iteration_counter):
+CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -59,9 +58,8 @@ CoeffsVector::CoeffsVector(
   std::vector<Value*>& args,
   std::vector<BasisFunctions*>& basisf,
   Communicator& cc,
-  const bool use_counter):
-CounterBase(use_counter),
-CoeffsBase(label,args,basisf),
+  const bool use_iteration_counter):
+CoeffsBase(label,args,basisf,use_iteration_counter),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -74,9 +72,9 @@ CoeffsVector::CoeffsVector(
   std::vector<std::vector<Value*> >& argsv,
   std::vector<std::vector<BasisFunctions*> >& basisfv,
   Communicator& cc,
-  const bool use_counter):
-CounterBase(use_counter),
-CoeffsBase(label,argsv,basisfv),
+  const bool use_iteration_counter,
+  const std::string& multicoeffs_label):
+CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -87,9 +85,7 @@ output_fmt_("%30.16e")
 CoeffsVector::CoeffsVector(
   const std::string& label,
   CoeffsMatrix* coeffsMat,
-  Communicator& cc,
-  const bool use_counter):
-CounterBase(use_counter),
+  Communicator& cc):
 CoeffsBase( *(static_cast<CoeffsBase*>(coeffsMat)) ),
 mycomm(cc),
 output_fmt_("%30.16e")
@@ -639,7 +635,7 @@ size_t CoeffsVector::countValues(const double value) const {
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_pntr) {
+void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const bool append_file, Action* action_pntr) {
   OFile file;
   if(action_pntr!=NULL){
     file.link(*action_pntr);
@@ -654,24 +650,24 @@ void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coe
 }
 
 
-void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_descriptions, const double current_time) {
+void CoeffsVector::writeToFile(OFile& ofile, const bool print_coeffs_descriptions) {
   std::vector<CoeffsVector*> CoeffsSetTmp;
   CoeffsSetTmp.push_back(this);
-  writeHeaderToFile(ofile,current_time);
+  writeHeaderToFile(ofile);
   writeDataToFile(ofile,CoeffsSetTmp,print_coeffs_descriptions);
 }
 
 
-void CoeffsVector::writeToFile(OFile& ofile, CoeffsVector* aux_coeffsvector, const bool print_coeffs_descriptions, const double current_time) {
+void CoeffsVector::writeToFile(OFile& ofile, CoeffsVector* aux_coeffsvector, const bool print_coeffs_descriptions) {
   std::vector<CoeffsVector*> CoeffsSetTmp;
   CoeffsSetTmp.push_back(this);
   CoeffsSetTmp.push_back(aux_coeffsvector);
-  writeHeaderToFile(ofile,current_time);
+  writeHeaderToFile(ofile);
   writeDataToFile(ofile,CoeffsSetTmp,print_coeffs_descriptions);
 }
 
 
-void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const double current_time, const bool append_file, Action* action_pntr) {
+void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const bool append_file, Action* action_pntr) {
   OFile file;
   if(action_pntr!=NULL){
     file.link(*action_pntr);
@@ -686,19 +682,20 @@ void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<Co
 }
 
 
-void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const double current_time) {
+void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions) {
   for(unsigned int k=1; k<coeffsvecSet.size(); k++){
     plumed_massert(coeffsvecSet[k]->sameShape(*coeffsvecSet[0]),"Error in writing a set of coeffs to file: The coeffs do not have the same shape and size");
   }
-  coeffsvecSet[0]->writeHeaderToFile(ofile,current_time);
+  coeffsvecSet[0]->writeHeaderToFile(ofile);
   writeDataToFile(ofile,coeffsvecSet, print_coeffs_descriptions);
 }
 
 
-void CoeffsVector::writeHeaderToFile(OFile& ofile, const double current_time) const {
+void CoeffsVector::writeHeaderToFile(OFile& ofile) const {
   ofile.clearFields();
-  if(current_time >= 0.0){writeTimeInfoToFile(ofile,current_time);}
-  writeCounterInfoToFile(ofile);
+  if(isIterationCounterActive()){
+    writeIterationCounterAndTimeToFile(ofile);
+  }
   writeCoeffsInfoToFile(ofile);
 }
 
@@ -775,11 +772,11 @@ size_t CoeffsVector::readFromFile(const std::string& filepath, const bool ignore
 
 
 void CoeffsVector::readHeaderFromFile(IFile& ifile, const bool ignore_coeffs_info) {
-  if(ifile){
-    getCoeffsInfoFromFile(ifile,ignore_coeffs_info);
+  if(ifile && isIterationCounterActive()){
+    getIterationCounterAndTimeFromFile(ifile);
   }
   if(ifile){
-    getCounterFieldFromFile(ifile);
+    getCoeffsInfoFromFile(ifile,ignore_coeffs_info);
   }
 }
 

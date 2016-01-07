@@ -27,7 +27,6 @@
 #include <cmath>
 
 #include "CoeffsBase.h"
-#include "CounterBase.h"
 
 namespace PLMD{
 
@@ -42,7 +41,6 @@ class CoeffsVector;
 
 /// \ingroup TOOLBOX
 class CoeffsMatrix:
-  public CounterBase,
   public CoeffsBase
 {
 public:
@@ -69,7 +67,7 @@ public:
     const std::vector<unsigned int>&,
     Communicator& cc,
     const bool diagonal=true,
-    const bool use_counter=false);
+    const bool use_iteration_counter=false);
   //
   explicit CoeffsMatrix(
     const std::string&,
@@ -77,7 +75,7 @@ public:
     std::vector<BasisFunctions*>&,
     Communicator& cc,
     const bool diagonal=true,
-    const bool use_counter=false);
+    const bool use_iteration_counter=false);
   //
   explicit CoeffsMatrix(
     const std::string&,
@@ -85,14 +83,14 @@ public:
     std::vector<std::vector<BasisFunctions*> >& basisfv,
     Communicator& cc,
     const bool diagonal=true,
-    const bool use_counter=false);
+    const bool use_iteration_counter=false,
+    const std::string& multicoeffs_label="bias");
   //
   explicit CoeffsMatrix(
     const std::string&,
     CoeffsVector*,
     Communicator& cc,
-    const bool diagonal=true,
-    const bool use_counter=false);
+    const bool diagonal=true);
   //
   ~CoeffsMatrix(){}
   //
@@ -180,12 +178,12 @@ public:
   void randomizeValuesGaussian(int);
   //
   // file input/output stuff
-  void writeToFile(OFile&, const double current_time=-1.0);
-  void writeToFile(const std::string&, const double current_time=-1.0, const bool append_file=false, Action* action_pntr=NULL);
+  void writeToFile(OFile&);
+  void writeToFile(const std::string&, const bool append_file=false, Action* action_pntr=NULL);
 private:
   void writeDataToFile(OFile&);
   void writeMatrixInfoToFile(OFile&);
-  void writeHeaderToFile(OFile&, const double current_time=-1.0);
+  void writeHeaderToFile(OFile&);
   void writeDataDiagonalToFile(OFile&);
   void writeDataFullToFile(OFile&);
 public:

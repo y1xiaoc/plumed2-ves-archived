@@ -27,7 +27,6 @@
 #include <cmath>
 
 #include "CoeffsBase.h"
-#include "CounterBase.h"
 
 namespace PLMD{
 
@@ -42,7 +41,6 @@ class CoeffsMatrix;
 
 /// \ingroup TOOLBOX
 class CoeffsVector:
-  public CounterBase,
   public CoeffsBase
 {
 public:
@@ -71,13 +69,13 @@ public:
     std::vector<std::vector<Value*> >&,
     std::vector<std::vector<BasisFunctions*> >&,
     Communicator&,
-    const bool use_counter=false);
+    const bool use_counter=false,
+    const std::string& multicoeffs_label="bias");
   //
   explicit CoeffsVector(
     const std::string&,
     CoeffsMatrix*,
-    Communicator&,
-    const bool use_counter=false);
+    Communicator&);
   //
   ~CoeffsVector(){}
   //
@@ -181,13 +179,13 @@ public:
   size_t countValues(const double) const;
 
   // file input/output stuff
-  void writeToFile(const std::string&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false, Action* action_pntr=NULL);
-  void writeToFile(OFile&, const bool print_description=false, const double current_time=-1.0);
-  void writeToFile(OFile& ofile, CoeffsVector*, const bool print_coeffs_descriptions=false, const double current_time=-1.0);
-  static void writeToFile(const std::string&, const std::vector<CoeffsVector*>&, const bool print_description=false, const double current_time=-1.0, const bool append_file=false, Action* action_pntr=NULL);
-  static void writeToFile(OFile&, const std::vector<CoeffsVector*>&, const bool print_description=false, const double current_time=-1.0);
+  void writeToFile(const std::string&, const bool print_description=false, const bool append_file=false, Action* action_pntr=NULL);
+  void writeToFile(OFile&, const bool print_description=false);
+  void writeToFile(OFile& ofile, CoeffsVector*, const bool print_coeffs_descriptions=false);
+  static void writeToFile(const std::string&, const std::vector<CoeffsVector*>&, const bool print_description=false, const bool append_file=false, Action* action_pntr=NULL);
+  static void writeToFile(OFile&, const std::vector<CoeffsVector*>&, const bool print_description=false);
 private:
-  void writeHeaderToFile(OFile&, const double current_time=-1.0) const;
+  void writeHeaderToFile(OFile&) const;
   static void writeDataToFile(OFile&, const std::vector<CoeffsVector*>&, const bool print_description=false);
 public:
   size_t readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_header=false);

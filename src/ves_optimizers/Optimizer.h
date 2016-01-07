@@ -91,6 +91,7 @@ private:
   void writeOutputFiles(const unsigned int);
   void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&);
   void readCoeffsFromFiles(const std::vector<std::string>&);
+  void setAllIterationCounters(); 
 protected:
   void turnOnHessian();
   void turnOffHessian();

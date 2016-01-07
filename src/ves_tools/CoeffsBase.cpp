@@ -37,10 +37,14 @@ namespace PLMD{
 CoeffsBase::CoeffsBase(
   const std::string& label,
   const std::vector<std::string>& dimension_labels,
-  const std::vector<unsigned int>& indices_shape):
+  const std::vector<unsigned int>& indices_shape,
+  const bool use_iteration_counter):
 label_(label),
 data_label_(label),
 coeffs_type_(Generic),
+iteration_and_time_active_(use_iteration_counter),
+iteration_opt(0),
+time_md(-1.0),
 action_pntr(NULL),
 bias_pntr(NULL),
 args_(0),
@@ -52,7 +56,8 @@ field_type_("type"),
 field_ndimensions_("ndimensions"),
 field_ncoeffs_total_("ncoeffs_total"),
 field_shape_prefix_("shape_"),
-field_time_("time")
+field_time_("time"),
+field_iteration_("iteration")
 {
   initializeIndices(indices_shape,dimension_labels);
   setAllCoeffsDescriptions();
@@ -62,10 +67,14 @@ field_time_("time")
 CoeffsBase::CoeffsBase(
   const std::string& label,
   std::vector<Value*>& args,
-  std::vector<BasisFunctions*>& basisf):
+  std::vector<BasisFunctions*>& basisf,
+  const bool use_iteration_counter):
 label_(label),
 data_label_(label),
 coeffs_type_(LinearBasisSet),
+iteration_and_time_active_(use_iteration_counter),
+iteration_opt(0),
+time_md(-1.0),
 action_pntr(NULL),
 bias_pntr(NULL),
 args_(args),
@@ -77,7 +86,8 @@ field_type_("type"),
 field_ndimensions_("ndimensions"),
 field_ncoeffs_total_("ncoeffs_total"),
 field_shape_prefix_("shape_"),
-field_time_("time")
+field_time_("time"),
+field_iteration_("iteration")
 {
   plumed_massert(args_.size()==basisf_.size(),"CoeffsBase: number of arguments do not match number of basis functions");
   std::vector<std::string> dimension_labels(args_.size());
@@ -95,10 +105,14 @@ CoeffsBase::CoeffsBase(
   const std::string& label,
   std::vector<std::vector<Value*> >& multicoeffs_args,
   std::vector<std::vector<BasisFunctions*> >& multicoeffs_basisf,
+  const bool use_iteration_counter,
   const std::string& multicoeffs_label):
 label_(label),
 data_label_(label),
 coeffs_type_(MultiCoeffs_LinearBasisSet),
+iteration_and_time_active_(use_iteration_counter),
+iteration_opt(0),
+time_md(-1.0),
 action_pntr(NULL),
 bias_pntr(NULL),
 args_(0),
@@ -110,7 +124,8 @@ field_type_("type"),
 field_ndimensions_("ndimensions"),
 field_ncoeffs_total_("ncoeffs_total"),
 field_shape_prefix_("shape_"),
-field_time_("time")
+field_time_("time"),
+field_iteration_("iteration")
 {
   plumed_massert(multicoeffs_args.size()==multicoeffs_basisf.size(),"Multi Coeffs: number of arguments vectors does not match number of basis functions vectors");
   unsigned int num_args = multicoeffs_args[0].size();
@@ -482,13 +497,6 @@ void CoeffsBase::writeCoeffsInfoToFile(OFile& ofile) const {
 }
 
 
-void CoeffsBase::writeTimeInfoToFile(OFile& ofile, const double current_time) const {
-  ofile.fmtField("%f");
-  ofile.addConstantField(field_time_).printField(field_time_,current_time);
-  ofile.fmtField();
-}
-
-
 void CoeffsBase::getCoeffsInfoFromFile(IFile& ifile, const bool ignore_coeffs_info) {
   int int_tmp;
   // label
@@ -558,6 +566,33 @@ void CoeffsBase::checkCoeffsInfo(const std::string& msg_header, const std::strin
       plumed_merror(msg);
     }
   }
+}
+
+
+void CoeffsBase::writeIterationCounterAndTimeToFile(OFile& ofile) const {
+  if(time_md>=0.0){
+    ofile.fmtField("%f");
+    ofile.addConstantField(field_time_).printField(field_time_,time_md);
+    ofile.fmtField();
+  }
+  ofile.addConstantField(field_iteration_).printField(field_iteration_,(int) iteration_opt);
+}
+
+bool CoeffsBase::getIterationCounterAndTimeFromFile(IFile& ifile) {
+  bool field_found=false;
+  if(ifile.FieldExist(field_time_)){
+    field_found=true;
+    double time_tmp;
+    ifile.scanField(field_time_,time_tmp);
+    time_md=time_tmp;
+  }
+  if(ifile.FieldExist(field_iteration_)){
+    field_found=true;
+    int iter_tmp;
+    ifile.scanField(field_iteration_,iter_tmp);
+    iteration_opt=(unsigned int) iter_tmp;
+  }
+  return field_found;
 }
 
 

@@ -58,6 +58,10 @@ private:
     MultiCoeffs_LinearBasisSet
   } coeffs_type_;
   //
+  bool iteration_and_time_active_;
+  unsigned int iteration_opt;
+  double time_md;
+  //
   Action* action_pntr;
   bias::VesBias* bias_pntr;
   //
@@ -73,12 +77,13 @@ private:
   bool multicoeffs_;
   std::vector<std::vector<Value*> > multicoeffs_args_;
   std::vector<std::vector<BasisFunctions*> >multicoeffs_basisf_;
-  // Labels for field in output/input files
+  // Labels for fields in output/input files
   const std::string field_type_;
   const std::string field_ndimensions_;
   const std::string field_ncoeffs_total_;
   const std::string field_shape_prefix_;
   const std::string field_time_;
+  const std::string field_iteration_;
   //
 
   //
@@ -90,18 +95,22 @@ public:
   explicit CoeffsBase(
     const std::string&,
     const std::vector<std::string>&,
-    const std::vector<unsigned int>&);
+    const std::vector<unsigned int>&,
+    const bool use_iteration_counter=false);
   //
   explicit CoeffsBase(
     const std::string&,
     std::vector<Value*>&,
-    std::vector<BasisFunctions*>&);
+    std::vector<BasisFunctions*>&,
+    const bool use_iteration_counter=false);
   //
   explicit CoeffsBase(
       const std::string&,
       std::vector<std::vector<Value*> >&,
       std::vector<std::vector<BasisFunctions*> >&,
-      const std::string& multicoeffs_label="bias");
+      const bool use_iteration_counter=false,
+      const std::string& multicoeffs_label="bias"
+    );
   //
   ~CoeffsBase() {}
   //
@@ -149,11 +158,55 @@ public:
   void writeTimeInfoToFile(OFile&, const double) const;
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
   void checkCoeffsInfo(const std::string&, const std::string&, const unsigned int, const size_t, const std::vector<unsigned int>&);
+  //
+  void turnOnIterationCounter(){iteration_and_time_active_=true;}
+  void turnOffIterationCounter(){iteration_and_time_active_=false;}
+  bool isIterationCounterActive() const {return iteration_and_time_active_;}
+  void setIterationCounter(const unsigned int);
+  void setTime(const double);
+  void setIterationCounterAndTime(const unsigned int, const double);
+  unsigned int getIterationCounter() const;
+  double getTimeValue() const;
+  //
 protected:
   void setupBasisFunctionsInfo();
   void resizeIndices(const std::vector<unsigned int>&);
   void resizeIndices(std::vector<BasisFunctions*>&);
   bool sameShape(const CoeffsBase&) const;
+  //
+  void writeIterationCounterAndTimeToFile(OFile&) const;
+  bool getIterationCounterAndTimeFromFile(IFile&);
+  //
+
 };
+
+inline
+void CoeffsBase::setIterationCounter(const unsigned int iteration_opt_in){
+  iteration_opt=iteration_opt_in;
+}
+
+inline
+void CoeffsBase::setTime(const double time_md_in){
+  time_md=time_md_in;
+}
+
+inline
+void CoeffsBase::setIterationCounterAndTime(const unsigned int iteration_opt_in, const double time_md_in){
+  iteration_opt=iteration_opt_in;
+  time_md=time_md_in;
+}
+
+inline
+unsigned int CoeffsBase::getIterationCounter() const {
+  return iteration_opt;
+}
+
+inline
+double CoeffsBase::getTimeValue() const {
+  return time_md;
+}
+
+
+
 }
 #endif

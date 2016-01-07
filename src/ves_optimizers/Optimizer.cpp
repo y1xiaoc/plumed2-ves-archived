@@ -84,7 +84,9 @@ identical_coeffs_shape_(true)
     for(unsigned int k=0; k<pntrs_coeffs.size(); k++){
       plumed_massert(pntrs_coeffs[k] != NULL,"some coefficient is not linked correctly");
       plumed_massert(pntrs_gradient[k] != NULL,"some gradient is not linked correctly");
+      pntrs_coeffs[k]->turnOnIterationCounter();
       coeffs_pntrs.push_back(pntrs_coeffs[k]);
+      pntrs_gradient[k]->turnOnIterationCounter();
       gradient_pntrs.push_back(pntrs_gradient[k]);
       CoeffsVector* aux_coeffs_tmp = new CoeffsVector(*pntrs_coeffs[k]);
       std::string aux_label = pntrs_coeffs[k]->getLabel();
@@ -214,6 +216,7 @@ identical_coeffs_shape_(true)
   if(getRestart()){
     readCoeffsFromFiles(coeffs_fnames);
   }
+  setAllIterationCounters();
 
   std::string coeffs_wstride_tmpstr="";
   parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
@@ -225,7 +228,7 @@ identical_coeffs_shape_(true)
   }
   setupOFiles(coeffs_fnames,coeffsOFiles_);
   for(unsigned int i=0; i<coeffsOFiles_.size();i++){
-    coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false,getTimeStep()*getStep());
+    coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false);
   }
 
   if(coeffs_fnames.size()>0){
@@ -253,7 +256,7 @@ identical_coeffs_shape_(true)
   }
   setupOFiles(gradient_fnames,gradientOFiles_);
   for(unsigned int i=0; i<gradientOFiles_.size(); i++){
-    gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false,getTimeStep()*getStep());
+    gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
   }
 
   if(gradient_fnames.size()>0){
@@ -347,7 +350,7 @@ identical_coeffs_shape_(true)
         maskOFile.enforceSuffix("");
       }
       maskOFile.open(mask_fnames_out[i]);
-      coeffs_mask_pntrs[i]->writeToFile(maskOFile,true,getTimeStep()*getStep());
+      coeffs_mask_pntrs[i]->writeToFile(maskOFile,true);
       maskOFile.close();
     }
   }
@@ -478,6 +481,8 @@ void Optimizer::turnOnHessian() {
   for(unsigned int i=0; i<nbiases_; i++){
     std::vector<CoeffsMatrix*> pntrs_hessian = enableHessian(bias_pntrs[i],diagonal_hessian_);
     for(unsigned int k=0; k<pntrs_hessian.size(); k++){
+      pntrs_hessian[k]->turnOnIterationCounter();
+      pntrs_hessian[k]->setIterationCounterAndTime(getIterationCounter(),getTime());
       hessian_pntrs.push_back(pntrs_hessian[k]);
     }
   }
@@ -490,7 +495,7 @@ void Optimizer::turnOnHessian() {
   }
   //
   for(unsigned int i=0; i<hessianOFiles_.size(); i++){
-    hessian_pntrs[i]->writeToFile(*hessianOFiles_[i],getTimeStep()*getStep());
+    hessian_pntrs[i]->writeToFile(*hessianOFiles_[i]);
   }
 }
 
@@ -555,10 +560,11 @@ void Optimizer::update() {
         if(use_hessian_){hessian_pntrs[i]->sumMultiSimCommMPI(multi_sim_comm);}
       }
       coeffsUpdate(i);
-      coeffs_pntrs[i]->increaseCounter();
-      aux_coeffs_pntrs[i]->increaseCounter();
-      gradient_pntrs[i]->increaseCounter();
-      if(use_hessian_){hessian_pntrs[i]->increaseCounter();}
+      // +1 as this is done before increaseIterationCounter() is used
+      coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());
+      aux_coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());
+      gradient_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());
+      if(use_hessian_){hessian_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());}
     }
     increaseIterationCounter();
     updateOutputComponents();
@@ -593,13 +599,13 @@ void Optimizer::updateOutputComponents() {
 void Optimizer::writeOutputFiles() {
   for(unsigned int i=0; i<ncoeffssets_; i++){
     if(coeffsOFiles_.size()>0 && iter_counter%coeffs_wstride_==0){
-      coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false,getTimeStep()*getStep());
+      coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false);
     }
     if(gradientOFiles_.size()>0 && iter_counter%gradient_wstride_==0){
-      gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false,getTimeStep()*getStep());
+      gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
     }
     if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
-      hessian_pntrs[i]->writeToFile(*hessianOFiles_[i],getTimeStep()*getStep());
+      hessian_pntrs[i]->writeToFile(*hessianOFiles_[i]);
     }
   }
 }
@@ -616,13 +622,13 @@ void Optimizer::turnOffCoeffsOutputFiles() {
 
 void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
   if(coeffsOFiles_.size()>0 && iter_counter%coeffs_wstride_==0){
-    coeffs_pntrs[coeffs_id]->writeToFile(*coeffsOFiles_[coeffs_id],aux_coeffs_pntrs[coeffs_id],false,getTimeStep()*getStep());
+    coeffs_pntrs[coeffs_id]->writeToFile(*coeffsOFiles_[coeffs_id],aux_coeffs_pntrs[coeffs_id],false);
   }
   if(gradientOFiles_.size()>0 && iter_counter%gradient_wstride_==0){
-    gradient_pntrs[coeffs_id]->writeToFile(*gradientOFiles_[coeffs_id],false,getTimeStep()*getStep());
+    gradient_pntrs[coeffs_id]->writeToFile(*gradientOFiles_[coeffs_id],false);
   }
   if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
-    hessian_pntrs[coeffs_id]->writeToFile(*hessianOFiles_[coeffs_id],getTimeStep()*getStep());
+    hessian_pntrs[coeffs_id]->writeToFile(*hessianOFiles_[coeffs_id]);
   }
 }
 
@@ -700,6 +706,18 @@ void Optimizer::addCoeffsSetIDsToFilenames(std::vector<std::string>& fnames, std
   for(unsigned int i=0; i<ncoeffssets_; i++){
     std::string is=""; Tools::convert(i,is);
     fnames[i] = FileBase::appendSuffix(fnames[i],"."+coeffssetid_prefix_+is);
+  }
+}
+
+
+void Optimizer::setAllIterationCounters(){
+  for(unsigned int i=0; i<ncoeffssets_; i++){
+    coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    aux_coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    gradient_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    if(use_hessian_){
+      hessian_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    }
   }
 }
 

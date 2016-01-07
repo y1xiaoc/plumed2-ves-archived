@@ -45,9 +45,8 @@ CoeffsMatrix::CoeffsMatrix(
   const std::vector<unsigned int>& indices_shape,
   Communicator& cc,
   const bool diagonal,
-  const bool use_counter):
-CounterBase(use_counter),
-CoeffsBase(label,dimension_labels,indices_shape),
+  const bool use_iteration_counter):
+CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
 mycomm(cc),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
@@ -62,9 +61,8 @@ CoeffsMatrix::CoeffsMatrix(
   std::vector<BasisFunctions*>& basisf,
   Communicator& cc,
   const bool diagonal,
-  const bool use_counter):
-CounterBase(use_counter),
-CoeffsBase(label,args,basisf),
+  const bool use_iteration_counter):
+CoeffsBase(label,args,basisf,use_iteration_counter),
 mycomm(cc),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
@@ -79,9 +77,9 @@ CoeffsMatrix::CoeffsMatrix(
   std::vector<std::vector<BasisFunctions*> >& basisfv,
   Communicator& cc,
   const bool diagonal,
-  const bool use_counter):
-CounterBase(use_counter),
-CoeffsBase(label,argsv,basisfv),
+  const bool use_iteration_counter,
+  const std::string& multicoeffs_label):
+CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
 mycomm(cc),
 diagonal_(diagonal),
 output_fmt_("%30.16e")
@@ -94,9 +92,7 @@ CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
   CoeffsVector* coeffsVec,
   Communicator& cc,
-  const bool diagonal,
-  const bool use_counter):
-CounterBase(use_counter),
+  const bool diagonal):
 CoeffsBase( *(static_cast<CoeffsBase*>(coeffsVec)) ),
 mycomm(cc),
 diagonal_(diagonal),
@@ -551,13 +547,13 @@ void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
 }
 
 
-void CoeffsMatrix::writeToFile(OFile& ofile, const double current_time) {
-  writeHeaderToFile(ofile, current_time);
+void CoeffsMatrix::writeToFile(OFile& ofile) {
+  writeHeaderToFile(ofile);
   writeDataToFile(ofile);
 }
 
 
-void CoeffsMatrix::writeToFile(const std::string& filepath, const double current_time, const bool append_file, Action* action_pntr) {
+void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_file, Action* action_pntr) {
   OFile file;
   if(action_pntr!=NULL){
     file.link(*action_pntr);
@@ -567,7 +563,7 @@ void CoeffsMatrix::writeToFile(const std::string& filepath, const double current
   }
   if(append_file){ file.enforceRestart(); }
   file.open(filepath);
-  writeToFile(file, current_time);
+  writeToFile(file);
   file.close();
 }
 
@@ -578,10 +574,11 @@ void CoeffsMatrix::writeMatrixInfoToFile(OFile& ofile) {
 }
 
 
-void CoeffsMatrix::writeHeaderToFile(OFile& ofile, const double current_time) {
+void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
   ofile.clearFields();
-  if(current_time >= 0.0){writeTimeInfoToFile(ofile,current_time);}
-  writeCounterInfoToFile(ofile);
+  if(isIterationCounterActive()){
+    writeIterationCounterAndTimeToFile(ofile);
+  }
   writeCoeffsInfoToFile(ofile);
   writeMatrixInfoToFile(ofile);
 }
