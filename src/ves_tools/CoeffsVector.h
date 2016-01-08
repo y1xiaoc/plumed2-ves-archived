@@ -45,8 +45,12 @@ class CoeffsVector:
 {
 public:
 private:
-  Communicator& mycomm;
   std::vector<double> data;
+  //
+  unsigned int average_counter;
+  //
+  Communicator& mycomm;
+  //
   std::string output_fmt_; // format for output
   //
 public:
@@ -175,6 +179,9 @@ public:
   void normalizeCoeffs();
   // Random values
   void randomizeValuesGaussian(int);
+  //
+  void resetAverageCounter() {average_counter=0;}
+  void addToAverage(const CoeffsVector&);
   //
   size_t countValues(const double) const;
 

@@ -47,8 +47,13 @@ CoeffsMatrix::CoeffsMatrix(
   const bool diagonal,
   const bool use_iteration_counter):
 CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
-mycomm(cc),
+data(0),
+size_(0),
+nrows_(0),
+ncolumns_(0),
 diagonal_(diagonal),
+average_counter(0),
+mycomm(cc),
 output_fmt_("%30.16e")
 {
   setupMatrix();
@@ -63,8 +68,13 @@ CoeffsMatrix::CoeffsMatrix(
   const bool diagonal,
   const bool use_iteration_counter):
 CoeffsBase(label,args,basisf,use_iteration_counter),
-mycomm(cc),
+data(0),
+size_(0),
+nrows_(0),
+ncolumns_(0),
 diagonal_(diagonal),
+average_counter(0),
+mycomm(cc),
 output_fmt_("%30.16e")
 {
   setupMatrix();
@@ -80,8 +90,13 @@ CoeffsMatrix::CoeffsMatrix(
   const bool use_iteration_counter,
   const std::string& multicoeffs_label):
 CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
-mycomm(cc),
+data(0),
+size_(0),
+nrows_(0),
+ncolumns_(0),
 diagonal_(diagonal),
+average_counter(0),
+mycomm(cc),
 output_fmt_("%30.16e")
 {
   setupMatrix();
@@ -94,8 +109,13 @@ CoeffsMatrix::CoeffsMatrix(
   Communicator& cc,
   const bool diagonal):
 CoeffsBase( *(static_cast<CoeffsBase*>(coeffsVec)) ),
-mycomm(cc),
+data(0),
+size_(0),
+nrows_(0),
+ncolumns_(0),
 diagonal_(diagonal),
+average_counter(0),
+mycomm(cc),
 output_fmt_("%30.16e")
 {
   setLabels(label);
@@ -544,6 +564,16 @@ void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
   for(size_t i=0; i<data.size(); i++){
     data[i]=rnd.Gaussian();
   }
+}
+
+
+void CoeffsMatrix::addToAverage(const CoeffsMatrix& coeffsmat) {
+  double aver_decay = 1.0 / ( static_cast<double>(average_counter) + 1.0 );
+  plumed_massert( data.size()==coeffsmat.getSize(), "Incorrect size");
+  for(size_t i=0; i<data.size(); i++){
+    data[i]+=(coeffsmat.data[i]-data[i])*aver_decay;
+  }
+  average_counter++;
 }
 
 

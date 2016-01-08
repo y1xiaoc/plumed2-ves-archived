@@ -45,16 +45,17 @@ class CoeffsMatrix:
 {
 public:
 private:
-  //
-  Communicator& mycomm;
+  std::vector<double> data;
   //
   size_t size_;
   size_t nrows_;
   size_t ncolumns_;
   //
-  std::vector<double> data;
-  //
   bool diagonal_;
+  //
+  unsigned int average_counter;
+  //
+  Communicator& mycomm;
   //
   std::string output_fmt_; // format for output
   //
@@ -176,6 +177,9 @@ public:
   double getMaxValue() const;
   //
   void randomizeValuesGaussian(int);
+  //
+  void resetAverageCounter() {average_counter=0;}
+  void addToAverage(const CoeffsMatrix&);
   //
   // file input/output stuff
   void writeToFile(OFile&);
