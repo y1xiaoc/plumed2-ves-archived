@@ -46,6 +46,8 @@ CoeffsVector::CoeffsVector(
   Communicator& cc,
   const bool use_iteration_counter):
 CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
+data(0),
+averaging_counter(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -61,7 +63,8 @@ CoeffsVector::CoeffsVector(
   const bool use_iteration_counter):
 CoeffsBase(label,args,basisf,use_iteration_counter),
 data(0),
-average_counter(0),
+averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -78,7 +81,8 @@ CoeffsVector::CoeffsVector(
   const std::string& multicoeffs_label):
 CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
 data(0),
-average_counter(0),
+averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -92,7 +96,8 @@ CoeffsVector::CoeffsVector(
   Communicator& cc):
 CoeffsBase( *(static_cast<CoeffsBase*>(coeffsMat)) ),
 data(0),
-average_counter(0),
+averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -630,13 +635,24 @@ void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
 }
 
 
+void CoeffsVector::resetAveraging() {
+  clear();
+  resetAveragingCounter();
+}
+
+
 void CoeffsVector::addToAverage(const CoeffsVector& coeffsvec) {
-  double aver_decay = 1.0 / ( static_cast<double>(average_counter) + 1.0 );
   plumed_massert( data.size()==coeffsvec.getSize(), "Incorrect size");
+  //
+  double aver_decay = 1.0 / ( static_cast<double>(averaging_counter) + 1.0 );
+  if(averaging_exp_decay_>0 &&  (averaging_counter+1 > averaging_exp_decay_) ){
+    aver_decay = 1.0 / static_cast<double>(averaging_exp_decay_);
+  }
+  //
   for(size_t i=0; i<data.size(); i++){
     data[i]+=(coeffsvec.data[i]-data[i])*aver_decay;
   }
-  average_counter++;
+  averaging_counter++;
 }
 
 

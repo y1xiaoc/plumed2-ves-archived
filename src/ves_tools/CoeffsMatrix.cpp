@@ -52,7 +52,8 @@ size_(0),
 nrows_(0),
 ncolumns_(0),
 diagonal_(diagonal),
-average_counter(0),
+averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -73,7 +74,8 @@ size_(0),
 nrows_(0),
 ncolumns_(0),
 diagonal_(diagonal),
-average_counter(0),
+averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -95,7 +97,8 @@ size_(0),
 nrows_(0),
 ncolumns_(0),
 diagonal_(diagonal),
-average_counter(0),
+averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -114,7 +117,8 @@ size_(0),
 nrows_(0),
 ncolumns_(0),
 diagonal_(diagonal),
-average_counter(0),
+averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc),
 output_fmt_("%30.16e")
 {
@@ -567,13 +571,24 @@ void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
 }
 
 
+void CoeffsMatrix::resetAveraging() {
+  clear();
+  resetAveragingCounter();
+}
+
+
 void CoeffsMatrix::addToAverage(const CoeffsMatrix& coeffsmat) {
-  double aver_decay = 1.0 / ( static_cast<double>(average_counter) + 1.0 );
   plumed_massert( data.size()==coeffsmat.getSize(), "Incorrect size");
+  //
+  double aver_decay = 1.0 / ( static_cast<double>(averaging_counter) + 1.0 );
+  if(averaging_exp_decay_>0 &&  (averaging_counter+1 > averaging_exp_decay_) ){
+    aver_decay = 1.0 / static_cast<double>(averaging_exp_decay_);
+  }
+  //
   for(size_t i=0; i<data.size(); i++){
     data[i]+=(coeffsmat.data[i]-data[i])*aver_decay;
   }
-  average_counter++;
+  averaging_counter++;
 }
 
 

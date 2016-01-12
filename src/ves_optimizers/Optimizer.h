@@ -127,7 +127,7 @@ public:
   static void useDynamicStepSizeKeywords(Keywords&);
   static void useMaskKeywords(Keywords&);
   static void useRestartKeywords(Keywords&);
-  static void useMonitorAverageGradientKeywords(Keywords&);
+  static void useMonitorAveragesKeywords(Keywords&);
   //
   explicit Optimizer(const ActionOptions&ao);
   ~Optimizer();

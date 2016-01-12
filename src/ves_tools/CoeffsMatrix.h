@@ -53,7 +53,8 @@ private:
   //
   bool diagonal_;
   //
-  unsigned int average_counter;
+  unsigned int averaging_counter;
+  unsigned int averaging_exp_decay_;
   //
   Communicator& mycomm;
   //
@@ -178,8 +179,12 @@ public:
   //
   void randomizeValuesGaussian(int);
   //
-  void resetAverageCounter() {average_counter=0;}
+  void resetAveragingCounter() {averaging_counter=0;}
+  void setupExponentiallyDecayingAveraging(const unsigned int averaging_exp_decay_in){averaging_exp_decay_=averaging_exp_decay_in;}
+  void turnOffExponentiallyDecayingAveraging(){ averaging_exp_decay_=0;}
+  void resetAveraging();
   void addToAverage(const CoeffsMatrix&);
+  void addToAverage(const CoeffsMatrix&, const unsigned int);
   //
   // file input/output stuff
   void writeToFile(OFile&);

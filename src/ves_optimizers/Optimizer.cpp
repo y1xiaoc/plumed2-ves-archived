@@ -195,6 +195,8 @@ identical_coeffs_shape_(true)
     bool monitor_aver_gradient = false;
     parseFlag("MONITOR_AVERAGE_GRADIENT",monitor_aver_gradient);
     if(monitor_aver_gradient){
+      unsigned int averaging_exp_decay=0;
+      parse("MONITOR_AVERAGES_EXP_DECAY",averaging_exp_decay);
       aver_gradient_pntrs.clear();
       for(unsigned int i=0; i<ncoeffssets_; i++){
         CoeffsVector* aver_gradient_tmp = new CoeffsVector(*gradient_pntrs[i]);
@@ -207,6 +209,9 @@ identical_coeffs_shape_(true)
           aver_grad_label += "_aver";
         }
         aver_gradient_tmp->setLabels(aver_grad_label);
+        if(averaging_exp_decay>0){
+          aver_gradient_tmp->setupExponentiallyDecayingAveraging(averaging_exp_decay);
+        }
         aver_gradient_pntrs.push_back(aver_gradient_tmp);
       }
     }
@@ -510,6 +515,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserveFlag("START_OPTIMIZATION_AFRESH",false,"if the iterations should be started afresh when a restart has been triggered by the RESTART keyword or the MD code.");
   //
   keys.reserveFlag("MONITOR_AVERAGE_GRADIENT",false,"if the averaged gradient should be monitored.");
+  keys.reserve("optional","MONITOR_AVERAGES_EXP_DECAY","use an exponentially decaying averaging with a given time constant when monitoring the averaged gradient");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
@@ -553,8 +559,9 @@ void Optimizer::useRestartKeywords(Keywords& keys) {
 }
 
 
-void Optimizer::useMonitorAverageGradientKeywords(Keywords& keys) {
+void Optimizer::useMonitorAveragesKeywords(Keywords& keys) {
   keys.use("MONITOR_AVERAGE_GRADIENT");
+  keys.use("MONITOR_AVERAGES_EXP_DECAY");
 }
 
 

@@ -47,7 +47,8 @@ public:
 private:
   std::vector<double> data;
   //
-  unsigned int average_counter;
+  unsigned int averaging_counter;
+  unsigned int averaging_exp_decay_;
   //
   Communicator& mycomm;
   //
@@ -180,7 +181,10 @@ public:
   // Random values
   void randomizeValuesGaussian(int);
   //
-  void resetAverageCounter() {average_counter=0;}
+  void resetAveragingCounter() {averaging_counter=0;}
+  void setupExponentiallyDecayingAveraging(const unsigned int averaging_exp_decay_in){averaging_exp_decay_=averaging_exp_decay_in;}
+  void turnOffExponentiallyDecayingAveraging(){averaging_exp_decay_=0;}
+  void resetAveraging();
   void addToAverage(const CoeffsVector&);
   //
   size_t countValues(const double) const;
