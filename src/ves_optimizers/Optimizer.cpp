@@ -61,6 +61,7 @@ ncoeffssets_(0),
 coeffs_pntrs(0),
 aux_coeffs_pntrs(0),
 gradient_pntrs(0),
+aver_gradient_pntrs(0),
 hessian_pntrs(0),
 coeffs_mask_pntrs(0),
 identical_coeffs_shape_(true)
@@ -88,6 +89,7 @@ identical_coeffs_shape_(true)
       coeffs_pntrs.push_back(pntrs_coeffs[k]);
       pntrs_gradient[k]->turnOnIterationCounter();
       gradient_pntrs.push_back(pntrs_gradient[k]);
+      //
       CoeffsVector* aux_coeffs_tmp = new CoeffsVector(*pntrs_coeffs[k]);
       std::string aux_label = pntrs_coeffs[k]->getLabel();
       if(aux_label.find("coeffs")!=std::string::npos){
@@ -189,6 +191,28 @@ identical_coeffs_shape_(true)
     }
   }
 
+  if(keywords.exists("MONITOR_AVERAGE_GRADIENT")){
+    bool monitor_aver_gradient = false;
+    parseFlag("MONITOR_AVERAGE_GRADIENT",monitor_aver_gradient);
+    if(monitor_aver_gradient){
+      aver_gradient_pntrs.clear();
+      for(unsigned int i=0; i<ncoeffssets_; i++){
+        CoeffsVector* aver_gradient_tmp = new CoeffsVector(*gradient_pntrs[i]);
+        aver_gradient_tmp->clear();
+        std::string aver_grad_label = aver_gradient_tmp->getLabel();
+        if(aver_grad_label.find("gradient")!=std::string::npos){
+          aver_grad_label.replace(aver_grad_label.find("gradient"), std::string("gradient").length(), "aver_gradient");
+        }
+        else {
+          aver_grad_label += "_aver";
+        }
+        aver_gradient_tmp->setLabels(aver_grad_label);
+        aver_gradient_pntrs.push_back(aver_gradient_tmp);
+      }
+    }
+  }
+
+
   if(ncoeffssets_>1){
     coeffssetid_prefix_="c-";
     parse("COEFFS_SET_ID_PREFIX",coeffssetid_prefix_);
@@ -280,7 +304,12 @@ identical_coeffs_shape_(true)
   }
   setupOFiles(gradient_fnames,gradientOFiles_);
   for(unsigned int i=0; i<gradientOFiles_.size(); i++){
-    gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
+    if(aver_gradient_pntrs.size()==0){
+      gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
+    }
+    else{
+      gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs[i],false);
+    }
   }
 
   if(gradient_fnames.size()>0){
@@ -386,6 +415,12 @@ identical_coeffs_shape_(true)
     addComponent("gradrms"); componentIsNotPeriodic("gradrms");
     log.printf(" ");
     addComponent("gradmax"); componentIsNotPeriodic("gradmax");
+    if(aver_gradient_pntrs.size()>0){
+      log.printf(" ");
+      addComponent("avergradrms"); componentIsNotPeriodic("avergradrms");
+      log.printf(" ");
+      addComponent("avergradmax"); componentIsNotPeriodic("avergradmax");
+    }
     if(!fixed_stepsize_){
       log.printf(" ");
       addComponent("stepsize"); componentIsNotPeriodic("stepsize");
@@ -399,6 +434,12 @@ identical_coeffs_shape_(true)
       addComponent("gradrms"+is); componentIsNotPeriodic("gradrms"+is);
       log.printf(" ");
       addComponent("gradmax"+is); componentIsNotPeriodic("gradmax"+is);
+      if(aver_gradient_pntrs.size()>0){
+        log.printf(" ");
+        addComponent("avergradrms"+is); componentIsNotPeriodic("avergradrms"+is);
+        log.printf(" ");
+        addComponent("avergradmax"+is); componentIsNotPeriodic("avergradmax"+is);
+      }
       if(!fixed_stepsize_){
         log.printf(" ");
         addComponent("stepsize"+is); componentIsNotPeriodic("stepsize"+is);
@@ -413,6 +454,12 @@ Optimizer::~Optimizer() {
     delete aux_coeffs_pntrs[i];
   }
   aux_coeffs_pntrs.clear();
+  //
+  for(unsigned int i=0; i<aver_gradient_pntrs.size(); i++){
+    delete aver_gradient_pntrs[i];
+  }
+  aver_gradient_pntrs.clear();
+  //
   for(unsigned int i=0; i<coeffsOFiles_.size(); i++){
     coeffsOFiles_[i]->close();
     delete coeffsOFiles_[i];
@@ -460,8 +507,9 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). One can write out the resulting mask by using the OUTPUT_MASK_FILE keyword.");
   keys.reserve("optional","OUTPUT_MASK_FILE","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
   //
-  //
   keys.reserveFlag("START_OPTIMIZATION_AFRESH",false,"if the iterations should be started afresh when a restart has been triggered by the RESTART keyword or the MD code.");
+  //
+  keys.reserveFlag("MONITOR_AVERAGE_GRADIENT",false,"if the averaged gradient should be monitored.");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
@@ -502,6 +550,11 @@ void Optimizer::useMaskKeywords(Keywords& keys) {
 
 void Optimizer::useRestartKeywords(Keywords& keys) {
   keys.use("START_OPTIMIZATION_AFRESH");
+}
+
+
+void Optimizer::useMonitorAverageGradientKeywords(Keywords& keys) {
+  keys.use("MONITOR_AVERAGE_GRADIENT");
 }
 
 
@@ -592,10 +645,18 @@ void Optimizer::update() {
       }
       coeffsUpdate(i);
       // +1 as this is done before increaseIterationCounter() is used
-      coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());
-      aux_coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());
-      gradient_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());
-      if(use_hessian_){hessian_pntrs[i]->setIterationCounterAndTime(getIterationCounter()+1,getTime());}
+      unsigned int curr_iter = getIterationCounter()+1;
+      double curr_time = getTime();
+      coeffs_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      aux_coeffs_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      gradient_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      if(use_hessian_){
+        hessian_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      }
+      if(aver_gradient_pntrs.size()>0){
+        aver_gradient_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
+        aver_gradient_pntrs[i]->addToAverage(*gradient_pntrs[i]);
+      }
     }
     increaseIterationCounter();
     updateOutputComponents();
@@ -612,6 +673,10 @@ void Optimizer::updateOutputComponents() {
     getPntrToComponent("gradrms")->set( gradient_pntrs[0]->getRMS() );
     size_t gradient_maxabs_idx=0;
     getPntrToComponent("gradmax")->set( gradient_pntrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
+    if(aver_gradient_pntrs.size()>0){
+      getPntrToComponent("avergradrms")->set( aver_gradient_pntrs[0]->getRMS() );
+      getPntrToComponent("avergradmax")->set( aver_gradient_pntrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
+    }
   }
   else {
     for(unsigned int i=0; i<ncoeffssets_; i++){
@@ -622,6 +687,10 @@ void Optimizer::updateOutputComponents() {
       getPntrToComponent("gradrms"+is)->set( gradient_pntrs[i]->getRMS() );
       size_t gradient_maxabs_idx=0;
       getPntrToComponent("gradmax"+is)->set( gradient_pntrs[i]->getMaxAbsValue(gradient_maxabs_idx) );
+      if(aver_gradient_pntrs.size()>0){
+        getPntrToComponent("avergradrms"+is)->set( aver_gradient_pntrs[0]->getRMS() );
+        getPntrToComponent("avergradmax"+is)->set( aver_gradient_pntrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
+      }
     }
   }
 }
@@ -633,7 +702,12 @@ void Optimizer::writeOutputFiles() {
       coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false);
     }
     if(gradientOFiles_.size()>0 && iter_counter%gradient_wstride_==0){
-      gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
+      if(aver_gradient_pntrs.size()==0){
+        gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
+      }
+      else{
+        gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs[i],false);
+      }
     }
     if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
       hessian_pntrs[i]->writeToFile(*hessianOFiles_[i]);

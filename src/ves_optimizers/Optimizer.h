@@ -80,6 +80,7 @@ private:
   std::vector<CoeffsVector*> coeffs_pntrs;
   std::vector<CoeffsVector*> aux_coeffs_pntrs;
   std::vector<CoeffsVector*> gradient_pntrs;
+  std::vector<CoeffsVector*> aver_gradient_pntrs;
   std::vector<CoeffsMatrix*> hessian_pntrs;
   std::vector<CoeffsVector*> coeffs_mask_pntrs;
   //
@@ -126,6 +127,7 @@ public:
   static void useDynamicStepSizeKeywords(Keywords&);
   static void useMaskKeywords(Keywords&);
   static void useRestartKeywords(Keywords&);
+  static void useMonitorAverageGradientKeywords(Keywords&);
   //
   explicit Optimizer(const ActionOptions&ao);
   ~Optimizer();
