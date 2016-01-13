@@ -28,6 +28,8 @@
 #include "tools/Communicator.h"
 #include "core/PlumedMain.h"
 #include "core/Atoms.h"
+#include "tools/File.h"
+
 
 #include <iostream>
 
@@ -45,6 +47,7 @@ hessian_pntrs(0),
 coeffderivs_aver_sampled(0),
 coeffderivs_cov_sampled(0),
 use_multiple_coeffssets_(false),
+coeffs_fnames(0),
 ncoeffs_total_(0),
 optimizer_pntr(NULL),
 optimize_coeffs_(false),
@@ -65,6 +68,10 @@ kbt_(0.0)
     log.printf("  KbT: %f\n",kbt_);
   }
   // NOTE: the check for that the temperature is given is done when linking the optimizer later on.
+
+  if(keywords.exists("COEFFS")){
+    parseVector("COEFFS",coeffs_fnames);
+  }
 }
 
 VesBias::~VesBias(){
@@ -82,6 +89,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature to PLUMED");
   keys.addOutputComponent("bias","default","the instantaneous value of the bias potential");
   keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential");
+  keys.reserve("optional","COEFFS","read-in the coefficents from files.");
 }
 
 
@@ -134,6 +142,39 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
   //
   ncoeffssets_++;
+}
+
+
+void VesBias::readCoeffsFromFiles() {
+  plumed_assert(ncoeffssets_>0);
+  plumed_massert(keywords.exists("COEFFS"),"you are not allowed to use this function as the COEFFS keyword is not enabled");
+  if(coeffs_fnames.size()>0){
+    plumed_massert(coeffs_fnames.size()==ncoeffssets_,"COEFFS keyword is of the wrong size");
+    if(ncoeffssets_==1){
+      log.printf("  Read in coefficents from file ");
+    }
+    else{
+      log.printf("  Read in coefficents from files:\n");
+    }
+    for(unsigned int i=0; i<ncoeffssets_; i++){
+      IFile ifile;
+      ifile.link(*this);
+      ifile.open(coeffs_fnames[i]);
+      if(!ifile.FieldExist(coeffs_pntrs[i]->getDataLabel())){
+        std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + coeffs_pntrs[i]->getDataLabel() + "\n";
+        plumed_merror(error_msg);
+      }
+      size_t ncoeffs_read = coeffs_pntrs[i]->readFromFile(ifile,false,false);
+      coeffs_pntrs[i]->setIterationCounterAndTime(0,getTime());
+      if(ncoeffssets_==1){
+        log.printf("%s (read %zu of %zu values)\n", ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+      }
+      else{
+        log.printf("   coefficent %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+      }
+      ifile.close();
+    }
+  }
 }
 
 

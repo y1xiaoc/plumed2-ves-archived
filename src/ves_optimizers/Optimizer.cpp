@@ -106,6 +106,8 @@ identical_coeffs_shape_(true)
   ncoeffssets_ = coeffs_pntrs.size();
   plumed_massert(aux_coeffs_pntrs.size()==ncoeffssets_,"problems in linking aux coefficients");
   plumed_massert(gradient_pntrs.size()==ncoeffssets_,"problems in linking gradients");
+  setAllCoeffsSetIterationCounters();
+
 
 
   //

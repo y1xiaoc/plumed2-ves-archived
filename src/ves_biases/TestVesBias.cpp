@@ -60,6 +60,7 @@ void TestVesBias::registerKeywords( Keywords& keys ){
   VesBias::registerKeywords(keys);
   keys.use("ARG");
   keys.add("compulsory","BASIS_SET","the label of the basis sets that you want to use");
+  keys.use("COEFFS");
 }
 
 TestVesBias::TestVesBias(const ActionOptions&ao):
@@ -89,6 +90,8 @@ bf_pointers(getNumberOfArguments(),NULL)
   for(unsigned int i=0; i<numberOfCoeffsSets(); i++){
     setCoeffsDerivsOverTargetDist(bf_pointers[i]->getBasisFunctionIntegrals(),i);
   }
+
+  readCoeffsFromFiles();
 
   addComponent("bias"); componentIsNotPeriodic("bias");
   valueBias=getPntrToComponent("bias");

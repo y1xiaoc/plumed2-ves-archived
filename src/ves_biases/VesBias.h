@@ -66,6 +66,8 @@ private:
   std::vector<std::vector<double> >coeffderivs_cov_sampled;
   bool use_multiple_coeffssets_;
   //
+  std::vector<std::string> coeffs_fnames;
+  //
   size_t ncoeffs_total_;
   //
   Optimizer* optimizer_pntr;
@@ -84,6 +86,7 @@ protected:
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
   void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
   void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
+  void readCoeffsFromFiles();
 public:
   static void registerKeywords(Keywords&);
   explicit VesBias(const ActionOptions&ao);
