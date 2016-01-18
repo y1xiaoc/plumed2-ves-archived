@@ -122,13 +122,13 @@ identical_coeffs_shape_(true)
   if(keywords.exists("STEPSIZE")){
     plumed_assert(!keywords.exists("INITIAL_STEPSIZE"));
     fixed_stepsize_=true;
-    parseValues("STEPSIZE",stepsizes_);
+    parseMultipleValues("STEPSIZE",stepsizes_);
     setCurrentStepSizes(stepsizes_);
   }
   if(keywords.exists("INITIAL_STEPSIZE")){
     plumed_assert(!keywords.exists("STEPSIZE"));
     fixed_stepsize_=false;
-    parseValues("INITIAL_STEPSIZE",stepsizes_);
+    parseMultipleValues("INITIAL_STEPSIZE",stepsizes_);
     setCurrentStepSizes(stepsizes_);
   }
   //

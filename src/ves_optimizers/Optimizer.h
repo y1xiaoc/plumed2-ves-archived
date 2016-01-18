@@ -113,9 +113,9 @@ protected:
   void turnOffCoeffsOutputFiles();
   //
   template<class T>
-  bool parseValues(const std::string&, std::vector<T>&);
+  bool parseMultipleValues(const std::string&, std::vector<T>&);
   template<class T>
-  bool parseValues(const std::string&, std::vector<T>&, const T&);
+  bool parseMultipleValues(const std::string&, std::vector<T>&, const T&);
   void parseFilenames(const std::string&, std::vector<std::string>&, const std::string&);
   void parseFilenames(const std::string&, std::vector<std::string>&);
   void addCoeffsSetIDsToFilenames(std::vector<std::string>&, std::string&);
@@ -238,7 +238,7 @@ void Optimizer::setIterationCounter(const unsigned int iter_counter_in) {iter_co
 
 
 template<class T>
-bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values) {
+bool Optimizer::parseMultipleValues(const std::string& keyword, std::vector<T>& values) {
   plumed_assert(ncoeffssets_>0);
   plumed_assert(values.size()==0);
   bool identical_values=false;
@@ -255,8 +255,8 @@ bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values) 
 }
 
 template<class T>
-bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values, const T& default_value) {
-  bool identical_values = parseValues(keyword,values);
+bool Optimizer::parseMultipleValues(const std::string& keyword, std::vector<T>& values, const T& default_value) {
+  bool identical_values = parseMultipleValues(keyword,values);
   if(values.size()==0){
     values.resize(ncoeffssets_,default_value);
     identical_values=true;
@@ -266,14 +266,14 @@ bool Optimizer::parseValues(const std::string& keyword, std::vector<T>& values, 
 
 inline
 void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames, const std::string& default_fname) {
-  if(parseValues<std::string>(keyword,fnames,default_fname)){
+  if(parseMultipleValues<std::string>(keyword,fnames,default_fname)){
     addCoeffsSetIDsToFilenames(fnames,coeffssetid_prefix_);
   }
 }
 
 inline
 void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames) {
-  if(parseValues<std::string>(keyword,fnames)){
+  if(parseMultipleValues<std::string>(keyword,fnames)){
     addCoeffsSetIDsToFilenames(fnames,coeffssetid_prefix_);
   }
 }

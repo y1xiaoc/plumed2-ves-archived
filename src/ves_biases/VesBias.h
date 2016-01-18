@@ -87,6 +87,11 @@ protected:
   void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
   void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
   void readCoeffsFromFiles();
+  //
+  template<class T>
+  bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int);
+  template<class T>
+  bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int, const T&);
 public:
   static void registerKeywords(Keywords&);
   explicit VesBias(const ActionOptions&ao);
@@ -170,6 +175,35 @@ std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const un
 
 inline
 size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id) const {return hessian_pntrs[coeffs_id]->getMatrixIndex(index1,index2);}
+
+
+template<class T>
+bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& values, unsigned int nvalues) {
+  plumed_assert(nvalues>0);
+  plumed_assert(values.size()==0);
+  bool identical_values=false;
+  //
+  parseVector(keyword,values);
+  if(values.size()==1 && nvalues>1){
+    values.resize(nvalues,values[0]);
+    identical_values=true;
+  }
+  if(values.size()>0 && values.size()!=nvalues){
+    plumed_merror("Error in " + keyword + " keyword: either give one common parameter value or seperate parameter values");
+  }
+  return identical_values;
+}
+
+template<class T>
+bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& values, unsigned int nvalues, const T& default_value) {
+  bool identical_values = parseMultipleValues(keyword,values,nvalues);
+  if(values.size()==0){
+    values.resize(nvalues,default_value);
+    identical_values=true;
+  }
+  return identical_values;
+}
+
 
 
 }
