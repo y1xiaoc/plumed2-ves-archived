@@ -63,7 +63,7 @@ private:
   double time_md;
   //
   Action* action_pntr;
-  bias::VesBias* bias_pntr;
+  bias::VesBias* vesbias_pntr;
   //
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
