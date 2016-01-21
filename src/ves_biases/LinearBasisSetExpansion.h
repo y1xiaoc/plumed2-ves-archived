@@ -88,6 +88,7 @@ private:
   //
   CoeffsVector& BiasCoeffs() const;
   CoeffsVector& FesWTCoeffs() const;
+  CoeffsVector& CoeffDerivsAverTargetDist() const;
   //
   void setSerial() {serial_=true;}
   void setParallel() {serial_=false;}
@@ -95,14 +96,16 @@ private:
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
   // calculate bias and derivatives
-  double getBiasAndForces(const std::vector<double>&, std::vector<double>&);
-  double getBias(const std::vector<double>&);
+  double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
+  double getBias(const std::vector<double>&) {return 0.0;}
   // Grid stuff
   void setupGrid(const std::vector<unsigned int>&, const bool usederiv=false);
   void updateBiasGrid();
   void writeBiasGridToFile(const std::string&, const bool);
+  //
+  void setupUniformTargetDistribution();
   // Well-Tempered p(s) stuff
-  void setupWellTempered(const double, const std::vector<unsigned int>&);
+  void setupWellTemperedTargetDistribution(const double, const std::vector<unsigned int>&);
   void updateWellTemperedFESCoeffs();
 };
 
@@ -132,6 +135,9 @@ CoeffsVector& LinearBasisSetExpansion::BiasCoeffs() const {return *bias_coeffs_p
 
 inline
 CoeffsVector& LinearBasisSetExpansion::FesWTCoeffs() const {return *fes_wt_coeffs_pntr;}
+
+inline
+CoeffsVector& LinearBasisSetExpansion::CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr;}
 
 }
 

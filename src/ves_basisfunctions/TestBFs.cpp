@@ -21,7 +21,6 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "ves_tools/CoeffsVector.h"
 #include "ves_tools/CoeffsMatrix.h"
-#include "ves_biases/LinearBiasExpansion.h"
 #include "ves_targetdistributions/TargetDistributionBase.h"
 #include "BasisFunctions.h"
 
@@ -52,7 +51,6 @@ class TestBFs :
   BasisFunctions* bf_pointer;
   BasisFunctions* bf_pointer2;
   CoeffsVector* coeffs2;
-  bias::LinearBiasExpansion* bias_expansion;
   unsigned int bf_order_;
 public:
   explicit TestBFs(const ActionOptions&);

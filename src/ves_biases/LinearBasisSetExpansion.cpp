@@ -29,6 +29,9 @@
 #include "tools/Grid.h"
 #include "tools/Communicator.h"
 
+#include <iostream>
+
+
 
 namespace PLMD{
 namespace bias{
@@ -38,7 +41,7 @@ namespace bias{
 */
 //+ENDPLUMEDOC
 
-void LinearBasisSetExpansion::registerKeywords(Keywords& keys){
+void LinearBasisSetExpansion::registerKeywords(Keywords& keys) {
 }
 
 
@@ -57,7 +60,7 @@ args_pntrs(args_pntrs_in),
 nargs_(args_pntrs.size()),
 basisf_pntrs(basisf_pntrs_in),
 nbasisf_(nargs_),
-bias_coeffs_pntr(NULL),
+bias_coeffs_pntr(bias_coeffs_pntr_in),
 ncoeffs_(0),
 coeffderivs_aver_ps_pntr(NULL),
 fes_wt_coeffs_pntr(NULL),
@@ -70,11 +73,13 @@ ps_grid_pntr(NULL)
   plumed_massert(args_pntrs.size()==basisf_pntrs.size(),"number of arguments and basis functions do not match");
   for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs[k]->getNumberOfBasisFunctions();}
   //
-  if(bias_coeffs_pntr_in==NULL){
+  if(bias_coeffs_pntr==NULL){
     bias_coeffs_pntr = new CoeffsVector(label_+".coeffs",args_pntrs,basisf_pntrs,mycomm,true);
   }
   //
+  ncoeffs_ = bias_coeffs_pntr->numberOfCoeffs();
   coeffderivs_aver_ps_pntr = new CoeffsVector(*bias_coeffs_pntr);
+
   std::string coeffderivs_aver_ps_label = bias_coeffs_pntr->getLabel();
   if(coeffderivs_aver_ps_label.find("coeffs")!=std::string::npos){
     coeffderivs_aver_ps_label.replace(coeffderivs_aver_ps_label.find("coeffs"), std::string("coeffs").length(), "coeffderivs_aver_ps");
@@ -105,18 +110,18 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
 }
 
 
-void LinearBasisSetExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void LinearBasisSetExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in) {
   vesbias_pntr = vesbias_pntr_in;
   action_pntr = static_cast<Action*>(vesbias_pntr_in);
 }
 
 
-void LinearBasisSetExpansion::linkAction(Action* action_pntr_in){
+void LinearBasisSetExpansion::linkAction(Action* action_pntr_in) {
   action_pntr = action_pntr_in;
 }
 
 
-void LinearBasisSetExpansion::setupGrid(const std::vector<unsigned int>& nbins, const bool usederiv){
+void LinearBasisSetExpansion::setupGrid(const std::vector<unsigned int>& nbins, const bool usederiv) {
   plumed_assert(nbins.size()==nargs_);
   std::vector<std::string> min(nargs_);
   std::vector<std::string> max(nargs_);
@@ -128,12 +133,13 @@ void LinearBasisSetExpansion::setupGrid(const std::vector<unsigned int>& nbins, 
 }
 
 
-void LinearBasisSetExpansion::updateBiasGrid(){
+void LinearBasisSetExpansion::updateBiasGrid() {
   for(unsigned int l=0; l<bias_grid_pntr->getSize(); l++){
     std::vector<double> forces(nargs_);
     std::vector<double> cv_value(nargs_);
+    std::vector<double> coeffsderivs_values(ncoeffs_);
     cv_value=bias_grid_pntr->getPoint(l);
-    double bias_value=getBiasAndForces(cv_value,forces);
+    double bias_value=getBiasAndForces(cv_value,forces,coeffsderivs_values);
     if(bias_grid_pntr->hasDerivatives()){
       bias_grid_pntr->setValueAndDerivatives(l,bias_value,forces);
     }
@@ -145,7 +151,7 @@ void LinearBasisSetExpansion::updateBiasGrid(){
 }
 
 
-void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file){
+void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) {
   OFile file;
   if(append_file){file.enforceRestart();}
   if(action_pntr!=NULL){
@@ -157,7 +163,7 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
 }
 
 
-double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces){
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
   std::vector<double> cv_values_trsfrm(nargs_);
   std::vector<bool>   inside_interval(nargs_,true);
   //
@@ -175,8 +181,8 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_v
     forces[k]=0.0;
   }
   //
-  unsigned int stride=1;
-  unsigned int rank=0;
+  size_t stride=1;
+  size_t rank=0;
   if(!serial_)
   {
     stride=mycomm.Get_size();
@@ -184,12 +190,15 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_v
   }
   // loop over coeffs
   double bias=0.0;
-  for(unsigned int i=rank;i<bias_coeffs_pntr->getSize();i+=stride){
+  for(size_t i=rank;i<ncoeffs_;i+=stride){
     std::vector<unsigned int> indices=bias_coeffs_pntr->getIndices(i);
     double coeff = bias_coeffs_pntr->getValue(i);
     double bf_curr=1.0;
-    for(unsigned int k=0;k<nargs_;k++){bf_curr*=bf_values[k][indices[k]];}
+    for(unsigned int k=0;k<nargs_;k++){
+      bf_curr*=bf_values[k][indices[k]];
+    }
     bias+=coeff*bf_curr;
+    coeffsderivs_values[i] = bf_curr;
     for(unsigned int k=0;k<nargs_;k++){
       forces[k]-=coeff*bf_curr*(bf_derivs[k][indices[k]]/bf_values[k][indices[k]]);
     }
@@ -198,18 +207,33 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_v
   if(!serial_){
     mycomm.Sum(bias);
     mycomm.Sum(forces);
+    // note: basisset_values has to be MPI summed by hand
+    // mycomm.Sum(basisset_values);
   }
   return bias;
 }
 
 
-double LinearBasisSetExpansion::getBias(const std::vector<double>& cv_values) {
-  std::vector<double> forces(nargs_);
-  return getBiasAndForces(cv_values,forces);
+void LinearBasisSetExpansion::setupUniformTargetDistribution() {
+  std::vector< std::vector <double> > bf_integrals;
+  //
+  for(unsigned int k=0;k<nargs_;k++){
+    std::vector<double> tmp_val = basisf_pntrs[k]->getBasisFunctionIntegrals();
+    bf_integrals.push_back(tmp_val);
+  }
+  //
+  for(size_t i=0;i<ncoeffs_;i++){
+    std::vector<unsigned int> indices=bias_coeffs_pntr->getIndices(i);
+    double value = 1.0;
+    for(unsigned int k=0;k<nargs_;k++){
+      value*=bf_integrals[k][indices[k]];
+    }
+    coeffderivs_aver_ps_pntr->setValue(i,value);
+  }
 }
 
 
-void LinearBasisSetExpansion::setupWellTempered(const double biasf, const std::vector<unsigned int>& nbins) {
+void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf, const std::vector<unsigned int>& nbins) {
   plumed_massert(biasf>1.0,"the value of the bias factor doesn't make sense, it should be larger than 1.0");
   biasf_=biasf;
   invbiasf_ = 1.0/biasf_;

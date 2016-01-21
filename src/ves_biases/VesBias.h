@@ -91,7 +91,7 @@ protected:
   void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
   void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
   void setCoeffsDerivsOverTargetDist(const CoeffsVector&, const unsigned coeffs_id= 0);
-  void setCoeffsDerivsOverTargetDistToZero();
+  void setCoeffsDerivsOverTargetDistToZero(const unsigned coeffs_id= 0);
 
   void readCoeffsFromFiles();
   //
@@ -202,7 +202,8 @@ bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& va
     identical_values=true;
   }
   if(values.size()>0 && values.size()!=nvalues){
-    plumed_merror("Error in " + keyword + " keyword: either give one common parameter value or seperate parameter values");
+    std::string s1; Tools::convert(nvalues,s1);
+    plumed_merror("Error in " + keyword + " keyword: either give one common parameter value or " + s1 + " seperate parameter values");
   }
   return identical_values;
 }
