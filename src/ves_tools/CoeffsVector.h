@@ -87,6 +87,7 @@ public:
   size_t getSize() const;
     // clear coeffs
   void clear();
+  void setAllValuesToZero();
   //
   bool sameShape(CoeffsVector&) const;
   bool sameShape(CoeffsMatrix&) const;

@@ -221,6 +221,13 @@ void CoeffsMatrix::clear() {
 }
 
 
+void CoeffsMatrix::setAllValuesToZero() {
+  for(size_t i=0; i<data.size(); i++){
+    data[i]=0.0;
+  }
+}
+
+
 double CoeffsMatrix::getValue(const size_t index1, const size_t index2) const {
   return data[getMatrixIndex(index1,index2)];
 }

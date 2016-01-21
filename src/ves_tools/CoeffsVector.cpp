@@ -118,6 +118,13 @@ void CoeffsVector::clear() {
 }
 
 
+void CoeffsVector::setAllValuesToZero() {
+  for(size_t i=0; i<data.size(); i++){
+    data[i]=0.0;
+  }
+}
+
+
 bool CoeffsVector::sameShape(CoeffsVector& coeffsvector_in) const {
   return CoeffsBase::sameShape( *(static_cast<CoeffsBase*>(&coeffsvector_in)) );
 }

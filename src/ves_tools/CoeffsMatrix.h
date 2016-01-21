@@ -116,6 +116,7 @@ public:
   //
   // clear coeffs
   void clear();
+  void setAllValuesToZero();
   // get value
   double getValue(const size_t, const size_t) const;
   double getValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&) const;
