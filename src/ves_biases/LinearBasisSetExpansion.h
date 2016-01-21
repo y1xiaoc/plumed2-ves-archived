@@ -19,8 +19,8 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#ifndef __PLUMED_ves_biases_LinearBiasExpansion_h
-#define __PLUMED_ves_biases_LinearBiasExpansion_h
+#ifndef __PLUMED_ves_biases_LinearBasisSetExpansion_h
+#define __PLUMED_ves_biases_LinearBasisSetExpansion_h
 
 #include <vector>
 #include <string>
@@ -38,7 +38,7 @@ namespace bias{
   class VesBias;
 
 
-class LinearBiasExpansion{
+class LinearBasisSetExpansion{
 private:
   std::string label_;
   //
@@ -68,14 +68,14 @@ private:
  public:
   static void registerKeywords( Keywords& keys );
   // Constructor
-  explicit LinearBiasExpansion(
+  explicit LinearBasisSetExpansion(
     const std::string&,
     Communicator &cc,
     std::vector<Value*>,
     std::vector<BasisFunctions*>,
     CoeffsVector* bias_coeffs_pntr_in=NULL);
   //
-  ~LinearBiasExpansion();
+  ~LinearBasisSetExpansion();
   //
   std::vector<Value*> getPntrsToArguments() const ;
   std::vector<BasisFunctions*> getPntrsToBasisFunctions() const ;
@@ -107,31 +107,31 @@ private:
 };
 
 inline
-std::vector<Value*> LinearBiasExpansion::getPntrsToArguments() const {return args_pntrs;}
+std::vector<Value*> LinearBasisSetExpansion::getPntrsToArguments() const {return args_pntrs;}
 
 inline
-std::vector<BasisFunctions*> LinearBiasExpansion::getPntrsToBasisFunctions() const {return basisf_pntrs;}
+std::vector<BasisFunctions*> LinearBasisSetExpansion::getPntrsToBasisFunctions() const {return basisf_pntrs;}
 
 inline
-CoeffsVector* LinearBiasExpansion::getPntrToBiasCoeffs() const {return bias_coeffs_pntr;}
+CoeffsVector* LinearBasisSetExpansion::getPntrToBiasCoeffs() const {return bias_coeffs_pntr;}
 
 inline
-Grid* LinearBiasExpansion::getPntrToBiasGrid() const {return bias_grid_pntr;}
+Grid* LinearBasisSetExpansion::getPntrToBiasGrid() const {return bias_grid_pntr;}
 
 inline
-unsigned int LinearBiasExpansion::getNumberOfArguments() const {return nargs_;}
+unsigned int LinearBasisSetExpansion::getNumberOfArguments() const {return nargs_;}
 
 inline
-std::vector<unsigned int> LinearBiasExpansion::getNumberOfBasisFunctions() const {return nbasisf_;}
+std::vector<unsigned int> LinearBasisSetExpansion::getNumberOfBasisFunctions() const {return nbasisf_;}
 
 inline
-size_t LinearBiasExpansion::getNumberOfCoeffs() const {return ncoeffs_;}
+size_t LinearBasisSetExpansion::getNumberOfCoeffs() const {return ncoeffs_;}
 
 inline
-CoeffsVector& LinearBiasExpansion::BiasCoeffs() const {return *bias_coeffs_pntr;}
+CoeffsVector& LinearBasisSetExpansion::BiasCoeffs() const {return *bias_coeffs_pntr;}
 
 inline
-CoeffsVector& LinearBiasExpansion::FesWTCoeffs() const {return *fes_wt_coeffs_pntr;}
+CoeffsVector& LinearBasisSetExpansion::FesWTCoeffs() const {return *fes_wt_coeffs_pntr;}
 
 }
 

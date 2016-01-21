@@ -19,7 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "LinearBiasExpansion.h"
+#include "LinearBasisSetExpansion.h"
 #include "VesBias.h"
 #include "ves_tools/CoeffsVector.h"
 #include "ves_basisfunctions/BasisFunctions.h"
@@ -33,16 +33,16 @@
 namespace PLMD{
 namespace bias{
 
-//+PLUMEDOC VES LinearBiasExpansion
+//+PLUMEDOC VES LinearBasisSetExpansion
 /*
 */
 //+ENDPLUMEDOC
 
-void LinearBiasExpansion::registerKeywords(Keywords& keys){
+void LinearBasisSetExpansion::registerKeywords(Keywords& keys){
 }
 
 
-LinearBiasExpansion::LinearBiasExpansion(
+LinearBasisSetExpansion::LinearBasisSetExpansion(
   const std::string& label,
   Communicator& cc,
   std::vector<Value*> args_pntrs_in,
@@ -86,7 +86,7 @@ ps_grid_pntr(NULL)
   //
 }
 
-LinearBiasExpansion::~LinearBiasExpansion() {
+LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   if(bias_grid_pntr!=NULL){
     delete bias_grid_pntr;
   }
@@ -105,18 +105,18 @@ LinearBiasExpansion::~LinearBiasExpansion() {
 }
 
 
-void LinearBiasExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void LinearBasisSetExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in){
   vesbias_pntr = vesbias_pntr_in;
   action_pntr = static_cast<Action*>(vesbias_pntr_in);
 }
 
 
-void LinearBiasExpansion::linkAction(Action* action_pntr_in){
+void LinearBasisSetExpansion::linkAction(Action* action_pntr_in){
   action_pntr = action_pntr_in;
 }
 
 
-void LinearBiasExpansion::setupGrid(const std::vector<unsigned int>& nbins, const bool usederiv){
+void LinearBasisSetExpansion::setupGrid(const std::vector<unsigned int>& nbins, const bool usederiv){
   plumed_assert(nbins.size()==nargs_);
   std::vector<std::string> min(nargs_);
   std::vector<std::string> max(nargs_);
@@ -128,7 +128,7 @@ void LinearBiasExpansion::setupGrid(const std::vector<unsigned int>& nbins, cons
 }
 
 
-void LinearBiasExpansion::updateBiasGrid(){
+void LinearBasisSetExpansion::updateBiasGrid(){
   for(unsigned int l=0; l<bias_grid_pntr->getSize(); l++){
     std::vector<double> forces(nargs_);
     std::vector<double> cv_value(nargs_);
@@ -145,7 +145,7 @@ void LinearBiasExpansion::updateBiasGrid(){
 }
 
 
-void LinearBiasExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file){
+void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file){
   OFile file;
   if(append_file){file.enforceRestart();}
   if(action_pntr!=NULL){
@@ -157,7 +157,7 @@ void LinearBiasExpansion::writeBiasGridToFile(const std::string& filepath, const
 }
 
 
-double LinearBiasExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces){
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces){
   std::vector<double> cv_values_trsfrm(nargs_);
   std::vector<bool>   inside_interval(nargs_,true);
   //
@@ -203,13 +203,13 @@ double LinearBiasExpansion::getBiasAndForces(const std::vector<double>& cv_value
 }
 
 
-double LinearBiasExpansion::getBias(const std::vector<double>& cv_values) {
+double LinearBasisSetExpansion::getBias(const std::vector<double>& cv_values) {
   std::vector<double> forces(nargs_);
   return getBiasAndForces(cv_values,forces);
 }
 
 
-void LinearBiasExpansion::setupWellTempered(const double biasf, const std::vector<unsigned int>& nbins) {
+void LinearBasisSetExpansion::setupWellTempered(const double biasf, const std::vector<unsigned int>& nbins) {
   plumed_massert(biasf>1.0,"the value of the bias factor doesn't make sense, it should be larger than 1.0");
   biasf_=biasf;
   invbiasf_ = 1.0/biasf_;
@@ -225,7 +225,7 @@ void LinearBiasExpansion::setupWellTempered(const double biasf, const std::vecto
 }
 
 
-void LinearBiasExpansion::updateWellTemperedFESCoeffs() {
+void LinearBasisSetExpansion::updateWellTemperedFESCoeffs() {
   plumed_assert(biasf_>1.0);
   FesWTCoeffs() = -BiasCoeffs() + invbiasf_*FesWTCoeffs();
 }
