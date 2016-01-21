@@ -48,6 +48,7 @@ void BachAveragedSGD::registerKeywords(Keywords& keys){
   Optimizer::useMaskKeywords(keys);
   Optimizer::useRestartKeywords(keys);
   Optimizer::useMonitorAveragesKeywords(keys);
+  Optimizer::useDynamicTargetDistributionKeywords(keys);
   }
 
 

@@ -20,8 +20,10 @@
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "LinearBiasExpansion.h"
+#include "VesBias.h"
 #include "ves_tools/CoeffsVector.h"
 #include "ves_basisfunctions/BasisFunctions.h"
+
 
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
@@ -29,8 +31,9 @@
 
 
 namespace PLMD{
+namespace bias{
 
-//+PLUMEDOC Variational LinearBiasExpansion
+//+PLUMEDOC VES LinearBiasExpansion
 /*
 */
 //+ENDPLUMEDOC
@@ -39,75 +42,105 @@ void LinearBiasExpansion::registerKeywords(Keywords& keys){
 }
 
 
-LinearBiasExpansion::LinearBiasExpansion(const std::string& label,
-                    std::vector<Value*> args,
-                    std::vector<BasisFunctions*> basisf,
-                    Communicator& cc):
+LinearBiasExpansion::LinearBiasExpansion(
+  const std::string& label,
+  Communicator& cc,
+  std::vector<Value*> args_pntrs_in,
+  std::vector<BasisFunctions*> basisf_pntrs_in,
+  CoeffsVector* bias_coeffs_pntr_in):
+label_(label),
+action_pntr(NULL),
+vesbias_pntr(NULL),
 mycomm(cc),
 serial_(false),
-bias_label_(label),
-bias_coeffs(NULL),
-wt_coeffs(NULL),
-basisf_norm(NULL),
-bias_grid(NULL),
-fes_grid(NULL),
-ps_grid(NULL),
-args_(args),
-basisf_(basisf)
+args_pntrs(args_pntrs_in),
+nargs_(args_pntrs.size()),
+basisf_pntrs(basisf_pntrs_in),
+nbasisf_(nargs_),
+bias_coeffs_pntr(NULL),
+ncoeffs_(0),
+coeffderivs_aver_ps_pntr(NULL),
+fes_wt_coeffs_pntr(NULL),
+biasf_(-1.0),
+invbiasf_(-1.0),
+bias_grid_pntr(NULL),
+fes_grid_pntr(NULL),
+ps_grid_pntr(NULL)
 {
-  plumed_massert(args_.size()==basisf_.size(),"number of arguments and basis functions do not match");
-  bias_coeffs = new CoeffsVector(label,args_,basisf_,mycomm,true);
-  ncv_=args_.size();
-  num_bf_.resize(ncv_);
-  for(unsigned int k=0;k<ncv_;k++){num_bf_[k]=basisf_[k]->getNumberOfBasisFunctions();}
+  plumed_massert(args_pntrs.size()==basisf_pntrs.size(),"number of arguments and basis functions do not match");
+  for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs[k]->getNumberOfBasisFunctions();}
+  //
+  if(bias_coeffs_pntr_in==NULL){
+    bias_coeffs_pntr = new CoeffsVector(label_+".coeffs",args_pntrs,basisf_pntrs,mycomm,true);
+  }
+  //
+  coeffderivs_aver_ps_pntr = new CoeffsVector(*bias_coeffs_pntr);
+  std::string coeffderivs_aver_ps_label = bias_coeffs_pntr->getLabel();
+  if(coeffderivs_aver_ps_label.find("coeffs")!=std::string::npos){
+    coeffderivs_aver_ps_label.replace(coeffderivs_aver_ps_label.find("coeffs"), std::string("coeffs").length(), "coeffderivs_aver_ps");
+  }
+  else {
+    coeffderivs_aver_ps_label += "_aver_ps";
+  }
+  coeffderivs_aver_ps_pntr->setLabels(coeffderivs_aver_ps_label);
+  //
 }
 
 LinearBiasExpansion::~LinearBiasExpansion() {
-  if(bias_grid!=NULL){
-    delete bias_grid;
+  if(bias_grid_pntr!=NULL){
+    delete bias_grid_pntr;
+  }
+  if(fes_grid_pntr!=NULL){
+    delete fes_grid_pntr;
+  }
+  if(ps_grid_pntr!=NULL){
+    delete ps_grid_pntr;
+  }
+  if(coeffderivs_aver_ps_pntr!=NULL){
+    delete coeffderivs_aver_ps_pntr;
+  }
+  if(fes_wt_coeffs_pntr!=NULL){
+    delete fes_wt_coeffs_pntr;
   }
 }
 
 
-std::vector<Value*> LinearBiasExpansion::getPointerToArguments() const {return args_;}
+void LinearBiasExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in){
+  vesbias_pntr = vesbias_pntr_in;
+  action_pntr = static_cast<Action*>(vesbias_pntr_in);
+}
 
 
-std::vector<BasisFunctions*> LinearBiasExpansion::getPointerToBasisFunctions() const {return basisf_;}
+void LinearBiasExpansion::linkAction(Action* action_pntr_in){
+  action_pntr = action_pntr_in;
+}
 
 
-CoeffsVector* LinearBiasExpansion::getPointerToBiasCoeffs() const {return bias_coeffs;}
-
-
-Grid* LinearBiasExpansion::getPointerToBiasGrid() const {return bias_grid;}
-
-
-unsigned int LinearBiasExpansion::getNumberOfArguments() const {return ncv_;}
-
-
-std::vector<unsigned int> LinearBiasExpansion::getNumberOfBasisFunctions() const {return num_bf_;}
-
-
-unsigned int LinearBiasExpansion::getNumberOfCoeffs() const {return bias_coeffs->getSize();}
-
-
-void LinearBiasExpansion::setupGrid(const std::vector<unsigned int>& nbins){
-  std::vector<std::string> min(ncv_);
-  std::vector<std::string> max(ncv_);
-  for(unsigned int k=0;k<ncv_;k++){
-    Tools::convert(basisf_[k]->intervalMin(),min[k]);
-    Tools::convert(basisf_[k]->intervalMax(),max[k]);
+void LinearBiasExpansion::setupGrid(const std::vector<unsigned int>& nbins, const bool usederiv){
+  plumed_assert(nbins.size()==nargs_);
+  std::vector<std::string> min(nargs_);
+  std::vector<std::string> max(nargs_);
+  for(unsigned int k=0;k<nargs_;k++){
+    Tools::convert(basisf_pntrs[k]->intervalMin(),min[k]);
+    Tools::convert(basisf_pntrs[k]->intervalMax(),max[k]);
   }
-  bias_grid = new Grid(bias_label_+".bias",args_,min,max,nbins,false,false);
+  bias_grid_pntr = new Grid(label_+".bias",args_pntrs,min,max,nbins,false,usederiv);
 }
 
 
 void LinearBiasExpansion::updateBiasGrid(){
-  for(unsigned int l=0; l<bias_grid->getSize(); l++){
-    std::vector<double> derivatives(ncv_);
-    std::vector<double> cv_value(ncv_);
-    cv_value=bias_grid->getPoint(l);
-    double bias_value=getBiasAndDerivatives(cv_value,derivatives);
-    bias_grid->setValue(l,bias_value);
+  for(unsigned int l=0; l<bias_grid_pntr->getSize(); l++){
+    std::vector<double> forces(nargs_);
+    std::vector<double> cv_value(nargs_);
+    cv_value=bias_grid_pntr->getPoint(l);
+    double bias_value=getBiasAndForces(cv_value,forces);
+    if(bias_grid_pntr->hasDerivatives()){
+      bias_grid_pntr->setValueAndDerivatives(l,bias_value,forces);
+    }
+    else{
+      bias_grid_pntr->setValue(l,bias_value);
+    }
+
  }
 }
 
@@ -115,27 +148,31 @@ void LinearBiasExpansion::updateBiasGrid(){
 void LinearBiasExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file){
   OFile file;
   if(append_file){file.enforceRestart();}
+  if(action_pntr!=NULL){
+    file.link(*action_pntr);
+  }
   file.open(filepath);
-  bias_grid->writeToFile(file);
+  bias_grid_pntr->writeToFile(file);
   file.close();
 }
 
 
-double LinearBiasExpansion::getBiasAndDerivatives(const std::vector<double>& cv_values, std::vector<double>& derivatives){
-  std::vector<double> cv_values_trsfrm(ncv_);
-  std::vector<bool>   inside_interval(ncv_,true);
+double LinearBiasExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces){
+  std::vector<double> cv_values_trsfrm(nargs_);
+  std::vector<bool>   inside_interval(nargs_,true);
   //
   std::vector< std::vector <double> > bf_values;
   std::vector< std::vector <double> > bf_derivs;
   //
-  for(unsigned int k=0;k<ncv_;k++){
-    std::vector<double> tmp_val(num_bf_[k]);
-    std::vector<double> tmp_der(num_bf_[k]);
+  for(unsigned int k=0;k<nargs_;k++){
+    std::vector<double> tmp_val(nbasisf_[k]);
+    std::vector<double> tmp_der(nbasisf_[k]);
     bool inside=true;
-    basisf_[k]->getAllValues(cv_values[k],cv_values_trsfrm[k],inside,tmp_val,tmp_der);
+    basisf_pntrs[k]->getAllValues(cv_values[k],cv_values_trsfrm[k],inside,tmp_val,tmp_der);
     inside_interval[k]=inside;
     bf_values.push_back(tmp_val);
     bf_derivs.push_back(tmp_der);
+    forces[k]=0.0;
   }
   //
   unsigned int stride=1;
@@ -147,23 +184,52 @@ double LinearBiasExpansion::getBiasAndDerivatives(const std::vector<double>& cv_
   }
   // loop over coeffs
   double bias=0.0;
-  for(unsigned int i=rank;i<bias_coeffs->getSize();i+=stride){
-    std::vector<unsigned int> indices=bias_coeffs->getIndices(i);
-    double coeff = bias_coeffs->getValue(i);
+  for(unsigned int i=rank;i<bias_coeffs_pntr->getSize();i+=stride){
+    std::vector<unsigned int> indices=bias_coeffs_pntr->getIndices(i);
+    double coeff = bias_coeffs_pntr->getValue(i);
     double bf_curr=1.0;
-    for(unsigned int k=0;k<ncv_;k++){bf_curr*=bf_values[k][indices[k]];}
+    for(unsigned int k=0;k<nargs_;k++){bf_curr*=bf_values[k][indices[k]];}
     bias+=coeff*bf_curr;
-    for(unsigned int k=0;k<ncv_;k++){
-      derivatives[k]+=coeff*bf_curr*(bf_derivs[k][indices[k]]/bf_values[k][indices[k]]);
+    for(unsigned int k=0;k<nargs_;k++){
+      forces[k]-=coeff*bf_curr*(bf_derivs[k][indices[k]]/bf_values[k][indices[k]]);
     }
   }
   //
   if(!serial_){
     mycomm.Sum(bias);
-    mycomm.Sum(derivatives);
+    mycomm.Sum(forces);
   }
   return bias;
 }
 
 
+double LinearBiasExpansion::getBias(const std::vector<double>& cv_values) {
+  std::vector<double> forces(nargs_);
+  return getBiasAndForces(cv_values,forces);
+}
+
+
+void LinearBiasExpansion::setupWellTempered(const double biasf, const std::vector<unsigned int>& nbins) {
+  plumed_massert(biasf>1.0,"the value of the bias factor doesn't make sense, it should be larger than 1.0");
+  biasf_=biasf;
+  invbiasf_ = 1.0/biasf_;
+  fes_wt_coeffs_pntr = new CoeffsVector(*bias_coeffs_pntr);
+  std::string fes_wt_label = bias_coeffs_pntr->getLabel();
+  if(fes_wt_label.find("coeffs")!=std::string::npos){
+    fes_wt_label.replace(fes_wt_label.find("coeffs"), std::string("coeffs").length(), "fes_wt_coeffs");
+  }
+  else {
+    fes_wt_label += "_fes_wt";
+  }
+  fes_wt_coeffs_pntr->setLabels(fes_wt_label);
+}
+
+
+void LinearBiasExpansion::updateWellTemperedFESCoeffs() {
+  plumed_assert(biasf_>1.0);
+  FesWTCoeffs() = -BiasCoeffs() + invbiasf_*FesWTCoeffs();
+}
+
+
+}
 }

@@ -52,7 +52,7 @@ class TestBFs :
   BasisFunctions* bf_pointer;
   BasisFunctions* bf_pointer2;
   CoeffsVector* coeffs2;
-  LinearBiasExpansion* bias_expansion;
+  bias::LinearBiasExpansion* bias_expansion;
   unsigned int bf_order_;
 public:
   explicit TestBFs(const ActionOptions&);

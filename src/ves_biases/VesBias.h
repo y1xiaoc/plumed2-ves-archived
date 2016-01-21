@@ -76,6 +76,8 @@ private:
   bool compute_hessian_;
   bool diagonal_hessian_;
   //
+  bool dynamic_targetdist_;
+  //
   double aver_counter;
   double kbt_;
 private:
@@ -84,8 +86,12 @@ private:
 protected:
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
+  void addCoeffsSet(CoeffsVector*);
+  void clearCoeffsPntrsVector();
   void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
   void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
+  void setCoeffsDerivsOverTargetDist(const CoeffsVector&, const unsigned coeffs_id= 0);
+
   void readCoeffsFromFiles();
   //
   template<class T>
@@ -133,11 +139,17 @@ public:
   void updateGradientAndHessian();
   void clearGradientAndHessian();
   //
+  virtual void updateTargetDistributions();
+  //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);
   void disableHessian();
   //
   void enableMultipleCoeffsSets() {use_multiple_coeffssets_=true;}
+  //
+  void enableDynamicTargetDistribution() {dynamic_targetdist_=true;}
+  void disableDynamicTargetDistribution() {dynamic_targetdist_=false;}
+  bool dynamicTargetDistribution() const {return dynamic_targetdist_;}
 };
 
 inline

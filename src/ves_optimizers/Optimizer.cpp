@@ -48,6 +48,8 @@ use_hessian_(false),
 diagonal_hessian_(true),
 use_mwalkers_mpi_(false),
 mwalkers_mpi_single_files_(true),
+dynamic_targetdists_(0),
+ustride_targetdist_(0),
 coeffssetid_prefix_(""),
 coeffs_wstride_(100),
 coeffsOFiles_(0),
@@ -190,6 +192,34 @@ identical_coeffs_shape_(true)
       log.printf("  optimization performed using multiple walkers connected via MPI:\n");
       log.printf("   number of walkers: %d\n",static_cast<int>(multi_sim_comm.Get_size()));
       log.printf("   walker number: %d\n",static_cast<int>(multi_sim_comm.Get_rank()));
+    }
+  }
+
+  dynamic_targetdists_.resize(nbiases_,false);
+  if(keywords.exists("TARGETDISTRIBUTION_STRIDE")){
+    bool need_stride = false;
+    for(unsigned int i=0; i<nbiases_; i++){
+      dynamic_targetdists_[i] = bias_pntrs[i]->dynamicTargetDistribution();
+      if(dynamic_targetdists_[i]){need_stride = true;}
+    }
+    parse("TARGETDISTRIBUTION_STRIDE",ustride_targetdist_);
+    if(need_stride && ustride_targetdist_==0){
+      plumed_merror("you need to give stride for updating a target distribution by using the TARGETDISTRIBUTION_STRIDE keyword");
+    }
+    if(!need_stride && ustride_targetdist_!=0){
+      plumed_merror("using the TARGETDISTRIBUTION_STRIDE keyword doesn't make sense as there is no target distribution to update");
+    }
+    if(ustride_targetdist_>0){
+      if(nbiases_==1){
+        log.printf("  the target distribution will be updated very %u coefficent iterations\n",ustride_targetdist_);
+      }
+      else{
+        log.printf("  the target distribution will be updated very %u coefficent iterations for the following biases\n   ",ustride_targetdist_);
+        for(unsigned int i=0; i<nbiases_; i++){
+          log.printf("%s ",bias_pntrs[i]->getLabel().c_str());
+        }
+        log.printf("\n");
+      }
     }
   }
 
@@ -518,6 +548,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.reserveFlag("MONITOR_AVERAGE_GRADIENT",false,"if the averaged gradient should be monitored.");
   keys.reserve("optional","MONITOR_AVERAGES_EXP_DECAY","use an exponentially decaying averaging with a given time constant when monitoring the averaged gradient");
+  //
+  keys.reserve("optional","TARGETDISTRIBUTION_STRIDE","stride for updating a target distribution that is teratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
@@ -565,6 +597,13 @@ void Optimizer::useMonitorAveragesKeywords(Keywords& keys) {
   keys.use("MONITOR_AVERAGE_GRADIENT");
   keys.use("MONITOR_AVERAGES_EXP_DECAY");
 }
+
+
+void Optimizer::useDynamicTargetDistributionKeywords(Keywords& keys) {
+  keys.use("TARGETDISTRIBUTION_STRIDE");
+}
+
+
 
 
 void Optimizer::turnOnHessian() {
@@ -670,6 +709,13 @@ void Optimizer::update() {
     increaseIterationCounter();
     updateOutputComponents();
     writeOutputFiles();
+    if(ustride_targetdist_>0 && iter_counter%ustride_targetdist_==0){
+      for(unsigned int i=0; i<nbiases_; i++){
+        if(dynamic_targetdists_[i]){
+          bias_pntrs[i]->updateTargetDistributions();
+        }
+      }
+    }
   }
 }
 

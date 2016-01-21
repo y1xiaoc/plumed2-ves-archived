@@ -53,6 +53,7 @@ optimizer_pntr(NULL),
 optimize_coeffs_(false),
 compute_hessian_(false),
 diagonal_hessian_(true),
+dynamic_targetdist_(false),
 aver_counter(0.0),
 kbt_(0.0)
 {
@@ -74,11 +75,18 @@ kbt_(0.0)
   }
 }
 
+
 VesBias::~VesBias(){
-  for(unsigned int i=0; i<ncoeffssets_; i++){
+  for(unsigned int i=0; i<coeffs_pntrs.size(); i++){
     delete coeffs_pntrs[i];
+  }
+  for(unsigned int i=0; i<coeffderivs_aver_ps_pntrs.size(); i++){
     delete coeffderivs_aver_ps_pntrs[i];
+  }
+  for(unsigned int i=0; i<gradient_pntrs.size(); i++){
     delete gradient_pntrs[i];
+  }
+  for(unsigned int i=0; i<hessian_pntrs.size(); i++){
     delete hessian_pntrs[i];
   }
 }
@@ -95,19 +103,24 @@ void VesBias::registerKeywords( Keywords& keys ) {
 
 void VesBias::addCoeffsSet(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {
   CoeffsVector* coeffs_pntr_tmp = new CoeffsVector("coeffs",dimension_labels,indices_shape,comm,true);
-  coeffs_pntr_tmp->linkVesBias(this);
   initializeCoeffs(coeffs_pntr_tmp);
 }
 
 
 void VesBias::addCoeffsSet(std::vector<Value*>& args,std::vector<BasisFunctions*>& basisf) {
   CoeffsVector* coeffs_pntr_tmp = new CoeffsVector("coeffs",args,basisf,comm,true);
-  coeffs_pntr_tmp->linkVesBias(this);
   initializeCoeffs(coeffs_pntr_tmp);
 }
 
 
+void VesBias::addCoeffsSet(CoeffsVector* coeffs_pntr_in) {
+  initializeCoeffs(coeffs_pntr_in);
+}
+
+
 void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
+  //
+  coeffs_pntr_in->linkVesBias(this);
   //
   std::string label;
   if(!use_multiple_coeffssets_ && ncoeffssets_==1){
@@ -142,6 +155,11 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
   //
   ncoeffssets_++;
+}
+
+
+void VesBias::clearCoeffsPntrsVector() {
+  coeffs_pntrs.clear();
 }
 
 
@@ -234,6 +252,11 @@ void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderi
 }
 
 
+void VesBias::setCoeffsDerivsOverTargetDist(const CoeffsVector& coeffderivs_aver_ps, const unsigned coeffs_id) {
+  CoeffDerivsAverTargetDist(coeffs_id) = coeffderivs_aver_ps;
+}
+
+
 void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
   //
   if(optimizer_pntr==NULL){
@@ -297,6 +320,11 @@ std::string VesBias::labelString(const std::string& type, const unsigned int coe
     label_postfix = "-" + label_postfix;
   }
   return label_prefix+type+label_postfix;
+}
+
+
+void VesBias::updateTargetDistributions() {
+  // empty for now
 }
 
 

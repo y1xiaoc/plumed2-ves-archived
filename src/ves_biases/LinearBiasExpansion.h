@@ -27,51 +27,113 @@
 
 namespace PLMD {
 
+class Action;
 class Keywords;
-class CoeffsVector;
-class BasisFunctions;
 class Value;
 class Communicator;
 class Grid;
+class CoeffsVector;
+class BasisFunctions;
+namespace bias{
+  class VesBias;
+
 
 class LinearBiasExpansion{
+private:
+  std::string label_;
+  //
+  Action* action_pntr;
+  bias::VesBias* vesbias_pntr;
   Communicator& mycomm;
   bool serial_;
-  std::string bias_label_;
-  CoeffsVector* bias_coeffs;
-  CoeffsVector* wt_coeffs;
-  CoeffsVector* basisf_norm;
-  Grid* bias_grid;
-  Grid* fes_grid;
-  Grid* ps_grid;
-  std::vector<Value*> args_;
-  std::vector<BasisFunctions*> basisf_;
-  unsigned int ncv_;
-  std::vector<unsigned int> num_bf_;
+  //
+  std::vector<Value*> args_pntrs;
+  unsigned int nargs_;
+  //
+  std::vector<BasisFunctions*> basisf_pntrs;
+  std::vector<unsigned int> nbasisf_;
+  //
+  CoeffsVector* bias_coeffs_pntr;
+  size_t ncoeffs_;
+  CoeffsVector* coeffderivs_aver_ps_pntr;
+  CoeffsVector* fes_wt_coeffs_pntr;
+  //
+  double biasf_;
+  double invbiasf_;
+  //
+  Grid* bias_grid_pntr;
+  Grid* fes_grid_pntr;
+  Grid* ps_grid_pntr;
   //
  public:
   static void registerKeywords( Keywords& keys );
   // Constructor
-  explicit LinearBiasExpansion(const std::string&,
-                      std::vector<Value*>,
-                      std::vector<BasisFunctions*>,
-                      Communicator &cc);
+  explicit LinearBiasExpansion(
+    const std::string&,
+    Communicator &cc,
+    std::vector<Value*>,
+    std::vector<BasisFunctions*>,
+    CoeffsVector* bias_coeffs_pntr_in=NULL);
   //
   ~LinearBiasExpansion();
-  std::vector<Value*> getPointerToArguments() const ;
-  std::vector<BasisFunctions*> getPointerToBasisFunctions() const ;
-  CoeffsVector* getPointerToBiasCoeffs() const ;
-  Grid* getPointerToBiasGrid() const ;
+  //
+  std::vector<Value*> getPntrsToArguments() const ;
+  std::vector<BasisFunctions*> getPntrsToBasisFunctions() const ;
+  CoeffsVector* getPntrToBiasCoeffs() const ;
+  Grid* getPntrToBiasGrid() const ;
+  //
   unsigned int getNumberOfArguments() const ;
   std::vector<unsigned int> getNumberOfBasisFunctions() const ;
-  unsigned int getNumberOfCoeffs() const ;
+  size_t getNumberOfCoeffs() const ;
+  //
+  CoeffsVector& BiasCoeffs() const;
+  CoeffsVector& FesWTCoeffs() const;
+  //
+  void setSerial() {serial_=true;}
+  void setParallel() {serial_=false;}
+  //
+  void linkVesBias(bias::VesBias*);
+  void linkAction(Action*);
+  // calculate bias and derivatives
+  double getBiasAndForces(const std::vector<double>&, std::vector<double>&);
+  double getBias(const std::vector<double>&);
   // Grid stuff
-  void setupGrid(const std::vector<unsigned int>&);
+  void setupGrid(const std::vector<unsigned int>&, const bool usederiv=false);
   void updateBiasGrid();
   void writeBiasGridToFile(const std::string&, const bool);
-  // calculate bias and derivatives
-  double getBiasAndDerivatives(const std::vector<double>&, std::vector<double>& derivatives);
+  // Well-Tempered p(s) stuff
+  void setupWellTempered(const double, const std::vector<unsigned int>&);
+  void updateWellTemperedFESCoeffs();
 };
+
+inline
+std::vector<Value*> LinearBiasExpansion::getPntrsToArguments() const {return args_pntrs;}
+
+inline
+std::vector<BasisFunctions*> LinearBiasExpansion::getPntrsToBasisFunctions() const {return basisf_pntrs;}
+
+inline
+CoeffsVector* LinearBiasExpansion::getPntrToBiasCoeffs() const {return bias_coeffs_pntr;}
+
+inline
+Grid* LinearBiasExpansion::getPntrToBiasGrid() const {return bias_grid_pntr;}
+
+inline
+unsigned int LinearBiasExpansion::getNumberOfArguments() const {return nargs_;}
+
+inline
+std::vector<unsigned int> LinearBiasExpansion::getNumberOfBasisFunctions() const {return nbasisf_;}
+
+inline
+size_t LinearBiasExpansion::getNumberOfCoeffs() const {return ncoeffs_;}
+
+inline
+CoeffsVector& LinearBiasExpansion::BiasCoeffs() const {return *bias_coeffs_pntr;}
+
+inline
+CoeffsVector& LinearBiasExpansion::FesWTCoeffs() const {return *fes_wt_coeffs_pntr;}
+
+}
 
 }
 

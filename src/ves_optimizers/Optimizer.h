@@ -62,6 +62,9 @@ private:
   bool use_mwalkers_mpi_;
   bool mwalkers_mpi_single_files_;
   //
+  std::vector<bool> dynamic_targetdists_;
+  unsigned int ustride_targetdist_;
+  //
   std::string coeffssetid_prefix_;
   //
   unsigned int coeffs_wstride_;
@@ -128,6 +131,7 @@ public:
   static void useMaskKeywords(Keywords&);
   static void useRestartKeywords(Keywords&);
   static void useMonitorAveragesKeywords(Keywords&);
+  static void useDynamicTargetDistributionKeywords(Keywords&);
   //
   explicit Optimizer(const ActionOptions&ao);
   ~Optimizer();
