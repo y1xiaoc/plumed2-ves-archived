@@ -91,6 +91,7 @@ protected:
   void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
   void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
   void setCoeffsDerivsOverTargetDist(const CoeffsVector&, const unsigned coeffs_id= 0);
+  void setCoeffsDerivsOverTargetDistToZero();
 
   void readCoeffsFromFiles();
   //

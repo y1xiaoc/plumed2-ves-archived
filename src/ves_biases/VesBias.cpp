@@ -256,6 +256,10 @@ void VesBias::setCoeffsDerivsOverTargetDist(const CoeffsVector& coeffderivs_aver
   CoeffDerivsAverTargetDist(coeffs_id) = coeffderivs_aver_ps;
 }
 
+void VesBias::setCoeffsDerivsOverTargetDistToZero(const unsigned coeffs_id) {
+  CoeffDerivsAverTargetDist(coeffs_id).setAllValuesToZero();
+}
+
 
 void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
   //
