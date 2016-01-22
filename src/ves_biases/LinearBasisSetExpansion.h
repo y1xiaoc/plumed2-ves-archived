@@ -99,7 +99,7 @@ private:
   double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
   double getBias(const std::vector<double>&) {return 0.0;}
   // Grid stuff
-  void setupGrid(const std::vector<unsigned int>&, const bool usederiv=false);
+  void setupBiasGrid(const std::vector<unsigned int>&, const bool usederiv=false);
   void updateBiasGrid();
   void writeBiasGridToFile(const std::string&, const bool);
   //

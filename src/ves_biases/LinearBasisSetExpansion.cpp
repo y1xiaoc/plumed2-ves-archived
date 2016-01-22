@@ -76,6 +76,7 @@ ps_grid_pntr(NULL)
   if(bias_coeffs_pntr==NULL){
     bias_coeffs_pntr = new CoeffsVector(label_+".coeffs",args_pntrs,basisf_pntrs,mycomm,true);
   }
+  plumed_massert(bias_coeffs_pntr->numberOfDimensions()==basisf_pntrs.size(),"dimension of coeffs does not match with number of basis functions ");
   //
   ncoeffs_ = bias_coeffs_pntr->numberOfCoeffs();
   coeffderivs_aver_ps_pntr = new CoeffsVector(*bias_coeffs_pntr);
@@ -121,7 +122,7 @@ void LinearBasisSetExpansion::linkAction(Action* action_pntr_in) {
 }
 
 
-void LinearBasisSetExpansion::setupGrid(const std::vector<unsigned int>& nbins, const bool usederiv) {
+void LinearBasisSetExpansion::setupBiasGrid(const std::vector<unsigned int>& nbins, const bool usederiv) {
   plumed_assert(nbins.size()==nargs_);
   std::vector<std::string> min(nargs_);
   std::vector<std::string> max(nargs_);
