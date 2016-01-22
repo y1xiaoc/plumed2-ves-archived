@@ -19,7 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "TargetDistributionBase.h"
+#include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
 
 #include "tools/Keywords.h"
@@ -32,9 +32,9 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class LinearCombinationOfDistributions: public TargetDistributionBase {
+class LinearCombinationOfDistributions: public TargetDistribution {
   // properties of the Gaussians
-  std::vector<TargetDistributionBase*> distributions;
+  std::vector<TargetDistribution*> distributions;
   std::vector<double> weights;
   unsigned int ndist;
 public:
@@ -49,7 +49,7 @@ VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(LinearCombinationOfDistributions,"LINEA
 
 
 void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
-  TargetDistributionBase::registerKeywords(keys);
+  TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DISTRIBUTION","t.");
   keys.add("optional","WEIGHTS","The weights of the Gaussians.");
   keys.addFlag("DO_NOT_NORMALIZE",false,"If the weight should not be normalized.");
@@ -57,13 +57,13 @@ void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
 
 
 LinearCombinationOfDistributions::LinearCombinationOfDistributions( const TargetDistributionOptions& to ):
-TargetDistributionBase(to)
+TargetDistribution(to)
 {
   for(unsigned int i=0;; i++) {
     std::string keywords;
     if(!parseNumbered("DISTRIBUTION",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);
-    TargetDistributionBase* dist_tmp = targetDistributionRegister().create( (words) );
+    TargetDistribution* dist_tmp = targetDistributionRegister().create( (words) );
     distributions.push_back(dist_tmp);
   }
   setDimension(distributions[0]->getDimension());

@@ -22,7 +22,7 @@
 #ifndef __PLUMED_ves_targetdistributions_TargetDistributionRegister_h
 #define __PLUMED_ves_targetdistributions_TargetDistributionRegister_h
 
-#include "TargetDistributionBase.h"
+#include "TargetDistribution.h"
 
 #include <string>
 #include <cstring>
@@ -36,7 +36,7 @@ namespace PLMD{
 class TargetDistributionRegister{
 private:
 /// Pointer to a function which, given the type for a ReferenceConfiguration, creates it
-  typedef TargetDistributionBase*(*creator_pointer)(const TargetDistributionOptions&);
+  typedef TargetDistribution*(*creator_pointer)(const TargetDistributionOptions&);
 /// The set of possible target distribution we can use
   std::map<std::string,creator_pointer> m;
 public:
@@ -49,14 +49,14 @@ public:
 /// Verify if a target distribution is present in the register
   bool check(std::string type);
 /// Create a target distribution object
-  TargetDistributionBase* create( const TargetDistributionOptions& to );
+  TargetDistribution* create( const TargetDistributionOptions& to );
 };
 
 TargetDistributionRegister& targetDistributionRegister();
 
 #define VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(classname,type) \
   static class classname##RegisterMe{ \
-    static TargetDistributionBase * create(const TargetDistributionOptions&to){return new classname(to);} \
+    static TargetDistribution * create(const TargetDistributionOptions&to){return new classname(to);} \
   public: \
     classname##RegisterMe(){targetDistributionRegister().add(type,create);}; \
     ~classname##RegisterMe(){targetDistributionRegister().remove(create);}; \

@@ -21,7 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "ves_tools/CoeffsVector.h"
 #include "ves_tools/CoeffsMatrix.h"
-#include "ves_targetdistributions/TargetDistributionBase.h"
+#include "ves_targetdistributions/TargetDistribution.h"
 #include "BasisFunctions.h"
 
 #include "../function/Function.h"
@@ -192,18 +192,18 @@ Function(ao)
   nbins[1]=200;
 
   std::string keywords = "GAUSSIAN CENTER0=-2.0,0.0 SIGMA0=0.5,0.5 CENTER1=+2.0,0.0 SIGMA1=0.5,0.5 WEIGHTS=1.0,10.0";
-  TargetDistributionBase::writeDistributionToFile("dist",keywords,min,max,nbins);
+  TargetDistribution::writeDistributionToFile("dist",keywords,min,max,nbins);
 
   keywords = "LINEAR_COMBINATION DISTRIBUTION0={GAUSSIAN CENTER0=-2.0,0.0 SIGMA0=0.5,0.5} DISTRIBUTION1={GAUSSIAN CENTER0=+2.0,0.0 SIGMA0=0.5,0.5} WEIGHTS=1.0,10.0,2.0 DISTRIBUTION2={UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0}";
-  TargetDistributionBase::writeDistributionToFile("dist2",keywords,min,max,nbins);
+  TargetDistribution::writeDistributionToFile("dist2",keywords,min,max,nbins);
 
   // keywords = "UNIFORM MINIMA=-2.0,-2.0 MAXIMA=2.0,1.0";
   //
   // keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN";
-  // TargetDistributionBase::writeDistributionToFile("dist3",keywords,min,max,nbins);
+  // TargetDistribution::writeDistributionToFile("dist3",keywords,min,max,nbins);
   //
   // keywords = "GRID FILE=dist ARGS=arg1,arg2 LABEL=GAUSSIAN NORMALIZE";
-  // TargetDistributionBase::writeDistributionToFile("dist4",keywords,min,max,nbins);
+  // TargetDistribution::writeDistributionToFile("dist4",keywords,min,max,nbins);
 
 
 

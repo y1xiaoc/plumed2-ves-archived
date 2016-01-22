@@ -19,7 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "TargetDistributionBase.h"
+#include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
 
 #include "tools/Keywords.h"
@@ -32,7 +32,7 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class GaussianDistribution: public TargetDistributionBase {
+class GaussianDistribution: public TargetDistribution {
   // properties of the Gaussians
   std::vector< std::vector<double> > sigmas;
   std::vector< std::vector<double> > centers;
@@ -54,7 +54,7 @@ VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(GaussianDistribution,"GAUSSIAN")
 
 
 void GaussianDistribution::registerKeywords(Keywords& keys){
-  TargetDistributionBase::registerKeywords(keys);
+  TargetDistribution::registerKeywords(keys);
   keys.add("numbered","CENTER","The centers of the Gaussians.");
   keys.add("numbered","SIGMA","The sigmas of the Gaussians.");
   keys.add("numbered","CORRELATION","The correlation between the arguments, currently only works for two-dimensional Gaussians ");
@@ -64,7 +64,7 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
 
 
 GaussianDistribution::GaussianDistribution( const TargetDistributionOptions& to ):
-TargetDistributionBase(to),
+TargetDistribution(to),
 diagonal(true)
 {
   for(unsigned int i=0;; i++) {

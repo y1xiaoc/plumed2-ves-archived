@@ -19,7 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "TargetDistributionBase.h"
+#include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
 
 #include "tools/Keywords.h"
@@ -29,7 +29,7 @@
 
 namespace PLMD {
 
-class DistributionFromGrid : public TargetDistributionBase {
+class DistributionFromGrid : public TargetDistribution {
   double normalization;
   Grid* distGrid;
   std::vector<double> minima;
@@ -45,7 +45,7 @@ VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(DistributionFromGrid,"GRID")
 
 
 void DistributionFromGrid::registerKeywords(Keywords& keys) {
-  TargetDistributionBase::registerKeywords(keys);
+  TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FILE","the name of the file contaning the target distribtion");
   keys.add("compulsory","ARGS","the arguments given in the grid file");
   keys.add("compulsory","LABEL","the label given in the grid file");
@@ -55,7 +55,7 @@ void DistributionFromGrid::registerKeywords(Keywords& keys) {
 
 
 DistributionFromGrid::DistributionFromGrid(const TargetDistributionOptions& to):
-TargetDistributionBase(to)
+TargetDistribution(to)
 {
   std::string filename;
   parse("FILE",filename);

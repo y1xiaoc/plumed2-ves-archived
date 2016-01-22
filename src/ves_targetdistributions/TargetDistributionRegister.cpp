@@ -56,8 +56,8 @@ bool TargetDistributionRegister::check(std::string type){
   return false;
 }
 
-TargetDistributionBase* TargetDistributionRegister::create( const TargetDistributionOptions& to ){
-  TargetDistributionBase* lselect;
+TargetDistribution* TargetDistributionRegister::create( const TargetDistributionOptions& to ){
+  TargetDistribution* lselect;
   if( check(to.words[0]) ){
      lselect=m[to.words[0]](to);
      lselect->checkRead();

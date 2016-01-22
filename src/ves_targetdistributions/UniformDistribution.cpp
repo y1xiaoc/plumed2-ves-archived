@@ -19,14 +19,14 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "TargetDistributionBase.h"
+#include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
 
 #include "tools/Keywords.h"
 
 namespace PLMD {
 
-class UniformDistribution : public TargetDistributionBase {
+class UniformDistribution : public TargetDistribution {
   double normalization;
   double inverse_normalization;
   std::vector<double> minima;
@@ -43,14 +43,14 @@ VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(UniformDistribution,"UNIFORM")
 
 
 void UniformDistribution::registerKeywords(Keywords& keys) {
-  TargetDistributionBase::registerKeywords(keys);
+  TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMA","The minima of the intervals on which the target distribution is defined.");
   keys.add("compulsory","MAXIMA","The maxima of the intervals on which the target distribution is defined.");
 }
 
 
 UniformDistribution::UniformDistribution(const TargetDistributionOptions& to):
-TargetDistributionBase(to)
+TargetDistribution(to)
 {
   parseVector("MINIMA",minima);
   parseVector("MAXIMA",maxima);
