@@ -164,18 +164,23 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
 }
 
 
-double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
-  std::vector<double> cv_values_trsfrm(nargs_);
-  std::vector<bool>   inside_interval(nargs_,true);
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values, std::vector<BasisFunctions*>& basisf_pntrs_in, CoeffsVector* coeffs_pntr_in, Communicator* comm_in) {
+  unsigned int nargs = cv_values.size();
+  plumed_assert(coeffs_pntr_in->numberOfDimensions()==nargs);
+  plumed_assert(basisf_pntrs_in.size()==nargs);
+  plumed_assert(forces.size()==nargs);
+
+  std::vector<double> cv_values_trsfrm(nargs);
+  std::vector<bool>   inside_interval(nargs,true);
   //
   std::vector< std::vector <double> > bf_values;
   std::vector< std::vector <double> > bf_derivs;
   //
-  for(unsigned int k=0;k<nargs_;k++){
-    std::vector<double> tmp_val(nbasisf_[k]);
-    std::vector<double> tmp_der(nbasisf_[k]);
+  for(unsigned int k=0;k<nargs;k++){
+    std::vector<double> tmp_val(basisf_pntrs_in[k]->getNumberOfBasisFunctions());
+    std::vector<double> tmp_der(tmp_val.size());
     bool inside=true;
-    basisf_pntrs[k]->getAllValues(cv_values[k],cv_values_trsfrm[k],inside,tmp_val,tmp_der);
+    basisf_pntrs_in[k]->getAllValues(cv_values[k],cv_values_trsfrm[k],inside,tmp_val,tmp_der);
     inside_interval[k]=inside;
     bf_values.push_back(tmp_val);
     bf_derivs.push_back(tmp_der);
@@ -184,34 +189,37 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_v
   //
   size_t stride=1;
   size_t rank=0;
-  if(!serial_)
+  if(comm_in!=NULL)
   {
-    stride=mycomm.Get_size();
-    rank=mycomm.Get_rank();
+    stride=comm_in->Get_size();
+    rank=comm_in->Get_rank();
   }
   // loop over coeffs
   double bias=0.0;
-  for(size_t i=rank;i<ncoeffs_;i+=stride){
-    std::vector<unsigned int> indices=bias_coeffs_pntr->getIndices(i);
-    double coeff = bias_coeffs_pntr->getValue(i);
+  for(size_t i=rank;i<coeffs_pntr_in->numberOfCoeffs();i+=stride){
+    std::vector<unsigned int> indices=coeffs_pntr_in->getIndices(i);
+    double coeff = coeffs_pntr_in->getValue(i);
     double bf_curr=1.0;
-    for(unsigned int k=0;k<nargs_;k++){
+    for(unsigned int k=0;k<nargs;k++){
       bf_curr*=bf_values[k][indices[k]];
     }
     bias+=coeff*bf_curr;
     coeffsderivs_values[i] = bf_curr;
-    for(unsigned int k=0;k<nargs_;k++){
+    for(unsigned int k=0;k<nargs;k++){
       forces[k]-=coeff*bf_curr*(bf_derivs[k][indices[k]]/bf_values[k][indices[k]]);
     }
   }
   //
-  if(!serial_){
-    mycomm.Sum(bias);
-    mycomm.Sum(forces);
-    // note: basisset_values has to be MPI summed by hand
-    // mycomm.Sum(basisset_values);
+  if(comm_in!=NULL){
+    comm_in->Sum(bias);
+    comm_in->Sum(forces);
   }
   return bias;
+}
+
+
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
+  return getBiasAndForces(cv_values,forces,coeffsderivs_values,basisf_pntrs, bias_coeffs_pntr, &mycomm);
 }
 
 

@@ -70,7 +70,7 @@ private:
   // Constructor
   explicit LinearBasisSetExpansion(
     const std::string&,
-    Communicator &cc,
+    Communicator&,
     std::vector<Value*>,
     std::vector<BasisFunctions*>,
     CoeffsVector* bias_coeffs_pntr_in=NULL);
@@ -96,8 +96,8 @@ private:
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
   // calculate bias and derivatives
+  static double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
-  double getBias(const std::vector<double>&) {return 0.0;}
   // Grid stuff
   void setupBiasGrid(const std::vector<unsigned int>&, const bool usederiv=false);
   void updateBiasGrid();
@@ -138,6 +138,7 @@ CoeffsVector& LinearBasisSetExpansion::FesWTCoeffs() const {return *fes_wt_coeff
 
 inline
 CoeffsVector& LinearBasisSetExpansion::CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr;}
+
 
 }
 
