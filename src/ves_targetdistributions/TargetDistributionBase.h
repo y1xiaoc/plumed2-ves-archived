@@ -43,51 +43,52 @@ public:
 
 class TargetDistributionBase {
 private:
-/// Name of the one dimensional target distribution
+  // Name of the one dimensional target distribution
   std::string type;
-/// The input to the target distribution
+  // The input to the target distribution
   std::vector<std::string> input;
-/// is the target distribution normalize or not
+  // is the target distribution normalize or not
   bool normalized_;
-/// dimension of the distribution
+  // dimension of the distribution
   unsigned int dimension_;
 protected:
-/// Read a keywords from the input
+  // Read a keywords from the input
   template <class T>
   bool parse(const std::string& ,T& , bool optional=false);
   template <class T>
   bool parseNumbered(const std::string& ,const unsigned int, T& , bool optional=false);
-/// Read a keywords vector from the input
+  // Read a keywords vector from the input
   template <class T>
   bool parseVector(const std::string& ,std::vector<T>& , bool optional=false);
   template <class T>
   bool parseNumberedVector(const std::string& ,const unsigned int, std::vector<T>& , bool optional=false);
-/// Read a flag from the input
+  // Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
+  // set the that target distribution is normalized
+  void setNormalized(){normalized_=true;};
+  void setNotNormalized(){normalized_=false;};
+  //
+  void setDimension(const unsigned int);
 public:
-/// keywords
+  // keywords
   static void registerKeywords( Keywords&);
   explicit TargetDistributionBase( const TargetDistributionOptions& to );
   virtual ~TargetDistributionBase();
-/// Check everything was read in
+  // Check everything was read in
   void checkRead() const ;
-/// Return a description
+  // Return a description
   std::string description();
-/// Overwrite this to have a more descriptive output
+  // Overwrite this to have a more descriptive output
   virtual std::string rest_of_description(){ return ""; };
-/// is the target distribution normalize or not
+  // is the target distribution normalize or not
   bool isNormalized() const {return normalized_;};
-/// set the that target distribution is normalized
-  void setNormalized(){normalized_=true;};
-  void setNotNormalized(){normalized_=false;};
-/// dimension
+  //
   unsigned getDimension() const {return dimension_;}
-  void setDimension(const unsigned int);
-/// get type of distribution
+  // get type of distribution
   std::string getType()const{return type;};
-/// calculate the target distribution itself
+  // calculate the target distribution itself
   virtual double getValue(const std::vector<double>&) const = 0;
-/// write the distribution out to file
+  // write the distribution out to file
   static void writeDistributionToFile(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   void calculateDistributionOnGrid(Grid*);
 };
