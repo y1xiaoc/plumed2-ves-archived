@@ -19,8 +19,8 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#ifndef __PLUMED_ves_targetdistributions_TargetDistributionBase_h
-#define __PLUMED_ves_targetdistributions_TargetDistributionBase_h
+#ifndef __PLUMED_ves_targetdistributions_TargetDistribution_h
+#define __PLUMED_ves_targetdistributions_TargetDistribution_h
 
 #include <vector>
 #include <string>
@@ -34,14 +34,14 @@ class Keywords;
 
 class TargetDistributionOptions{
 friend class TargetDistributionRegister;
-friend class TargetDistributionBase;
+friend class TargetDistribution;
 private:
   std::vector<std::string> words;
 public:
   TargetDistributionOptions( const std::vector<std::string>& input);
 };
 
-class TargetDistributionBase {
+class TargetDistribution {
 private:
   // Name of the one dimensional target distribution
   std::string type;
@@ -72,8 +72,8 @@ protected:
 public:
   // keywords
   static void registerKeywords( Keywords&);
-  explicit TargetDistributionBase( const TargetDistributionOptions& to );
-  virtual ~TargetDistributionBase();
+  explicit TargetDistribution( const TargetDistributionOptions& to );
+  virtual ~TargetDistribution();
   // Check everything was read in
   void checkRead() const ;
   // Return a description
@@ -95,7 +95,7 @@ public:
 
 
 template <class T>
-bool TargetDistributionBase::parse( const std::string& key, T& t, bool optional){
+bool TargetDistribution::parse( const std::string& key, T& t, bool optional){
   bool found=Tools::parse(input,key,t);
   if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
   return found;
@@ -103,14 +103,14 @@ bool TargetDistributionBase::parse( const std::string& key, T& t, bool optional)
 
 
 template<class T>
-bool TargetDistributionBase::parseNumbered(const std::string&key, const unsigned int no, T&t, bool optional) {
+bool TargetDistribution::parseNumbered(const std::string&key, const unsigned int no, T&t, bool optional) {
   std::string num; Tools::convert(no,num);
   return Tools::parse(input,key+num,t);
 }
 
 
 template <class T>
-bool TargetDistributionBase::parseVector( const std::string& key, std::vector<T>& t , bool optional){
+bool TargetDistribution::parseVector( const std::string& key, std::vector<T>& t , bool optional){
   bool found=Tools::parseVector(input,key,t);
   if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
   return found;
@@ -118,7 +118,7 @@ bool TargetDistributionBase::parseVector( const std::string& key, std::vector<T>
 
 
 template <class T>
-bool TargetDistributionBase::parseNumberedVector( const std::string& key, const unsigned int no, std::vector<T>& t , bool optional) {
+bool TargetDistribution::parseNumberedVector( const std::string& key, const unsigned int no, std::vector<T>& t , bool optional) {
   std::string num; Tools::convert(no,num);
   return Tools::parseVector(input,key+num,t);
 }

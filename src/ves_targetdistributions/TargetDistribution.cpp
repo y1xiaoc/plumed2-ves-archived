@@ -19,7 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "TargetDistributionBase.h"
+#include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
 
 #include "core/Value.h"
@@ -35,11 +35,11 @@ words(input)
 }
 
 
-void TargetDistributionBase::registerKeywords( Keywords& keys ){
+void TargetDistribution::registerKeywords( Keywords& keys ){
 }
 
 
-TargetDistributionBase::TargetDistributionBase( const TargetDistributionOptions& to):
+TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
 type(to.words[0]),
 input(to.words),
 normalized_(false),
@@ -49,21 +49,21 @@ dimension_(1)
 }
 
 
-TargetDistributionBase::~TargetDistributionBase() {
+TargetDistribution::~TargetDistribution() {
 }
 
 
-void TargetDistributionBase::setDimension(const unsigned int dimension){
+void TargetDistribution::setDimension(const unsigned int dimension){
   dimension_=dimension;
 }
 
 
-void TargetDistributionBase::parseFlag(const std::string& key, bool& t) {
+void TargetDistribution::parseFlag(const std::string& key, bool& t) {
   Tools::parseFlag(input,key,t);
 }
 
 
-void TargetDistributionBase::checkRead() const {
+void TargetDistribution::checkRead() const {
   if(!input.empty()){
      std::string msg="cannot understand the following words from the target distribution input : ";
      for(unsigned i=0;i<input.size();++i) msg = msg + input[i] + ", ";
@@ -72,16 +72,16 @@ void TargetDistributionBase::checkRead() const {
 }
 
 
-std::string TargetDistributionBase::description() {
+std::string TargetDistribution::description() {
   std::string str="Type: " + type;
   return str;
 }
 
 
-void TargetDistributionBase::writeDistributionToFile(const std::string& filepath, const std::string& keywords, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+void TargetDistribution::writeDistributionToFile(const std::string& filepath, const std::string& keywords, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
   // create distribtion
   std::vector<std::string> words = Tools::getWords(keywords);
-  TargetDistributionBase* distribution=targetDistributionRegister().create( (words) );
+  TargetDistribution* distribution=targetDistributionRegister().create( (words) );
   unsigned int dimension = distribution->getDimension();
   // create grid
   std::vector<Value*> arguments(dimension);
@@ -104,7 +104,7 @@ void TargetDistributionBase::writeDistributionToFile(const std::string& filepath
 }
 
 
-void TargetDistributionBase::calculateDistributionOnGrid(Grid* grid_pntr){
+void TargetDistribution::calculateDistributionOnGrid(Grid* grid_pntr){
   plumed_massert(grid_pntr->getDimension()==dimension_,"Grid is of the wrong dimension");
   for(unsigned int l=0; l<grid_pntr->getSize(); l++)
   {
