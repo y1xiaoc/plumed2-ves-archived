@@ -92,7 +92,7 @@ Function(ao)
   addComponent("argT"); componentIsNotPeriodic("argT");
   addComponent("inside"); componentIsNotPeriodic("inside");
   checkRead();
-  log.printf("  using the %d order basis function from the %s basis set\n",static_cast<int>(bf_order_),basisset_label.c_str());
+  log.printf("  using the %u order basis function from the %s basis set\n",bf_order_,basisset_label.c_str());
 
   std::vector<BasisFunctions*> bf; bf.resize(2); bf[0]=bf_pointer; bf[1]=bf_pointer2;
   std::vector<BasisFunctions*> bf2; bf2.resize(2); bf2[0]=bf_pointer2; bf2[1]=bf_pointer;

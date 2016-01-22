@@ -137,29 +137,29 @@ identical_coeffs_shape_(true)
   if(ncoeffssets_==1){
     log.printf("  optimizing VES bias %s with label %s: \n",bias_pntrs[0]->getName().c_str(),bias_pntrs[0]->getLabel().c_str());
     log.printf("   KbT: %f\n",bias_pntrs[0]->getKbT());
-    log.printf("  number of coefficients: %d\n",static_cast<int>(coeffs_pntrs[0]->numberOfCoeffs()));
+    log.printf("  number of coefficients: %zu\n",coeffs_pntrs[0]->numberOfCoeffs());
     if(stepsizes_.size()>0){
       if(fixed_stepsize_){log.printf("  using a constant step size of %f\n",stepsizes_[0]);}
       else{log.printf("  using an initial step size of %f\n",stepsizes_[0]);}
     }
   }
   else {
-    log.printf("  optimizing %d coefficent sets from following %d VES biases:\n",static_cast<int>(ncoeffssets_),static_cast<int>(nbiases_));
+    log.printf("  optimizing %u coefficent sets from following %u VES biases:\n",ncoeffssets_,nbiases_);
     for(unsigned int i=0; i<nbiases_; i++) {
       log.printf("   %s of type %s (KbT: %f) \n",bias_pntrs[i]->getLabel().c_str(),bias_pntrs[i]->getName().c_str(),bias_pntrs[i]->getKbT());
     }
     size_t tot_ncoeffs = 0;
     for(unsigned int i=0; i<ncoeffssets_; i++) {
-      log.printf("  coefficient set %d: \n",static_cast<int>(i));
+      log.printf("  coefficient set %u: \n",i);
       log.printf("   used in bias %s (type %s)\n",coeffs_pntrs[i]->getPntrToAction()->getLabel().c_str(),coeffs_pntrs[i]->getPntrToAction()->getName().c_str());
-      log.printf("   number of coefficients: %d\n",static_cast<int>(coeffs_pntrs[i]->numberOfCoeffs()));
+      log.printf("   number of coefficients: %zu\n",coeffs_pntrs[i]->numberOfCoeffs());
       if(stepsizes_.size()>0){
         if(fixed_stepsize_){log.printf("   using a constant step size of %f\n",stepsizes_[i]);}
         else{log.printf("   using an initial step size of %f\n",stepsizes_[i]);}
       }
       tot_ncoeffs += coeffs_pntrs[i]->numberOfCoeffs();
     }
-    log.printf("  total number of coefficients: %d\n",static_cast<int>(tot_ncoeffs));
+    log.printf("  total number of coefficients: %zu\n",tot_ncoeffs);
     if(identical_coeffs_shape_){
       log.printf("  the indices shape is identical for all coefficient sets\n");
     }
@@ -190,8 +190,8 @@ identical_coeffs_shape_(true)
     }
     if(use_mwalkers_mpi_ ){
       log.printf("  optimization performed using multiple walkers connected via MPI:\n");
-      log.printf("   number of walkers: %d\n",static_cast<int>(multi_sim_comm.Get_size()));
-      log.printf("   walker number: %d\n",static_cast<int>(multi_sim_comm.Get_rank()));
+      log.printf("   number of walkers: %u\n",multi_sim_comm.Get_size());
+      log.printf("   walker number: %u\n",multi_sim_comm.Get_rank());
     }
   }
 
@@ -318,12 +318,12 @@ identical_coeffs_shape_(true)
 
   if(coeffs_fnames.size()>0){
     if(ncoeffssets_==1){
-      log.printf("  Coefficients will be written out to file %s every %d iterations\n",coeffsOFiles_[0]->getPath().c_str(),static_cast<int>(coeffs_wstride_));
+      log.printf("  Coefficients will be written out to file %s every %u iterations\n",coeffsOFiles_[0]->getPath().c_str(),coeffs_wstride_);
     }
     else {
-      log.printf("  Coefficients will be written out to the following files every %d iterations:\n",static_cast<int>(coeffs_wstride_));
+      log.printf("  Coefficients will be written out to the following files every %u iterations:\n",coeffs_wstride_);
       for(unsigned int i=0; i<coeffs_fnames.size(); i++){
-        log.printf("   coefficient set %d: %s\n",static_cast<int>(i),coeffsOFiles_[i]->getPath().c_str());
+        log.printf("   coefficient set %u: %s\n",i,coeffsOFiles_[i]->getPath().c_str());
       }
     }
   }
@@ -351,12 +351,12 @@ identical_coeffs_shape_(true)
 
   if(gradient_fnames.size()>0){
     if(ncoeffssets_==1){
-      log.printf("  Gradient will be written out to file %s every %d iterations\n",gradientOFiles_[0]->getPath().c_str(),static_cast<int>(gradient_wstride_));
+      log.printf("  Gradient will be written out to file %s every %u iterations\n",gradientOFiles_[0]->getPath().c_str(),gradient_wstride_);
     }
     else {
-      log.printf("  Gradient will be written out to the following files every %d iterations:\n",static_cast<int>(gradient_wstride_));
+      log.printf("  Gradient will be written out to the following files every %u iterations:\n",gradient_wstride_);
       for(unsigned int i=0; i<gradient_fnames.size(); i++){
-        log.printf("   coefficient set %d: %s\n",static_cast<int>(i),gradientOFiles_[i]->getPath().c_str());
+        log.printf("   coefficient set %u: %s\n",i,gradientOFiles_[i]->getPath().c_str());
       }
     }
   }
@@ -374,12 +374,12 @@ identical_coeffs_shape_(true)
 
     if(hessian_fnames.size()>0){
       if(ncoeffssets_==1){
-        log.printf("  Hessian will be written out to file %s every %d iterations\n",hessianOFiles_[0]->getPath().c_str(),static_cast<int>(hessian_wstride_));
+        log.printf("  Hessian will be written out to file %s every %u iterations\n",hessianOFiles_[0]->getPath().c_str(),hessian_wstride_);
       }
       else {
-        log.printf("  Hessian will be written out to the following files every %d iterations:\n",static_cast<int>(hessian_wstride_));
+        log.printf("  Hessian will be written out to the following files every %u iterations:\n",hessian_wstride_);
         for(unsigned int i=0; i<hessian_fnames.size(); i++){
-          log.printf("   coefficient set %d: %s\n",static_cast<int>(i),hessianOFiles_[i]->getPath().c_str());
+          log.printf("   coefficient set %u: %s\n",i,hessianOFiles_[i]->getPath().c_str());
         }
       }
     }
@@ -408,17 +408,17 @@ identical_coeffs_shape_(true)
     if(mask_fnames_in.size()>0){
       if(ncoeffssets_==1){
         size_t nread = coeffs_mask_pntrs[0]->readFromFile(mask_fnames_in[0],true,true);
-        log.printf("  read %d values from mask file %s\n",static_cast<int>(nread),mask_fnames_in[0].c_str());
+        log.printf("  read %zu values from mask file %s\n",nread,mask_fnames_in[0].c_str());
         size_t ndeactived = coeffs_mask_pntrs[0]->countValues(0.0);
-        log.printf("  deactived optimization of %d coefficients\n",static_cast<int>(ndeactived));
+        log.printf("  deactived optimization of %zu coefficients\n",ndeactived);
       }
       else{
         for(unsigned int i=0; i<ncoeffssets_; i++){
           size_t nread = coeffs_mask_pntrs[i]->readFromFile(mask_fnames_in[i],true,true);
-          log.printf("  mask for coefficent set %d:\n",static_cast<int>(i));
-          log.printf("   read %d values from file %s\n",static_cast<int>(nread),mask_fnames_in[i].c_str());
+          log.printf("  mask for coefficent set %u:\n",i);
+          log.printf("   read %zu values from file %s\n",nread,mask_fnames_in[i].c_str());
           size_t ndeactived = coeffs_mask_pntrs[0]->countValues(0.0);
-          log.printf("   deactived optimization of %d coefficients\n",static_cast<int>(ndeactived));
+          log.printf("   deactived optimization of %zu coefficients\n",ndeactived);
         }
       }
     }
@@ -465,7 +465,7 @@ identical_coeffs_shape_(true)
   }
   else {
     for(unsigned int i=0; i<ncoeffssets_; i++){
-      log.printf("  Output Components for coefficent set %d:\n",static_cast<int>(i));
+      log.printf("  Output Components for coefficent set %u:\n",i);
       std::string is=""; Tools::convert(i,is); is = "_" + coeffssetid_prefix_ + is;
       log.printf(" ");
       addComponent("gradrms"+is); componentIsNotPeriodic("gradrms"+is);
