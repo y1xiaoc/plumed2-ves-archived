@@ -127,11 +127,11 @@ void BasisFunctions::printInfo(){
   log.printf("   Description: %s\n",description_.c_str());
   log.printf("   Type: %s\n",type_.c_str());
   if(periodic_){log.printf("   The basis functions are periodic\n");}
-  log.printf("   Order of basis set: %d\n",static_cast<int>(norder_));
-  log.printf("   Number of basis functions: %d\n",static_cast<int>(nbasis_));
+  log.printf("   Order of basis set: %u\n",norder_);
+  log.printf("   Number of basis functions: %u\n",nbasis_);
   log.printf("   Interval of basis set: %f to %f\n",interval_min_,interval_max_);
   log.printf("   Description of basis functions:\n");
-  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %10s\n",static_cast<int>(i),bf_description_[i].c_str());}
+  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2u       %10s\n",i,bf_description_[i].c_str());}
   //
   if(print_debug_info_){
     log.printf("  Debug information:\n");
@@ -142,7 +142,7 @@ void BasisFunctions::printInfo(){
     log.printf("   Derivative factor due to interval translation: %f\n",argT_derivf_);
     log.printf("   Integral of basis functions over the interval:\n");
     if(numerical_bf_integrals_){log.printf("   Note: calculated numerically\n");}
-    for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2d       %16.10f\n",static_cast<int>(i),bf_integrals_[i]);}
+    for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2u       %16.10f\n",i,bf_integrals_[i]);}
     log.printf("   --------------------------\n");
   }
 }
