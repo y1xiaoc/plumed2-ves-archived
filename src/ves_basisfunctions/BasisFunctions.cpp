@@ -85,21 +85,6 @@ void BasisFunctions::setupInterval(){
 }
 
 
-double BasisFunctions::translateArgument(const double arg, bool& inside_interval){
-  inside_interval=true;
-  double argT = (arg-interval_mean_)*argT_derivf_;
-  if(argT < interval_default_min_){
-    inside_interval=false;
-    argT=interval_default_min_;
-  }
-  else if(argT > interval_default_max_){
-    inside_interval=false;
-    argT=interval_default_max_;
-  }
-  return argT;
-}
-
-
 void BasisFunctions::apply(){}
 
 
@@ -183,19 +168,6 @@ void BasisFunctions::numericalBFIntegrals(){
     // norm with the "volume of the interval"
     bf_integrals_[i] = (0.5*h*sum)/interval_range_;
   }
-}
-
-
-template<typename T>
-void BasisFunctions::addKeywordToList(const std::string& keyword, const T value){
-  std::string str_value;
-  Tools::convert(value,str_value);
-  bf_keywords_.push_back(keyword+"="+str_value);
-}
-
-
-void BasisFunctions::addKeywordToList(const std::string& keyword, const bool value){
-  if(value){bf_keywords_.push_back(keyword);}
 }
 
 

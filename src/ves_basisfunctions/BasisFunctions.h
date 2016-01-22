@@ -197,6 +197,35 @@ inline
 std::vector<std::string> BasisFunctions::getBasisFunctionDescriptions(){return bf_description_;}
 
 
+inline
+double BasisFunctions::translateArgument(const double arg, bool& inside_interval){
+  inside_interval=true;
+  double argT = (arg-interval_mean_)*argT_derivf_;
+  if(argT < interval_default_min_){
+    inside_interval=false;
+    argT=interval_default_min_;
+  }
+  else if(argT > interval_default_max_){
+    inside_interval=false;
+    argT=interval_default_max_;
+  }
+  return argT;
+}
+
+
+template<typename T>
+void BasisFunctions::addKeywordToList(const std::string& keyword, const T value){
+  std::string str_value;
+  Tools::convert(value,str_value);
+  bf_keywords_.push_back(keyword+"="+str_value);
+}
+
+inline
+void BasisFunctions::addKeywordToList(const std::string& keyword, const bool value){
+  if(value){bf_keywords_.push_back(keyword);}
+}
+
+
 }
 
 #endif
