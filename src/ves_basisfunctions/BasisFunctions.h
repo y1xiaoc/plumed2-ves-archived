@@ -36,6 +36,8 @@ namespace PLMD{
 Abstract base class for implenting new 1D basis sets.
 */
 
+class TargetDistribution;
+
 class BasisFunctions :
   public ActionWithValue
 {
@@ -77,15 +79,18 @@ protected:
   // the derivative term in the chain rule coming from the translation of the interval
   double argT_derivf_;
   // calculate numerically the integrals of the basis functions over the intervals
-  bool numerical_bf_integrals_;
+  bool numerical_uniform_integrals_;
+  unsigned int nbins_;
   // the integrals of the basis functions over the interval on which they are defined
-  std::vector <double> bf_integrals_;
+  std::vector <double> uniform_integrals_;
   // setup various stuff
   void setupBF();
   void setupInterval();
-  void numericalBFIntegrals();
+  void setNumericalIntegrationBins(const unsigned int nbins) {nbins_=nbins;}
+  void numericalUniformIntegrals();
+  std::vector<double> numericalIntegralsOverTargetDistribution(TargetDistribution*);
   virtual void setupDescription();
-  virtual void setupBFIntegrals();
+  virtual void setupUniformIntegrals();
   template<typename T>
   void addKeywordToList(const std::string&, const T);
   void addKeywordToList(const std::string&, const bool);
@@ -105,16 +110,16 @@ public:
   double intervalRange();
   double intervalMean();
   double intervalDerivf();
-  double getBasisFunctionIntegral(const unsigned int);
   std::vector<double> getBasisFunctionIntegrals();
-  unsigned getNumberOfDerivatives();
+  std::vector<double> getBasisFunctionIntegrals(TargetDistribution*);
+  unsigned getNumberOfDerivatives(){return 0;}
   std::vector<std::string> getKeywordList();
   std::string getBasisFunctionDescription(const unsigned int);
   std::vector<std::string> getBasisFunctionDescriptions();
   //
   double translateArgument(const double, bool&);
-  void apply();
-  void calculate();
+  void apply(){};
+  void calculate(){};
   // calculate the value for the n-th basis function
   virtual double getValue(const double, const unsigned int, double&, bool&)=0;
   // calcuate the values for all basis functions
@@ -174,15 +179,13 @@ double BasisFunctions::intervalMean(){return interval_mean_;}
 
 
 inline
-double BasisFunctions::getBasisFunctionIntegral(unsigned int index){return bf_integrals_[index];}
+std::vector<double> BasisFunctions::getBasisFunctionIntegrals() {return uniform_integrals_;}
 
 
 inline
-std::vector<double> BasisFunctions::getBasisFunctionIntegrals(){return bf_integrals_;}
-
-
-inline
-unsigned BasisFunctions::getNumberOfDerivatives(){return 0;}
+std::vector<double> BasisFunctions::getBasisFunctionIntegrals(TargetDistribution* targetdist_in) {
+  return numericalIntegralsOverTargetDistribution(targetdist_in);
+}
 
 
 inline

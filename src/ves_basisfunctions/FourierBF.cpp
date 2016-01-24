@@ -26,7 +26,7 @@ namespace PLMD{
 
 class FourierBF : public BasisFunctions {
   virtual void setupDescription();
-  virtual void setupBFIntegrals();
+  virtual void setupUniformIntegrals();
 public:
   static void registerKeywords(Keywords&);
   explicit FourierBF(const ActionOptions&);
@@ -110,9 +110,9 @@ void FourierBF::setupDescription(){
 }
 
 
-void FourierBF::setupBFIntegrals(){
-  bf_integrals_.assign(nbasis_,0.0);
-  bf_integrals_[0]=1.0;
+void FourierBF::setupUniformIntegrals(){
+  uniform_integrals_.assign(nbasis_,0.0);
+  uniform_integrals_[0]=1.0;
 }
 
 

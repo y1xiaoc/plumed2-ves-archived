@@ -26,7 +26,7 @@
 namespace PLMD{
 
 class ChebyshevBF : public BasisFunctions {
-  virtual void setupBFIntegrals();
+  virtual void setupUniformIntegrals();
 public:
   static void registerKeywords(Keywords&);
   explicit ChebyshevBF(const ActionOptions&);
@@ -89,12 +89,12 @@ void ChebyshevBF::getAllValues(const double arg, double& argT, bool& inside_rang
 }
 
 
-void ChebyshevBF::setupBFIntegrals(){
-  bf_integrals_.assign(nbasis_,0.0);
+void ChebyshevBF::setupUniformIntegrals(){
+  uniform_integrals_.assign(nbasis_,0.0);
   for(unsigned int i=0; i<nbasis_; i++){
     double io = i;
-    if(i % 2 == 0){bf_integrals_[i] = -2.0/( pow(io,2.0)-1.0)*0.5;}
-    else{bf_integrals_[i]=0.0;}
+    if(i % 2 == 0){uniform_integrals_[i] = -2.0/( pow(io,2.0)-1.0)*0.5;}
+    else{uniform_integrals_[i]=0.0;}
   }
 }
 
