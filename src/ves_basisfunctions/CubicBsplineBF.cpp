@@ -28,12 +28,12 @@ namespace PLMD{
 
 class CubicBsplineBF : public BasisFunctions {
   double spacing_;
-  double spline(const double, double&);
+  double spline(const double, double&) const;
 public:
   static void registerKeywords( Keywords&);
   explicit CubicBsplineBF(const ActionOptions&);
-  double getValue(const double, const unsigned int, double&, bool&);
-  void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
+  double getValue(const double, const unsigned int, double&, bool&) const;
+  void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
@@ -47,22 +47,20 @@ void CubicBsplineBF::registerKeywords(Keywords& keys){
 CubicBsplineBF::CubicBsplineBF(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
-  nbasis_ = norder_+1;
-  interval_default_min_=interval_min_;
-  interval_default_max_=interval_max_;
-  spacing_=(interval_max_-interval_min_)/norder_;
-  periodic_=false;
-  interval_bounded_=true;
-  type_="splines_2nd-order";
-  description_="Cubic B-splines (2nd order splines)";
-  bf_description_prefix_="S";
+  setNumberOfBasisFunctions(getOrder()+1);
+  setIntrinsicInterval(intervalMin(),intervalMax());
+  spacing_=(intervalMax()-intervalMin())/static_cast<double>(getOrder());
+  setNonPeriodic();
+  setIntervalBounded();
+  setType("splines_2nd-order");
+  setDescription("Cubic B-splines (2nd order splines");
+  setLabelPrefix("S");
   setupBF();
-  printInfo();
 }
 
 
-double CubicBsplineBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range){
-  if(n>=nbasis_){error("getValue: n is outside range of the defined order of the basis set");}
+double CubicBsplineBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+  plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
   argT=translateArgument(arg, inside_range);
   //
@@ -78,15 +76,16 @@ double CubicBsplineBF::getValue(const double arg, const unsigned int n, double& 
 }
 
 
-void CubicBsplineBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs){
-  if(values.size()!=nbasis_ || derivs.size()!=nbasis_){error("getAllValues: wrong size of values or derivs vectors");}
+void CubicBsplineBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+  // plumed_assert(values.size()==numberOfBasisFunctions());
+  // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
   argT=translateArgument(arg, inside_range);
   //
   values[0]=1.0;
   derivs[0]=0.0;
   //
-  for(unsigned int i=1; i < norder_;i++){
+  for(unsigned int i=1; i < getOrder();i++){
     double io=i;
     double argx = argT/spacing_-(io-1.0);
     values[i]  = spline(argx, derivs[i]);
@@ -95,7 +94,7 @@ void CubicBsplineBF::getAllValues(const double arg, double& argT, bool& inside_r
 }
 
 
-double CubicBsplineBF::spline(const double arg, double& deriv){
+double CubicBsplineBF::spline(const double arg, double& deriv) const {
   double value=0.0;
   double x=arg;
   if(x < 0){x=-x;}

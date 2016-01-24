@@ -42,8 +42,6 @@ class BasisFunctions :
   public ActionWithValue
 {
 private:
-
-protected:
   // print extra info about the basis set
   bool print_debug_info_;
   // to check if the basis set has been defined
@@ -58,19 +56,19 @@ protected:
   unsigned int nbasis_;
   // the keywords used to invoke the basis set
   std::vector<std::string> bf_keywords_;
-  // prefix for the basis function descriptions
-  std::string bf_description_prefix_;
-  // description of each basis function
-  std::vector<std::string> bf_description_;
+  // prefix for the basis function labels
+  std::string bf_label_prefix_;
+  // label of each basis function
+  std::vector<std::string> bf_labels_;
   // if the basis functions are periodic or not
   bool periodic_;
   // if the basis functions are defined on a bounded interval or not
   bool interval_bounded_;
-  // the default interval of the basis functions
-  double interval_default_min_;
-  double interval_default_max_;
-  double interval_default_range_;
-  double interval_default_mean_;
+  // the intrinsic interval of the basis functions
+  double interval_intrinsic_min_;
+  double interval_intrinsic_max_;
+  double interval_intrinsic_range_;
+  double interval_intrinsic_mean_;
   // the defined (translated) interval of the basis functions
   double interval_min_;
   double interval_max_;
@@ -83,134 +81,206 @@ protected:
   unsigned int nbins_;
   // the integrals of the basis functions over the interval on which they are defined
   std::vector <double> uniform_integrals_;
+protected:
   // setup various stuff
   void setupBF();
   void setupInterval();
   void setNumericalIntegrationBins(const unsigned int nbins) {nbins_=nbins;}
   void numericalUniformIntegrals();
-  std::vector<double> numericalIntegralsOverTargetDistribution(TargetDistribution*);
-  virtual void setupDescription();
+  std::vector<double> numericalIntegralsOverTargetDistribution(const TargetDistribution*) const ;
+  virtual void setupLabels();
   virtual void setupUniformIntegrals();
   template<typename T>
   void addKeywordToList(const std::string&, const T);
   void addKeywordToList(const std::string&, const bool);
+  //
+  void setPeriodic() {periodic_=true;}
+  void setNonPeriodic() {periodic_=false;}
+  void setIntervalBounded() {interval_bounded_=true;}
+  void setIntervalNonBounded() {interval_bounded_=false;}
+  void setType(const std::string type_in) {type_=type_in;}
+  void setDescription(const std::string description_in) {description_=description_in;}
+  //
+  void setNumberOfBasisFunctions(const unsigned int);
+  void setIntrinsicInterval(const double, const double);
+  //
+  void setUniformIntegral(const unsigned int, const double);
+  void setUniformIntegrals(const std::vector<double>&);
+  void setAllUniformIntegralsToZero();
+  //
+  void setLabelPrefix(const std::string&);
+  void setLabel(const unsigned int, const std::string&);
+  void setLabels(const std::vector<std::string>&);
+
 public:
   static void registerKeywords(Keywords&);
   explicit BasisFunctions(const ActionOptions&ao);
-  bool hasBeenSet();
-  std::string getType();
-  std::string getDescription();
-  unsigned int getOrder();
-  unsigned int getNumberOfBasisFunctions();
-  unsigned int getSize();
-  bool arePeriodic();
-  bool intervalBounded();
-  double intervalMin();
-  double intervalMax();
-  double intervalRange();
-  double intervalMean();
-  double intervalDerivf();
-  std::vector<double> getBasisFunctionIntegrals();
-  std::vector<double> getBasisFunctionIntegrals(TargetDistribution*);
+  bool hasBeenSet() const;
+  std::string getType() const;
+  std::string getDescription() const;
+  unsigned int getOrder() const;
+  unsigned int getNumberOfBasisFunctions() const;
+  unsigned int numberOfBasisFunctions() const;
+  unsigned int getSize() const;
+  bool arePeriodic() const;
+  bool intervalBounded() const;
+  double intervalMin() const;
+  double intervalMax() const;
+  double intervalRange() const;
+  double intervalMean() const;
+  double intervalDerivf() const;
+  std::vector<double> getBasisFunctionIntegrals() const;
+  std::vector<double> getBasisFunctionIntegrals(TargetDistribution*) const;
   unsigned getNumberOfDerivatives(){return 0;}
-  std::vector<std::string> getKeywordList();
-  std::string getBasisFunctionDescription(const unsigned int);
-  std::vector<std::string> getBasisFunctionDescriptions();
+  std::vector<std::string> getKeywordList() const;
+  std::string getBasisFunctionLabel(const unsigned int) const;
+  std::vector<std::string> getBasisFunctionLabels() const;
   //
-  double translateArgument(const double, bool&);
+  double translateArgument(const double, bool&) const;
   void apply(){};
   void calculate(){};
   // calculate the value for the n-th basis function
-  virtual double getValue(const double, const unsigned int, double&, bool&)=0;
+  virtual double getValue(const double, const unsigned int, double&, bool&) const = 0;
   // calcuate the values for all basis functions
-  virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&)=0;
+  virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const = 0;
   //virtual void get2ndDerivaties(const double, std::vector<double>&)=0;
-  void printInfo();
-  std::string getKeywordString();
+  void printInfo() const;
+  std::string getKeywordString() const;
 };
 
 
 inline
-bool BasisFunctions::hasBeenSet(){return has_been_set;}
+bool BasisFunctions::hasBeenSet() const {return has_been_set;}
 
 
 inline
-std::string BasisFunctions::getType(){return type_;}
+std::string BasisFunctions::getType() const {return type_;}
 
 
 inline
-std::string BasisFunctions::getDescription(){return description_;}
+std::string BasisFunctions::getDescription() const {return description_;}
 
 
 inline
-unsigned int BasisFunctions::getOrder(){return norder_;}
+unsigned int BasisFunctions::getOrder() const {return norder_;}
 
 
 inline
-unsigned int BasisFunctions::getNumberOfBasisFunctions(){return nbasis_;}
+unsigned int BasisFunctions::getNumberOfBasisFunctions() const  {return nbasis_;}
 
 
 inline
-unsigned int BasisFunctions::getSize(){return getNumberOfBasisFunctions();}
+unsigned int BasisFunctions::numberOfBasisFunctions() const  {return nbasis_;}
 
 
 inline
-bool BasisFunctions::arePeriodic(){return periodic_;}
+unsigned int BasisFunctions::getSize() const {return getNumberOfBasisFunctions();}
 
 
 inline
-bool BasisFunctions::intervalBounded(){return interval_bounded_;}
+bool BasisFunctions::arePeriodic() const {return periodic_;}
 
 
 inline
-double BasisFunctions::intervalMin(){return interval_min_;}
+bool BasisFunctions::intervalBounded() const {return interval_bounded_;}
 
 
 inline
-double BasisFunctions::intervalMax(){return interval_max_;}
+double BasisFunctions::intervalMin() const {return interval_min_;}
 
 
 inline
-double BasisFunctions::intervalRange(){return interval_range_;}
+double BasisFunctions::intervalMax() const {return interval_max_;}
 
 
 inline
-double BasisFunctions::intervalMean(){return interval_mean_;}
+double BasisFunctions::intervalRange() const {return interval_range_;}
 
 
 inline
-std::vector<double> BasisFunctions::getBasisFunctionIntegrals() {return uniform_integrals_;}
+double BasisFunctions::intervalMean() const {return interval_mean_;}
 
 
 inline
-std::vector<double> BasisFunctions::getBasisFunctionIntegrals(TargetDistribution* targetdist_in) {
+double BasisFunctions::intervalDerivf() const {return argT_derivf_;}
+
+
+inline
+std::vector<double> BasisFunctions::getBasisFunctionIntegrals() const {return uniform_integrals_;}
+
+
+inline
+std::vector<double> BasisFunctions::getBasisFunctionIntegrals(TargetDistribution* targetdist_in) const {
   return numericalIntegralsOverTargetDistribution(targetdist_in);
 }
 
 
 inline
-std::vector<std::string> BasisFunctions::getKeywordList(){return bf_keywords_;}
+std::vector<std::string> BasisFunctions::getKeywordList() const {return bf_keywords_;}
 
 
 inline
-std::string BasisFunctions::getBasisFunctionDescription(unsigned int index){return bf_description_[index];}
+std::string BasisFunctions::getBasisFunctionLabel(const unsigned int index) const {return bf_labels_[index];}
 
 
 inline
-std::vector<std::string> BasisFunctions::getBasisFunctionDescriptions(){return bf_description_;}
+std::vector<std::string> BasisFunctions::getBasisFunctionLabels() const {return bf_labels_;}
 
 
 inline
-double BasisFunctions::translateArgument(const double arg, bool& inside_interval){
+void BasisFunctions::setUniformIntegral(const unsigned index, const double value) {
+  uniform_integrals_[index] = value;
+}
+
+
+inline
+void BasisFunctions::setUniformIntegrals(const std::vector<double>& uniform_integrals_in) {
+  plumed_assert(uniform_integrals_in.size()==nbasis_);
+  uniform_integrals_ = uniform_integrals_in;
+}
+
+
+inline
+void BasisFunctions::setAllUniformIntegralsToZero() {
+  uniform_integrals_.assign(nbasis_,0.0);
+}
+
+inline
+void BasisFunctions::setLabelPrefix(const std::string& bf_label_prefix_in) {
+  bf_label_prefix_ = bf_label_prefix_in;
+}
+
+
+inline
+void BasisFunctions::setLabel(const unsigned int index, const std::string& label) {
+  bf_labels_[index] = label;
+}
+
+
+inline
+void BasisFunctions::setLabels(const std::vector<std::string>& bf_labels_in) {
+  bf_labels_ = bf_labels_in;
+}
+
+
+inline
+void BasisFunctions::setIntrinsicInterval(const double interval_intrinsic_min_in, const double interval_intrinsic_max_in) {
+  interval_intrinsic_min_ = interval_intrinsic_min_in;
+  interval_intrinsic_max_ = interval_intrinsic_max_in;
+}
+
+
+inline
+double BasisFunctions::translateArgument(const double arg, bool& inside_interval) const {
   inside_interval=true;
   double argT = (arg-interval_mean_)*argT_derivf_;
-  if(argT < interval_default_min_){
+  if(argT < interval_intrinsic_min_){
     inside_interval=false;
-    argT=interval_default_min_;
+    argT=interval_intrinsic_min_;
   }
-  else if(argT > interval_default_max_){
+  else if(argT > interval_intrinsic_max_){
     inside_interval=false;
-    argT=interval_default_max_;
+    argT=interval_intrinsic_max_;
   }
   return argT;
 }

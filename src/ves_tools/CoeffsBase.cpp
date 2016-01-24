@@ -184,9 +184,9 @@ void CoeffsBase::setupBasisFunctionsInfo() {
     for(unsigned int i=0; i<numberOfCoeffs();i++){
       std::vector<unsigned int> indices=getIndices(i);
       std::string desc;
-      desc=basisf_[0]->getBasisFunctionDescription(indices[0]);
+      desc=basisf_[0]->getBasisFunctionLabel(indices[0]);
       for(unsigned int k=1; k<numberOfDimensions(); k++){
-        desc+="*"+basisf_[k]->getBasisFunctionDescription(indices[k]);
+        desc+="*"+basisf_[k]->getBasisFunctionLabel(indices[k]);
       }
       setCoeffDescription(i,desc);
     }
@@ -200,9 +200,9 @@ void CoeffsBase::setupBasisFunctionsInfo() {
       // std::string mc_label = getDimensionLabel(ndimensions_-1);
       std::string postfix = ":" + mc_idstr;
       std::string desc ="";
-      desc+=multicoeffs_basisf_[mc_id][0]->getBasisFunctionDescription(indices[0]);
+      desc+=multicoeffs_basisf_[mc_id][0]->getBasisFunctionLabel(indices[0]);
       for(unsigned int k=1; k<(numberOfDimensions()-1); k++){
-        desc+="*"+multicoeffs_basisf_[mc_id][k]->getBasisFunctionDescription(indices[k]);
+        desc+="*"+multicoeffs_basisf_[mc_id][k]->getBasisFunctionLabel(indices[k]);
       }
       desc+=postfix;
       setCoeffDescription(i,desc);

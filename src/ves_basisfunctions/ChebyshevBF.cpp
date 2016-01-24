@@ -30,8 +30,8 @@ class ChebyshevBF : public BasisFunctions {
 public:
   static void registerKeywords(Keywords&);
   explicit ChebyshevBF(const ActionOptions&);
-  double getValue(const double, const unsigned int, double&, bool&);
-  void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&);
+  double getValue(const double, const unsigned int, double&, bool&) const;
+  void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
@@ -45,31 +45,30 @@ void ChebyshevBF::registerKeywords(Keywords& keys){
 ChebyshevBF::ChebyshevBF(const ActionOptions&ao):
  PLUMED_BASISFUNCTIONS_INIT(ao)
 {
-  nbasis_ = norder_+1;
-  interval_default_min_=-1.0;
-  interval_default_max_=+1.0;
-  periodic_=false;
-  interval_bounded_=true;
-  type_="chebyshev-1st-kind";
-  description_="Chebyshev polynomials of the first kind";
-  bf_description_prefix_="T";
+  setNumberOfBasisFunctions(getOrder()+1);
+  setIntrinsicInterval(-1.0,+1.0);
+  setNonPeriodic();
+  setIntervalBounded();
+  setType("chebyshev-1st-kind");
+  setDescription("Chebyshev polynomials of the first kind");
+  setLabelPrefix("T");
   setupBF();
-  printInfo();
 }
 
 
-double ChebyshevBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range){
-  if(n>=nbasis_){error("getValue: n is outside range of the defined order of the basis set");}
+double ChebyshevBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+  plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
-  std::vector<double> tmp_values(nbasis_);
-  std::vector<double> tmp_derivs(nbasis_);
+  std::vector<double> tmp_values(numberOfBasisFunctions());
+  std::vector<double> tmp_derivs(numberOfBasisFunctions());
   getAllValues(arg, argT, inside_range, tmp_values, tmp_derivs);
   return tmp_values[n];
 }
 
 
-void ChebyshevBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs){
-  if(values.size()!=nbasis_ || derivs.size()!=nbasis_){error("getAllValues: wrong size of values or derivs vectors");}
+void ChebyshevBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+  // plumed_assert(values.size()==numberOfBasisFunctions());
+  // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
   argT=translateArgument(arg, inside_range);
   std::vector<double> derivsT(derivs.size());
@@ -79,22 +78,24 @@ void ChebyshevBF::getAllValues(const double arg, double& argT, bool& inside_rang
   derivs[0]=0.0;
   values[1]=argT;
   derivsT[1]=1.0;
-  derivs[1]=argT_derivf_;
-  for(unsigned int i=1; i < norder_;i++){
+  derivs[1]=intervalDerivf();
+  for(unsigned int i=1; i < getOrder();i++){
     values[i+1]  = 2.0*argT*values[i]-values[i-1];
     derivsT[i+1] = 2.0*values[i]+2.0*argT*derivsT[i]-derivsT[i-1];
-    derivs[i+1]  = argT_derivf_*derivsT[i+1];
+    derivs[i+1]  = intervalDerivf()*derivsT[i+1];
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
 }
 
 
-void ChebyshevBF::setupUniformIntegrals(){
-  uniform_integrals_.assign(nbasis_,0.0);
-  for(unsigned int i=0; i<nbasis_; i++){
+void ChebyshevBF::setupUniformIntegrals() {
+  for(unsigned int i=0; i<numberOfBasisFunctions(); i++){
     double io = i;
-    if(i % 2 == 0){uniform_integrals_[i] = -2.0/( pow(io,2.0)-1.0)*0.5;}
-    else{uniform_integrals_[i]=0.0;}
+    double value = 0.0;
+    if(i % 2 == 0){
+      value = -2.0/( pow(io,2.0)-1.0)*0.5;
+    }
+    setUniformIntegral(i,value);
   }
 }
 

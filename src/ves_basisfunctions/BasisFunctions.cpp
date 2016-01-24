@@ -44,14 +44,14 @@ description_("Undefined"),
 type_("Undefined"),
 norder_(0),
 nbasis_(1),
-bf_description_prefix_("f"),
-bf_description_(nbasis_,"f0"),
+bf_label_prefix_("f"),
+bf_labels_(nbasis_,"f0"),
 periodic_(false),
 interval_bounded_(true),
-interval_default_min_(1.0),
-interval_default_max_(-1.0),
-interval_default_range_(0.0),
-interval_default_mean_(0.0),
+interval_intrinsic_min_(1.0),
+interval_intrinsic_max_(-1.0),
+interval_intrinsic_range_(0.0),
+interval_intrinsic_mean_(0.0),
 interval_min_(0.0),
 interval_max_(0.0),
 interval_range_(0.0),
@@ -78,47 +78,54 @@ uniform_integrals_(nbasis_,0.0)
 }
 
 
-void BasisFunctions::setupInterval(){
-  // if(!intervalBounded()){plumed_merror("setupInterval() only works for bounded interval");}
-  interval_default_range_ = interval_default_max_-interval_default_min_;
-  interval_default_mean_  = 0.5*(interval_default_max_+interval_default_min_);
-  interval_range_ = interval_max_-interval_min_;
-  interval_mean_  = 0.5*(interval_max_+interval_min_);
-  argT_derivf_ = interval_default_range_/interval_range_;
+void BasisFunctions::setNumberOfBasisFunctions(const unsigned int nbasis_in) {
+  nbasis_=nbasis_in;
+  bf_labels_.assign(nbasis_,"");
+  uniform_integrals_.assign(nbasis_,0.0);
 }
 
 
-void BasisFunctions::setupDescription(){
-  bf_description_.resize(nbasis_);
+void BasisFunctions::setupInterval() {
+  // if(!intervalBounded()){plumed_merror("setupInterval() only works for bounded interval");}
+  interval_intrinsic_range_ = interval_intrinsic_max_-interval_intrinsic_min_;
+  interval_intrinsic_mean_  = 0.5*(interval_intrinsic_max_+interval_intrinsic_min_);
+  interval_range_ = interval_max_-interval_min_;
+  interval_mean_  = 0.5*(interval_max_+interval_min_);
+  argT_derivf_ = interval_intrinsic_range_/interval_range_;
+}
+
+
+void BasisFunctions::setupLabels() {
   for(unsigned int i=0; i < nbasis_;i++){
     std::string is; Tools::convert(i,is);
-    bf_description_[i]=bf_description_prefix_+is+"(s)";
+    bf_labels_[i]=bf_label_prefix_+is+"(s)";
   }
 }
 
 
-void BasisFunctions::setupUniformIntegrals(){
+void BasisFunctions::setupUniformIntegrals() {
   numerical_uniform_integrals_=true;
   numericalUniformIntegrals();
 }
 
 
-void BasisFunctions::setupBF(){
+void BasisFunctions::setupBF() {
   checkRead();
-  if(interval_default_min_>interval_default_max_){plumed_merror("setupBF: default intervals are not correctly set");}
+  if(interval_intrinsic_min_>interval_intrinsic_max_){plumed_merror("setupBF: default intervals are not correctly set");}
   setupInterval();
-  setupDescription();
-  if(bf_description_.size()==1){plumed_merror("setupBF: the description of the basis functions is not correct.");}
+  setupLabels();
+  if(bf_labels_.size()==1){plumed_merror("setupBF: the labels of the basis functions are not correct.");}
   if(!numerical_uniform_integrals_){setupUniformIntegrals();}
   else{numericalUniformIntegrals();}
   if(uniform_integrals_.size()==1){plumed_merror("setupBF: the integrals of the basis functions is not correct.");}
   if(type_=="Undefined"){plumed_merror("setupBF: the type of the basis function is not defined.");}
   if(description_=="Undefined"){plumed_merror("setupBF: the description of the basis function is not defined.");}
   has_been_set=true;
+  printInfo();
 }
 
 
-void BasisFunctions::printInfo(){
+void BasisFunctions::printInfo() const {
   if(!has_been_set){plumed_merror("the basis set has not be setup correctly");}
   log.printf("  One-dimensional basis set\n");
   log.printf("   Description: %s\n",description_.c_str());
@@ -128,12 +135,12 @@ void BasisFunctions::printInfo(){
   log.printf("   Number of basis functions: %u\n",nbasis_);
   log.printf("   Interval of basis set: %f to %f\n",interval_min_,interval_max_);
   log.printf("   Description of basis functions:\n");
-  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2u       %10s\n",i,bf_description_[i].c_str());}
+  for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2u       %10s\n",i,bf_labels_[i].c_str());}
   //
   if(print_debug_info_){
     log.printf("  Debug information:\n");
-    log.printf("   Default interval of basis set: [%f,%f]\n",interval_default_min_,interval_default_max_);
-    log.printf("   Default interval of basis set: range=%f,  mean=%f\n",interval_default_range_,interval_default_mean_);
+    log.printf("   Default interval of basis set: [%f,%f]\n",interval_intrinsic_min_,interval_intrinsic_max_);
+    log.printf("   Default interval of basis set: range=%f,  mean=%f\n",interval_intrinsic_range_,interval_intrinsic_mean_);
     log.printf("   Defined interval of basis set: [%f,%f]\n",interval_min_,interval_max_);
     log.printf("   Defined interval of basis set: range=%f,  mean=%f\n",interval_range_,interval_mean_);
     log.printf("   Derivative factor due to interval translation: %f\n",argT_derivf_);
@@ -147,7 +154,6 @@ void BasisFunctions::printInfo(){
 
 void BasisFunctions::numericalUniformIntegrals() {
   double h=(interval_max_-interval_min_)/nbins_;
-  uniform_integrals_.assign(nbasis_,0.0);
   //
   bool dummy_bool=true;
   double dummy_dbl=0.0;
@@ -167,7 +173,7 @@ void BasisFunctions::numericalUniformIntegrals() {
 }
 
 
-std::vector<double> BasisFunctions::numericalIntegralsOverTargetDistribution(TargetDistribution* targetdist_in) {
+std::vector<double> BasisFunctions::numericalIntegralsOverTargetDistribution(const TargetDistribution* targetdist_in) const {
   plumed_massert(targetdist_in!=NULL,"something wrong with input target distribution");
   plumed_massert(targetdist_in->getDimension()==1,"the target distribution should be one dimensional");
   //
@@ -213,7 +219,7 @@ std::vector<double> BasisFunctions::numericalIntegralsOverTargetDistribution(Tar
 
 
 
-std::string BasisFunctions::getKeywordString(){
+std::string BasisFunctions::getKeywordString() const {
   std::string str_keywords=bf_keywords_[0];
   for(unsigned int i=1; i<bf_keywords_.size();i++){str_keywords+=" "+bf_keywords_[i];}
   return str_keywords;

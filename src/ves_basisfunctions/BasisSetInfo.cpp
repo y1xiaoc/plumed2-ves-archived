@@ -118,8 +118,8 @@ std::vector<std::string> BasisSetInfo::getKeywords() const {
 std::string BasisSetInfo::getBasisSetDescription(std::vector<unsigned int>& indices) const {
   plumed_massert(indices.size()==basisset_dim_,"incorrect number of indicies");
   std::string desc;
-  desc=basisf_[0]->getBasisFunctionDescription(indices[0]);
-  for(unsigned int k=1;k<basisset_dim_;k++){ desc+="*"+basisf_[k]->getBasisFunctionDescription(indices[k]); }
+  desc=basisf_[0]->getBasisFunctionLabel(indices[0]);
+  for(unsigned int k=1;k<basisset_dim_;k++){ desc+="*"+basisf_[k]->getBasisFunctionLabel(indices[k]); }
   return desc;
 }
 
