@@ -172,7 +172,7 @@ void CoeffsVector::sumMultiSimCommMPI(Communicator& multi_sim_cc) {
     multi_sim_cc.Sum(data);
     scaleAllValues(1.0/nwalkers);
   }
-  multi_sim_cc.Bcast(data,0);
+  mycomm.Bcast(data,0);
 }
 
 
