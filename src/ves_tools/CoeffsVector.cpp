@@ -789,7 +789,7 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
 
 size_t CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs, const bool ignore_header) {
   ifile.allowIgnoredFields();
-  size_t ncoeffs_read;
+  size_t ncoeffs_read=0;
   while(ifile){
     if(!ignore_header){readHeaderFromFile(ifile);}
     if(ifile){
