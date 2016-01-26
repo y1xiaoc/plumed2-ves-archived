@@ -593,18 +593,18 @@ double CoeffsVector::getNorm() const {
 
 
 double CoeffsVector::getL1Norm() const {
-  double norm;
+  double norm=0.0;
   for(size_t i=0; i<data.size(); i++){
-    norm=std::abs(data[i]);
+    norm+=std::abs(data[i]);
   }
   return norm;
 }
 
 
 double CoeffsVector::getL2Norm() const {
-  double norm;
+  double norm=0.0;
   for(size_t i=0; i<data.size(); i++){
-    norm=data[i]*data[i];
+    norm+=data[i]*data[i];
   }
   norm=sqrt(norm);
   return norm;
@@ -612,9 +612,9 @@ double CoeffsVector::getL2Norm() const {
 
 
 double CoeffsVector::getLpNorm(const double p) const {
-  double norm;
+  double norm=0.0;
   for(size_t i=0; i<data.size(); i++){
-    norm=pow(data[i],p);
+    norm+=pow(data[i],p);
   }
   norm=pow(norm,(1.0/p));
   return norm;
