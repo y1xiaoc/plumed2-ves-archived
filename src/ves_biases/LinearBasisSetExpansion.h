@@ -44,28 +44,28 @@ class LinearBasisSetExpansion{
 private:
   std::string label_;
   //
-  Action* action_pntr;
-  bias::VesBias* vesbias_pntr;
-  Communicator& mycomm;
+  Action* action_pntr_;
+  bias::VesBias* vesbias_pntr_;
+  Communicator& mycomm_;
   bool serial_;
   //
-  std::vector<Value*> args_pntrs;
+  std::vector<Value*> args_pntrs_;
   unsigned int nargs_;
   //
-  std::vector<BasisFunctions*> basisf_pntrs;
+  std::vector<BasisFunctions*> basisf_pntrs_;
   std::vector<unsigned int> nbasisf_;
   //
-  CoeffsVector* bias_coeffs_pntr;
+  CoeffsVector* bias_coeffs_pntr_;
   size_t ncoeffs_;
-  CoeffsVector* coeffderivs_aver_ps_pntr;
-  CoeffsVector* fes_wt_coeffs_pntr;
+  CoeffsVector* coeffderivs_aver_ps_pntr_;
+  CoeffsVector* fes_wt_coeffs_pntr_;
   //
   double biasf_;
   double invbiasf_;
   //
-  Grid* bias_grid_pntr;
-  Grid* fes_grid_pntr;
-  Grid* ps_grid_pntr;
+  Grid* bias_grid_pntr_;
+  Grid* fes_grid_pntr_;
+  Grid* ps_grid_pntr_;
   //
  public:
   static void registerKeywords( Keywords& keys );
@@ -119,16 +119,16 @@ private:
 };
 
 inline
-std::vector<Value*> LinearBasisSetExpansion::getPntrsToArguments() const {return args_pntrs;}
+std::vector<Value*> LinearBasisSetExpansion::getPntrsToArguments() const {return args_pntrs_;}
 
 inline
-std::vector<BasisFunctions*> LinearBasisSetExpansion::getPntrsToBasisFunctions() const {return basisf_pntrs;}
+std::vector<BasisFunctions*> LinearBasisSetExpansion::getPntrsToBasisFunctions() const {return basisf_pntrs_;}
 
 inline
-CoeffsVector* LinearBasisSetExpansion::getPntrToBiasCoeffs() const {return bias_coeffs_pntr;}
+CoeffsVector* LinearBasisSetExpansion::getPntrToBiasCoeffs() const {return bias_coeffs_pntr_;}
 
 inline
-Grid* LinearBasisSetExpansion::getPntrToBiasGrid() const {return bias_grid_pntr;}
+Grid* LinearBasisSetExpansion::getPntrToBiasGrid() const {return bias_grid_pntr_;}
 
 inline
 unsigned int LinearBasisSetExpansion::getNumberOfArguments() const {return nargs_;}
@@ -140,13 +140,13 @@ inline
 size_t LinearBasisSetExpansion::getNumberOfCoeffs() const {return ncoeffs_;}
 
 inline
-CoeffsVector& LinearBasisSetExpansion::BiasCoeffs() const {return *bias_coeffs_pntr;}
+CoeffsVector& LinearBasisSetExpansion::BiasCoeffs() const {return *bias_coeffs_pntr_;}
 
 inline
-CoeffsVector& LinearBasisSetExpansion::FesWTCoeffs() const {return *fes_wt_coeffs_pntr;}
+CoeffsVector& LinearBasisSetExpansion::FesWTCoeffs() const {return *fes_wt_coeffs_pntr_;}
 
 inline
-CoeffsVector& LinearBasisSetExpansion::CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr;}
+CoeffsVector& LinearBasisSetExpansion::CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr_;}
 
 
 }

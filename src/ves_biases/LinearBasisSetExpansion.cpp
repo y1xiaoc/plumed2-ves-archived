@@ -29,7 +29,7 @@
 #include "tools/Grid.h"
 #include "tools/Communicator.h"
 
-#include <iostream>
+// #include <iostream>
 
 
 
@@ -52,73 +52,73 @@ LinearBasisSetExpansion::LinearBasisSetExpansion(
   std::vector<BasisFunctions*> basisf_pntrs_in,
   CoeffsVector* bias_coeffs_pntr_in):
 label_(label),
-action_pntr(NULL),
-vesbias_pntr(NULL),
-mycomm(cc),
+action_pntr_(NULL),
+vesbias_pntr_(NULL),
+mycomm_(cc),
 serial_(false),
-args_pntrs(args_pntrs_in),
-nargs_(args_pntrs.size()),
-basisf_pntrs(basisf_pntrs_in),
-nbasisf_(basisf_pntrs.size()),
-bias_coeffs_pntr(bias_coeffs_pntr_in),
+args_pntrs_(args_pntrs_in),
+nargs_(args_pntrs_.size()),
+basisf_pntrs_(basisf_pntrs_in),
+nbasisf_(basisf_pntrs_.size()),
+bias_coeffs_pntr_(bias_coeffs_pntr_in),
 ncoeffs_(0),
-coeffderivs_aver_ps_pntr(NULL),
-fes_wt_coeffs_pntr(NULL),
+coeffderivs_aver_ps_pntr_(NULL),
+fes_wt_coeffs_pntr_(NULL),
 biasf_(-1.0),
 invbiasf_(-1.0),
-bias_grid_pntr(NULL),
-fes_grid_pntr(NULL),
-ps_grid_pntr(NULL)
+bias_grid_pntr_(NULL),
+fes_grid_pntr_(NULL),
+ps_grid_pntr_(NULL)
 {
-  plumed_massert(args_pntrs.size()==basisf_pntrs.size(),"number of arguments and basis functions do not match");
-  for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs[k]->getNumberOfBasisFunctions();}
+  plumed_massert(args_pntrs_.size()==basisf_pntrs_.size(),"number of arguments and basis functions do not match");
+  for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs_[k]->getNumberOfBasisFunctions();}
   //
-  if(bias_coeffs_pntr==NULL){
-    bias_coeffs_pntr = new CoeffsVector(label_+".coeffs",args_pntrs,basisf_pntrs,mycomm,true);
+  if(bias_coeffs_pntr_==NULL){
+    bias_coeffs_pntr_ = new CoeffsVector(label_+".coeffs",args_pntrs_,basisf_pntrs_,mycomm_,true);
   }
-  plumed_massert(bias_coeffs_pntr->numberOfDimensions()==basisf_pntrs.size(),"dimension of coeffs does not match with number of basis functions ");
+  plumed_massert(bias_coeffs_pntr_->numberOfDimensions()==basisf_pntrs_.size(),"dimension of coeffs does not match with number of basis functions ");
   //
-  ncoeffs_ = bias_coeffs_pntr->numberOfCoeffs();
-  coeffderivs_aver_ps_pntr = new CoeffsVector(*bias_coeffs_pntr);
+  ncoeffs_ = bias_coeffs_pntr_->numberOfCoeffs();
+  coeffderivs_aver_ps_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
 
-  std::string coeffderivs_aver_ps_label = bias_coeffs_pntr->getLabel();
+  std::string coeffderivs_aver_ps_label = bias_coeffs_pntr_->getLabel();
   if(coeffderivs_aver_ps_label.find("coeffs")!=std::string::npos){
     coeffderivs_aver_ps_label.replace(coeffderivs_aver_ps_label.find("coeffs"), std::string("coeffs").length(), "coeffderivs_aver_ps");
   }
   else {
     coeffderivs_aver_ps_label += "_aver_ps";
   }
-  coeffderivs_aver_ps_pntr->setLabels(coeffderivs_aver_ps_label);
+  coeffderivs_aver_ps_pntr_->setLabels(coeffderivs_aver_ps_label);
   //
 }
 
 LinearBasisSetExpansion::~LinearBasisSetExpansion() {
-  if(bias_grid_pntr!=NULL){
-    delete bias_grid_pntr;
+  if(bias_grid_pntr_!=NULL){
+    delete bias_grid_pntr_;
   }
-  if(fes_grid_pntr!=NULL){
-    delete fes_grid_pntr;
+  if(fes_grid_pntr_!=NULL){
+    delete fes_grid_pntr_;
   }
-  if(ps_grid_pntr!=NULL){
-    delete ps_grid_pntr;
+  if(ps_grid_pntr_!=NULL){
+    delete ps_grid_pntr_;
   }
-  if(coeffderivs_aver_ps_pntr!=NULL){
-    delete coeffderivs_aver_ps_pntr;
+  if(coeffderivs_aver_ps_pntr_!=NULL){
+    delete coeffderivs_aver_ps_pntr_;
   }
-  if(fes_wt_coeffs_pntr!=NULL){
-    delete fes_wt_coeffs_pntr;
+  if(fes_wt_coeffs_pntr_!=NULL){
+    delete fes_wt_coeffs_pntr_;
   }
 }
 
 
 void LinearBasisSetExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in) {
-  vesbias_pntr = vesbias_pntr_in;
-  action_pntr = static_cast<Action*>(vesbias_pntr_in);
+  vesbias_pntr_ = vesbias_pntr_in;
+  action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 }
 
 
 void LinearBasisSetExpansion::linkAction(Action* action_pntr_in) {
-  action_pntr = action_pntr_in;
+  action_pntr_ = action_pntr_in;
 }
 
 
@@ -127,24 +127,24 @@ void LinearBasisSetExpansion::setupBiasGrid(const std::vector<unsigned int>& nbi
   std::vector<std::string> min(nargs_);
   std::vector<std::string> max(nargs_);
   for(unsigned int k=0;k<nargs_;k++){
-    Tools::convert(basisf_pntrs[k]->intervalMin(),min[k]);
-    Tools::convert(basisf_pntrs[k]->intervalMax(),max[k]);
+    Tools::convert(basisf_pntrs_[k]->intervalMin(),min[k]);
+    Tools::convert(basisf_pntrs_[k]->intervalMax(),max[k]);
   }
-  bias_grid_pntr = new Grid(label_+".bias",args_pntrs,min,max,nbins,false,usederiv);
+  bias_grid_pntr_ = new Grid(label_+".bias",args_pntrs_,min,max,nbins,false,usederiv);
 }
 
 
 void LinearBasisSetExpansion::updateBiasGrid() {
-  for(unsigned int l=0; l<bias_grid_pntr->getSize(); l++){
+  for(unsigned int l=0; l<bias_grid_pntr_->getSize(); l++){
     std::vector<double> forces(nargs_);
     std::vector<double> coeffsderivs_values(ncoeffs_);
-    std::vector<double> args_values = bias_grid_pntr->getPoint(l);
+    std::vector<double> args_values = bias_grid_pntr_->getPoint(l);
     double bias_value=getBiasAndForces(args_values,forces,coeffsderivs_values);
-    if(bias_grid_pntr->hasDerivatives()){
-      bias_grid_pntr->setValueAndDerivatives(l,bias_value,forces);
+    if(bias_grid_pntr_->hasDerivatives()){
+      bias_grid_pntr_->setValueAndDerivatives(l,bias_value,forces);
     }
     else{
-      bias_grid_pntr->setValue(l,bias_value);
+      bias_grid_pntr_->setValue(l,bias_value);
     }
 
  }
@@ -154,11 +154,11 @@ void LinearBasisSetExpansion::updateBiasGrid() {
 void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) {
   OFile file;
   if(append_file){file.enforceRestart();}
-  if(action_pntr!=NULL){
-    file.link(*action_pntr);
+  if(action_pntr_!=NULL){
+    file.link(*action_pntr_);
   }
   file.open(filepath);
-  bias_grid_pntr->writeToFile(file);
+  bias_grid_pntr_->writeToFile(file);
   file.close();
 }
 
@@ -218,7 +218,7 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args
 
 
 double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
-  return getBiasAndForces(args_values,forces,coeffsderivs_values,basisf_pntrs, bias_coeffs_pntr, &mycomm);
+  return getBiasAndForces(args_values,forces,coeffsderivs_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
 }
 
 
@@ -262,7 +262,7 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
 
 
 void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values) {
-  getBasisSetValues(args_values,basisset_values,basisf_pntrs, bias_coeffs_pntr, &mycomm);
+  getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
 }
 
 
@@ -271,37 +271,37 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
   std::vector< std::vector <double> > bf_integrals;
   //
   for(unsigned int k=0;k<nargs_;k++){
-    std::vector<double> tmp_val = basisf_pntrs[k]->getUniformIntegrals();
+    std::vector<double> tmp_val = basisf_pntrs_[k]->getUniformIntegrals();
     bf_integrals.push_back(tmp_val);
   }
   //
   for(size_t i=0;i<ncoeffs_;i++){
-    std::vector<unsigned int> indices=bias_coeffs_pntr->getIndices(i);
+    std::vector<unsigned int> indices=bias_coeffs_pntr_->getIndices(i);
     double value = 1.0;
     for(unsigned int k=0;k<nargs_;k++){
       value*=bf_integrals[k][indices[k]];
     }
-    coeffderivs_aver_ps_pntr->setValue(i,value);
+    coeffderivs_aver_ps_pntr_->setValue(i,value);
   }
 }
 
 
-void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDistribution*>& targetdists) {
-  plumed_massert(targetdists.size()==nargs_,"number of target distribution does not match the number of basis functions");
+void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
+  plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
   std::vector< std::vector <double> > bf_integrals;
   //
   for(unsigned int k=0;k<nargs_;k++){
-    std::vector<double> tmp_val = basisf_pntrs[k]->getTargetDistributionIntegrals(targetdists[k]);
+    std::vector<double> tmp_val = basisf_pntrs_[k]->getTargetDistributionIntegrals(targetdist_pntrs[k]);
     bf_integrals.push_back(tmp_val);
   }
   //
   for(size_t i=0;i<ncoeffs_;i++){
-    std::vector<unsigned int> indices=bias_coeffs_pntr->getIndices(i);
+    std::vector<unsigned int> indices=bias_coeffs_pntr_->getIndices(i);
     double value = 1.0;
     for(unsigned int k=0;k<nargs_;k++){
       value*=bf_integrals[k][indices[k]];
     }
-    coeffderivs_aver_ps_pntr->setValue(i,value);
+    coeffderivs_aver_ps_pntr_->setValue(i,value);
   }
 }
 
@@ -311,15 +311,15 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
   plumed_massert(biasf>1.0,"the value of the bias factor doesn't make sense, it should be larger than 1.0");
   biasf_=biasf;
   invbiasf_ = 1.0/biasf_;
-  fes_wt_coeffs_pntr = new CoeffsVector(*bias_coeffs_pntr);
-  std::string fes_wt_label = bias_coeffs_pntr->getLabel();
+  fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
+  std::string fes_wt_label = bias_coeffs_pntr_->getLabel();
   if(fes_wt_label.find("coeffs")!=std::string::npos){
     fes_wt_label.replace(fes_wt_label.find("coeffs"), std::string("coeffs").length(), "fes_wt_coeffs");
   }
   else {
     fes_wt_label += "_fes_wt";
   }
-  fes_wt_coeffs_pntr->setLabels(fes_wt_label);
+  fes_wt_coeffs_pntr_->setLabels(fes_wt_label);
 }
 
 
