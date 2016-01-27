@@ -91,6 +91,7 @@ public:
   // write the distribution out to file
   static void writeDistributionToFile(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   void calculateDistributionOnGrid(Grid*);
+  virtual void update() {};
 };
 
 
