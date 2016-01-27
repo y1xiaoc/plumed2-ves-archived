@@ -173,20 +173,22 @@ void BasisFunctions::numericalUniformIntegrals() {
 }
 
 
-std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const TargetDistribution* targetdist_in) const {
-  plumed_massert(targetdist_in!=NULL,"something wrong with input target distribution");
-  plumed_massert(targetdist_in->getDimension()==1,"the target distribution should be one dimensional");
+std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const TargetDistribution* targetdist) const {
+  if(targetdist==NULL){
+    return getUniformIntegrals();
+  }
+  plumed_massert(targetdist->getDimension()==1,"the target distribution should be one dimensional");
   //
   double h=(interval_max_-interval_min_)/nbins_;
-  std::vector<double> targetdist_integrals_(nbasis_,0.0);
+  std::vector<double> targetdist_integrals(nbasis_,0.0);
   //
   std::vector<double> weights(nbins_+1,0.0);
   for(unsigned int k=0; k < (nbins_+1); k++){
     std::vector<double> x1(1);
     x1[0] = interval_min_+(k)*h;
-    weights[k] = targetdist_in->getValue(x1);
+    weights[k] = targetdist->getValue(x1);
   }
-  if( !(targetdist_in->isNormalized()) ){
+  if( !(targetdist->isNormalized()) ){
     double norm = 0.0;
     for(unsigned int k=0; k < nbins_; k++){
       norm = norm + (weights[k] + weights[k+1]);
@@ -210,10 +212,10 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const T
       sum = sum + (v1+v2);
     }
     // norm with the "volume of the interval"
-    targetdist_integrals_[i] = (0.5*h*sum)/interval_range_;
+    targetdist_integrals[i] = (0.5*h*sum)/interval_range_;
   }
   //
-  return targetdist_integrals_;
+  return targetdist_integrals;
 
 }
 
