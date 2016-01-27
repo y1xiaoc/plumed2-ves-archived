@@ -111,7 +111,7 @@ protected:
   double StepSize(const unsigned int coeffs_id = 0) const;
   virtual void coeffsUpdate(const unsigned int coeffs_id = 0) = 0;
   void setCurrentStepSize(const double,const unsigned int i = 0);
-  void setCurrentStepSizes(const std::vector<double>);
+  void setCurrentStepSizes(const std::vector<double>&);
   //
   void turnOffCoeffsOutputFiles();
   //
@@ -145,7 +145,7 @@ public:
   std::vector<double> getCurrentStepSizes() const;
   double getStepSize(const unsigned int coeffs_id = 0) const;
   double getCurrentStepSize(const unsigned int coeffs_id = 0) const;
-  void setStepSizes(const std::vector<double>);
+  void setStepSizes(const std::vector<double>&);
   void setStepSize(const double, const unsigned int coeffs_id = 0);
   //
   unsigned int getIterationCounter() const;
@@ -207,7 +207,7 @@ inline
 double Optimizer::getCurrentStepSize(const unsigned int coeffs_id) const {return current_stepsizes[coeffs_id];}
 
 inline
-void Optimizer::setStepSizes(const std::vector<double> stepsizes_in) {
+void Optimizer::setStepSizes(const std::vector<double>& stepsizes_in) {
   plumed_assert(stepsizes_in.size()==ncoeffssets_);
   stepsizes_ = stepsizes_in;
 }
@@ -223,7 +223,7 @@ void Optimizer::setCurrentStepSize(const double current_stepsize_in, const unsig
 }
 
 inline
-void Optimizer::setCurrentStepSizes(const std::vector<double> current_stepsizes_in) {
+void Optimizer::setCurrentStepSizes(const std::vector<double>& current_stepsizes_in) {
   plumed_assert(current_stepsizes_in.size()==ncoeffssets_);
   current_stepsizes = current_stepsizes_in;
 }

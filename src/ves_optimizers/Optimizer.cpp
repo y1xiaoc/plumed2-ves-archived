@@ -190,8 +190,8 @@ identical_coeffs_shape_(true)
     }
     if(use_mwalkers_mpi_ ){
       log.printf("  optimization performed using multiple walkers connected via MPI:\n");
-      log.printf("   number of walkers: %u\n",multi_sim_comm.Get_size());
-      log.printf("   walker number: %u\n",multi_sim_comm.Get_rank());
+      log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
+      log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
     }
   }
 

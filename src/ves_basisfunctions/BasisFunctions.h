@@ -98,8 +98,8 @@ protected:
   void setNonPeriodic() {periodic_=false;}
   void setIntervalBounded() {interval_bounded_=true;}
   void setIntervalNonBounded() {interval_bounded_=false;}
-  void setType(const std::string type_in) {type_=type_in;}
-  void setDescription(const std::string description_in) {description_=description_in;}
+  void setType(const std::string& type_in) {type_=type_in;}
+  void setDescription(const std::string& description_in) {description_=description_in;}
   //
   void setNumberOfBasisFunctions(const unsigned int);
   void setIntrinsicInterval(const double, const double);
