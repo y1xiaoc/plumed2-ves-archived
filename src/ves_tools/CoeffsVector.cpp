@@ -841,11 +841,11 @@ size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_co
     int idx_tmp;
     for(unsigned int k=0; k<numberOfDimensions(); k++){
       ifile.scanField(ilabels[k],idx_tmp);
-      indices[k] = (unsigned int) idx_tmp;
+      indices[k] = static_cast<unsigned int>(idx_tmp);
     }
     data[getIndex(indices)] = coeff_tmp;
     ifile.scanField(field_index,idx_tmp);
-    if(getIndex(indices)!=idx_tmp){
+    if(getIndex(indices)!=static_cast<unsigned int>(idx_tmp)){
       std::string is1; Tools::convert(idx_tmp,is1);
       std::string msg="ERROR: problem with indices at index " + is1 + " when reading coefficients from file";
       plumed_merror(msg);
@@ -855,7 +855,7 @@ size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_co
     ifile.scanField();
     ncoeffs_read++;
     if(ncoeffs_read==numberOfCoeffs()){
-      plumed_massert(idx_tmp+1==numberOfCoeffs(),"something strange about the coefficent file, perhaps multiple entries and missing values");
+      plumed_massert((static_cast<unsigned int>(idx_tmp)+1)==numberOfCoeffs(),"something strange about the coefficent file, perhaps multiple entries and missing values");
       break;
     }
   }
