@@ -34,6 +34,8 @@ class Communicator;
 class Grid;
 class CoeffsVector;
 class BasisFunctions;
+class TargetDistribution;
+
 namespace bias{
   class VesBias;
 
@@ -104,6 +106,10 @@ private:
   void writeBiasGridToFile(const std::string&, const bool);
   //
   void setupUniformTargetDistribution();
+  //
+  void setupTargetDistribution(const std::vector<TargetDistribution*>&);
+  void setupTargetDistribution(const TargetDistribution*);
+  //
   // Well-Tempered p(s) stuff
   void setupWellTemperedTargetDistribution(const double, const std::vector<unsigned int>&);
   void updateWellTemperedFESCoeffs();

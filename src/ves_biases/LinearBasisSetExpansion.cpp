@@ -59,7 +59,7 @@ serial_(false),
 args_pntrs(args_pntrs_in),
 nargs_(args_pntrs.size()),
 basisf_pntrs(basisf_pntrs_in),
-nbasisf_(nargs_),
+nbasisf_(basisf_pntrs.size()),
 bias_coeffs_pntr(bias_coeffs_pntr_in),
 ncoeffs_(0),
 coeffderivs_aver_ps_pntr(NULL),
@@ -240,6 +240,27 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
     coeffderivs_aver_ps_pntr->setValue(i,value);
   }
 }
+
+
+void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDistribution*>& targetdists) {
+  plumed_massert(targetdists.size()==nargs_,"number of target distribution does not match the number of basis functions");
+  std::vector< std::vector <double> > bf_integrals;
+  //
+  for(unsigned int k=0;k<nargs_;k++){
+    std::vector<double> tmp_val = basisf_pntrs[k]->getTargetDistributionIntegrals(targetdists[k]);
+    bf_integrals.push_back(tmp_val);
+  }
+  //
+  for(size_t i=0;i<ncoeffs_;i++){
+    std::vector<unsigned int> indices=bias_coeffs_pntr->getIndices(i);
+    double value = 1.0;
+    for(unsigned int k=0;k<nargs_;k++){
+      value*=bf_integrals[k][indices[k]];
+    }
+    coeffderivs_aver_ps_pntr->setValue(i,value);
+  }
+}
+
 
 
 void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf, const std::vector<unsigned int>& nbins) {
