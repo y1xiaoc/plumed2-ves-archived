@@ -178,10 +178,10 @@ identical_coeffs_shape_(true)
   if(keywords.exists("MULTIPLE_WALKERS")){
     parseFlag("MULTIPLE_WALKERS",use_mwalkers_mpi_);
   }
-  if(keywords.exists("MWALKERS_SEPERATE_FILES")){
-    bool mw_seperate_files = false;
-    parseFlag("MWALKERS_SEPERATE_FILES",mw_seperate_files);
-    mwalkers_mpi_single_files_ = !mw_seperate_files;
+  if(keywords.exists("MWALKERS_SEPARATE_FILES")){
+    bool mw_separate_files = false;
+    parseFlag("MWALKERS_SEPARATE_FILES",mw_separate_files);
+    mwalkers_mpi_single_files_ = !mw_separate_files;
   }
 
   if(comm.Get_rank()==0){
@@ -391,10 +391,10 @@ identical_coeffs_shape_(true)
     parseVector("MASK_FILE",mask_fnames_in);
     if(mask_fnames_in.size()==1 && ncoeffssets_>1){
       if(identical_coeffs_shape_){mask_fnames_in.resize(ncoeffssets_,mask_fnames_in[0]);}
-      else{plumed_merror("the coefficients indices shape differs between biases so you need to give a seperate file for each coefficient set\n");}
+      else{plumed_merror("the coefficients indices shape differs between biases so you need to give a separate file for each coefficient set\n");}
     }
     if(mask_fnames_in.size()>0 && mask_fnames_in.size()!=ncoeffssets_){
-      plumed_merror("Error in MASK_FILE keyword: either give one value for all biases or a seperate value for each coefficient set");
+      plumed_merror("Error in MASK_FILE keyword: either give one value for all biases or a separate value for each coefficient set");
     }
 
     coeffs_mask_pntrs.resize(ncoeffssets_);
@@ -539,7 +539,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("hidden","HESSIAN_OUTPUT_STRIDE","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
   // Keywords related to the multiple walkers, actived with the useMultipleWalkersKeywords function
   keys.reserveFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
-  keys.reserveFlag("MWALKERS_SEPERATE_FILES",false,"DEBUG OPTION: if seperate files should be outputted to file when using MPI multiple walkers");
+  keys.reserveFlag("MWALKERS_SEPARATE_FILES",false,"DEBUG OPTION: if separate files should be outputted to file when using MPI multiple walkers");
   // Keywords related to the mask file, actived with the useMaskKeywords function
   keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). One can write out the resulting mask by using the OUTPUT_MASK_FILE keyword.");
   keys.reserve("optional","OUTPUT_MASK_FILE","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
@@ -567,7 +567,7 @@ void Optimizer::useHessianKeywords(Keywords& keys) {
 
 void Optimizer::useMultipleWalkersKeywords(Keywords& keys) {
   keys.use("MULTIPLE_WALKERS");
-  keys.use("MWALKERS_SEPERATE_FILES");
+  keys.use("MWALKERS_SEPARATE_FILES");
 }
 
 
