@@ -173,7 +173,7 @@ void BasisFunctions::numericalUniformIntegrals() {
 }
 
 
-std::vector<double> BasisFunctions::numericalIntegralsOverTargetDistribution(const TargetDistribution* targetdist_in) const {
+std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const TargetDistribution* targetdist_in) const {
   plumed_massert(targetdist_in!=NULL,"something wrong with input target distribution");
   plumed_massert(targetdist_in->getDimension()==1,"the target distribution should be one dimensional");
   //

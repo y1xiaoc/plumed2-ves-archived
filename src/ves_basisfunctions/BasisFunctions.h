@@ -87,7 +87,7 @@ protected:
   void setupInterval();
   void setNumericalIntegrationBins(const unsigned int nbins) {nbins_=nbins;}
   void numericalUniformIntegrals();
-  std::vector<double> numericalIntegralsOverTargetDistribution(const TargetDistribution*) const ;
+  std::vector<double> numericalTargetDistributionIntegrals(const TargetDistribution*) const ;
   virtual void setupLabels();
   virtual void setupUniformIntegrals();
   template<typename T>
@@ -129,8 +129,8 @@ public:
   double intervalRange() const;
   double intervalMean() const;
   double intervalDerivf() const;
-  std::vector<double> getBasisFunctionIntegrals() const;
-  std::vector<double> getBasisFunctionIntegrals(TargetDistribution*) const;
+  std::vector<double> getUniformIntegrals() const;
+  std::vector<double> getTargetDistributionIntegrals(TargetDistribution*) const;
   unsigned getNumberOfDerivatives(){return 0;}
   std::vector<std::string> getKeywordList() const;
   std::string getBasisFunctionLabel(const unsigned int) const;
@@ -206,12 +206,12 @@ double BasisFunctions::intervalDerivf() const {return argT_derivf_;}
 
 
 inline
-std::vector<double> BasisFunctions::getBasisFunctionIntegrals() const {return uniform_integrals_;}
+std::vector<double> BasisFunctions::getUniformIntegrals() const {return uniform_integrals_;}
 
 
 inline
-std::vector<double> BasisFunctions::getBasisFunctionIntegrals(TargetDistribution* targetdist_in) const {
-  return numericalIntegralsOverTargetDistribution(targetdist_in);
+std::vector<double> BasisFunctions::getTargetDistributionIntegrals(TargetDistribution* targetdist_in) const {
+  return numericalTargetDistributionIntegrals(targetdist_in);
 }
 
 

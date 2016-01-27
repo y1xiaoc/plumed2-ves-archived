@@ -88,7 +88,7 @@ bf_pointers(getNumberOfArguments(),NULL)
   }
 
   for(unsigned int i=0; i<numberOfCoeffsSets(); i++){
-    setCoeffsDerivsOverTargetDist(bf_pointers[i]->getBasisFunctionIntegrals(),i);
+    setCoeffsDerivsOverTargetDist(bf_pointers[i]->getUniformIntegrals(),i);
   }
 
   readCoeffsFromFiles();

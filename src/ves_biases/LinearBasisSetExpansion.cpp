@@ -227,7 +227,7 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
   std::vector< std::vector <double> > bf_integrals;
   //
   for(unsigned int k=0;k<nargs_;k++){
-    std::vector<double> tmp_val = basisf_pntrs[k]->getBasisFunctionIntegrals();
+    std::vector<double> tmp_val = basisf_pntrs[k]->getUniformIntegrals();
     bf_integrals.push_back(tmp_val);
   }
   //
