@@ -132,11 +132,15 @@ public:
   std::vector<double> getUniformIntegrals() const;
   std::vector<double> getTargetDistributionIntegrals(TargetDistribution*) const;
   unsigned getNumberOfDerivatives(){return 0;}
+  //
   std::vector<std::string> getKeywordList() const;
+  std::string getKeywordString() const;
+  //
   std::string getBasisFunctionLabel(const unsigned int) const;
   std::vector<std::string> getBasisFunctionLabels() const;
   //
   double translateArgument(const double, bool&) const;
+  //
   void apply(){};
   void calculate(){};
   // calculate the value for the n-th basis function
@@ -145,7 +149,7 @@ public:
   virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const = 0;
   //virtual void get2ndDerivaties(const double, std::vector<double>&)=0;
   void printInfo() const;
-  std::string getKeywordString() const;
+
 };
 
 
@@ -174,7 +178,7 @@ unsigned int BasisFunctions::numberOfBasisFunctions() const  {return nbasis_;}
 
 
 inline
-unsigned int BasisFunctions::getSize() const {return getNumberOfBasisFunctions();}
+unsigned int BasisFunctions::getSize() const {return nbasis_;}
 
 
 inline
