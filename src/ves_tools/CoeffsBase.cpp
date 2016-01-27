@@ -45,8 +45,8 @@ coeffs_type_(Generic),
 iteration_and_time_active_(use_iteration_counter),
 iteration_opt(0),
 time_md(-1.0),
-action_pntr(NULL),
-vesbias_pntr(NULL),
+action_pntr_(NULL),
+vesbias_pntr_(NULL),
 ndimensions_(0),
 indices_shape_(0),
 ncoeffs_(0),
@@ -80,8 +80,8 @@ coeffs_type_(LinearBasisSet),
 iteration_and_time_active_(use_iteration_counter),
 iteration_opt(0),
 time_md(-1.0),
-action_pntr(NULL),
-vesbias_pntr(NULL),
+action_pntr_(NULL),
+vesbias_pntr_(NULL),
 ndimensions_(0),
 indices_shape_(0),
 ncoeffs_(0),
@@ -123,8 +123,8 @@ coeffs_type_(MultiCoeffs_LinearBasisSet),
 iteration_and_time_active_(use_iteration_counter),
 iteration_opt(0),
 time_md(-1.0),
-action_pntr(NULL),
-vesbias_pntr(NULL),
+action_pntr_(NULL),
+vesbias_pntr_(NULL),
 ndimensions_(0),
 indices_shape_(0),
 ncoeffs_(0),
@@ -319,25 +319,25 @@ void CoeffsBase::setType(const CoeffsType coeffs_type) {
 
 
 void CoeffsBase::linkVesBias(bias::VesBias* vesbias_pntr_in){
-  vesbias_pntr = vesbias_pntr_in;
-  action_pntr = static_cast<Action*>(vesbias_pntr_in);
+  vesbias_pntr_ = vesbias_pntr_in;
+  action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 }
 
 
 void CoeffsBase::linkAction(Action* action_pntr_in){
-  action_pntr = action_pntr_in;
+  action_pntr_ = action_pntr_in;
 }
 
 
 bias::VesBias* CoeffsBase::getPntrToVesBias() const {
-  plumed_massert(vesbias_pntr!=NULL,"the VES bias has not been linked");
-  return vesbias_pntr;
+  plumed_massert(vesbias_pntr_!=NULL,"the VES bias has not been linked");
+  return vesbias_pntr_;
 }
 
 
 Action* CoeffsBase::getPntrToAction() const {
-  plumed_massert(action_pntr!=NULL,"the action has not been linked");
-  return action_pntr;
+  plumed_massert(action_pntr_!=NULL,"the action has not been linked");
+  return action_pntr_;
 }
 
 

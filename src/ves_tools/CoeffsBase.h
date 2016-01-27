@@ -62,8 +62,8 @@ private:
   unsigned int iteration_opt;
   double time_md;
   //
-  Action* action_pntr;
-  bias::VesBias* vesbias_pntr;
+  Action* action_pntr_;
+  bias::VesBias* vesbias_pntr_;
   //
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
