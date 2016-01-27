@@ -137,10 +137,9 @@ void LinearBasisSetExpansion::setupBiasGrid(const std::vector<unsigned int>& nbi
 void LinearBasisSetExpansion::updateBiasGrid() {
   for(unsigned int l=0; l<bias_grid_pntr->getSize(); l++){
     std::vector<double> forces(nargs_);
-    std::vector<double> cv_value(nargs_);
     std::vector<double> coeffsderivs_values(ncoeffs_);
-    cv_value=bias_grid_pntr->getPoint(l);
-    double bias_value=getBiasAndForces(cv_value,forces,coeffsderivs_values);
+    std::vector<double> args_values = bias_grid_pntr->getPoint(l);
+    double bias_value=getBiasAndForces(args_values,forces,coeffsderivs_values);
     if(bias_grid_pntr->hasDerivatives()){
       bias_grid_pntr->setValueAndDerivatives(l,bias_value,forces);
     }
@@ -164,13 +163,13 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
 }
 
 
-double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& arg_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values, std::vector<BasisFunctions*>& basisf_pntrs_in, CoeffsVector* coeffs_pntr_in, Communicator* comm_in) {
-  unsigned int nargs = arg_values.size();
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values, std::vector<BasisFunctions*>& basisf_pntrs_in, CoeffsVector* coeffs_pntr_in, Communicator* comm_in) {
+  unsigned int nargs = args_values.size();
   plumed_assert(coeffs_pntr_in->numberOfDimensions()==nargs);
   plumed_assert(basisf_pntrs_in.size()==nargs);
   plumed_assert(forces.size()==nargs);
 
-  std::vector<double> arg_values_trsfrm(nargs);
+  std::vector<double> args_values_trsfrm(nargs);
   std::vector<bool>   inside_interval(nargs,true);
   //
   std::vector< std::vector <double> > bf_values;
@@ -180,7 +179,7 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& arg_
     std::vector<double> tmp_val(basisf_pntrs_in[k]->getNumberOfBasisFunctions());
     std::vector<double> tmp_der(tmp_val.size());
     bool inside=true;
-    basisf_pntrs_in[k]->getAllValues(arg_values[k],arg_values_trsfrm[k],inside,tmp_val,tmp_der);
+    basisf_pntrs_in[k]->getAllValues(args_values[k],args_values_trsfrm[k],inside,tmp_val,tmp_der);
     inside_interval[k]=inside;
     bf_values.push_back(tmp_val);
     bf_derivs.push_back(tmp_der);
@@ -218,8 +217,8 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& arg_
 }
 
 
-double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& cv_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
-  return getBiasAndForces(cv_values,forces,coeffsderivs_values,basisf_pntrs, bias_coeffs_pntr, &mycomm);
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
+  return getBiasAndForces(args_values,forces,coeffsderivs_values,basisf_pntrs, bias_coeffs_pntr, &mycomm);
 }
 
 
