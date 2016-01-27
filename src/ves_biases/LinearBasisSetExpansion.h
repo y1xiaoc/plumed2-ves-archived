@@ -100,6 +100,9 @@ private:
   // calculate bias and derivatives
   static double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
+  //
+  static void getBasisSetValues(const std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
+  void getBasisSetValues(const std::vector<double>&, std::vector<double>&);
   // Grid stuff
   void setupBiasGrid(const std::vector<unsigned int>&, const bool usederiv=false);
   void updateBiasGrid();

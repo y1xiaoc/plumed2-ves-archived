@@ -222,6 +222,51 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args
 }
 
 
+void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values, std::vector<BasisFunctions*>& basisf_pntrs_in, CoeffsVector* coeffs_pntr_in, Communicator* comm_in) {
+  unsigned int nargs = args_values.size();
+  plumed_assert(coeffs_pntr_in->numberOfDimensions()==nargs);
+  plumed_assert(basisf_pntrs_in.size()==nargs);
+
+  std::vector<double> args_values_trsfrm(nargs);
+  std::vector< std::vector <double> > bf_values;
+  //
+  for(unsigned int k=0;k<nargs;k++){
+    std::vector<double> tmp_val(basisf_pntrs_in[k]->getNumberOfBasisFunctions());
+    std::vector<double> tmp_der(tmp_val.size());
+    bool inside=true;
+    basisf_pntrs_in[k]->getAllValues(args_values[k],args_values_trsfrm[k],inside,tmp_val,tmp_der);
+    bf_values.push_back(tmp_val);
+  }
+  //
+  size_t stride=1;
+  size_t rank=0;
+  if(comm_in!=NULL)
+  {
+    stride=comm_in->Get_size();
+    rank=comm_in->Get_rank();
+  }
+  // loop over basis set
+  for(size_t i=rank;i<coeffs_pntr_in->numberOfCoeffs();i+=stride){
+    std::vector<unsigned int> indices=coeffs_pntr_in->getIndices(i);
+    double bf_curr=1.0;
+    for(unsigned int k=0;k<nargs;k++){
+      bf_curr*=bf_values[k][indices[k]];
+    }
+    basisset_values[i] = bf_curr;
+  }
+  //
+  if(comm_in!=NULL){
+    comm_in->Sum(basisset_values);
+  }
+}
+
+
+void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values) {
+  getBasisSetValues(args_values,basisset_values,basisf_pntrs, bias_coeffs_pntr, &mycomm);
+}
+
+
+
 void LinearBasisSetExpansion::setupUniformTargetDistribution() {
   std::vector< std::vector <double> > bf_integrals;
   //
