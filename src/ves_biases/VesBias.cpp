@@ -41,16 +41,16 @@ VesBias::VesBias(const ActionOptions&ao):
 Action(ao),
 Bias(ao),
 ncoeffssets_(0),
-coeffs_pntrs(0),
-coeffderivs_aver_ps_pntrs(0),
-gradient_pntrs(0),
-hessian_pntrs(0),
+coeffs_pntrs_(0),
+coeffderivs_aver_ps_pntrs_(0),
+gradient_pntrs_(0),
+hessian_pntrs_(0),
 coeffderivs_aver_sampled(0),
 coeffderivs_cov_sampled(0),
 use_multiple_coeffssets_(false),
 coeffs_fnames(0),
 ncoeffs_total_(0),
-optimizer_pntr(NULL),
+optimizer_pntr_(NULL),
 optimize_coeffs_(false),
 compute_hessian_(false),
 diagonal_hessian_(true),
@@ -78,17 +78,17 @@ kbt_(0.0)
 
 
 VesBias::~VesBias(){
-  for(unsigned int i=0; i<coeffs_pntrs.size(); i++){
-    delete coeffs_pntrs[i];
+  for(unsigned int i=0; i<coeffs_pntrs_.size(); i++){
+    delete coeffs_pntrs_[i];
   }
-  for(unsigned int i=0; i<coeffderivs_aver_ps_pntrs.size(); i++){
-    delete coeffderivs_aver_ps_pntrs[i];
+  for(unsigned int i=0; i<coeffderivs_aver_ps_pntrs_.size(); i++){
+    delete coeffderivs_aver_ps_pntrs_[i];
   }
-  for(unsigned int i=0; i<gradient_pntrs.size(); i++){
-    delete gradient_pntrs[i];
+  for(unsigned int i=0; i<gradient_pntrs_.size(); i++){
+    delete gradient_pntrs_[i];
   }
-  for(unsigned int i=0; i<hessian_pntrs.size(); i++){
-    delete hessian_pntrs[i];
+  for(unsigned int i=0; i<hessian_pntrs_.size(); i++){
+    delete hessian_pntrs_[i];
   }
 }
 
@@ -131,21 +131,21 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   label = labelString("coeffs",ncoeffssets_);
   coeffs_pntr_in->setLabels(label);
 
-  coeffs_pntrs.push_back(coeffs_pntr_in);
+  coeffs_pntrs_.push_back(coeffs_pntr_in);
   CoeffsVector* aver_ps_tmp = new CoeffsVector(*coeffs_pntr_in);
   label = labelString("ps-aver",ncoeffssets_);
   aver_ps_tmp->setLabels(label);
   aver_ps_tmp->setValues(0.0);
-  coeffderivs_aver_ps_pntrs.push_back(aver_ps_tmp);
+  coeffderivs_aver_ps_pntrs_.push_back(aver_ps_tmp);
   //
   CoeffsVector* gradient_tmp = new CoeffsVector(*coeffs_pntr_in);
   label = labelString("gradient",ncoeffssets_);
   gradient_tmp->setLabels(label);
-  gradient_pntrs.push_back(gradient_tmp);
+  gradient_pntrs_.push_back(gradient_tmp);
   //
   label = labelString("hessian",ncoeffssets_);
   CoeffsMatrix* hessian_tmp = new CoeffsMatrix(label,coeffs_pntr_in,comm,diagonal_hessian_);
-  hessian_pntrs.push_back(hessian_tmp);
+  hessian_pntrs_.push_back(hessian_tmp);
   //
   std::vector<double> aver_sampled_tmp;
   aver_sampled_tmp.assign(coeffs_pntr_in->numberOfCoeffs(),0.0);
@@ -160,7 +160,7 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
 
 
 void VesBias::clearCoeffsPntrsVector() {
-  coeffs_pntrs.clear();
+  coeffs_pntrs_.clear();
 }
 
 
@@ -179,17 +179,17 @@ void VesBias::readCoeffsFromFiles() {
       IFile ifile;
       ifile.link(*this);
       ifile.open(coeffs_fnames[i]);
-      if(!ifile.FieldExist(coeffs_pntrs[i]->getDataLabel())){
-        std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + coeffs_pntrs[i]->getDataLabel() + "\n";
+      if(!ifile.FieldExist(coeffs_pntrs_[i]->getDataLabel())){
+        std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + coeffs_pntrs_[i]->getDataLabel() + "\n";
         plumed_merror(error_msg);
       }
-      size_t ncoeffs_read = coeffs_pntrs[i]->readFromFile(ifile,false,false);
-      coeffs_pntrs[i]->setIterationCounterAndTime(0,getTime());
+      size_t ncoeffs_read = coeffs_pntrs_[i]->readFromFile(ifile,false,false);
+      coeffs_pntrs_[i]->setIterationCounterAndTime(0,getTime());
       if(ncoeffssets_==1){
-        log.printf("%s (read %zu of %zu values)\n", ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+        log.printf("%s (read %zu of %zu values)\n", ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs_[i]->numberOfCoeffs());
       }
       else{
-        log.printf("   coefficent %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+        log.printf("   coefficent %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs_[i]->numberOfCoeffs());
       }
       ifile.close();
     }
@@ -264,11 +264,11 @@ void VesBias::setCoeffsDerivsOverTargetDistToZero(const unsigned coeffs_id) {
 
 void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
   //
-  if(optimizer_pntr==NULL){
-    optimizer_pntr = optimizer_pntr_in;
+  if(optimizer_pntr_==NULL){
+    optimizer_pntr_ = optimizer_pntr_in;
   }
   else {
-    std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + " has already been linked with optimizer " + optimizer_pntr->getLabel() + " of type " + optimizer_pntr->getName() + ". You cannot link two optimizer to the same VES bias.";
+    std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + " has already been linked with optimizer " + optimizer_pntr_->getLabel() + " of type " + optimizer_pntr_->getName() + ". You cannot link two optimizer to the same VES bias.";
     plumed_merror(err_msg);
   }
   //
@@ -286,11 +286,11 @@ void VesBias::enableHessian(const bool diagonal_hessian) {
   diagonal_hessian_=diagonal_hessian;
   coeffderivs_cov_sampled.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
-    delete hessian_pntrs[i];
+    delete hessian_pntrs_[i];
     std::string label = labelString("hessian",i);
-    hessian_pntrs[i] = new CoeffsMatrix(label,coeffs_pntrs[i],comm,diagonal_hessian_);
+    hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
     std::vector<double> cov_sampled_tmp;
-    cov_sampled_tmp.assign(hessian_pntrs[i]->getSize(),0.0);
+    cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
     coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
   }
 }
@@ -301,11 +301,11 @@ void VesBias::disableHessian() {
   diagonal_hessian_=true;
   coeffderivs_cov_sampled.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
-    delete hessian_pntrs[i];
+    delete hessian_pntrs_[i];
     std::string label = labelString("hessian",i);
-    hessian_pntrs[i] = new CoeffsMatrix(label,coeffs_pntrs[i],comm,diagonal_hessian_);
+    hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
     std::vector<double> cov_sampled_tmp;
-    cov_sampled_tmp.assign(hessian_pntrs[i]->getSize(),0.0);
+    cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
     coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
   }
 }

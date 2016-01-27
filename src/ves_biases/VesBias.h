@@ -58,10 +58,10 @@ public Bias
 {
 private:
   unsigned int ncoeffssets_;
-  std::vector<CoeffsVector*> coeffs_pntrs;
-  std::vector<CoeffsVector*> coeffderivs_aver_ps_pntrs;
-  std::vector<CoeffsVector*> gradient_pntrs;
-  std::vector<CoeffsMatrix*> hessian_pntrs;
+  std::vector<CoeffsVector*> coeffs_pntrs_;
+  std::vector<CoeffsVector*> coeffderivs_aver_ps_pntrs_;
+  std::vector<CoeffsVector*> gradient_pntrs_;
+  std::vector<CoeffsMatrix*> hessian_pntrs_;
   std::vector<std::vector<double> > coeffderivs_aver_sampled;
   std::vector<std::vector<double> >coeffderivs_cov_sampled;
   bool use_multiple_coeffssets_;
@@ -70,7 +70,7 @@ private:
   //
   size_t ncoeffs_total_;
   //
-  Optimizer* optimizer_pntr;
+  Optimizer* optimizer_pntr_;
   bool optimize_coeffs_;
   //
   bool compute_hessian_;
@@ -106,15 +106,15 @@ public:
   //
   void apply();
   //
-  std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs;}
-  std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs;}
-  std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs;}
-  std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs;}
+  std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
+  std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
+  std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}
+  std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs_;}
   //
-  CoeffsVector* getCoeffsPntr(const unsigned int coeffs_id = 0) const {return coeffs_pntrs[coeffs_id];}
-  CoeffsVector* getCoeffDerivsAverTargetDistPntr(const unsigned int coeffs_id = 0) const {return coeffderivs_aver_ps_pntrs[coeffs_id];}
-  CoeffsVector* getGradientPntr(const unsigned int coeffs_id = 0)const {return gradient_pntrs[coeffs_id];}
-  CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs[coeffs_id];}
+  CoeffsVector* getCoeffsPntr(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id];}
+  CoeffsVector* getCoeffDerivsAverTargetDistPntr(const unsigned int coeffs_id = 0) const {return coeffderivs_aver_ps_pntrs_[coeffs_id];}
+  CoeffsVector* getGradientPntr(const unsigned int coeffs_id = 0)const {return gradient_pntrs_[coeffs_id];}
+  CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs_[coeffs_id];}
 
   //
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const;
@@ -154,7 +154,7 @@ public:
 };
 
 inline
-size_t VesBias::numberOfCoeffs(const unsigned int coeffs_id) const {return coeffs_pntrs[coeffs_id]->numberOfCoeffs();}
+size_t VesBias::numberOfCoeffs(const unsigned int coeffs_id) const {return coeffs_pntrs_[coeffs_id]->numberOfCoeffs();}
 
 inline
 unsigned int VesBias::numberOfCoeffsSets() const {return ncoeffssets_;}
@@ -163,16 +163,16 @@ inline
 size_t VesBias::totalNumberOfCoeffs() const {return ncoeffs_total_;}
 
 inline
-CoeffsVector& VesBias::Coeffs(const unsigned int coeffs_id) const {return *coeffs_pntrs[coeffs_id];}
+CoeffsVector& VesBias::Coeffs(const unsigned int coeffs_id) const {return *coeffs_pntrs_[coeffs_id];}
 
 inline
-CoeffsVector& VesBias::CoeffDerivsAverTargetDist(const unsigned int coeffs_id) const {return *coeffderivs_aver_ps_pntrs[coeffs_id];}
+CoeffsVector& VesBias::CoeffDerivsAverTargetDist(const unsigned int coeffs_id) const {return *coeffderivs_aver_ps_pntrs_[coeffs_id];}
 
 inline
-CoeffsVector& VesBias::Gradient(const unsigned int coeffs_id) const {return *gradient_pntrs[coeffs_id];}
+CoeffsVector& VesBias::Gradient(const unsigned int coeffs_id) const {return *gradient_pntrs_[coeffs_id];}
 
 inline
-CoeffsMatrix& VesBias::Hessian(const unsigned int coeffs_id) const {return *hessian_pntrs[coeffs_id];}
+CoeffsMatrix& VesBias::Hessian(const unsigned int coeffs_id) const {return *hessian_pntrs_[coeffs_id];}
 
 inline
 double VesBias::getKbT() const {return kbt_;}
@@ -181,13 +181,13 @@ inline
 double VesBias::getBeta() const {return 1.0/kbt_;}
 
 inline
-size_t VesBias::getCoeffsIndex(const std::vector<unsigned int>& indices, const unsigned int coeffs_id) const {return coeffs_pntrs[coeffs_id]->getIndex(indices);}
+size_t VesBias::getCoeffsIndex(const std::vector<unsigned int>& indices, const unsigned int coeffs_id) const {return coeffs_pntrs_[coeffs_id]->getIndex(indices);}
 
 inline
-std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const unsigned int coeffs_id) const {return coeffs_pntrs[coeffs_id]->getIndices(index);}
+std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const unsigned int coeffs_id) const {return coeffs_pntrs_[coeffs_id]->getIndices(index);}
 
 inline
-size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id) const {return hessian_pntrs[coeffs_id]->getMatrixIndex(index1,index2);}
+size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id) const {return hessian_pntrs_[coeffs_id]->getMatrixIndex(index1,index2);}
 
 
 template<class T>
