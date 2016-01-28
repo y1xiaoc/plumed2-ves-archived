@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
+#include "ves_biases/VesBias.h"
 
 #include "core/Value.h"
 #include "tools/Grid.h"
@@ -43,7 +44,9 @@ TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
 type(to.words[0]),
 input(to.words),
 normalized_(false),
-dimension_(1)
+dimension_(1),
+action_pntr_(NULL),
+vesbias_pntr_(NULL)
 {
   input.erase( input.begin() );
 }
@@ -55,6 +58,17 @@ TargetDistribution::~TargetDistribution() {
 
 void TargetDistribution::setDimension(const unsigned int dimension){
   dimension_=dimension;
+}
+
+
+void TargetDistribution::linkVesBias(bias::VesBias* vesbias_pntr_in){
+  vesbias_pntr_ = vesbias_pntr_in;
+  action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
+}
+
+
+void TargetDistribution::linkAction(Action* action_pntr_in){
+  action_pntr_ = action_pntr_in;
 }
 
 

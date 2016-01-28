@@ -36,7 +36,13 @@ namespace PLMD{
 Abstract base class for implenting new 1D basis sets.
 */
 
+class Action;
 class TargetDistribution;
+
+namespace bias{
+  class VesBias;
+}
+
 
 class BasisFunctions :
   public ActionWithValue
@@ -81,6 +87,9 @@ private:
   unsigned int nbins_;
   // the integrals of the basis functions over the interval on which they are defined
   std::vector <double> uniform_integrals_;
+  //
+  bias::VesBias* vesbias_pntr_;
+  Action* action_pntr_;
 protected:
   // setup various stuff
   void setupBF();
@@ -139,6 +148,11 @@ public:
   std::string getBasisFunctionLabel(const unsigned int) const;
   std::vector<std::string> getBasisFunctionLabels() const;
   //
+  void linkVesBias(bias::VesBias*);
+  void linkAction(Action*);
+  bias::VesBias* getPntrToVesBias() const;
+  Action* getPntrToAction() const;
+  //
   double translateArgument(const double, bool&) const;
   //
   void apply(){};
@@ -151,6 +165,20 @@ public:
   void printInfo() const;
 
 };
+
+
+inline
+bias::VesBias* BasisFunctions::getPntrToVesBias() const {
+  plumed_massert(vesbias_pntr_!=NULL,"the VES bias has not been linked");
+  return vesbias_pntr_;
+}
+
+
+inline
+Action* BasisFunctions::getPntrToAction() const {
+  plumed_massert(action_pntr_!=NULL,"the action has not been linked");
+  return action_pntr_;
+}
 
 
 inline

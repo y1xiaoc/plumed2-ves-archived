@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "BasisFunctions.h"
 #include "ves_targetdistributions/TargetDistribution.h"
+#include "ves_biases/VesBias.h"
 
 namespace PLMD{
 
@@ -59,7 +60,9 @@ interval_mean_(0.0),
 argT_derivf_(1.0),
 numerical_uniform_integrals_(false),
 nbins_(1001),
-uniform_integrals_(nbasis_,0.0)
+uniform_integrals_(nbasis_,0.0),
+vesbias_pntr_(NULL),
+action_pntr_(NULL)
 {
   bf_keywords_.push_back(getName());
   parse("ORDER",norder_); addKeywordToList("ORDER",norder_);
@@ -149,6 +152,17 @@ void BasisFunctions::printInfo() const {
     for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2u       %16.10f\n",i,uniform_integrals_[i]);}
     log.printf("   --------------------------\n");
   }
+}
+
+
+void BasisFunctions::linkVesBias(bias::VesBias* vesbias_pntr_in){
+  vesbias_pntr_ = vesbias_pntr_in;
+  action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
+}
+
+
+void BasisFunctions::linkAction(Action* action_pntr_in){
+  action_pntr_ = action_pntr_in;
 }
 
 

@@ -31,6 +31,11 @@ namespace PLMD {
 
 class Grid;
 class Keywords;
+class Action;
+
+namespace bias{
+  class VesBias;
+}
 
 class TargetDistributionOptions{
 friend class TargetDistributionRegister;
@@ -51,6 +56,9 @@ private:
   bool normalized_;
   // dimension of the distribution
   unsigned int dimension_;
+  //
+  Action* action_pntr_;
+  bias::VesBias* vesbias_pntr_;
 protected:
   // Read a keywords from the input
   template <class T>
@@ -86,6 +94,11 @@ public:
   unsigned getDimension() const {return dimension_;}
   // get type of distribution
   std::string getType()const{return type;};
+  //
+  void linkVesBias(bias::VesBias*);
+  void linkAction(Action*);
+  bias::VesBias* getPntrToVesBias() const;
+  Action* getPntrToAction() const;
   // calculate the target distribution itself
   virtual double getValue(const std::vector<double>&) const = 0;
   // write the distribution out to file
@@ -93,6 +106,20 @@ public:
   void calculateDistributionOnGrid(Grid*);
   virtual void update() {};
 };
+
+
+inline
+bias::VesBias* TargetDistribution::getPntrToVesBias() const {
+  plumed_massert(vesbias_pntr_!=NULL,"the VES bias has not been linked");
+  return vesbias_pntr_;
+}
+
+
+inline
+Action* TargetDistribution::getPntrToAction() const {
+  plumed_massert(action_pntr_!=NULL,"the action has not been linked");
+  return action_pntr_;
+}
 
 
 template <class T>
