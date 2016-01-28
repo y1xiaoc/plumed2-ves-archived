@@ -77,15 +77,15 @@ private:
   std::vector<OFile*> hessianOFiles_;
   //
   unsigned int nbiases_;
-  std::vector<bias::VesBias*> bias_pntrs;
+  std::vector<bias::VesBias*> bias_pntrs_;
   //
   unsigned int ncoeffssets_;
-  std::vector<CoeffsVector*> coeffs_pntrs;
-  std::vector<CoeffsVector*> aux_coeffs_pntrs;
-  std::vector<CoeffsVector*> gradient_pntrs;
-  std::vector<CoeffsVector*> aver_gradient_pntrs;
-  std::vector<CoeffsMatrix*> hessian_pntrs;
-  std::vector<CoeffsVector*> coeffs_mask_pntrs;
+  std::vector<CoeffsVector*> coeffs_pntrs_;
+  std::vector<CoeffsVector*> aux_coeffs_pntrs_;
+  std::vector<CoeffsVector*> gradient_pntrs_;
+  std::vector<CoeffsVector*> aver_gradient_pntrs_;
+  std::vector<CoeffsMatrix*> hessian_pntrs_;
+  std::vector<CoeffsVector*> coeffs_mask_pntrs_;
   //
   bool identical_coeffs_shape_;
   //
@@ -166,33 +166,33 @@ public:
   //
   bool useMultipleWalkers() const {return use_mwalkers_mpi_;}
   //
-  std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs;}
-  std::vector<CoeffsVector*> getAuxCoeffsPntrs() const {return aux_coeffs_pntrs;}
-  std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs;}
-  std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs;}
-  std::vector<CoeffsVector*> getCoeffsMaskPntrs() const {return coeffs_mask_pntrs;}
+  std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
+  std::vector<CoeffsVector*> getAuxCoeffsPntrs() const {return aux_coeffs_pntrs_;}
+  std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}
+  std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs_;}
+  std::vector<CoeffsVector*> getCoeffsMaskPntrs() const {return coeffs_mask_pntrs_;}
   };
 
 inline
 double Optimizer::StepSize(const unsigned int coeffs_id) const {return stepsizes_[coeffs_id];}
 
 inline
-CoeffsVector& Optimizer::Coeffs(const unsigned int coeffs_id) const {return *coeffs_pntrs[coeffs_id];}
+CoeffsVector& Optimizer::Coeffs(const unsigned int coeffs_id) const {return *coeffs_pntrs_[coeffs_id];}
 
 inline
-CoeffsVector& Optimizer::AuxCoeffs(const unsigned int coeffs_id) const {return *aux_coeffs_pntrs[coeffs_id];}
+CoeffsVector& Optimizer::AuxCoeffs(const unsigned int coeffs_id) const {return *aux_coeffs_pntrs_[coeffs_id];}
 
 inline
-CoeffsVector& Optimizer::Gradient(const unsigned int coeffs_id) const {return *gradient_pntrs[coeffs_id];}
+CoeffsVector& Optimizer::Gradient(const unsigned int coeffs_id) const {return *gradient_pntrs_[coeffs_id];}
 
 inline
 CoeffsMatrix& Optimizer::Hessian(const unsigned int coeffs_id) const {
   plumed_massert(use_hessian_,"You cannot use the Hessian without asking for before");
-  return *hessian_pntrs[coeffs_id];
+  return *hessian_pntrs_[coeffs_id];
 }
 
 inline
-CoeffsVector& Optimizer::CoeffsMask(const unsigned int coeffs_id) const {return *coeffs_mask_pntrs[coeffs_id];}
+CoeffsVector& Optimizer::CoeffsMask(const unsigned int coeffs_id) const {return *coeffs_mask_pntrs_[coeffs_id];}
 
 inline
 std::vector<double> Optimizer::getStepSizes() const {return stepsizes_;}

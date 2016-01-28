@@ -58,14 +58,14 @@ gradientOFiles_(0),
 hessian_wstride_(100),
 hessianOFiles_(0),
 nbiases_(0),
-bias_pntrs(0),
+bias_pntrs_(0),
 ncoeffssets_(0),
-coeffs_pntrs(0),
-aux_coeffs_pntrs(0),
-gradient_pntrs(0),
-aver_gradient_pntrs(0),
-hessian_pntrs(0),
-coeffs_mask_pntrs(0),
+coeffs_pntrs_(0),
+aux_coeffs_pntrs_(0),
+gradient_pntrs_(0),
+aver_gradient_pntrs_(0),
+hessian_pntrs_(0),
+coeffs_mask_pntrs_(0),
 identical_coeffs_shape_(true)
 {
   std::vector<std::string> bias_labels(0);
@@ -73,24 +73,24 @@ identical_coeffs_shape_(true)
   plumed_massert(bias_labels.size()>0,"problem with BIAS keyword");
   nbiases_ = bias_labels.size();
   //
-  bias_pntrs.resize(nbiases_);
+  bias_pntrs_.resize(nbiases_);
   //
   for(unsigned int i=0; i<nbiases_; i++) {
-    bias_pntrs[i]=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_labels[i]);
-    if(!bias_pntrs[i]){plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES biases.");}
+    bias_pntrs_[i]=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_labels[i]);
+    if(!bias_pntrs_[i]){plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES biases.");}
     //
-    bias_pntrs[i]->linkOptimizer(this);
+    bias_pntrs_[i]->linkOptimizer(this);
     //
-    std::vector<CoeffsVector*> pntrs_coeffs = bias_pntrs[i]->getCoeffsPntrs();
-    std::vector<CoeffsVector*> pntrs_gradient = bias_pntrs[i]->getGradientPntrs();
+    std::vector<CoeffsVector*> pntrs_coeffs = bias_pntrs_[i]->getCoeffsPntrs();
+    std::vector<CoeffsVector*> pntrs_gradient = bias_pntrs_[i]->getGradientPntrs();
     plumed_massert(pntrs_coeffs.size()==pntrs_gradient.size(),"something wrong in the coefficients and gradient passed from VES bias");
     for(unsigned int k=0; k<pntrs_coeffs.size(); k++){
       plumed_massert(pntrs_coeffs[k] != NULL,"some coefficient is not linked correctly");
       plumed_massert(pntrs_gradient[k] != NULL,"some gradient is not linked correctly");
       pntrs_coeffs[k]->turnOnIterationCounter();
-      coeffs_pntrs.push_back(pntrs_coeffs[k]);
+      coeffs_pntrs_.push_back(pntrs_coeffs[k]);
       pntrs_gradient[k]->turnOnIterationCounter();
-      gradient_pntrs.push_back(pntrs_gradient[k]);
+      gradient_pntrs_.push_back(pntrs_gradient[k]);
       //
       CoeffsVector* aux_coeffs_tmp = new CoeffsVector(*pntrs_coeffs[k]);
       std::string aux_label = pntrs_coeffs[k]->getLabel();
@@ -101,13 +101,13 @@ identical_coeffs_shape_(true)
         aux_label += "_aux";
       }
       aux_coeffs_tmp->setLabels(aux_label);
-      aux_coeffs_pntrs.push_back(aux_coeffs_tmp);
+      aux_coeffs_pntrs_.push_back(aux_coeffs_tmp);
       AuxCoeffs(i) = Coeffs(i);
     }
   }
-  ncoeffssets_ = coeffs_pntrs.size();
-  plumed_massert(aux_coeffs_pntrs.size()==ncoeffssets_,"problems in linking aux coefficients");
-  plumed_massert(gradient_pntrs.size()==ncoeffssets_,"problems in linking gradients");
+  ncoeffssets_ = coeffs_pntrs_.size();
+  plumed_massert(aux_coeffs_pntrs_.size()==ncoeffssets_,"problems in linking aux coefficients");
+  plumed_massert(gradient_pntrs_.size()==ncoeffssets_,"problems in linking gradients");
   setAllCoeffsSetIterationCounters();
 
 
@@ -115,7 +115,7 @@ identical_coeffs_shape_(true)
   //
   identical_coeffs_shape_ = true;
   for(unsigned int i=1; i<ncoeffssets_; i++) {
-    if(!coeffs_pntrs[0]->sameShape(*coeffs_pntrs[i])){
+    if(!coeffs_pntrs_[0]->sameShape(*coeffs_pntrs_[i])){
       identical_coeffs_shape_ = false;
       break;
     }
@@ -135,9 +135,9 @@ identical_coeffs_shape_(true)
   }
   //
   if(ncoeffssets_==1){
-    log.printf("  optimizing VES bias %s with label %s: \n",bias_pntrs[0]->getName().c_str(),bias_pntrs[0]->getLabel().c_str());
-    log.printf("   KbT: %f\n",bias_pntrs[0]->getKbT());
-    log.printf("  number of coefficients: %zu\n",coeffs_pntrs[0]->numberOfCoeffs());
+    log.printf("  optimizing VES bias %s with label %s: \n",bias_pntrs_[0]->getName().c_str(),bias_pntrs_[0]->getLabel().c_str());
+    log.printf("   KbT: %f\n",bias_pntrs_[0]->getKbT());
+    log.printf("  number of coefficients: %zu\n",coeffs_pntrs_[0]->numberOfCoeffs());
     if(stepsizes_.size()>0){
       if(fixed_stepsize_){log.printf("  using a constant step size of %f\n",stepsizes_[0]);}
       else{log.printf("  using an initial step size of %f\n",stepsizes_[0]);}
@@ -146,18 +146,18 @@ identical_coeffs_shape_(true)
   else {
     log.printf("  optimizing %u coefficent sets from following %u VES biases:\n",ncoeffssets_,nbiases_);
     for(unsigned int i=0; i<nbiases_; i++) {
-      log.printf("   %s of type %s (KbT: %f) \n",bias_pntrs[i]->getLabel().c_str(),bias_pntrs[i]->getName().c_str(),bias_pntrs[i]->getKbT());
+      log.printf("   %s of type %s (KbT: %f) \n",bias_pntrs_[i]->getLabel().c_str(),bias_pntrs_[i]->getName().c_str(),bias_pntrs_[i]->getKbT());
     }
     size_t tot_ncoeffs = 0;
     for(unsigned int i=0; i<ncoeffssets_; i++) {
       log.printf("  coefficient set %u: \n",i);
-      log.printf("   used in bias %s (type %s)\n",coeffs_pntrs[i]->getPntrToAction()->getLabel().c_str(),coeffs_pntrs[i]->getPntrToAction()->getName().c_str());
-      log.printf("   number of coefficients: %zu\n",coeffs_pntrs[i]->numberOfCoeffs());
+      log.printf("   used in bias %s (type %s)\n",coeffs_pntrs_[i]->getPntrToAction()->getLabel().c_str(),coeffs_pntrs_[i]->getPntrToAction()->getName().c_str());
+      log.printf("   number of coefficients: %zu\n",coeffs_pntrs_[i]->numberOfCoeffs());
       if(stepsizes_.size()>0){
         if(fixed_stepsize_){log.printf("   using a constant step size of %f\n",stepsizes_[i]);}
         else{log.printf("   using an initial step size of %f\n",stepsizes_[i]);}
       }
-      tot_ncoeffs += coeffs_pntrs[i]->numberOfCoeffs();
+      tot_ncoeffs += coeffs_pntrs_[i]->numberOfCoeffs();
     }
     log.printf("  total number of coefficients: %zu\n",tot_ncoeffs);
     if(identical_coeffs_shape_){
@@ -199,7 +199,7 @@ identical_coeffs_shape_(true)
   if(keywords.exists("TARGETDISTRIBUTION_STRIDE")){
     bool need_stride = false;
     for(unsigned int i=0; i<nbiases_; i++){
-      dynamic_targetdists_[i] = bias_pntrs[i]->dynamicTargetDistribution();
+      dynamic_targetdists_[i] = bias_pntrs_[i]->dynamicTargetDistribution();
       if(dynamic_targetdists_[i]){need_stride = true;}
     }
     parse("TARGETDISTRIBUTION_STRIDE",ustride_targetdist_);
@@ -216,7 +216,7 @@ identical_coeffs_shape_(true)
       else{
         log.printf("  the target distribution will be updated very %u coefficent iterations for the following biases\n   ",ustride_targetdist_);
         for(unsigned int i=0; i<nbiases_; i++){
-          log.printf("%s ",bias_pntrs[i]->getLabel().c_str());
+          log.printf("%s ",bias_pntrs_[i]->getLabel().c_str());
         }
         log.printf("\n");
       }
@@ -229,9 +229,9 @@ identical_coeffs_shape_(true)
     if(monitor_aver_gradient){
       unsigned int averaging_exp_decay=0;
       parse("MONITOR_AVERAGES_EXP_DECAY",averaging_exp_decay);
-      aver_gradient_pntrs.clear();
+      aver_gradient_pntrs_.clear();
       for(unsigned int i=0; i<ncoeffssets_; i++){
-        CoeffsVector* aver_gradient_tmp = new CoeffsVector(*gradient_pntrs[i]);
+        CoeffsVector* aver_gradient_tmp = new CoeffsVector(*gradient_pntrs_[i]);
         aver_gradient_tmp->clear();
         std::string aver_grad_label = aver_gradient_tmp->getLabel();
         if(aver_grad_label.find("gradient")!=std::string::npos){
@@ -244,7 +244,7 @@ identical_coeffs_shape_(true)
         if(averaging_exp_decay>0){
           aver_gradient_tmp->setupExponentiallyDecayingAveraging(averaging_exp_decay);
         }
-        aver_gradient_pntrs.push_back(aver_gradient_tmp);
+        aver_gradient_pntrs_.push_back(aver_gradient_tmp);
       }
     }
   }
@@ -284,9 +284,9 @@ identical_coeffs_shape_(true)
   }
   if(getRestart()){
     readCoeffsFromFiles(coeffs_fnames,true);
-    unsigned int iter_opt_tmp = coeffs_pntrs[0]->getIterationCounter();
+    unsigned int iter_opt_tmp = coeffs_pntrs_[0]->getIterationCounter();
     for(unsigned int i=1; i<ncoeffssets_; i++){
-      plumed_massert(coeffs_pntrs[i]->getIterationCounter()==iter_opt_tmp,"the iteraton counter should be the same for all files when restarting from previous coefficient files\n");
+      plumed_massert(coeffs_pntrs_[i]->getIterationCounter()==iter_opt_tmp,"the iteraton counter should be the same for all files when restarting from previous coefficient files\n");
     }
     if(start_opt_afresh){
       setIterationCounter(0);
@@ -296,7 +296,7 @@ identical_coeffs_shape_(true)
       }
     }
     else{
-      setIterationCounter(coeffs_pntrs[0]->getIterationCounter());
+      setIterationCounter(coeffs_pntrs_[0]->getIterationCounter());
       log.printf("  Optimization restarted at iteration %u\n",getIterationCounter());
     }
     setAllCoeffsSetIterationCounters();
@@ -313,7 +313,7 @@ identical_coeffs_shape_(true)
   }
   setupOFiles(coeffs_fnames,coeffsOFiles_);
   for(unsigned int i=0; i<coeffsOFiles_.size();i++){
-    coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false);
+    coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
   }
 
   if(coeffs_fnames.size()>0){
@@ -341,11 +341,11 @@ identical_coeffs_shape_(true)
   }
   setupOFiles(gradient_fnames,gradientOFiles_);
   for(unsigned int i=0; i<gradientOFiles_.size(); i++){
-    if(aver_gradient_pntrs.size()==0){
-      gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
+    if(aver_gradient_pntrs_.size()==0){
+      gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],false);
     }
     else{
-      gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs[i],false);
+      gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs_[i],false);
     }
   }
 
@@ -397,27 +397,27 @@ identical_coeffs_shape_(true)
       plumed_merror("Error in MASK_FILE keyword: either give one value for all biases or a separate value for each coefficient set");
     }
 
-    coeffs_mask_pntrs.resize(ncoeffssets_);
+    coeffs_mask_pntrs_.resize(ncoeffssets_);
     for(unsigned int i=0; i<ncoeffssets_; i++){
-      coeffs_mask_pntrs[i] = new CoeffsVector(*coeffs_pntrs[i]);
-      coeffs_mask_pntrs[i]->setLabels("mask");
-      coeffs_mask_pntrs[i]->setValues(1.0);
-      coeffs_mask_pntrs[i]->setOutputFmt("%f");
+      coeffs_mask_pntrs_[i] = new CoeffsVector(*coeffs_pntrs_[i]);
+      coeffs_mask_pntrs_[i]->setLabels("mask");
+      coeffs_mask_pntrs_[i]->setValues(1.0);
+      coeffs_mask_pntrs_[i]->setOutputFmt("%f");
     }
 
     if(mask_fnames_in.size()>0){
       if(ncoeffssets_==1){
-        size_t nread = coeffs_mask_pntrs[0]->readFromFile(mask_fnames_in[0],true,true);
+        size_t nread = coeffs_mask_pntrs_[0]->readFromFile(mask_fnames_in[0],true,true);
         log.printf("  read %zu values from mask file %s\n",nread,mask_fnames_in[0].c_str());
-        size_t ndeactived = coeffs_mask_pntrs[0]->countValues(0.0);
+        size_t ndeactived = coeffs_mask_pntrs_[0]->countValues(0.0);
         log.printf("  deactived optimization of %zu coefficients\n",ndeactived);
       }
       else{
         for(unsigned int i=0; i<ncoeffssets_; i++){
-          size_t nread = coeffs_mask_pntrs[i]->readFromFile(mask_fnames_in[i],true,true);
+          size_t nread = coeffs_mask_pntrs_[i]->readFromFile(mask_fnames_in[i],true,true);
           log.printf("  mask for coefficent set %u:\n",i);
           log.printf("   read %zu values from file %s\n",nread,mask_fnames_in[i].c_str());
-          size_t ndeactived = coeffs_mask_pntrs[0]->countValues(0.0);
+          size_t ndeactived = coeffs_mask_pntrs_[0]->countValues(0.0);
           log.printf("   deactived optimization of %zu coefficients\n",ndeactived);
         }
       }
@@ -440,7 +440,7 @@ identical_coeffs_shape_(true)
         maskOFile.enforceSuffix("");
       }
       maskOFile.open(mask_fnames_out[i]);
-      coeffs_mask_pntrs[i]->writeToFile(maskOFile,true);
+      coeffs_mask_pntrs_[i]->writeToFile(maskOFile,true);
       maskOFile.close();
     }
   }
@@ -452,7 +452,7 @@ identical_coeffs_shape_(true)
     addComponent("gradrms"); componentIsNotPeriodic("gradrms");
     log.printf(" ");
     addComponent("gradmax"); componentIsNotPeriodic("gradmax");
-    if(aver_gradient_pntrs.size()>0){
+    if(aver_gradient_pntrs_.size()>0){
       log.printf(" ");
       addComponent("avergradrms"); componentIsNotPeriodic("avergradrms");
       log.printf(" ");
@@ -471,7 +471,7 @@ identical_coeffs_shape_(true)
       addComponent("gradrms"+is); componentIsNotPeriodic("gradrms"+is);
       log.printf(" ");
       addComponent("gradmax"+is); componentIsNotPeriodic("gradmax"+is);
-      if(aver_gradient_pntrs.size()>0){
+      if(aver_gradient_pntrs_.size()>0){
         log.printf(" ");
         addComponent("avergradrms"+is); componentIsNotPeriodic("avergradrms"+is);
         log.printf(" ");
@@ -487,15 +487,15 @@ identical_coeffs_shape_(true)
 
 
 Optimizer::~Optimizer() {
-  for(unsigned int i=0; i<aux_coeffs_pntrs.size(); i++){
-    delete aux_coeffs_pntrs[i];
+  for(unsigned int i=0; i<aux_coeffs_pntrs_.size(); i++){
+    delete aux_coeffs_pntrs_[i];
   }
-  aux_coeffs_pntrs.clear();
+  aux_coeffs_pntrs_.clear();
   //
-  for(unsigned int i=0; i<aver_gradient_pntrs.size(); i++){
-    delete aver_gradient_pntrs[i];
+  for(unsigned int i=0; i<aver_gradient_pntrs_.size(); i++){
+    delete aver_gradient_pntrs_[i];
   }
-  aver_gradient_pntrs.clear();
+  aver_gradient_pntrs_.clear();
   //
   for(unsigned int i=0; i<coeffsOFiles_.size(); i++){
     coeffsOFiles_[i]->close();
@@ -607,18 +607,18 @@ void Optimizer::useDynamicTargetDistributionKeywords(Keywords& keys) {
 
 
 void Optimizer::turnOnHessian() {
-  plumed_massert(hessian_pntrs.size()==0,"turnOnHessian() should only be run during initialization");
+  plumed_massert(hessian_pntrs_.size()==0,"turnOnHessian() should only be run during initialization");
   use_hessian_=true;
-  hessian_pntrs.clear();
+  hessian_pntrs_.clear();
   for(unsigned int i=0; i<nbiases_; i++){
-    std::vector<CoeffsMatrix*> pntrs_hessian = enableHessian(bias_pntrs[i],diagonal_hessian_);
+    std::vector<CoeffsMatrix*> pntrs_hessian = enableHessian(bias_pntrs_[i],diagonal_hessian_);
     for(unsigned int k=0; k<pntrs_hessian.size(); k++){
       pntrs_hessian[k]->turnOnIterationCounter();
       pntrs_hessian[k]->setIterationCounterAndTime(getIterationCounter(),getTime());
-      hessian_pntrs.push_back(pntrs_hessian[k]);
+      hessian_pntrs_.push_back(pntrs_hessian[k]);
     }
   }
-  plumed_massert(hessian_pntrs.size()==ncoeffssets_,"problems in linking Hessians");
+  plumed_massert(hessian_pntrs_.size()==ncoeffssets_,"problems in linking Hessians");
   if(diagonal_hessian_){
     log.printf("  Optimization performed using diagonal Hessian matrix\n");
   }
@@ -627,7 +627,7 @@ void Optimizer::turnOnHessian() {
   }
   //
   for(unsigned int i=0; i<hessianOFiles_.size(); i++){
-    hessian_pntrs[i]->writeToFile(*hessianOFiles_[i]);
+    hessian_pntrs_[i]->writeToFile(*hessianOFiles_[i]);
   }
 }
 
@@ -635,9 +635,9 @@ void Optimizer::turnOnHessian() {
 void Optimizer::turnOffHessian() {
   use_hessian_=false;
   for(unsigned int i=0; i<nbiases_; i++){
-    bias_pntrs[i]->disableHessian();
+    bias_pntrs_[i]->disableHessian();
   }
-  hessian_pntrs.clear();
+  hessian_pntrs_.clear();
   for(unsigned int i=0; i<hessianOFiles_.size(); i++){
     hessianOFiles_[i]->close();
     delete hessianOFiles_[i];
@@ -684,26 +684,26 @@ std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in,
 void Optimizer::update() {
   if(onStep() && getStep()!=0){
     for(unsigned int i=0; i<nbiases_; i++){
-      bias_pntrs[i]->updateGradientAndHessian();
+      bias_pntrs_[i]->updateGradientAndHessian();
     }
     for(unsigned int i=0; i<ncoeffssets_; i++){
       if(use_mwalkers_mpi_){
-        gradient_pntrs[i]->sumMultiSimCommMPI(multi_sim_comm);
-        if(use_hessian_){hessian_pntrs[i]->sumMultiSimCommMPI(multi_sim_comm);}
+        gradient_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);
+        if(use_hessian_){hessian_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);}
       }
       coeffsUpdate(i);
       // +1 as this is done before increaseIterationCounter() is used
       unsigned int curr_iter = getIterationCounter()+1;
       double curr_time = getTime();
-      coeffs_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
-      aux_coeffs_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
-      gradient_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      coeffs_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      aux_coeffs_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      gradient_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
       if(use_hessian_){
-        hessian_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
+        hessian_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
       }
-      if(aver_gradient_pntrs.size()>0){
-        aver_gradient_pntrs[i]->setIterationCounterAndTime(curr_iter,curr_time);
-        aver_gradient_pntrs[i]->addToAverage(*gradient_pntrs[i]);
+      if(aver_gradient_pntrs_.size()>0){
+        aver_gradient_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
+        aver_gradient_pntrs_[i]->addToAverage(*gradient_pntrs_[i]);
       }
     }
     increaseIterationCounter();
@@ -712,7 +712,7 @@ void Optimizer::update() {
     if(ustride_targetdist_>0 && iter_counter%ustride_targetdist_==0){
       for(unsigned int i=0; i<nbiases_; i++){
         if(dynamic_targetdists_[i]){
-          bias_pntrs[i]->updateTargetDistributions();
+          bias_pntrs_[i]->updateTargetDistributions();
         }
       }
     }
@@ -725,12 +725,12 @@ void Optimizer::updateOutputComponents() {
     if(!fixed_stepsize_){
       getPntrToComponent("stepsize")->set( getCurrentStepSize(0) );
     }
-    getPntrToComponent("gradrms")->set( gradient_pntrs[0]->getRMS() );
+    getPntrToComponent("gradrms")->set( gradient_pntrs_[0]->getRMS() );
     size_t gradient_maxabs_idx=0;
-    getPntrToComponent("gradmax")->set( gradient_pntrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
-    if(aver_gradient_pntrs.size()>0){
-      getPntrToComponent("avergradrms")->set( aver_gradient_pntrs[0]->getRMS() );
-      getPntrToComponent("avergradmax")->set( aver_gradient_pntrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
+    getPntrToComponent("gradmax")->set( gradient_pntrs_[0]->getMaxAbsValue(gradient_maxabs_idx) );
+    if(aver_gradient_pntrs_.size()>0){
+      getPntrToComponent("avergradrms")->set( aver_gradient_pntrs_[0]->getRMS() );
+      getPntrToComponent("avergradmax")->set( aver_gradient_pntrs_[0]->getMaxAbsValue(gradient_maxabs_idx) );
     }
   }
   else {
@@ -739,12 +739,12 @@ void Optimizer::updateOutputComponents() {
       if(!fixed_stepsize_){
         getPntrToComponent("stepsize"+is)->set( getCurrentStepSize(i) );
       }
-      getPntrToComponent("gradrms"+is)->set( gradient_pntrs[i]->getRMS() );
+      getPntrToComponent("gradrms"+is)->set( gradient_pntrs_[i]->getRMS() );
       size_t gradient_maxabs_idx=0;
-      getPntrToComponent("gradmax"+is)->set( gradient_pntrs[i]->getMaxAbsValue(gradient_maxabs_idx) );
-      if(aver_gradient_pntrs.size()>0){
-        getPntrToComponent("avergradrms"+is)->set( aver_gradient_pntrs[0]->getRMS() );
-        getPntrToComponent("avergradmax"+is)->set( aver_gradient_pntrs[0]->getMaxAbsValue(gradient_maxabs_idx) );
+      getPntrToComponent("gradmax"+is)->set( gradient_pntrs_[i]->getMaxAbsValue(gradient_maxabs_idx) );
+      if(aver_gradient_pntrs_.size()>0){
+        getPntrToComponent("avergradrms"+is)->set( aver_gradient_pntrs_[0]->getRMS() );
+        getPntrToComponent("avergradmax"+is)->set( aver_gradient_pntrs_[0]->getMaxAbsValue(gradient_maxabs_idx) );
       }
     }
   }
@@ -754,18 +754,18 @@ void Optimizer::updateOutputComponents() {
 void Optimizer::writeOutputFiles() {
   for(unsigned int i=0; i<ncoeffssets_; i++){
     if(coeffsOFiles_.size()>0 && iter_counter%coeffs_wstride_==0){
-      coeffs_pntrs[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs[i],false);
+      coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
     }
     if(gradientOFiles_.size()>0 && iter_counter%gradient_wstride_==0){
-      if(aver_gradient_pntrs.size()==0){
-        gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],false);
+      if(aver_gradient_pntrs_.size()==0){
+        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],false);
       }
       else{
-        gradient_pntrs[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs[i],false);
+        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs_[i],false);
       }
     }
     if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
-      hessian_pntrs[i]->writeToFile(*hessianOFiles_[i]);
+      hessian_pntrs_[i]->writeToFile(*hessianOFiles_[i]);
     }
   }
 }
@@ -782,13 +782,13 @@ void Optimizer::turnOffCoeffsOutputFiles() {
 
 void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
   if(coeffsOFiles_.size()>0 && iter_counter%coeffs_wstride_==0){
-    coeffs_pntrs[coeffs_id]->writeToFile(*coeffsOFiles_[coeffs_id],aux_coeffs_pntrs[coeffs_id],false);
+    coeffs_pntrs_[coeffs_id]->writeToFile(*coeffsOFiles_[coeffs_id],aux_coeffs_pntrs_[coeffs_id],false);
   }
   if(gradientOFiles_.size()>0 && iter_counter%gradient_wstride_==0){
-    gradient_pntrs[coeffs_id]->writeToFile(*gradientOFiles_[coeffs_id],false);
+    gradient_pntrs_[coeffs_id]->writeToFile(*gradientOFiles_[coeffs_id],false);
   }
   if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
-    hessian_pntrs[coeffs_id]->writeToFile(*hessianOFiles_[coeffs_id]);
+    hessian_pntrs_[coeffs_id]->writeToFile(*hessianOFiles_[coeffs_id]);
   }
 }
 
@@ -828,25 +828,25 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames, cons
       ifile.enforceSuffix("");
     }
     ifile.open(fnames[i]);
-    if(!ifile.FieldExist(coeffs_pntrs[i]->getDataLabel())){
-      std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + coeffs_pntrs[i]->getDataLabel() + "\n";
+    if(!ifile.FieldExist(coeffs_pntrs_[i]->getDataLabel())){
+      std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + coeffs_pntrs_[i]->getDataLabel() + "\n";
       plumed_merror(error_msg);
     }
-    size_t ncoeffs_read = coeffs_pntrs[i]->readFromFile(ifile,false,false);
+    size_t ncoeffs_read = coeffs_pntrs_[i]->readFromFile(ifile,false,false);
     if(ncoeffssets_==1){
-      log.printf("%s (read %zu of %zu values)\n", ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+      log.printf("%s (read %zu of %zu values)\n", ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs_[i]->numberOfCoeffs());
     }
     else{
-      log.printf("   coefficent set %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs[i]->numberOfCoeffs());
+      log.printf("   coefficent set %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs_[i]->numberOfCoeffs());
     }
     ifile.close();
     if(read_aux_coeffs){
       ifile.open(fnames[i]);
-      if(!ifile.FieldExist(aux_coeffs_pntrs[i]->getDataLabel())){
-        std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + aux_coeffs_pntrs[i]->getDataLabel() + "\n";
+      if(!ifile.FieldExist(aux_coeffs_pntrs_[i]->getDataLabel())){
+        std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + aux_coeffs_pntrs_[i]->getDataLabel() + "\n";
         plumed_merror(error_msg);
       }
-      aux_coeffs_pntrs[i]->readFromFile(ifile,false,false);
+      aux_coeffs_pntrs_[i]->readFromFile(ifile,false,false);
       ifile.close();
     }
     else{
@@ -873,11 +873,11 @@ void Optimizer::addCoeffsSetIDsToFilenames(std::vector<std::string>& fnames, std
 
 void Optimizer::setAllCoeffsSetIterationCounters(){
   for(unsigned int i=0; i<ncoeffssets_; i++){
-    coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
-    aux_coeffs_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
-    gradient_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    coeffs_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    aux_coeffs_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    gradient_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     if(use_hessian_){
-      hessian_pntrs[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+      hessian_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     }
   }
 }
