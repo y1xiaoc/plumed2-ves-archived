@@ -48,11 +48,11 @@ namespace bias{
 class VesLinearExpansion : public VesBias{
 private:
   unsigned int nargs_;
-  std::vector<BasisFunctions*> basisf_pntrs;
-  LinearBasisSetExpansion* bias_expansion_pntr;
+  std::vector<BasisFunctions*> basisf_pntrs_;
+  LinearBasisSetExpansion* bias_expansion_pntr_;
   size_t ncoeffs_;
-  Value* valueBias;
-  Value* valueForce2;
+  Value* valueBias_;
+  Value* valueForce2_;
 public:
   explicit VesLinearExpansion(const ActionOptions&);
   ~VesLinearExpansion();
@@ -72,44 +72,46 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
 PLUMED_VESBIAS_INIT(ao),
 nargs_(getNumberOfArguments()),
-basisf_pntrs(getNumberOfArguments(),NULL),
-bias_expansion_pntr(NULL)
+basisf_pntrs_(getNumberOfArguments(),NULL),
+bias_expansion_pntr_(NULL),
+valueBias_(NULL),
+valueForce2_(NULL)
 {
   std::vector<std::string> basisf_labels;
   parseMultipleValues("BASIS_FUNCTIONS",basisf_labels,nargs_);
   checkRead();
 
   for(unsigned int i=0; i<basisf_labels.size(); i++){
-    basisf_pntrs[i] = plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisf_labels[i]);
-    plumed_massert(basisf_pntrs[i]!=NULL,"basis function "+basisf_labels[i]+" does not exist. NOTE: the basis functions should always be defined BEFORE the VES bias.");
+    basisf_pntrs_[i] = plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisf_labels[i]);
+    plumed_massert(basisf_pntrs_[i]!=NULL,"basis function "+basisf_labels[i]+" does not exist. NOTE: the basis functions should always be defined BEFORE the VES bias.");
   }
 
   //
   std::vector<Value*> args_pntrs = getArguments();
-  addCoeffsSet(args_pntrs,basisf_pntrs);
+  addCoeffsSet(args_pntrs,basisf_pntrs_);
   ncoeffs_ = numberOfCoeffs();
 
 
 
-  bias_expansion_pntr = new LinearBasisSetExpansion(getLabel(),comm,args_pntrs,basisf_pntrs,getCoeffsPntr());
-  bias_expansion_pntr->linkVesBias(this);
+  bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
+  bias_expansion_pntr_->linkVesBias(this);
 
   //
-  bias_expansion_pntr->setupUniformTargetDistribution();
-  setCoeffsDerivsOverTargetDist(bias_expansion_pntr->CoeffDerivsAverTargetDist());
+  bias_expansion_pntr_->setupUniformTargetDistribution();
+  setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
   //
   readCoeffsFromFiles();
   //
   addComponent("bias"); componentIsNotPeriodic("bias");
-  valueBias=getPntrToComponent("bias");
+  valueBias_=getPntrToComponent("bias");
   addComponent("force2"); componentIsNotPeriodic("force2");
-  valueForce2=getPntrToComponent("force2");
+  valueForce2_=getPntrToComponent("force2");
 }
 
 
 VesLinearExpansion::~VesLinearExpansion() {
-  if(bias_expansion_pntr!=NULL){
-    delete bias_expansion_pntr;
+  if(bias_expansion_pntr_!=NULL){
+    delete bias_expansion_pntr_;
   }
 }
 
@@ -124,8 +126,8 @@ void VesLinearExpansion::calculate() {
     cv_values[k]=getArgument(k);
   }
 
-  double bias = bias_expansion_pntr->getBiasAndForces(cv_values,forces,coeffsderivs_values);
-  valueBias->set(bias);
+  double bias = bias_expansion_pntr_->getBiasAndForces(cv_values,forces,coeffsderivs_values);
+  valueBias_->set(bias);
 
   double totalForce2 = 0.0;
   for(unsigned int k=0; k<nargs_; k++){
@@ -133,7 +135,7 @@ void VesLinearExpansion::calculate() {
     totalForce2 += forces[k]*forces[k];
   }
 
-  valueForce2->set(totalForce2);
+  valueForce2_->set(totalForce2);
   setCoeffsDerivs(coeffsderivs_values);
 }
 
