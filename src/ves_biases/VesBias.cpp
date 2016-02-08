@@ -58,7 +58,9 @@ targetdist_keywords_(0),
 targetdist_pntrs_(0),
 dynamic_targetdist_(false),
 aver_counter(0.0),
-kbt_(0.0)
+kbt_(0.0),
+welltemp_biasf_(1.0),
+welltemp_targetdist_(false)
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -93,6 +95,19 @@ kbt_(0.0)
     }
   }
 
+  if(keywords.exists("BIAS_FACTOR")){
+    parse("BIAS_FACTOR",welltemp_biasf_);
+    if(welltemp_biasf_<1.0){
+      plumed_merror("the well-tempered bias factor doesn't make sense, it should be larger than 1.0");
+    }
+    if(welltemp_biasf_>1.0){
+      welltemp_targetdist_=true;
+      enableDynamicTargetDistribution();
+      if(targetdist_keywords_.size()>0){
+        plumed_merror("you cannot both specify a bias factor for a well-tempered target distribution using the BIAS_FACTOR keyword and give a target distribution with the TARGET_DISTRIBUTION keyword.");
+      }
+    }
+  }
 }
 
 
@@ -119,6 +134,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential.");
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
+  keys.reserve("optional","BIAS_FACTOR","Bias factor to be used for the well-tempered target distribution.");
 }
 
 
@@ -130,6 +146,12 @@ void VesBias::useInitialCoeffsKeywords(Keywords& keys) {
 void VesBias::useTargetDistributionKeywords(Keywords& keys) {
   keys.use("TARGET_DISTRIBUTION");
 }
+
+
+void VesBias::useWellTemperdKeywords(Keywords& keys) {
+  keys.use("BIAS_FACTOR");
+}
+
 
 
 void VesBias::addCoeffsSet(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {

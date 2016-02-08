@@ -83,6 +83,10 @@ private:
   //
   double aver_counter;
   double kbt_;
+  //
+  double welltemp_biasf_;
+  bool welltemp_targetdist_;
+  //
 private:
   void initializeCoeffs(CoeffsVector*);
   std::string labelString(const std::string&, const unsigned int coeffs_id = 0);
@@ -111,6 +115,7 @@ public:
   //
   static void useInitialCoeffsKeywords(Keywords&);
   static void useTargetDistributionKeywords(Keywords&);
+  static void useWellTemperdKeywords(Keywords&);
   //
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
@@ -129,8 +134,8 @@ public:
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const;
   size_t totalNumberOfCoeffs() const;
   unsigned int numberOfCoeffsSets() const;
-  double getKbT() const;
-  double getBeta() const;
+  double getKbT() const {return kbt_;}
+  double getBeta() const {return 1.0/kbt_;}
   //
   CoeffsVector& Coeffs(const unsigned int coeffs_id = 0) const;
   CoeffsVector& CoeffDerivsAverTargetDist(const unsigned int coeffs_id = 0) const;
@@ -160,6 +165,9 @@ public:
   void enableDynamicTargetDistribution() {dynamic_targetdist_=true;}
   void disableDynamicTargetDistribution() {dynamic_targetdist_=false;}
   bool dynamicTargetDistribution() const {return dynamic_targetdist_;}
+  //
+  double getWellTemperedBiasFactor() const;
+  bool wellTemperdTargetDistribution() const {return welltemp_targetdist_;}
 };
 
 inline
@@ -184,12 +192,6 @@ inline
 CoeffsMatrix& VesBias::Hessian(const unsigned int coeffs_id) const {return *hessian_pntrs_[coeffs_id];}
 
 inline
-double VesBias::getKbT() const {return kbt_;}
-
-inline
-double VesBias::getBeta() const {return 1.0/kbt_;}
-
-inline
 size_t VesBias::getCoeffsIndex(const std::vector<unsigned int>& indices, const unsigned int coeffs_id) const {return coeffs_pntrs_[coeffs_id]->getIndex(indices);}
 
 inline
@@ -197,6 +199,12 @@ std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const un
 
 inline
 size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id) const {return hessian_pntrs_[coeffs_id]->getMatrixIndex(index1,index2);}
+
+inline
+double VesBias::getWellTemperedBiasFactor() const {
+  plumed_massert(welltemp_targetdist_,"the well-tempered target distribution is not active so it doesn't make sense to get the value of the bias factor");
+  return welltemp_biasf_;
+}
 
 
 template<class T>
