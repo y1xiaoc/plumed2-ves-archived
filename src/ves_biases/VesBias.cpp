@@ -108,6 +108,7 @@ welltemp_targetdist_(false)
       }
     }
   }
+
 }
 
 
@@ -180,22 +181,22 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
     plumed_merror("you are not allowed to use multiple coefficient sets");
   }
   //
-  label = labelString("coeffs",ncoeffssets_);
+  label = getCoeffsSetLabelString("coeffs",ncoeffssets_);
   coeffs_pntr_in->setLabels(label);
 
   coeffs_pntrs_.push_back(coeffs_pntr_in);
   CoeffsVector* aver_ps_tmp = new CoeffsVector(*coeffs_pntr_in);
-  label = labelString("ps-aver",ncoeffssets_);
+  label = getCoeffsSetLabelString("ps-aver",ncoeffssets_);
   aver_ps_tmp->setLabels(label);
   aver_ps_tmp->setValues(0.0);
   coeffderivs_aver_ps_pntrs_.push_back(aver_ps_tmp);
   //
   CoeffsVector* gradient_tmp = new CoeffsVector(*coeffs_pntr_in);
-  label = labelString("gradient",ncoeffssets_);
+  label = getCoeffsSetLabelString("gradient",ncoeffssets_);
   gradient_tmp->setLabels(label);
   gradient_pntrs_.push_back(gradient_tmp);
   //
-  label = labelString("hessian",ncoeffssets_);
+  label = getCoeffsSetLabelString("hessian",ncoeffssets_);
   CoeffsMatrix* hessian_tmp = new CoeffsMatrix(label,coeffs_pntr_in,comm,diagonal_hessian_);
   hessian_pntrs_.push_back(hessian_tmp);
   //
@@ -339,7 +340,7 @@ void VesBias::enableHessian(const bool diagonal_hessian) {
   coeffderivs_cov_sampled.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
     delete hessian_pntrs_[i];
-    std::string label = labelString("hessian",i);
+    std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
     std::vector<double> cov_sampled_tmp;
     cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
@@ -354,7 +355,7 @@ void VesBias::disableHessian() {
   coeffderivs_cov_sampled.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
     delete hessian_pntrs_[i];
-    std::string label = labelString("hessian",i);
+    std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
     std::vector<double> cov_sampled_tmp;
     cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
@@ -369,7 +370,7 @@ void VesBias::apply() {
 }
 
 
-std::string VesBias::labelString(const std::string& type, const unsigned int coeffs_id) {
+std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsigned int coeffs_id) {
   std::string label_prefix = getLabel() + ".";
   std::string label_postfix = "";
   if(use_multiple_coeffssets_){
