@@ -66,7 +66,8 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
   VesBias::registerKeywords(keys);
   keys.use("ARG");
   keys.add("compulsory","BASIS_FUNCTIONS","the label of the basis sets that you want to use");
-  keys.use("COEFFS");
+  VesBias::useInitialCoeffsKeywords(keys);  
+  VesBias::useTargetDistributionKeywords(keys);
 }
 
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):

@@ -44,6 +44,7 @@ namespace PLMD{
   class BasisFunctions;
   class Value;
   class Optimizer;
+  class TargetDistribution;
 
 namespace bias{
 
@@ -76,6 +77,8 @@ private:
   bool compute_hessian_;
   bool diagonal_hessian_;
   //
+  std::vector<std::string> targetdist_keywords_;
+  std::vector<TargetDistribution*> targetdist_pntrs_;
   bool dynamic_targetdist_;
   //
   double aver_counter;
@@ -106,16 +109,21 @@ public:
   //
   void apply();
   //
+  static void useInitialCoeffsKeywords(Keywords&);
+  static void useTargetDistributionKeywords(Keywords&);
+  //
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
   std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}
   std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs_;}
+  std::vector<TargetDistribution*> getTargetDistributionPntrs() const {return targetdist_pntrs_;}
   //
   CoeffsVector* getCoeffsPntr(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id];}
   CoeffsVector* getCoeffDerivsAverTargetDistPntr(const unsigned int coeffs_id = 0) const {return coeffderivs_aver_ps_pntrs_[coeffs_id];}
   CoeffsVector* getGradientPntr(const unsigned int coeffs_id = 0)const {return gradient_pntrs_[coeffs_id];}
   CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs_[coeffs_id];}
-
+  //
+  std::vector<std::string> getTargetDistributionKeywords() const {return targetdist_keywords_;}
   //
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const;
   size_t totalNumberOfCoeffs() const;

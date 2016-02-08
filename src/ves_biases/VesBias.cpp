@@ -54,6 +54,8 @@ optimizer_pntr_(NULL),
 optimize_coeffs_(false),
 compute_hessian_(false),
 diagonal_hessian_(true),
+targetdist_keywords_(0),
+targetdist_pntrs_(0),
 dynamic_targetdist_(false),
 aver_counter(0.0),
 kbt_(0.0)
@@ -74,6 +76,23 @@ kbt_(0.0)
   if(keywords.exists("COEFFS")){
     parseVector("COEFFS",coeffs_fnames);
   }
+
+  if(keywords.exists("TARGET_DISTRIBUTION")){
+    std::string str_ps="";
+    for(int i=1;;i++){
+      if(!parseNumbered("TARGET_DISTRIBUTION",i,str_ps)){break;}
+      targetdist_keywords_.push_back(str_ps);
+    }
+    str_ps="";
+    parse("TARGET_DISTRIBUTION",str_ps);
+    if(str_ps.size()>0){
+      if(targetdist_keywords_.size()>0){
+        plumed_merror("Either give a single target distribution using the TARGET_DISTRIBUTION keyword or multiple using numbered TARGET_DISTRIBUTION1,  TARGET_DISTRIBUTION2 keywords");
+      }
+      targetdist_keywords_.push_back(str_ps);
+    }
+  }
+
 }
 
 
@@ -95,10 +114,21 @@ VesBias::~VesBias(){
 
 void VesBias::registerKeywords( Keywords& keys ) {
   Bias::registerKeywords(keys);
-  keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature to PLUMED");
-  keys.addOutputComponent("bias","default","the instantaneous value of the bias potential");
-  keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential");
+  keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature to PLUMED.");
+  keys.addOutputComponent("bias","default","the instantaneous value of the bias potential.");
+  keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential.");
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
+  keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
+}
+
+
+void VesBias::useInitialCoeffsKeywords(Keywords& keys) {
+  keys.use("COEFFS");
+}
+
+
+void VesBias::useTargetDistributionKeywords(Keywords& keys) {
+  keys.use("TARGET_DISTRIBUTION");
 }
 
 
@@ -328,9 +358,7 @@ std::string VesBias::labelString(const std::string& type, const unsigned int coe
 }
 
 
-void VesBias::updateTargetDistributions() {
-  // empty for now
-}
+void VesBias::updateTargetDistributions() {}
 
 
 }
