@@ -69,6 +69,7 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
   VesBias::useInitialCoeffsKeywords(keys);
   VesBias::useTargetDistributionKeywords(keys);
   VesBias::useWellTemperdKeywords(keys);
+  VesBias::useGridBinKeywords(keys);
 }
 
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):

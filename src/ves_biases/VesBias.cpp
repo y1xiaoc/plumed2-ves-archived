@@ -60,7 +60,8 @@ dynamic_targetdist_(false),
 aver_counter(0.0),
 kbt_(0.0),
 welltemp_biasf_(1.0),
-welltemp_targetdist_(false)
+welltemp_targetdist_(false),
+grid_bins_(0)
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -77,6 +78,10 @@ welltemp_targetdist_(false)
 
   if(keywords.exists("COEFFS")){
     parseVector("COEFFS",coeffs_fnames);
+  }
+
+  if(keywords.exists("GRID_BINS")){
+    parseMultipleValues("GRID_BINS",grid_bins_,getNumberOfArguments());
   }
 
   if(keywords.exists("TARGET_DISTRIBUTION")){
@@ -109,6 +114,7 @@ welltemp_targetdist_(false)
     }
   }
 
+
 }
 
 
@@ -136,6 +142,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
   keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
+  keys.reserve("optional","GRID_BINS","the number of bins used for the grid");
 }
 
 
@@ -153,6 +160,10 @@ void VesBias::useWellTemperdKeywords(Keywords& keys) {
   keys.use("BIAS_FACTOR");
 }
 
+
+void VesBias::useGridBinKeywords(Keywords& keys) {
+  keys.use("GRID_BINS");
+}
 
 
 void VesBias::addCoeffsSet(const std::vector<std::string>& dimension_labels,const std::vector<unsigned int>& indices_shape) {
@@ -382,6 +393,19 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 
 
 void VesBias::updateTargetDistributions() {}
+
+
+void VesBias::setGridBins(const std::vector<unsigned int>& grid_bins_in) {
+  plumed_massert(grid_bins_in.size()==getNumberOfArguments(),"the number of grid bins given doesn't match the number of arguments");
+  grid_bins_=grid_bins_in;
+}
+
+
+void VesBias::setGridBins(const unsigned int nbins) {
+  std::vector<unsigned int> grid_bins_in(getNumberOfArguments(),nbins);
+  grid_bins_=grid_bins_in;
+}
+
 
 
 }

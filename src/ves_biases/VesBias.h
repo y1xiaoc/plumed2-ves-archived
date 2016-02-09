@@ -87,6 +87,8 @@ private:
   double welltemp_biasf_;
   bool welltemp_targetdist_;
   //
+  std::vector<unsigned int> grid_bins_;
+  //
 private:
   void initializeCoeffs(CoeffsVector*);
   std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0);
@@ -116,6 +118,7 @@ public:
   static void useInitialCoeffsKeywords(Keywords&);
   static void useTargetDistributionKeywords(Keywords&);
   static void useWellTemperdKeywords(Keywords&);
+  static void useGridBinKeywords(Keywords&);
   //
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
@@ -168,6 +171,10 @@ public:
   //
   double getWellTemperedBiasFactor() const;
   bool wellTemperdTargetDistribution() const {return welltemp_targetdist_;}
+  //
+  std::vector<unsigned int> getGridBins() const {return grid_bins_;}
+  void setGridBins(const std::vector<unsigned int>&);
+  void setGridBins(const unsigned int);
 };
 
 inline
