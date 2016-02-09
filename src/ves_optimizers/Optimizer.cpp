@@ -207,7 +207,7 @@ identical_coeffs_shape_(true)
       plumed_merror("one of the biases has a dynamic target distribution so you need to give stride for updating it by using the TARGETDISTRIBUTION_STRIDE keyword");
     }
     if(!need_stride && ustride_targetdist_!=0){
-      plumed_merror("using the TARGETDISTRIBUTION_STRIDE keyword doesn't make sense as there is no target distribution to update");
+      plumed_merror("using the TARGETDISTRIBUTION_STRIDE keyword doesn't make sense as there is no dynamic target distribution to update");
     }
     if(ustride_targetdist_>0){
       if(nbiases_==1){
