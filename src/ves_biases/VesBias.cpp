@@ -135,6 +135,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential.");
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
+  keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
   keys.reserve("optional","BIAS_FACTOR","Bias factor to be used for the well-tempered target distribution.");
 }
 
