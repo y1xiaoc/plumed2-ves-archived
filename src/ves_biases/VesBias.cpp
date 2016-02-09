@@ -61,7 +61,9 @@ aver_counter(0.0),
 kbt_(0.0),
 welltemp_biasf_(1.0),
 welltemp_targetdist_(false),
-grid_bins_(0)
+grid_bins_(0),
+grid_min_(0),
+grid_max_(0)
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -82,6 +84,11 @@ grid_bins_(0)
 
   if(keywords.exists("GRID_BINS")){
     parseMultipleValues("GRID_BINS",grid_bins_,getNumberOfArguments());
+  }
+
+  if(keywords.exists("GRID_MIN") && keywords.exists("GRID_MAX")){
+    parseMultipleValues("GRID_MIN",grid_min_,getNumberOfArguments());
+    parseMultipleValues("GRID_MAX",grid_max_,getNumberOfArguments());
   }
 
   if(keywords.exists("TARGET_DISTRIBUTION")){
@@ -143,6 +150,8 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
   keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
   keys.reserve("optional","GRID_BINS","the number of bins used for the grid");
+  keys.reserve("optional","GRID_MIN","the lower bounds used for the grid");
+  keys.reserve("optional","GRID_MAX","the upper bounds used for the grid");
 }
 
 
@@ -163,6 +172,12 @@ void VesBias::useWellTemperdKeywords(Keywords& keys) {
 
 void VesBias::useGridBinKeywords(Keywords& keys) {
   keys.use("GRID_BINS");
+}
+
+
+void VesBias::useGridLimitsKeywords(Keywords& keys) {
+  keys.use("GRID_MIN");
+  keys.use("GRID_MAX");
 }
 
 
@@ -406,6 +421,17 @@ void VesBias::setGridBins(const unsigned int nbins) {
   grid_bins_=grid_bins_in;
 }
 
+
+void VesBias::setGridMin(const std::vector<double>& grid_min_in) {
+  plumed_massert(grid_min_in.size()==getNumberOfArguments(),"the number of lower bounds given for the grid doesn't match the number of arguments");
+  grid_min_=grid_min_in;
+}
+
+
+void VesBias::setGridMax(const std::vector<double>& grid_max_in) {
+  plumed_massert(grid_max_in.size()==getNumberOfArguments(),"the number of upper bounds given for the grid doesn't match the number of arguments");
+  grid_max_=grid_max_in;
+}
 
 
 }

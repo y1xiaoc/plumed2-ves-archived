@@ -88,6 +88,8 @@ private:
   bool welltemp_targetdist_;
   //
   std::vector<unsigned int> grid_bins_;
+  std::vector<double> grid_min_;
+  std::vector<double> grid_max_;
   //
 private:
   void initializeCoeffs(CoeffsVector*);
@@ -119,6 +121,7 @@ public:
   static void useTargetDistributionKeywords(Keywords&);
   static void useWellTemperdKeywords(Keywords&);
   static void useGridBinKeywords(Keywords&);
+  static void useGridLimitsKeywords(Keywords&);
   //
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
@@ -175,6 +178,10 @@ public:
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);
   void setGridBins(const unsigned int);
+  std::vector<double> getGridMax() const {return grid_max_;}
+  void setGridMax(const std::vector<double>&);
+  std::vector<double> getGridMin() const {return grid_min_;}
+  void setGridMin(const std::vector<double>&);
 };
 
 inline
