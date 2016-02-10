@@ -59,7 +59,7 @@ void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
 LinearCombinationOfDistributions::LinearCombinationOfDistributions( const TargetDistributionOptions& to ):
 TargetDistribution(to)
 {
-  for(unsigned int i=0;; i++) {
+  for(unsigned int i=1;; i++) {
     std::string keywords;
     if(!parseNumbered("DISTRIBUTION",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);

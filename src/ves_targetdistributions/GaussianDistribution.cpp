@@ -67,7 +67,7 @@ GaussianDistribution::GaussianDistribution( const TargetDistributionOptions& to 
 TargetDistribution(to),
 diagonal(true)
 {
-  for(unsigned int i=0;; i++) {
+  for(unsigned int i=1;; i++) {
     std::vector<double> tmp_center;
     if(!parseNumberedVector("CENTER",i,tmp_center) ){break;}
     centers.push_back(tmp_center);
