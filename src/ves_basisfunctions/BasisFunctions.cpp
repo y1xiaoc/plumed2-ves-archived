@@ -187,11 +187,11 @@ void BasisFunctions::numericalUniformIntegrals() {
 }
 
 
-std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const TargetDistribution* targetdist) const {
-  if(targetdist==NULL){
+std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const TargetDistribution* targetdist_pntr) const {
+  if(targetdist_pntr==NULL){
     return getUniformIntegrals();
   }
-  plumed_massert(targetdist->getDimension()==1,"the target distribution should be one dimensional");
+  plumed_massert(targetdist_pntr->getDimension()==1,"the target distribution should be one dimensional");
   //
   double h=(interval_max_-interval_min_)/nbins_;
   std::vector<double> targetdist_integrals(nbasis_,0.0);
@@ -200,9 +200,9 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const T
   for(unsigned int k=0; k < (nbins_+1); k++){
     std::vector<double> x1(1);
     x1[0] = interval_min_+(k)*h;
-    weights[k] = targetdist->getValue(x1);
+    weights[k] = targetdist_pntr->getValue(x1);
   }
-  if( !(targetdist->isNormalized()) ){
+  if( !(targetdist_pntr->isNormalized()) ){
     double norm = 0.0;
     for(unsigned int k=0; k < nbins_; k++){
       norm = norm + (weights[k] + weights[k+1]);
