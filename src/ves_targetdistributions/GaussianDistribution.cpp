@@ -72,7 +72,7 @@ diagonal(true)
     if(!parseNumberedVector("CENTER",i,tmp_center) ){break;}
     centers.push_back(tmp_center);
   }
-  for(unsigned int i=0;; i++) {
+  for(unsigned int i=1;; i++) {
     std::vector<double> tmp_sigma;
     if(!parseNumberedVector("SIGMA",i,tmp_sigma) ){break;}
     sigmas.push_back(tmp_sigma);
@@ -85,7 +85,7 @@ diagonal(true)
   //
   for(unsigned int i=0;i<ngaussians; i++){
     std::vector<double> corr;
-    if(parseNumberedVector("CORRELATION",i,corr,true)){
+    if(parseNumberedVector("CORRELATION",(i+1),corr,true)){
       plumed_massert(getDimension()==2,"CORRELATION is only defined for two-dimensional Gaussians");
       plumed_massert(corr.size()==1,"only one value should be given in CORRELATION");
       for(unsigned int k=0;k<corr.size(); k++){
