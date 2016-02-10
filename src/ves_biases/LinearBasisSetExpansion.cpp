@@ -23,6 +23,8 @@
 #include "VesBias.h"
 #include "ves_tools/CoeffsVector.h"
 #include "ves_basisfunctions/BasisFunctions.h"
+#include "ves_targetdistributions/TargetDistribution.h"
+#include "ves_targetdistributions/TargetDistributionRegister.h"
 
 
 #include "tools/Keywords.h"
@@ -266,33 +268,59 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
 }
 
 
-
 void LinearBasisSetExpansion::setupUniformTargetDistribution() {
-  std::vector< std::vector <double> > bf_integrals;
-  //
-  for(unsigned int k=0;k<nargs_;k++){
-    std::vector<double> tmp_val = basisf_pntrs_[k]->getUniformIntegrals();
-    bf_integrals.push_back(tmp_val);
+  std::vector<TargetDistribution*> targetdist_dummy(nargs_,NULL);
+  setupSeperableTargetDistribution(targetdist_dummy);
+}
+
+
+void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<std::string>& targetdist_keywords) {
+  if(targetdist_keywords.size()!=1 && targetdist_keywords.size()!=nargs_){
+    plumed_merror("the number of target distribution keywords needs to be either 1 or equal to the number of arguments");
   }
-  //
-  for(size_t i=0;i<ncoeffs_;i++){
-    std::vector<unsigned int> indices=bias_coeffs_pntr_->getIndices(i);
-    double value = 1.0;
-    for(unsigned int k=0;k<nargs_;k++){
-      value*=bf_integrals[k][indices[k]];
+  std::vector<TargetDistribution*> targetdist_pntrs(targetdist_keywords.size(),NULL);
+  for(unsigned int k=0;k<targetdist_keywords.size();k++){
+    std::vector<std::string> words = Tools::getWords(targetdist_keywords[k]);
+    if(words[0]=="UNIFORM"){
+      targetdist_pntrs[k] = NULL;
     }
-    coeffderivs_aver_ps_pntr_->setValue(i,value);
+    else{
+      targetdist_pntrs[k] = targetDistributionRegister().create(words);
+    }
+  }
+  setupTargetDistribution(targetdist_pntrs);
+  for(unsigned int k=0;k<targetdist_pntrs.size();k++){
+    if(targetdist_pntrs[k]!=NULL){
+      delete targetdist_pntrs[k];
+    }
   }
 }
 
 
 void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
+  if(targetdist_pntrs.size()!=1 && targetdist_pntrs.size()!=nargs_){
+    plumed_merror("the number of target distribution pointers needs to be either 1 or equal to the number of arguments");
+  }
+  if(targetdist_pntrs.size()==1){
+    setupNonSeperableTargetDistribution(targetdist_pntrs[0]);
+  }
+  else{
+    setupSeperableTargetDistribution(targetdist_pntrs);
+  }
+}
+
+
+void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
   plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
-  std::vector< std::vector <double> > bf_integrals;
   //
+  std::vector< std::vector <double> > bf_integrals;
   for(unsigned int k=0;k<nargs_;k++){
-    std::vector<double> tmp_val = basisf_pntrs_[k]->getTargetDistributionIntegrals(targetdist_pntrs[k]);
-    bf_integrals.push_back(tmp_val);
+    if(basisf_pntrs_[k]!=NULL){
+      bf_integrals.push_back(basisf_pntrs_[k]->getTargetDistributionIntegrals(targetdist_pntrs[k]));
+    }
+    else{
+      bf_integrals.push_back(basisf_pntrs_[k]->getUniformIntegrals());
+    }
   }
   //
   for(size_t i=0;i<ncoeffs_;i++){
@@ -305,6 +333,13 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDi
   }
 }
 
+
+void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDistribution* targetdist_pntr) {
+  if(targetdist_pntr==NULL){
+    setupUniformTargetDistribution();
+    return;
+  }
+}
 
 
 void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf, const std::vector<unsigned int>& nbins) {

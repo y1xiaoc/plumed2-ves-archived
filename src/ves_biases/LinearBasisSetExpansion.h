@@ -111,11 +111,18 @@ private:
   void setupUniformTargetDistribution();
   //
   void setupTargetDistribution(const std::vector<TargetDistribution*>&);
-  void setupTargetDistribution(const TargetDistribution*);
+  void setupTargetDistribution(const std::vector<std::string>&);
+  void setupTargetDistribution(TargetDistribution*);
+  void setupTargetDistribution(const std::string&);
   //
   // Well-Tempered p(s) stuff
   void setupWellTemperedTargetDistribution(const double, const std::vector<unsigned int>&);
   void updateWellTemperedFESCoeffs();
+private:
+  //
+  void setupSeperableTargetDistribution(const std::vector<TargetDistribution*>&);
+  void setupNonSeperableTargetDistribution(const TargetDistribution*);
+  //
 };
 
 inline
@@ -147,6 +154,21 @@ CoeffsVector& LinearBasisSetExpansion::FesWTCoeffs() const {return *fes_wt_coeff
 
 inline
 CoeffsVector& LinearBasisSetExpansion::CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr_;}
+
+inline
+void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_keyword) {
+  std::vector<std::string> targetdist_keywords(1);
+  targetdist_keywords[0] = targetdist_keyword;
+  setupTargetDistribution(targetdist_keywords);
+}
+
+inline
+void LinearBasisSetExpansion::setupTargetDistribution(TargetDistribution* targetdist_pntr) {
+  std::vector<TargetDistribution*> targetdist_pntrs(1);
+  targetdist_pntrs[0] = targetdist_pntr;
+  setupTargetDistribution(targetdist_pntrs);
+}
+
 
 
 }
