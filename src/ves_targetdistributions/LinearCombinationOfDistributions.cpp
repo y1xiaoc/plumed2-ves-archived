@@ -34,9 +34,9 @@ namespace PLMD {
 
 class LinearCombinationOfDistributions: public TargetDistribution {
   // properties of the Gaussians
-  std::vector<TargetDistribution*> distributions;
-  std::vector<double> weights;
-  unsigned int ndist;
+  std::vector<TargetDistribution*> distributions_;
+  std::vector<double> weights_;
+  unsigned int ndist_;
 public:
   static void registerKeywords(Keywords&);
   explicit LinearCombinationOfDistributions(const TargetDistributionOptions& to);
@@ -57,31 +57,34 @@ void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
 
 
 LinearCombinationOfDistributions::LinearCombinationOfDistributions( const TargetDistributionOptions& to ):
-TargetDistribution(to)
+TargetDistribution(to),
+distributions_(0),
+weights_(0),
+ndist_(0)
 {
   for(unsigned int i=1;; i++) {
     std::string keywords;
     if(!parseNumbered("DISTRIBUTION",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);
     TargetDistribution* dist_tmp = targetDistributionRegister().create( (words) );
-    distributions.push_back(dist_tmp);
+    distributions_.push_back(dist_tmp);
   }
-  setDimension(distributions[0]->getDimension());
-  ndist = distributions.size();
+  setDimension(distributions_[0]->getDimension());
+  ndist_ = distributions_.size();
 
-  for(unsigned int i=0; i<ndist; i++){
-    plumed_massert(getDimension()==distributions[0]->getDimension(),"all distributions have to have the same dimension");
+  for(unsigned int i=0; i<ndist_; i++){
+    plumed_massert(getDimension()==distributions_[0]->getDimension(),"all distributions have to have the same dimension");
   }
   //
-  if(!parseVector("WEIGHTS",weights,true)){weights.assign(distributions.size(),1.0);}
-  plumed_massert(distributions.size()==weights.size(),"there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
+  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(distributions_.size(),1.0);}
+  plumed_massert(distributions_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
   //
   bool do_not_normalize=false;
   parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
   if(!do_not_normalize){
     double sum_weights=0.0;
-    for(unsigned int i=0;i<weights.size();i++){sum_weights+=weights[i];}
-    for(unsigned int i=0;i<weights.size();i++){weights[i]/=sum_weights;}
+    for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
+    for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
     setNormalized();
   }
   else{
@@ -92,16 +95,16 @@ TargetDistribution(to)
 
 
 LinearCombinationOfDistributions::~LinearCombinationOfDistributions(){
-  for(unsigned int i=0; i<ndist; i++){
-    delete distributions[i];
+  for(unsigned int i=0; i<ndist_; i++){
+    delete distributions_[i];
   }
 }
 
 
 double LinearCombinationOfDistributions::getValue(const std::vector<double>& argument) const {
   double value=0.0;
-  for(unsigned int i=0; i<ndist; i++){
-    value += weights[i] * distributions[i]->getValue(argument);
+  for(unsigned int i=0; i<ndist_; i++){
+    value += weights_[i] * distributions_[i]->getValue(argument);
   }
   return value;
 }

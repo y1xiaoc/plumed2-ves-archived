@@ -27,15 +27,15 @@
 namespace PLMD {
 
 class UniformDistribution : public TargetDistribution {
-  double normalization;
-  double inverse_normalization;
-  std::vector<double> minima;
-  std::vector<double> maxima;
+  double normalization_;
+  double inverse_normalization_;
+  std::vector<double> minima_;
+  std::vector<double> maxima_;
 public:
   static void registerKeywords( Keywords&);
   explicit UniformDistribution( const TargetDistributionOptions& to );
   double getValue(const std::vector<double>&) const;
-  double getNormalization() const;
+  double getNormalization() const {return normalization_;}
 };
 
 
@@ -50,18 +50,22 @@ void UniformDistribution::registerKeywords(Keywords& keys) {
 
 
 UniformDistribution::UniformDistribution(const TargetDistributionOptions& to):
-TargetDistribution(to)
+TargetDistribution(to),
+normalization_(1.0),
+inverse_normalization_(1.0),
+minima_(0),
+maxima_(0)
 {
-  parseVector("MINIMA",minima);
-  parseVector("MAXIMA",maxima);
-  plumed_massert(minima.size()==maxima.size(),"MINIMA and MAXIMA for the uniform distribution do not have the same size");
-  setDimension(minima.size());
-  normalization = 1.0;
+  parseVector("MINIMA",minima_);
+  parseVector("MAXIMA",maxima_);
+  plumed_massert(minima_.size()==maxima_.size(),"MINIMA and MAXIMA for the uniform distribution do not have the same size");
+  setDimension(minima_.size());
+  normalization_ = 1.0;
   for(unsigned int k=0; k<getDimension(); k++){
-    plumed_massert(maxima[k]>minima[k],"Check MINIMA and MAXIMA keywords");
-    normalization *= maxima[k]-minima[k];
+    plumed_massert(maxima_[k]>minima_[k],"Check MINIMA and MAXIMA keywords");
+    normalization_ *= maxima_[k]-minima_[k];
   }
-  inverse_normalization=1.0/normalization;
+  inverse_normalization_=1.0/normalization_;
   setNormalized();
   checkRead();
 }
@@ -69,18 +73,12 @@ TargetDistribution(to)
 
 double UniformDistribution::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
-  double inside = inverse_normalization;
+  double inside = inverse_normalization_;
   for(unsigned int k=0; k<getDimension(); k++){
-    if(argument[k] < minima[k] || argument[k] > maxima[k]){return outside;}
+    if(argument[k] < minima_[k] || argument[k] > maxima_[k]){return outside;}
   }
   return inside;
 }
-
-
-double UniformDistribution::getNormalization() const {
-  return normalization;
-}
-
 
 
 }
