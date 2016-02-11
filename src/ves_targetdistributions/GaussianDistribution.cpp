@@ -34,13 +34,13 @@ namespace PLMD {
 
 class GaussianDistribution: public TargetDistribution {
   // properties of the Gaussians
-  std::vector< std::vector<double> > sigmas;
-  std::vector< std::vector<double> > centers;
-  std::vector< std::vector<double> > correlation;
-  std::vector<double> weights;
-  bool normalize_distribution;
-  bool diagonal;
-  unsigned int ngaussians;
+  std::vector< std::vector<double> > sigmas_;
+  std::vector< std::vector<double> > centers_;
+  std::vector< std::vector<double> > correlation_;
+  std::vector<double> weights_;
+  bool normalize_distribution_;
+  bool diagonal_;
+  unsigned int ngaussians_;
   double GaussianDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const bool normalize=true) const;
   double Gaussian2D(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const bool normalize=true) const;
 public:
@@ -65,56 +65,75 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
 
 GaussianDistribution::GaussianDistribution( const TargetDistributionOptions& to ):
 TargetDistribution(to),
-diagonal(true)
+sigmas_(0),
+centers_(0),
+correlation_(0),
+weights_(0),
+normalize_distribution_(true),
+diagonal_(true),
+ngaussians_(0)
 {
   for(unsigned int i=1;; i++) {
     std::vector<double> tmp_center;
     if(!parseNumberedVector("CENTER",i,tmp_center) ){break;}
-    centers.push_back(tmp_center);
+    centers_.push_back(tmp_center);
   }
   for(unsigned int i=1;; i++) {
     std::vector<double> tmp_sigma;
     if(!parseNumberedVector("SIGMA",i,tmp_sigma) ){break;}
-    sigmas.push_back(tmp_sigma);
+    sigmas_.push_back(tmp_sigma);
   }
-  plumed_massert(centers.size()==sigmas.size(),"there has to be an equal amount of numbered CENTER and SIGMA keywords");
-  setDimension(centers[0].size());
-  ngaussians = centers.size();
-
-  correlation.resize(ngaussians);
+  if(centers_.size()==0 && sigmas_.size()==0){
+    std::vector<double> tmp_center;
+    if(parseVector("CENTER",tmp_center,true)){
+      centers_.push_back(tmp_center);
+    }
+    std::vector<double> tmp_sigma;
+    if(parseVector("SIGMA",tmp_sigma,true)){
+      sigmas_.push_back(tmp_sigma);
+    }
+  }
+  plumed_massert(centers_.size()==sigmas_.size(),"there has to be an equal amount of CENTER and SIGMA keywords");
+  if(centers_.size()==0){
+    plumed_merror("CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
+  }
   //
-  for(unsigned int i=0;i<ngaussians; i++){
+  setDimension(centers_[0].size());
+  ngaussians_ = centers_.size();
+  // check centers and sigmas
+  for(unsigned int i=0; i<ngaussians_; i++) {
+    plumed_massert(centers_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
+    plumed_massert(sigmas_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
+  }
+  //
+  correlation_.resize(ngaussians_);
+  for(unsigned int i=0;i<ngaussians_; i++){
     std::vector<double> corr;
-    if(parseNumberedVector("CORRELATION",(i+1),corr,true)){
-      plumed_massert(getDimension()==2,"CORRELATION is only defined for two-dimensional Gaussians");
+    if(parseNumberedVector("CORRELATION",(i+1),corr)){
+      plumed_massert(getDimension()==2,"CORRELATION is only defined for two-dimensional Gaussians for now.");
       plumed_massert(corr.size()==1,"only one value should be given in CORRELATION");
       for(unsigned int k=0;k<corr.size(); k++){
         plumed_massert(corr[k] >= -1.0 && corr[k] <= 1.0,"values given in CORRELATION should be between -1.0 and 1.0" );
       }
-      correlation[i] = corr;
-      diagonal = false;
+      correlation_[i] = corr;
+      diagonal_ = false;
     }
     else {
       corr.assign(1,0.0);
-      correlation[i] = corr;
+      correlation_[i] = corr;
     }
   }
-  // check centers and sigmas
-  for(unsigned int i=0; i<ngaussians; i++) {
-    plumed_massert(centers[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
-    plumed_massert(sigmas[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
-  }
   //
-  if(!parseVector("WEIGHTS",weights,true)){weights.assign(centers.size(),1.0);}
-  plumed_massert(centers.size()==weights.size(),"there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
+  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(centers_.size(),1.0);}
+  plumed_massert(centers_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   //
   bool do_not_normalize=false;
   parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
-  normalize_distribution=!do_not_normalize;
-  if(normalize_distribution){
+  normalize_distribution_=!do_not_normalize;
+  if(normalize_distribution_){
     double sum_weights=0.0;
-    for(unsigned int i=0;i<weights.size();i++){sum_weights+=weights[i];}
-    for(unsigned int i=0;i<weights.size();i++){weights[i]/=sum_weights;}
+    for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
+    for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
     setNormalized();
   }
   else{
@@ -126,14 +145,14 @@ diagonal(true)
 
 double GaussianDistribution::getValue(const std::vector<double>& argument) const {
   double value=0.0;
-  if(diagonal){
-    for(unsigned int i=0;i<ngaussians;i++){
-      value+=weights[i]*GaussianDiagonal(argument, centers[i], sigmas[i],normalize_distribution);
+  if(diagonal_){
+    for(unsigned int i=0;i<ngaussians_;i++){
+      value+=weights_[i]*GaussianDiagonal(argument, centers_[i], sigmas_[i],normalize_distribution_);
     }
   }
-  else if(!diagonal && getDimension()==2){
-    for(unsigned int i=0;i<ngaussians;i++){
-      value+=weights[i]*Gaussian2D(argument, centers[i], sigmas[i],correlation[i],normalize_distribution);
+  else if(!diagonal_ && getDimension()==2){
+    for(unsigned int i=0;i<ngaussians_;i++){
+      value+=weights_[i]*Gaussian2D(argument, centers_[i], sigmas_[i],correlation_[i],normalize_distribution_);
     }
   }
   return value;

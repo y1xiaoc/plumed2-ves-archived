@@ -64,12 +64,12 @@ protected:
   template <class T>
   bool parse(const std::string& ,T& , bool optional=false);
   template <class T>
-  bool parseNumbered(const std::string& ,const unsigned int, T& , bool optional=false);
+  bool parseNumbered(const std::string& ,const unsigned int, T&);
   // Read a keywords vector from the input
   template <class T>
   bool parseVector(const std::string& ,std::vector<T>& , bool optional=false);
   template <class T>
-  bool parseNumberedVector(const std::string& ,const unsigned int, std::vector<T>& , bool optional=false);
+  bool parseNumberedVector(const std::string& ,const unsigned int, std::vector<T>&);
   // Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
   // set the that target distribution is normalized
@@ -131,7 +131,7 @@ bool TargetDistribution::parse( const std::string& key, T& t, bool optional){
 
 
 template<class T>
-bool TargetDistribution::parseNumbered(const std::string&key, const unsigned int no, T&t, bool optional) {
+bool TargetDistribution::parseNumbered(const std::string&key, const unsigned int no, T&t) {
   std::string num; Tools::convert(no,num);
   return Tools::parse(input,key+num,t);
 }
@@ -146,7 +146,7 @@ bool TargetDistribution::parseVector( const std::string& key, std::vector<T>& t 
 
 
 template <class T>
-bool TargetDistribution::parseNumberedVector( const std::string& key, const unsigned int no, std::vector<T>& t , bool optional) {
+bool TargetDistribution::parseNumberedVector( const std::string& key, const unsigned int no, std::vector<T>& t) {
   std::string num; Tools::convert(no,num);
   return Tools::parseVector(input,key+num,t);
 }
