@@ -31,6 +31,7 @@ void BasisFunctions::registerKeywords(Keywords& keys){
   keys.add("compulsory","ORDER","The order of the basis functions.");
   keys.add("compulsory","INTERVAL_MIN","the minimum of the interval on which the basis functions are defined");
   keys.add("compulsory","INTERVAL_MAX","the maximum of the interval on which the basis functions are defined");
+  keys.add("optional","NGRID_POINTS","the number of grid points used for numerical integrals");
   keys.addFlag("DEBUG_INFO",false,"print out more detailed information about the basis set, useful for debugging");
   keys.addFlag("NUMERICAL_INTEGRALS",false,"calculate basis function integral for the uniform distribution numerically");
 }
@@ -76,6 +77,7 @@ action_pntr_(NULL)
   //
   parseFlag("DEBUG_INFO",print_debug_info_);
   parseFlag("NUMERICAL_INTEGRALS",numerical_uniform_integrals_);
+  parse("NGRID_POINTS",nbins_);
   // log.printf(" %s \n",getKeywordString().c_str());
 
 }
