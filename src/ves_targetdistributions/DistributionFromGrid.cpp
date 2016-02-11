@@ -30,10 +30,10 @@
 namespace PLMD {
 
 class DistributionFromGrid : public TargetDistribution {
-  double normalization;
-  Grid* distGrid;
-  std::vector<double> minima;
-  std::vector<double> maxima;
+  double normalization_;
+  Grid* distGrid_;
+  std::vector<double> minima_;
+  std::vector<double> maxima_;
 public:
   static void registerKeywords( Keywords&);
   explicit DistributionFromGrid( const TargetDistributionOptions& to );
@@ -55,7 +55,11 @@ void DistributionFromGrid::registerKeywords(Keywords& keys) {
 
 
 DistributionFromGrid::DistributionFromGrid(const TargetDistributionOptions& to):
-TargetDistribution(to)
+TargetDistribution(to),
+normalization_(0.0),
+distGrid_(NULL),
+minima_(0),
+maxima_(0)
 {
   std::string filename;
   parse("FILE",filename);
@@ -79,23 +83,23 @@ TargetDistribution(to)
     arguments[i]->setNotPeriodic();
   }
   IFile gridfile; gridfile.open(filename);
-  distGrid=Grid::create(gridlabel,arguments,gridfile,sparsegrid,spline,false);
-  plumed_massert(distGrid->getDimension()==getDimension(),"mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
+  distGrid_=Grid::create(gridlabel,arguments,gridfile,sparsegrid,spline,false);
+  plumed_massert(distGrid_->getDimension()==getDimension(),"mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
 
-  minima.resize(getDimension());
-  maxima.resize(getDimension());
+  minima_.resize(getDimension());
+  maxima_.resize(getDimension());
   for (unsigned int i=0; i < getDimension(); i++) {
-    Tools::convert(distGrid->getMin()[i],minima[i]);
-    Tools::convert(distGrid->getMax()[i],maxima[i]);
+    Tools::convert(distGrid_->getMin()[i],minima_[i]);
+    Tools::convert(distGrid_->getMax()[i],maxima_[i]);
   }
   if(normalize){
-    normalization = 0.0;
-    for(unsigned int l=0; l<distGrid->getSize(); l++)
+    normalization_ = 0.0;
+    for(unsigned int l=0; l<distGrid_->getSize(); l++)
     {
-     normalization += distGrid->getValue(l);
+     normalization_ += distGrid_->getValue(l);
     }
-    normalization *= distGrid->getBinVolume();
-    distGrid->scaleAllValuesAndDerivatives(1.0/normalization);
+    normalization_ *= distGrid_->getBinVolume();
+    distGrid_->scaleAllValuesAndDerivatives(1.0/normalization_);
   }
   setNormalized();
 }
@@ -104,9 +108,9 @@ TargetDistribution(to)
 double DistributionFromGrid::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
   for(unsigned int k=0; k<getDimension(); k++){
-    if(argument[k] < minima[k] || argument[k] > maxima[k]){return outside;}
+    if(argument[k] < minima_[k] || argument[k] > maxima_[k]){return outside;}
   }
-  return distGrid->getValue(argument);
+  return distGrid_->getValue(argument);
 }
 
 
