@@ -208,6 +208,42 @@ std::string CoeffsBase::getDimensionLabel(const unsigned int dim_index) const {
 }
 
 
+// we are flattening arrays using a column-major order
+inline
+size_t CoeffsBase::getIndex(const std::vector<unsigned int>& indices) const {
+  // plumed_dbg_assert(indices.size()==ndimensions_);
+  // for(unsigned int i=0; i<ndimensions_; i++){
+  //   if(indices[i]>=indices_shape_[i]){
+  //     std::string is;
+  //     Tools::convert(i,is);
+  //     std::string msg="ERROR: the system is looking for a value outside the indices along the " + is + "dimension!";
+  //     plumed_merror(msg);
+  //   }
+  // }
+  size_t index=indices[ndimensions_-1];
+  for(unsigned int i=ndimensions_-1; i>0; --i){
+    index=index*indices_shape_[i-1]+indices[i-1];
+  }
+  return index;
+}
+
+// we are flattening arrays using a column-major order
+inline
+std::vector<unsigned int> CoeffsBase::getIndices(const size_t index) const {
+  std::vector<unsigned int> indices(ndimensions_);
+  size_t kk=index;
+  indices[0]=(index%indices_shape_[0]);
+  for(unsigned int i=1; i<ndimensions_-1; ++i){
+    kk=(kk-indices[i-1])/indices_shape_[i-1];
+    indices[i]=(kk%indices_shape_[i]);
+  }
+  if(ndimensions_>=2){
+   indices[ndimensions_-1]=((kk-indices[ndimensions_-2])/indices_shape_[ndimensions_-2]);
+  }
+  return indices;
+}
+
+
 
 
 }
