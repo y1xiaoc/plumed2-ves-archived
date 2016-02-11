@@ -261,18 +261,8 @@ bool CoeffsBase::sameShape(const CoeffsBase& coeffsbase_in) const {
 }
 
 
-std::string CoeffsBase::getLabel() const {
-  return label_;
-}
-
-
 void CoeffsBase::setLabel(const std::string& label) {
   label_=label;
-}
-
-
-std::string CoeffsBase::getDataLabel() const {
-  return data_label_;
 }
 
 
@@ -290,11 +280,6 @@ void CoeffsBase::setLabels(const std::string& label) {
 void CoeffsBase::setLabels(const std::string& label, const std::string& data_label) {
   label_=label;
   data_label_=data_label;
-}
-
-
-CoeffsBase::CoeffsType CoeffsBase::getType() const {
-  return coeffs_type_;
 }
 
 
@@ -326,53 +311,6 @@ void CoeffsBase::linkVesBias(bias::VesBias* vesbias_pntr_in){
 
 void CoeffsBase::linkAction(Action* action_pntr_in){
   action_pntr_ = action_pntr_in;
-}
-
-
-bias::VesBias* CoeffsBase::getPntrToVesBias() const {
-  plumed_massert(vesbias_pntr_!=NULL,"the VES bias has not been linked");
-  return vesbias_pntr_;
-}
-
-
-Action* CoeffsBase::getPntrToAction() const {
-  plumed_massert(action_pntr_!=NULL,"the action has not been linked");
-  return action_pntr_;
-}
-
-
-bool CoeffsBase::isGenericCoeffs() const {
-  return coeffs_type_==Generic;
-}
-
-
-bool CoeffsBase::isLinearBasisSetCoeffs() const {
-  return coeffs_type_==LinearBasisSet;
-}
-
-
-bool CoeffsBase::isMultiLinearBasisSetCoeffs() const {
-  return coeffs_type_==MultiCoeffs_LinearBasisSet;
-}
-
-
-std::vector<unsigned int> CoeffsBase::shapeOfIndices() const {
-  return indices_shape_;
-}
-
-
-unsigned int CoeffsBase::shapeOfIndices(const unsigned int dim_index) const {
-  return indices_shape_[dim_index];
-}
-
-
-size_t CoeffsBase::numberOfCoeffs() const {
-  return ncoeffs_;
-}
-
-
-unsigned int CoeffsBase::numberOfDimensions() const {
-  return ndimensions_;
 }
 
 
@@ -422,21 +360,6 @@ bool CoeffsBase::indicesExist(const std::vector<unsigned int>& indices) const {
 }
 
 
-std::string CoeffsBase::getCoeffDescription(const size_t index) const {
-  return coeffs_descriptions_[index];
-}
-
-
-std::string CoeffsBase::getCoeffDescription(const std::vector<unsigned int>& indices) const {
-  return getCoeffDescription(getIndex(indices));
-}
-
-
-std::vector<std::string> CoeffsBase::getAllCoeffsDescriptions() const {
-  return coeffs_descriptions_;
-}
-
-
 void CoeffsBase::setCoeffDescription(const size_t index, const std::string& description) {
   coeffs_descriptions_[index]=description;
 }
@@ -466,17 +389,6 @@ void CoeffsBase::setAllCoeffsDescriptions(const std::vector<std::string>& coeffs
   for(size_t i=0; i<numberOfCoeffs(); i++){
     coeffs_descriptions_[i]=coeffs_descriptions[i];
   }
-}
-
-
-std::string CoeffsBase::getDimensionLabel(const unsigned int dim_index) const {
-  plumed_massert(dim_index<numberOfDimensions(),"Trying to get the label of a dimension outside the number of dimensions");
-  return dimension_labels_[dim_index];
-}
-
-
-std::vector<std::string> CoeffsBase::getAllDimensionLabels() const {
-  return dimension_labels_;
 }
 
 
@@ -592,6 +504,7 @@ void CoeffsBase::writeIterationCounterAndTimeToFile(OFile& ofile) const {
   }
   ofile.addConstantField(field_iteration_).printField(field_iteration_,(int) iteration_opt);
 }
+
 
 bool CoeffsBase::getIterationCounterAndTimeFromFile(IFile& ifile) {
   bool field_found=false;
