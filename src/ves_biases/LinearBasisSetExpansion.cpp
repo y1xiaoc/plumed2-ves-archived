@@ -304,9 +304,9 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDi
 void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
   plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
   //
-  std::vector< std::vector <double> > bf_integrals;
+  std::vector< std::vector <double> > bf_integrals(0);
   for(unsigned int k=0;k<nargs_;k++){
-    if(basisf_pntrs_[k]!=NULL){
+    if(targetdist_pntrs[k]!=NULL){
       bf_integrals.push_back(basisf_pntrs_[k]->getTargetDistributionIntegrals(targetdist_pntrs[k]));
     }
     else{
