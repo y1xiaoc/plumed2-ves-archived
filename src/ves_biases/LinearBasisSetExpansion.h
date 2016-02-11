@@ -60,8 +60,8 @@ private:
   CoeffsVector* coeffderivs_aver_ps_pntr_;
   CoeffsVector* fes_wt_coeffs_pntr_;
   //
-  double biasf_;
-  double invbiasf_;
+  double welltemp_biasf_;
+  double inv_welltemp_biasf_;
   //
   Grid* bias_grid_pntr_;
   Grid* fes_grid_pntr_;
@@ -100,6 +100,8 @@ private:
   // calculate bias and derivatives
   static double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
+  double getBias(const std::vector<double>&);
+  double getFES_WellTempered(const std::vector<double>&);
   //
   static void getBasisSetValues(const std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   void getBasisSetValues(const std::vector<double>&, std::vector<double>&);
@@ -118,6 +120,7 @@ private:
   // Well-Tempered p(s) stuff
   void setupWellTemperedTargetDistribution(const double, const std::vector<unsigned int>&);
   void updateWellTemperedFESCoeffs();
+  double getWellTemperedBiasFactor() const {return welltemp_biasf_;}
 private:
   //
   void setupSeperableTargetDistribution(const std::vector<TargetDistribution*>&);
@@ -174,6 +177,30 @@ inline
 double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
   return getBiasAndForces(args_values,forces,coeffsderivs_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
 }
+
+
+inline
+double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values) {
+  std::vector<double> forces_dummy(nargs_);
+  std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
+  return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+}
+
+
+inline
+double LinearBasisSetExpansion::getFES_WellTempered(const std::vector<double>& args_values) {
+  std::vector<double> forces_dummy(nargs_);
+  std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
+  return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, &mycomm_);
+}
+
+
+inline
+void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values) {
+  getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+}
+
+
 
 
 

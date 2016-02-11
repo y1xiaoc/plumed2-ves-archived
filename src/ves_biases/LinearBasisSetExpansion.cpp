@@ -66,8 +66,8 @@ bias_coeffs_pntr_(bias_coeffs_pntr_in),
 ncoeffs_(0),
 coeffderivs_aver_ps_pntr_(NULL),
 fes_wt_coeffs_pntr_(NULL),
-biasf_(-1.0),
-invbiasf_(-1.0),
+welltemp_biasf_(-1.0),
+inv_welltemp_biasf_(-1.0),
 bias_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
 ps_grid_pntr_(NULL)
@@ -170,6 +170,7 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args
   plumed_assert(coeffs_pntr_in->numberOfDimensions()==nargs);
   plumed_assert(basisf_pntrs_in.size()==nargs);
   plumed_assert(forces.size()==nargs);
+  plumed_assert(coeffsderivs_values.size()==coeffs_pntr_in->numberOfCoeffs());
 
   std::vector<double> args_values_trsfrm(nargs);
   std::vector<bool>   inside_interval(nargs,true);
@@ -258,11 +259,6 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
 }
 
 
-void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values) {
-  getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
-}
-
-
 void LinearBasisSetExpansion::setupUniformTargetDistribution() {
   std::vector<TargetDistribution*> targetdist_dummy(nargs_,NULL);
   setupSeperableTargetDistribution(targetdist_dummy);
@@ -339,8 +335,8 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
 
 void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf, const std::vector<unsigned int>& nbins) {
   plumed_massert(biasf>1.0,"the value of the bias factor doesn't make sense, it should be larger than 1.0");
-  biasf_=biasf;
-  invbiasf_ = 1.0/biasf_;
+  welltemp_biasf_=biasf;
+  inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
   fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
   std::string fes_wt_label = bias_coeffs_pntr_->getLabel();
   if(fes_wt_label.find("coeffs")!=std::string::npos){
@@ -354,8 +350,8 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
 
 
 void LinearBasisSetExpansion::updateWellTemperedFESCoeffs() {
-  plumed_assert(biasf_>1.0);
-  FesWTCoeffs() = -BiasCoeffs() + invbiasf_*FesWTCoeffs();
+  plumed_assert(welltemp_biasf_>1.0);
+  FesWTCoeffs() = -BiasCoeffs() + inv_welltemp_biasf_*FesWTCoeffs();
 }
 
 
