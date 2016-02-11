@@ -92,33 +92,40 @@ std::string TargetDistribution::description() {
 }
 
 
-void TargetDistribution::writeDistributionToFile(const std::string& filepath, const std::string& keywords, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
-  // create distribtion
-  std::vector<std::string> words = Tools::getWords(keywords);
-  TargetDistribution* distribution=targetDistributionRegister().create( (words) );
-  unsigned int dimension = distribution->getDimension();
-  // create grid
+void TargetDistribution::writeDistributionToFile(const std::string& filepath, const TargetDistribution* targetdist_pntr, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  unsigned int dimension = targetdist_pntr->getDimension();
+  plumed_assert(min.size()==dimension);
+  plumed_assert(max.size()==dimension);
+  plumed_assert(nbins.size()==dimension);
   std::vector<Value*> arguments(dimension);
   for (unsigned int i=0; i < dimension; i++) {
     std::string is; Tools::convert(i+1,is);
     arguments[i]= new Value(NULL,"arg"+is,false);
     arguments[i]->setNotPeriodic();
   }
-  Grid* grid = new Grid(distribution->getType(),arguments,min,max,nbins,false,false);
+  Grid* grid = new Grid(targetdist_pntr->getType(),arguments,min,max,nbins,false,false);
   //
-  distribution->calculateDistributionOnGrid(grid);
+  targetdist_pntr->calculateDistributionOnGrid(grid);
   // write to file
   OFile file; file.open(filepath);
   grid->writeToFile(file);
   file.close();
   // delete stuff
   delete grid;
-  delete distribution;
   for (unsigned int i=0; i < dimension; i++) {delete arguments[i];}
 }
 
 
-void TargetDistribution::calculateDistributionOnGrid(Grid* grid_pntr){
+void TargetDistribution::writeDistributionToFile(const std::string& filepath, const std::string& keywords, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  // create distribtion
+  std::vector<std::string> words = Tools::getWords(keywords);
+  TargetDistribution* targetdist_pntr=targetDistributionRegister().create( (words) );
+  TargetDistribution::writeDistributionToFile(filepath,targetdist_pntr,min,max,nbins);
+  delete targetdist_pntr;
+}
+
+
+void TargetDistribution::calculateDistributionOnGrid(Grid* grid_pntr) const {
   plumed_massert(grid_pntr->getDimension()==dimension_,"Grid is of the wrong dimension");
   for(unsigned int l=0; l<grid_pntr->getSize(); l++)
   {

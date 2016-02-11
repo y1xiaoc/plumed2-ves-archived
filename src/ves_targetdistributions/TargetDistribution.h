@@ -102,8 +102,9 @@ public:
   // calculate the target distribution itself
   virtual double getValue(const std::vector<double>&) const = 0;
   // write the distribution out to file
+  static void writeDistributionToFile(const std::string&, const TargetDistribution*, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   static void writeDistributionToFile(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
-  void calculateDistributionOnGrid(Grid*);
+  void calculateDistributionOnGrid(Grid*) const;
   virtual void update() {};
   virtual double getNormalization() const {return 1.0;}
 };
