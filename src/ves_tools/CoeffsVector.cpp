@@ -105,11 +105,6 @@ output_fmt_("%30.16e")
 }
 
 
-size_t CoeffsVector::getSize() const {
-  return numberOfCoeffs();
-}
-
-
 void CoeffsVector::clear() {
   data.resize(getSize());
   for(size_t i=0; i<data.size(); i++){

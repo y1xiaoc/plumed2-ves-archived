@@ -84,7 +84,7 @@ public:
   //
   ~CoeffsVector(){}
   //
-  size_t getSize() const;
+  size_t getSize() const {return numberOfCoeffs();}
     // clear coeffs
   void clear();
   void setAllValuesToZero();
