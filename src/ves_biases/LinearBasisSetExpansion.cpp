@@ -219,11 +219,6 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args
 }
 
 
-double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
-  return getBiasAndForces(args_values,forces,coeffsderivs_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
-}
-
-
 void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values, std::vector<BasisFunctions*>& basisf_pntrs_in, CoeffsVector* coeffs_pntr_in, Communicator* comm_in) {
   unsigned int nargs = args_values.size();
   plumed_assert(coeffs_pntr_in->numberOfDimensions()==nargs);

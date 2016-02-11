@@ -170,6 +170,12 @@ void LinearBasisSetExpansion::setupTargetDistribution(TargetDistribution* target
 }
 
 
+inline
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
+  return getBiasAndForces(args_values,forces,coeffsderivs_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+}
+
+
 
 }
 
