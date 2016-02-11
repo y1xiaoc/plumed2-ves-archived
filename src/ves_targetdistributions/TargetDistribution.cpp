@@ -93,6 +93,7 @@ std::string TargetDistribution::description() {
 
 
 void TargetDistribution::writeDistributionToFile(const std::string& filepath, const TargetDistribution* targetdist_pntr, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  if(targetdist_pntr==NULL){return;}
   unsigned int dimension = targetdist_pntr->getDimension();
   plumed_assert(min.size()==dimension);
   plumed_assert(max.size()==dimension);
