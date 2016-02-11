@@ -292,7 +292,7 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDi
   if(targetdist_pntrs.size()!=1 && targetdist_pntrs.size()!=nargs_){
     plumed_merror("the number of target distribution pointers needs to be either 1 or equal to the number of arguments");
   }
-  if(targetdist_pntrs.size()==1){
+  if(nargs_>1 && targetdist_pntrs.size()==1){
     setupNonSeperableTargetDistribution(targetdist_pntrs[0]);
   }
   else{
