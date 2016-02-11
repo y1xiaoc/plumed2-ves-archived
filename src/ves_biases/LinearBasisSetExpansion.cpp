@@ -304,6 +304,18 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDi
 void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
   plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
   //
+  for(unsigned int k=0;k<nargs_;k++){
+    std::vector<std::string> min(1);
+    std::vector<std::string> max(1);
+    Tools::convert(basisf_pntrs_[k]->intervalMin(),min[0]);
+    Tools::convert(basisf_pntrs_[k]->intervalMax(),max[0]);
+    std::vector<unsigned int> nbins(1);
+    nbins[0]=300;
+    std::string ks; Tools::convert(k+1,ks);
+    std::string filename = "targetdist-" + ks + ".data";
+    TargetDistribution::writeDistributionToFile(filename,targetdist_pntrs[k],min,max,nbins);
+  }
+  //
   std::vector< std::vector <double> > bf_integrals(0);
   for(unsigned int k=0;k<nargs_;k++){
     if(targetdist_pntrs[k]!=NULL){
