@@ -110,6 +110,8 @@ valueForce2_(NULL)
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
+
+  getCoeffDerivsAverTargetDistPntr()->writeToFile("basis_norm.data",true,false,static_cast<Action*>(this));
   //
   readCoeffsFromFiles();
   //
