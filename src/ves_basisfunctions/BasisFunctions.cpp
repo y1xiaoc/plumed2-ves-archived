@@ -185,6 +185,8 @@ void BasisFunctions::numericalUniformIntegrals() {
       sum = sum + (v1+v2);
     }
     // norm with the "volume of the interval"
+    // assume that the first function is the constant
+    uniform_integrals_[0] = getValue(0.0,0,dummy_dbl,dummy_bool);
     uniform_integrals_[i] = (0.5*h*sum)/interval_range_;
   }
 }
@@ -232,6 +234,8 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const T
     targetdist_integrals[i] = (0.5*h*sum);
   }
   //
+  // assume that the first function is the constant
+  targetdist_integrals[0] = getValue(0.0,0,dummy_dbl,dummy_bool);
   return targetdist_integrals;
 
 }
