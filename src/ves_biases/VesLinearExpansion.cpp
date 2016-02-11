@@ -100,10 +100,10 @@ valueForce2_(NULL)
   bias_expansion_pntr_->linkVesBias(this);
 
   //
-  if(getNumberOfTargetDistributionKeywords()!=1 && getNumberOfTargetDistributionKeywords()!=nargs_){
-    plumed_merror("the number of target distribution keywords given by the TARGET_DISTRIBUTION keywords needs to be either 1 or equal to the number of arguments");
-  }
   if(getNumberOfTargetDistributionKeywords()>0){
+    if(getNumberOfTargetDistributionKeywords()!=1 && getNumberOfTargetDistributionKeywords()!=nargs_){
+      plumed_merror("the number of target distribution keywords given by the TARGET_DISTRIBUTION keywords needs to be either 1 or equal to the number of arguments");
+    }
     bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords());
   }
   else{
