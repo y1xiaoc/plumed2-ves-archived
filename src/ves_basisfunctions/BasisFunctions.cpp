@@ -23,6 +23,7 @@
 #include "ves_targetdistributions/TargetDistribution.h"
 #include "ves_biases/VesBias.h"
 
+
 namespace PLMD{
 
 void BasisFunctions::registerKeywords(Keywords& keys){
@@ -228,7 +229,7 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const T
       sum = sum + (v1+v2);
     }
     // norm with the "volume of the interval"
-    targetdist_integrals[i] = (0.5*h*sum)/interval_range_;
+    targetdist_integrals[i] = (0.5*h*sum);
   }
   //
   return targetdist_integrals;
