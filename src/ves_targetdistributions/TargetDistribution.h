@@ -49,7 +49,7 @@ public:
 class TargetDistribution {
 private:
   // Name of the one dimensional target distribution
-  std::string type;
+  std::string type_;
   // The input to the target distribution
   std::vector<std::string> input;
   // is the target distribution normalize or not
@@ -93,7 +93,7 @@ public:
   //
   unsigned getDimension() const {return dimension_;}
   // get type of distribution
-  std::string getType()const{return type;};
+  std::string getType()const{return type_;};
   //
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
@@ -126,7 +126,7 @@ Action* TargetDistribution::getPntrToAction() const {
 template <class T>
 bool TargetDistribution::parse( const std::string& key, T& t, bool optional){
   bool found=Tools::parse(input,key,t);
-  if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
+  if(!optional && !found) plumed_merror("target distribution " + type_ + " requires " + key + " keyword");
   return found;
 }
 
@@ -141,7 +141,7 @@ bool TargetDistribution::parseNumbered(const std::string&key, const unsigned int
 template <class T>
 bool TargetDistribution::parseVector( const std::string& key, std::vector<T>& t , bool optional){
   bool found=Tools::parseVector(input,key,t);
-  if(!optional && !found) plumed_merror("target distribution " + type + " requires " + key + " keyword");
+  if(!optional && !found) plumed_merror("target distribution " + type_ + " requires " + key + " keyword");
   return found;
 }
 

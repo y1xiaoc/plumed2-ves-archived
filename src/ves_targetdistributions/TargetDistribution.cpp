@@ -41,7 +41,7 @@ void TargetDistribution::registerKeywords( Keywords& keys ){
 
 
 TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
-type(to.words[0]),
+type_(to.words[0]),
 input(to.words),
 normalized_(false),
 dimension_(1),
@@ -87,7 +87,7 @@ void TargetDistribution::checkRead() const {
 
 
 std::string TargetDistribution::description() {
-  std::string str="Type: " + type;
+  std::string str="Type: " + type_;
   return str;
 }
 
