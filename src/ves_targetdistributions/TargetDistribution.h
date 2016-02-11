@@ -105,6 +105,7 @@ public:
   static void writeDistributionToFile(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   void calculateDistributionOnGrid(Grid*);
   virtual void update() {};
+  virtual double getNormalization() const {return 1.0;}
 };
 
 
