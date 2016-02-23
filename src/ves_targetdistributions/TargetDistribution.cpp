@@ -92,9 +92,8 @@ std::string TargetDistribution::description() {
 }
 
 
-void TargetDistribution::writeDistributionToFile(const std::string& filepath, const TargetDistribution* targetdist_pntr, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
-  if(targetdist_pntr==NULL){return;}
-  unsigned int dimension = targetdist_pntr->getDimension();
+void TargetDistribution::writeDistributionToFile(const std::string& filepath, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  unsigned int dimension = getDimension();
   plumed_assert(min.size()==dimension);
   plumed_assert(max.size()==dimension);
   plumed_assert(nbins.size()==dimension);
@@ -104,9 +103,9 @@ void TargetDistribution::writeDistributionToFile(const std::string& filepath, co
     arguments[i]= new Value(NULL,"arg"+is,false);
     arguments[i]->setNotPeriodic();
   }
-  Grid* grid = new Grid(targetdist_pntr->getType(),arguments,min,max,nbins,false,false);
+  Grid* grid = new Grid(getType(),arguments,min,max,nbins,false,false);
   //
-  targetdist_pntr->calculateDistributionOnGrid(grid);
+  calculateDistributionOnGrid(grid);
   // write to file
   OFile file; file.open(filepath);
   grid->writeToFile(file);
@@ -121,7 +120,7 @@ void TargetDistribution::writeDistributionToFile(const std::string& filepath, co
   // create distribtion
   std::vector<std::string> words = Tools::getWords(keywords);
   TargetDistribution* targetdist_pntr=targetDistributionRegister().create( (words) );
-  TargetDistribution::writeDistributionToFile(filepath,targetdist_pntr,min,max,nbins);
+  targetdist_pntr->writeDistributionToFile(filepath,min,max,nbins);
   delete targetdist_pntr;
 }
 
