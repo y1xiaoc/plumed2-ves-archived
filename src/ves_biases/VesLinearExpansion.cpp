@@ -98,7 +98,7 @@ valueForce2_(NULL)
 
   bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
   bias_expansion_pntr_->linkVesBias(this);
-
+  bias_expansion_pntr_->setGridBins(this->getGridBins());
   //
   if(getNumberOfTargetDistributionKeywords()>0){
     if(getNumberOfTargetDistributionKeywords()!=1 && getNumberOfTargetDistributionKeywords()!=nargs_){

@@ -83,7 +83,7 @@ grid_max_(0)
   }
 
   if(keywords.exists("GRID_BINS")){
-    parseMultipleValues("GRID_BINS",grid_bins_,getNumberOfArguments());
+    parseMultipleValues<unsigned int>("GRID_BINS",grid_bins_,getNumberOfArguments(),100);
   }
 
   if(keywords.exists("GRID_MIN") && keywords.exists("GRID_MAX")){
@@ -149,9 +149,9 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
   keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
-  keys.reserve("optional","GRID_BINS","the number of bins used for the grid");
-  keys.reserve("optional","GRID_MIN","the lower bounds used for the grid");
-  keys.reserve("optional","GRID_MAX","the upper bounds used for the grid");
+  keys.reserve("optional","GRID_BINS","the number of bins used for the grid. The default value is 100 bins per dimension.");
+  keys.reserve("optional","GRID_MIN","the lower bounds used for the grid.");
+  keys.reserve("optional","GRID_MAX","the upper bounds used for the grid.");
 }
 
 
