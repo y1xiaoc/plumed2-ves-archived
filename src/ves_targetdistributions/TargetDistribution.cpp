@@ -30,6 +30,13 @@
 
 namespace PLMD {
 
+class MarginalWeight:public WeightBase{
+  public:
+    explicit MarginalWeight(){}
+    double projectInnerLoop(double &input, double &v){return  input+v;}
+    double projectOuterLoop(double &v){return v;}
+};
+
 TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
 words(input)
 {
@@ -103,15 +110,13 @@ void TargetDistribution::writeDistributionToFile(const std::string& filepath, co
     arguments[i]= new Value(NULL,"arg"+is,false);
     arguments[i]->setNotPeriodic();
   }
-  Grid* grid = new Grid(getType(),arguments,min,max,nbins,false,false);
+  Grid* grid_pntr = new Grid(getType(),arguments,min,max,nbins,false,false);
   //
-  calculateDistributionOnGrid(grid);
-  // write to file
-  OFile file; file.open(filepath);
-  grid->writeToFile(file);
-  file.close();
+  calculateDistributionOnGrid(grid_pntr);
+  TargetDistribution::writeProbGridToFile(filepath,grid_pntr);
+
   // delete stuff
-  delete grid;
+  delete grid_pntr;
   for (unsigned int i=0; i < dimension; i++) {delete arguments[i];}
 }
 
@@ -132,6 +137,40 @@ void TargetDistribution::calculateDistributionOnGrid(Grid* grid_pntr) const {
    std::vector<double> argument=grid_pntr->getPoint(l);
    double value=getValue(argument);
    grid_pntr->setValue(l,value);
+  }
+}
+
+
+void TargetDistribution::writeProbGridToFile(const std::string filepath, Grid* grid_pntr, const bool do_projections) {
+  OFile file;
+  file.setBackupString("bck");
+  file.open(filepath);
+  grid_pntr->writeToFile(file);
+  file.close();
+  if(do_projections && grid_pntr->getDimension()>1){
+    MarginalWeight* Pw = new MarginalWeight();
+    std::vector<std::string> argnames = grid_pntr->getArgNames();
+    std::vector<double> binDeltas = grid_pntr->getDx();
+    for(unsigned int i=0; i<argnames.size(); i++){
+      std::vector<std::string> arg(1,argnames[i]);
+      Grid proj_grid = grid_pntr->project(arg,Pw);
+      // scale with the bin volume used for the integral such that the
+      // marginals are proberly normalized
+      double intVol = 1.0;
+      for(unsigned int l=0; l<binDeltas.size(); l++){
+        if(l!=i){intVol*=binDeltas[l];}
+      }
+      proj_grid.scaleAllValuesAndDerivatives(intVol);
+      //
+      OFile file2;
+      file2.setBackupString("bck");
+      std::string proj_fname = argnames[i];
+      proj_fname = FileBase::appendSuffix(filepath,"."+proj_fname);
+      file2.open(proj_fname);
+      proj_grid.writeToFile(file2);
+      file2.close();
+    }
+    delete Pw;
   }
 }
 
