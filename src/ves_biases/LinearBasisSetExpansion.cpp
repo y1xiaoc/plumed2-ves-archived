@@ -68,6 +68,7 @@ coeffderivs_aver_ps_pntr_(NULL),
 fes_wt_coeffs_pntr_(NULL),
 welltemp_biasf_(-1.0),
 inv_welltemp_biasf_(-1.0),
+grid_bins_(nargs_,100),
 bias_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
 ps_grid_pntr_(NULL)
@@ -124,7 +125,19 @@ void LinearBasisSetExpansion::linkAction(Action* action_pntr_in) {
 }
 
 
-void LinearBasisSetExpansion::setupBiasGrid(const std::vector<unsigned int>& nbins, const bool usederiv) {
+void LinearBasisSetExpansion::setGridBins(const std::vector<unsigned int>& grid_bins_in) {
+  plumed_massert(grid_bins_in.size()==nargs_,"the number of grid bins given doesn't match the number of arguments");
+  grid_bins_=grid_bins_in;
+}
+
+
+void LinearBasisSetExpansion::setGridBins(const unsigned int nbins) {
+  std::vector<unsigned int> grid_bins_in(nargs_,nbins);
+  grid_bins_=grid_bins_in;
+}
+
+
+Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::vector<unsigned int>& nbins, const bool usederiv) {
   plumed_assert(nbins.size()==nargs_);
   std::vector<std::string> min(nargs_);
   std::vector<std::string> max(nargs_);
@@ -132,7 +145,8 @@ void LinearBasisSetExpansion::setupBiasGrid(const std::vector<unsigned int>& nbi
     Tools::convert(basisf_pntrs_[k]->intervalMin(),min[k]);
     Tools::convert(basisf_pntrs_[k]->intervalMax(),max[k]);
   }
-  bias_grid_pntr_ = new Grid(label_+".bias",args_pntrs_,min,max,nbins,false,usederiv);
+  Grid* grid_pntr = new Grid(label_+".bias",args_pntrs_,min,max,nbins,false,usederiv);
+  return grid_pntr;
 }
 
 
@@ -148,7 +162,6 @@ void LinearBasisSetExpansion::updateBiasGrid() {
     else{
       bias_grid_pntr_->setValue(l,bias_value);
     }
-
  }
 }
 
@@ -313,7 +326,10 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     nbins[0]=300;
     std::string ks; Tools::convert(k+1,ks);
     std::string filename = "targetdist-" + ks + ".data";
-    TargetDistribution::writeDistributionToFile(filename,targetdist_pntrs[k],min,max,nbins);
+    if(targetdist_pntrs[k]!=NULL){
+      targetdist_pntrs[k]->writeDistributionToFile(filename,min,max,nbins);
+    }
+
   }
   //
   std::vector< std::vector <double> > bf_integrals(0);
@@ -342,6 +358,11 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
     setupUniformTargetDistribution();
     return;
   }
+  Grid* ps_grid_pntr = setupGeneralGrid(grid_bins_,false);
+  targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
+  calculateCoeffDerivsAverFromGrid(ps_grid_pntr);
+  TargetDistribution::writeProbGridToFile("targetdist.data",ps_grid_pntr,true);
+  delete ps_grid_pntr;
 }
 
 
@@ -367,5 +388,31 @@ void LinearBasisSetExpansion::updateWellTemperedFESCoeffs() {
 }
 
 
+void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_grid_pntr, const bool normalize_dist) {
+  plumed_assert(ps_grid_pntr!=NULL);
+  std::vector<double> coeffderivs_aver_ps(ncoeffs_,0.0);
+  double sum_grid = 0.0;
+  double binVol = ps_grid_pntr->getBinVolume();
+  for(unsigned int l=0; l<ps_grid_pntr->getSize(); l++){
+    std::vector<double> args_values = ps_grid_pntr->getPoint(l);
+    std::vector<double> basisset_values(ncoeffs_);
+    getBasisSetValues(args_values,basisset_values);
+    double weight = ps_grid_pntr->getValue(l)*binVol;
+    sum_grid += weight;
+    for(unsigned int i=0; i<ncoeffs_; i++){
+      coeffderivs_aver_ps[i] += weight*basisset_values[i];
+    }
+  }
+  // std::cerr << "sum_grid: " << sum_grid << "\n";
+  if(normalize_dist){
+    for(unsigned int i=0; i<ncoeffs_; i++){
+      coeffderivs_aver_ps[i] /= sum_grid;
+    }
+  }
+  coeffderivs_aver_ps[0] = 1.0;
+  CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
 }
+
+}
+
 }
