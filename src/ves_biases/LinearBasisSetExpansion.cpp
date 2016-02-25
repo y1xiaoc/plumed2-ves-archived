@@ -405,10 +405,11 @@ void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_gr
   }
   // std::cerr << "sum_grid: " << sum_grid << "\n";
   if(normalize_dist){
-    for(unsigned int i=0; i<ncoeffs_; i++){
+    for(unsigned int i=1; i<ncoeffs_; i++){
       coeffderivs_aver_ps[i] /= sum_grid;
     }
   }
+  // the overall constant;
   coeffderivs_aver_ps[0] = 1.0;
   CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
 }
