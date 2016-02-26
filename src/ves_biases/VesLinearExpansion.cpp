@@ -57,6 +57,7 @@ public:
   explicit VesLinearExpansion(const ActionOptions&);
   ~VesLinearExpansion();
   void calculate();
+  void updateTargetDistributions();
   static void registerKeywords( Keywords& keys );
 };
 
@@ -94,9 +95,8 @@ valueForce2_(NULL)
   addCoeffsSet(args_pntrs,basisf_pntrs_);
   ncoeffs_ = numberOfCoeffs();
 
-
-
-  bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
+  checkThatTemperatureIsGiven();
+  bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),getBeta(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
   bias_expansion_pntr_->linkVesBias(this);
   bias_expansion_pntr_->setGridBins(this->getGridBins());
   //
@@ -110,6 +110,9 @@ valueForce2_(NULL)
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
+  if(this->wellTemperdTargetDistribution()){
+    bias_expansion_pntr_->setupWellTemperedTargetDistribution(this->getWellTemperedBiasFactor());
+  }
 
   getCoeffDerivsAverTargetDistPntr()->writeToFile("basis_norm.data",true,false,static_cast<Action*>(this));
   //
@@ -150,6 +153,13 @@ void VesLinearExpansion::calculate() {
 
   valueForce2_->set(totalForce2);
   setCoeffsDerivs(coeffsderivs_values);
+}
+
+
+void VesLinearExpansion::updateTargetDistributions() {
+  bias_expansion_pntr_->updateWellTemperedTargetDistribution();
+  setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
+  getCoeffDerivsAverTargetDistPntr()->writeToFile("basis_norm.data",true,true,static_cast<Action*>(this));
 }
 
 }

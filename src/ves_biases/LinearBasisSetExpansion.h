@@ -49,6 +49,8 @@ private:
   Communicator& mycomm_;
   bool serial_;
   //
+  double beta_;
+  //
   std::vector<Value*> args_pntrs_;
   unsigned int nargs_;
   //
@@ -62,6 +64,7 @@ private:
   //
   double welltemp_biasf_;
   double inv_welltemp_biasf_;
+  double beta_prime_;
   //
   //
   std::vector<unsigned int> grid_bins_;
@@ -69,12 +72,14 @@ private:
   Grid* bias_grid_pntr_;
   Grid* fes_grid_pntr_;
   Grid* ps_grid_pntr_;
+  Grid* welltemp_ps_grid_pntr_;
   //
  public:
   static void registerKeywords( Keywords& keys );
   // Constructor
   explicit LinearBasisSetExpansion(
     const std::string&,
+    const double,
     Communicator&,
     std::vector<Value*>,
     std::vector<BasisFunctions*>,
@@ -125,16 +130,19 @@ private:
   void setupTargetDistribution(const std::string&);
   //
   // Well-Tempered p(s) stuff
-  void setupWellTemperedTargetDistribution(const double, const std::vector<unsigned int>&);
-  void updateWellTemperedFESCoeffs();
+  void setupWellTemperedTargetDistribution(const double);
   double getWellTemperedBiasFactor() const {return welltemp_biasf_;}
+  void updateWellTemperedTargetDistribution();
 private:
   //
-  Grid* setupGeneralGrid(const std::vector<unsigned int>&, const bool usederiv=false);
+  Grid* setupGeneralGrid(const std::string, const std::vector<unsigned int>&, const bool usederiv=false);
   void setupSeperableTargetDistribution(const std::vector<TargetDistribution*>&);
   void setupNonSeperableTargetDistribution(const TargetDistribution*);
   //
   void calculateCoeffDerivsAverFromGrid(const Grid*, const bool normalize_dist=false);
+  //
+  void updateWellTemperedFESCoeffs();
+  void updateWellTemperedPsGrid();
   //
 };
 
@@ -213,7 +221,7 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
 
 inline
 void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
-  bias_grid_pntr_ = setupGeneralGrid(grid_bins_,usederiv);
+  bias_grid_pntr_ = setupGeneralGrid("bias",grid_bins_,usederiv);
 }
 
 

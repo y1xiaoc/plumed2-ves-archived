@@ -49,6 +49,7 @@ void LinearBasisSetExpansion::registerKeywords(Keywords& keys) {
 
 LinearBasisSetExpansion::LinearBasisSetExpansion(
   const std::string& label,
+  const double beta_in,
   Communicator& cc,
   std::vector<Value*> args_pntrs_in,
   std::vector<BasisFunctions*> basisf_pntrs_in,
@@ -58,6 +59,7 @@ action_pntr_(NULL),
 vesbias_pntr_(NULL),
 mycomm_(cc),
 serial_(false),
+beta_(beta_in),
 args_pntrs_(args_pntrs_in),
 nargs_(args_pntrs_.size()),
 basisf_pntrs_(basisf_pntrs_in),
@@ -68,10 +70,12 @@ coeffderivs_aver_ps_pntr_(NULL),
 fes_wt_coeffs_pntr_(NULL),
 welltemp_biasf_(-1.0),
 inv_welltemp_biasf_(-1.0),
+beta_prime_(0.0),
 grid_bins_(nargs_,100),
 bias_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
-ps_grid_pntr_(NULL)
+ps_grid_pntr_(NULL),
+welltemp_ps_grid_pntr_(NULL)
 {
   plumed_massert(args_pntrs_.size()==basisf_pntrs_.size(),"number of arguments and basis functions do not match");
   for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs_[k]->getNumberOfBasisFunctions();}
@@ -96,6 +100,12 @@ ps_grid_pntr_(NULL)
 }
 
 LinearBasisSetExpansion::~LinearBasisSetExpansion() {
+  if(coeffderivs_aver_ps_pntr_!=NULL){
+    delete coeffderivs_aver_ps_pntr_;
+  }
+  if(fes_wt_coeffs_pntr_!=NULL){
+    delete fes_wt_coeffs_pntr_;
+  }
   if(bias_grid_pntr_!=NULL){
     delete bias_grid_pntr_;
   }
@@ -105,12 +115,10 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   if(ps_grid_pntr_!=NULL){
     delete ps_grid_pntr_;
   }
-  if(coeffderivs_aver_ps_pntr_!=NULL){
-    delete coeffderivs_aver_ps_pntr_;
+  if(welltemp_ps_grid_pntr_!=NULL){
+    delete welltemp_ps_grid_pntr_;
   }
-  if(fes_wt_coeffs_pntr_!=NULL){
-    delete fes_wt_coeffs_pntr_;
-  }
+
 }
 
 
@@ -137,7 +145,7 @@ void LinearBasisSetExpansion::setGridBins(const unsigned int nbins) {
 }
 
 
-Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::vector<unsigned int>& nbins, const bool usederiv) {
+Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string label_suffix, const std::vector<unsigned int>& nbins, const bool usederiv) {
   plumed_assert(nbins.size()==nargs_);
   std::vector<std::string> min(nargs_);
   std::vector<std::string> max(nargs_);
@@ -145,7 +153,7 @@ Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::vector<unsigned int>&
     Tools::convert(basisf_pntrs_[k]->intervalMin(),min[k]);
     Tools::convert(basisf_pntrs_[k]->intervalMax(),max[k]);
   }
-  Grid* grid_pntr = new Grid(label_+".bias",args_pntrs_,min,max,nbins,false,usederiv);
+  Grid* grid_pntr = new Grid(label_+"."+label_suffix,args_pntrs_,min,max,nbins,false,usederiv);
   return grid_pntr;
 }
 
@@ -358,7 +366,7 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
     setupUniformTargetDistribution();
     return;
   }
-  Grid* ps_grid_pntr = setupGeneralGrid(grid_bins_,false);
+  Grid* ps_grid_pntr = setupGeneralGrid("ps",grid_bins_,false);
   targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
   calculateCoeffDerivsAverFromGrid(ps_grid_pntr);
   TargetDistribution::writeProbGridToFile("targetdist.data",ps_grid_pntr,true);
@@ -366,10 +374,11 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
 }
 
 
-void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf, const std::vector<unsigned int>& nbins) {
+void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf) {
   plumed_massert(biasf>1.0,"the value of the bias factor doesn't make sense, it should be larger than 1.0");
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
+  beta_prime_ = beta_/welltemp_biasf_;
   fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
   std::string fes_wt_label = bias_coeffs_pntr_->getLabel();
   if(fes_wt_label.find("coeffs")!=std::string::npos){
@@ -379,12 +388,32 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
     fes_wt_label += "_fes_wt";
   }
   fes_wt_coeffs_pntr_->setLabels(fes_wt_label);
+  welltemp_ps_grid_pntr_ = setupGeneralGrid("ps_wt",grid_bins_,false);
 }
 
 
-void LinearBasisSetExpansion::updateWellTemperedFESCoeffs() {
+void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
+  double norm = 0.0;
+  for(unsigned int l=0; l<welltemp_ps_grid_pntr_->getSize(); l++){
+    std::vector<double> args_values = welltemp_ps_grid_pntr_->getPoint(l);
+    double value = -beta_prime_ * getFES_WellTempered(args_values);
+    value = exp(value);
+    norm += value;
+    welltemp_ps_grid_pntr_->setValue(l,value);
+  }
+  norm = 1.0/(welltemp_ps_grid_pntr_->getBinVolume()*norm);
+  welltemp_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
+}
+
+
+void LinearBasisSetExpansion::updateWellTemperedTargetDistribution() {
   plumed_assert(welltemp_biasf_>1.0);
+  // Update FES WT coeffs
   FesWTCoeffs() = -BiasCoeffs() + inv_welltemp_biasf_*FesWTCoeffs();
+  // Update p(s) grid
+  updateWellTemperedPsGrid();
+  // calcuate coeffs derivs from grid
+  calculateCoeffDerivsAverFromGrid(welltemp_ps_grid_pntr_);
 }
 
 
