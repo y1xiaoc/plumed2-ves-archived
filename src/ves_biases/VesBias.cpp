@@ -336,8 +336,17 @@ void VesBias::setCoeffsDerivsOverTargetDist(const CoeffsVector& coeffderivs_aver
   CoeffDerivsAverTargetDist(coeffs_id) = coeffderivs_aver_ps;
 }
 
+
 void VesBias::setCoeffsDerivsOverTargetDistToZero(const unsigned coeffs_id) {
   CoeffDerivsAverTargetDist(coeffs_id).setAllValuesToZero();
+}
+
+
+void VesBias::checkThatTemperatureIsGiven() {
+  if(kbt_==0.0){
+    std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + ": the temperature is needed so you need to give it using the TEMP keyword as the MD engine does not pass it to PLUMED.";
+    plumed_merror(err_msg);
+  }
 }
 
 
@@ -350,12 +359,7 @@ void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
     std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + " has already been linked with optimizer " + optimizer_pntr_->getLabel() + " of type " + optimizer_pntr_->getName() + ". You cannot link two optimizer to the same VES bias.";
     plumed_merror(err_msg);
   }
-  //
-  if(kbt_==0.0){
-    std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + ": if you want to optimize this bias you need to give the temperature using the TEMP keyword as the MD engine does not pass it to PLUMED";
-    plumed_merror(err_msg);
-  }
-  //
+  checkThatTemperatureIsGiven();
   optimize_coeffs_ = true;
 }
 

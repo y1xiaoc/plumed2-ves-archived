@@ -95,6 +95,9 @@ private:
   void initializeCoeffs(CoeffsVector*);
   std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0);
 protected:
+  //
+  void checkThatTemperatureIsGiven();
+  //
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
   void addCoeffsSet(CoeffsVector*);
@@ -141,7 +144,7 @@ public:
   size_t totalNumberOfCoeffs() const;
   unsigned int numberOfCoeffsSets() const;
   double getKbT() const {return kbt_;}
-  double getBeta() const {return 1.0/kbt_;}
+  double getBeta() const;
   //
   CoeffsVector& Coeffs(const unsigned int coeffs_id = 0) const;
   CoeffsVector& CoeffDerivsAverTargetDist(const unsigned int coeffs_id = 0) const;
@@ -218,6 +221,12 @@ inline
 double VesBias::getWellTemperedBiasFactor() const {
   plumed_massert(welltemp_targetdist_,"the well-tempered target distribution is not active so it doesn't make sense to get the value of the bias factor");
   return welltemp_biasf_;
+}
+
+inline
+double VesBias::getBeta() const {
+  plumed_massert(kbt_!=0.0,"you are requesting beta=1/(kB*T) when kB*T has not been defined. You need to give the temperature using the TEMP keyword as the MD engine does not pass it to PLUMED.");
+  return 1.0/kbt_;
 }
 
 
