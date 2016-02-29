@@ -394,15 +394,18 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
 
 void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
   double norm = 0.0;
-  for(unsigned int l=0; l<welltemp_ps_grid_pntr_->getSize(); l++){
+  size_t stride=mycomm_.Get_size();
+  size_t rank=mycomm_.Get_rank();
+  for(unsigned int l=rank; l<welltemp_ps_grid_pntr_->getSize(); l+=stride){
     std::vector<double> args_values = welltemp_ps_grid_pntr_->getPoint(l);
-    double value = -beta_prime_ * getFES_WellTempered(args_values);
+    double value = -beta_prime_ * getFES_WellTempered(args_values,false);
     value = exp(value);
     norm += value;
     welltemp_ps_grid_pntr_->setValue(l,value);
   }
   norm = 1.0/(welltemp_ps_grid_pntr_->getBinVolume()*norm);
   welltemp_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
+  welltemp_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
 }
 
 
@@ -422,23 +425,26 @@ void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_gr
   std::vector<double> coeffderivs_aver_ps(ncoeffs_,0.0);
   double sum_grid = 0.0;
   double binVol = ps_grid_pntr->getBinVolume();
-  for(unsigned int l=0; l<ps_grid_pntr->getSize(); l++){
+  size_t stride=mycomm_.Get_size();
+  size_t rank=mycomm_.Get_rank();
+  for(unsigned int l=rank; l<ps_grid_pntr->getSize(); l+=stride){
     std::vector<double> args_values = ps_grid_pntr->getPoint(l);
     std::vector<double> basisset_values(ncoeffs_);
-    getBasisSetValues(args_values,basisset_values);
+    getBasisSetValues(args_values,basisset_values,false);
     double weight = ps_grid_pntr->getValue(l)*binVol;
     sum_grid += weight;
     for(unsigned int i=0; i<ncoeffs_; i++){
       coeffderivs_aver_ps[i] += weight*basisset_values[i];
     }
   }
-  // std::cerr << "sum_grid: " << sum_grid << "\n";
   if(normalize_dist){
-    for(unsigned int i=1; i<ncoeffs_; i++){
+    mycomm_.Sum(sum_grid);
+    for(unsigned int i=rank; i<ncoeffs_; i+=stride){
       coeffderivs_aver_ps[i] /= sum_grid;
     }
   }
   // the overall constant;
+  mycomm_.Sum(coeffderivs_aver_ps);
   coeffderivs_aver_ps[0] = 1.0;
   CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
 }
