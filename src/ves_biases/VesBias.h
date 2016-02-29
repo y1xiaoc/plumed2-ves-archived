@@ -159,6 +159,7 @@ public:
   bool diagonalHessian() const {return diagonal_hessian_;}
   //
   bool optimizeCoeffs() const {return optimize_coeffs_;}
+  Optimizer* getOptimizerPntr() const {return optimizer_pntr_;}
 
   void updateGradientAndHessian();
   void clearGradientAndHessian();

@@ -24,6 +24,7 @@
 #include "ves_tools/CoeffsVector.h"
 #include "ves_tools/CoeffsMatrix.h"
 #include "ves_basisfunctions/BasisFunctions.h"
+#include "ves_optimizers/Optimizer.h"
 
 #include "bias/Bias.h"
 #include "core/ActionRegister.h"
@@ -159,6 +160,7 @@ void VesLinearExpansion::calculate() {
 void VesLinearExpansion::updateTargetDistributions() {
   bias_expansion_pntr_->updateWellTemperedTargetDistribution();
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
+  getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(getOptimizerPntr()->getIterationCounter(),this->getTime());
   getCoeffDerivsAverTargetDistPntr()->writeToFile("basis_norm.data",true,true,static_cast<Action*>(this));
 }
 
