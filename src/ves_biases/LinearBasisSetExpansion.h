@@ -109,10 +109,10 @@ private:
   static double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
   double getBias(const std::vector<double>&);
-  double getFES_WellTempered(const std::vector<double>&);
+  double getFES_WellTempered(const std::vector<double>&, const bool parallel=true);
   //
   static void getBasisSetValues(const std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
-  void getBasisSetValues(const std::vector<double>&, std::vector<double>&);
+  void getBasisSetValues(const std::vector<double>&, std::vector<double>&, const bool parallel=true);
   // Grid stuff
   void setupBiasGrid(const bool usederiv=false);
   void updateBiasGrid();
@@ -206,16 +206,26 @@ double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values) 
 
 
 inline
-double LinearBasisSetExpansion::getFES_WellTempered(const std::vector<double>& args_values) {
+double LinearBasisSetExpansion::getFES_WellTempered(const std::vector<double>& args_values, const bool parallel) {
   std::vector<double> forces_dummy(nargs_);
   std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
-  return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, &mycomm_);
+  if(parallel){
+    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, &mycomm_);
+  }
+  else{
+    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, NULL);
+  }
 }
 
 
 inline
-void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values) {
-  getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values, const bool parallel) {
+  if(parallel){
+    getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+  }
+  else{
+    getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, NULL);
+  }
 }
 
 
