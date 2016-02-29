@@ -115,6 +115,7 @@ valueForce2_(NULL)
     bias_expansion_pntr_->setupWellTemperedTargetDistribution(this->getWellTemperedBiasFactor());
   }
 
+  getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(getOptimizerPntr()->getIterationCounter(),this->getTime());
   getCoeffDerivsAverTargetDistPntr()->writeToFile("basis_norm.data",true,false,static_cast<Action*>(this));
   //
   readCoeffsFromFiles();
