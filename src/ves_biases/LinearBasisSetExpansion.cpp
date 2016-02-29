@@ -403,6 +403,7 @@ void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
     norm += value;
     welltemp_ps_grid_pntr_->setValue(l,value);
   }
+  mycomm_.Sum(norm);
   norm = 1.0/(welltemp_ps_grid_pntr_->getBinVolume()*norm);
   welltemp_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
   welltemp_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
