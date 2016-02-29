@@ -440,7 +440,7 @@ void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_gr
   }
   if(normalize_dist){
     mycomm_.Sum(sum_grid);
-    for(unsigned int i=rank; i<ncoeffs_; i+=stride){
+    for(unsigned int i=0; i<ncoeffs_; i++){
       coeffderivs_aver_ps[i] /= sum_grid;
     }
   }
