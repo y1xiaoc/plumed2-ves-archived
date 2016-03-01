@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "BasisFunctions.h"
 #include "ves_targetdistributions/TargetDistribution.h"
+#include "ves_targetdistributions/TargetDistributionRegister.h"
 #include "ves_biases/VesBias.h"
 
 
@@ -240,6 +241,22 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const T
 
 }
 
+
+std::vector<double> BasisFunctions::getTargetDistributionIntegrals(const std::string targetdist_keyword) const {
+  std::vector<std::string> words = Tools::getWords(targetdist_keyword);
+  TargetDistribution* targetdist_pntr = NULL;
+  if(words[0]=="UNIFORM"){
+    targetdist_pntr = NULL;
+  }
+  else{
+    targetdist_pntr = targetDistributionRegister().create(words);
+  }
+  std::vector<double> integrals = getTargetDistributionIntegrals(targetdist_pntr);
+  if(targetdist_pntr!=NULL){
+    delete targetdist_pntr;
+  }
+  return integrals;
+}
 
 
 std::string BasisFunctions::getKeywordString() const {

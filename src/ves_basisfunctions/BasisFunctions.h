@@ -140,6 +140,7 @@ public:
   double intervalDerivf() const;
   std::vector<double> getUniformIntegrals() const;
   std::vector<double> getTargetDistributionIntegrals(TargetDistribution*) const;
+  std::vector<double> getTargetDistributionIntegrals(const std::string) const;
   unsigned getNumberOfDerivatives(){return 0;}
   //
   std::vector<std::string> getKeywordList() const;
