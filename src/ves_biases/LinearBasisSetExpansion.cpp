@@ -333,7 +333,8 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     std::vector<unsigned int> nbins(1);
     nbins[0]=300;
     std::string ks; Tools::convert(k+1,ks);
-    std::string filename = "targetdist-" + ks + ".data";
+    std::string filename = "targetdist.arg-" + ks + ".data";
+    if(nargs_==1){filename = "targetdist.data";}
     if(targetdist_pntrs[k]!=NULL){
       targetdist_pntrs[k]->writeDistributionToFile(filename,min,max,nbins);
     }
