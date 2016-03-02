@@ -57,6 +57,7 @@ diagonal_hessian_(true),
 targetdist_keywords_(0),
 targetdist_pntrs_(0),
 dynamic_targetdist_(false),
+fname_coeffderivs_aver_ps("targetdist_averages.data"),
 aver_counter(0.0),
 kbt_(0.0),
 welltemp_biasf_(1.0),
@@ -80,6 +81,10 @@ grid_max_(0)
 
   if(keywords.exists("COEFFS")){
     parseVector("COEFFS",coeffs_fnames);
+  }
+
+  if(keywords.exists("TARGETDISTRIBUTION_AVERAGES_FILE")){
+    parse("TARGETDISTRIBUTION_AVERAGES_FILE",fname_coeffderivs_aver_ps);
   }
 
   if(keywords.exists("GRID_BINS")){
@@ -144,11 +149,19 @@ VesBias::~VesBias(){
 void VesBias::registerKeywords( Keywords& keys ) {
   Bias::registerKeywords(keys);
   keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature to PLUMED.");
+  //
   keys.addOutputComponent("bias","default","the instantaneous value of the bias potential.");
   keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential.");
+  //
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
+  //
+  keys.add("optional","TARGETDISTRIBUTION_AVERAGES_FILE","file for writing out the averages over the target distribution.");
+  //
+  //
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
+    //
   keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
+  //
   keys.reserve("optional","GRID_BINS","the number of bins used for the grid. The default value is 100 bins per dimension.");
   keys.reserve("optional","GRID_MIN","the lower bounds used for the grid.");
   keys.reserve("optional","GRID_MAX","the upper bounds used for the grid.");
@@ -412,6 +425,12 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 
 
 void VesBias::updateTargetDistributions() {}
+
+
+void VesBias::writeCoeffDerivsAverTargetDistToFile(const bool append, const unsigned int iteration) {
+  getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(iteration,this->getTime());
+  getCoeffDerivsAverTargetDistPntr()->writeToFile(fname_coeffderivs_aver_ps,true,append,static_cast<Action*>(this));
+}
 
 
 void VesBias::setGridBins(const std::vector<unsigned int>& grid_bins_in) {

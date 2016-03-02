@@ -81,6 +81,8 @@ private:
   std::vector<TargetDistribution*> targetdist_pntrs_;
   bool dynamic_targetdist_;
   //
+  std::string fname_coeffderivs_aver_ps;
+  //
   double aver_counter;
   double kbt_;
   //
@@ -165,6 +167,7 @@ public:
   void clearGradientAndHessian();
   //
   virtual void updateTargetDistributions();
+  void writeCoeffDerivsAverTargetDistToFile(const bool append = false, const unsigned int iteration = 0);
   //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);

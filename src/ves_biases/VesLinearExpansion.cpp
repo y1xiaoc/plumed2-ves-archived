@@ -115,8 +115,7 @@ valueForce2_(NULL)
     bias_expansion_pntr_->setupWellTemperedTargetDistribution(this->getWellTemperedBiasFactor());
   }
 
-  getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(0,this->getTime());
-  getCoeffDerivsAverTargetDistPntr()->writeToFile("basis_norm.data",true,false,static_cast<Action*>(this));
+  writeCoeffDerivsAverTargetDistToFile();
   //
   readCoeffsFromFiles();
   //
@@ -161,8 +160,7 @@ void VesLinearExpansion::calculate() {
 void VesLinearExpansion::updateTargetDistributions() {
   bias_expansion_pntr_->updateWellTemperedTargetDistribution();
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
-  getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(getOptimizerPntr()->getIterationCounter(),this->getTime());
-  getCoeffDerivsAverTargetDistPntr()->writeToFile("basis_norm.data",true,true,static_cast<Action*>(this));
+  writeCoeffDerivsAverTargetDistToFile(true,getOptimizerPntr()->getIterationCounter());
 }
 
 }
