@@ -95,7 +95,6 @@ private:
   //
 private:
   void initializeCoeffs(CoeffsVector*);
-  std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0);
 protected:
   //
   void checkThatTemperatureIsGiven();
@@ -103,6 +102,7 @@ protected:
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
   void addCoeffsSet(CoeffsVector*);
+  std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0);
   void clearCoeffsPntrsVector();
   void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
   void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
