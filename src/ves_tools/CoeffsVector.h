@@ -89,6 +89,8 @@ public:
   void clear();
   void setAllValuesToZero();
   //
+  std::vector<double> getDataAsVector() const {return data;}
+  //
   bool sameShape(CoeffsVector&) const;
   bool sameShape(CoeffsMatrix&) const;
   static bool sameShape(CoeffsVector&, CoeffsVector&);

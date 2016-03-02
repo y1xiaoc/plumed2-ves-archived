@@ -117,6 +117,8 @@ public:
   // clear coeffs
   void clear();
   void setAllValuesToZero();
+  //
+  std::vector<double> getDataAsVector() const {return data;}
   // get value
   double getValue(const size_t, const size_t) const;
   double getValue(const std::vector<unsigned int>&, const std::vector<unsigned int>&) const;
