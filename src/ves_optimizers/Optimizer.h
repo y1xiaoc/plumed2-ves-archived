@@ -89,6 +89,9 @@ private:
   //
   bool identical_coeffs_shape_;
   //
+  bool bias_output_active_;
+  unsigned int bias_output_stride_;
+  //
 private:
   void updateOutputComponents();
   void writeOutputFiles();

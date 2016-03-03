@@ -93,6 +93,8 @@ private:
   std::vector<double> grid_min_;
   std::vector<double> grid_max_;
   //
+  std::string bias_filename_;
+  //
 private:
   void initializeCoeffs(CoeffsVector*);
 protected:
@@ -189,6 +191,12 @@ public:
   void setGridMax(const std::vector<double>&);
   std::vector<double> getGridMin() const {return grid_min_;}
   void setGridMin(const std::vector<double>&);
+  //
+  std::string getBiasOutputFilename() const {return bias_filename_;}
+  std::string getCurrentBiasOutputFilename() const;
+  //
+  virtual void setupBiasFileOutput();
+  virtual void writeBiasToFile();
 };
 
 inline

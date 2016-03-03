@@ -64,7 +64,8 @@ welltemp_biasf_(1.0),
 welltemp_targetdist_(false),
 grid_bins_(0),
 grid_min_(0),
-grid_max_(0)
+grid_max_(0),
+bias_filename_("")
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -126,6 +127,12 @@ grid_max_(0)
     }
   }
 
+  if(keywords.exists("BIAS_FILENAME")){
+    parse("BIAS_FILENAME",bias_filename_);
+    if(bias_filename_.size()==0){
+      bias_filename_ = "bias." + getLabel() + ".data";
+    }
+  }
 
 }
 
@@ -165,6 +172,8 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","GRID_BINS","the number of bins used for the grid. The default value is 100 bins per dimension.");
   keys.reserve("optional","GRID_MIN","the lower bounds used for the grid.");
   keys.reserve("optional","GRID_MAX","the upper bounds used for the grid.");
+  //
+  keys.add("optional","BIAS_FILENAME","filename of the file on which the bias should be written out. By default it is bias.LABEL.data");
 }
 
 
@@ -455,6 +464,27 @@ void VesBias::setGridMax(const std::vector<double>& grid_max_in) {
   plumed_massert(grid_max_in.size()==getNumberOfArguments(),"the number of upper bounds given for the grid doesn't match the number of arguments");
   grid_max_=grid_max_in;
 }
+
+
+std::string VesBias::getCurrentBiasOutputFilename() const {
+  std::string filename;
+  if(optimizeCoeffs()){
+    std::string iter_str;
+    Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
+    iter_str = "iter-" + iter_str;
+    filename = FileBase::appendSuffix(bias_filename_,"."+iter_str);
+  }
+  else{
+    filename = bias_filename_;
+  }
+  return filename;
+}
+
+
+void VesBias::setupBiasFileOutput() {}
+
+
+void VesBias::writeBiasToFile() {}
 
 
 }
