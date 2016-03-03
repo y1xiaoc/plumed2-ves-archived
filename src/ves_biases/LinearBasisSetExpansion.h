@@ -116,7 +116,7 @@ private:
   // Grid stuff
   void setupBiasGrid(const bool usederiv=false);
   void updateBiasGrid();
-  void writeBiasGridToFile(const std::string&, const bool);
+  void writeBiasGridToFile(const std::string&, const bool append=false);
   //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);

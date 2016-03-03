@@ -59,6 +59,8 @@ public:
   ~VesLinearExpansion();
   void calculate();
   void updateTargetDistributions();
+  void setupBiasFileOutput();
+  void writeBiasToFile();
   static void registerKeywords( Keywords& keys );
 };
 
@@ -161,6 +163,17 @@ void VesLinearExpansion::updateTargetDistributions() {
   bias_expansion_pntr_->updateWellTemperedTargetDistribution();
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
   writeCoeffDerivsAverTargetDistToFile(true,getOptimizerPntr()->getIterationCounter());
+}
+
+
+void VesLinearExpansion::setupBiasFileOutput() {
+  bias_expansion_pntr_->setupBiasGrid(false);
+}
+
+
+void VesLinearExpansion::writeBiasToFile() {
+  bias_expansion_pntr_->updateBiasGrid();
+  bias_expansion_pntr_->writeBiasGridToFile(getCurrentBiasOutputFilename());
 }
 
 }
