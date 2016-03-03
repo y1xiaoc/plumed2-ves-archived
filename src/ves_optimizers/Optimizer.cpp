@@ -453,6 +453,7 @@ bias_output_stride_(0)
       bias_output_active_=true;
       for(unsigned int i=0; i<nbiases_; i++){
         bias_pntrs_[i]->setupBiasFileOutput();
+        bias_pntrs_[i]->writeBiasToFile();
       }
     }
     else{
