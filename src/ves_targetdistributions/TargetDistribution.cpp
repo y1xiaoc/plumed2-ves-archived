@@ -174,4 +174,25 @@ void TargetDistribution::writeProbGridToFile(const std::string& filepath, Grid* 
   }
 }
 
+
+void TargetDistribution::calculateSeperableDistributionOnGrid(Grid* grid_pntr, std::vector<TargetDistribution*> targetdist_pntrs) {
+  unsigned int ntargetdist = targetdist_pntrs.size();
+  plumed_massert(grid_pntr->getDimension()==ntargetdist,"dimension of Grid doesn't match the number of seperable one-dimensional target distribtions");
+  for(unsigned int k=0; k<ntargetdist; k++){
+    plumed_massert(targetdist_pntrs[k]->getDimension()==1,"all the target distribtions must be one-dimensional");
+  }
+  for(unsigned int l=0; l<grid_pntr->getSize(); l++)
+  {
+   std::vector<double> argument=grid_pntr->getPoint(l);
+   double value=1;
+   std::vector<double> arg1d(1);
+   for(unsigned int k=0; k<ntargetdist; k++){
+     arg1d[0] = argument[k];
+     value*=targetdist_pntrs[k]->getValue(arg1d);
+   }
+   grid_pntr->setValue(l,value);
+  }
+}
+
+
 }
