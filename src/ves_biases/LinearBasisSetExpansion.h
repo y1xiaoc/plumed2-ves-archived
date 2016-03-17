@@ -73,8 +73,7 @@ private:
   Grid* fes_grid_pntr_;
   Grid* ps_grid_pntr_;
   Grid* welltemp_ps_grid_pntr_;
-  //
- public:
+public:
   static void registerKeywords( Keywords& keys );
   // Constructor
   explicit LinearBasisSetExpansion(
@@ -85,6 +84,10 @@ private:
     std::vector<BasisFunctions*>,
     CoeffsVector* bias_coeffs_pntr_in=NULL);
   //
+private:
+  // copy constructor is disabled (private and unimplemented)
+  explicit LinearBasisSetExpansion(const LinearBasisSetExpansion&);
+public:
   ~LinearBasisSetExpansion();
   //
   std::vector<Value*> getPntrsToArguments() const ;
@@ -135,7 +138,7 @@ private:
   void updateWellTemperedTargetDistribution();
 private:
   //
-  Grid* setupGeneralGrid(const std::string, const std::vector<unsigned int>&, const bool usederiv=false);
+  Grid* setupGeneralGrid(const std::string&, const std::vector<unsigned int>&, const bool usederiv=false);
   void setupSeperableTargetDistribution(const std::vector<TargetDistribution*>&);
   void setupNonSeperableTargetDistribution(const TargetDistribution*);
   //
@@ -226,12 +229,6 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
   else{
     getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, NULL);
   }
-}
-
-
-inline
-void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
-  bias_grid_pntr_ = setupGeneralGrid("bias",grid_bins_,usederiv);
 }
 
 

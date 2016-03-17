@@ -242,7 +242,7 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const T
 }
 
 
-std::vector<double> BasisFunctions::getTargetDistributionIntegrals(const std::string targetdist_keyword) const {
+std::vector<double> BasisFunctions::getTargetDistributionIntegrals(const std::string& targetdist_keyword) const {
   std::vector<std::string> words = Tools::getWords(targetdist_keyword);
   TargetDistribution* targetdist_pntr = NULL;
   if(words[0]=="UNIFORM"){

@@ -145,7 +145,7 @@ void LinearBasisSetExpansion::setGridBins(const unsigned int nbins) {
 }
 
 
-Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string label_suffix, const std::vector<unsigned int>& nbins, const bool usederiv) {
+Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string& label_suffix, const std::vector<unsigned int>& nbins, const bool usederiv) {
   plumed_assert(nbins.size()==nargs_);
   std::vector<std::string> min(nargs_);
   std::vector<std::string> max(nargs_);
@@ -155,6 +155,12 @@ Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string label_suffix, 
   }
   Grid* grid_pntr = new Grid(label_+"."+label_suffix,args_pntrs_,min,max,nbins,false,usederiv);
   return grid_pntr;
+}
+
+
+void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
+  plumed_massert(bias_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias grid has already been defined.");
+  bias_grid_pntr_ = setupGeneralGrid("bias",grid_bins_,usederiv);
 }
 
 
@@ -380,6 +386,7 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
   beta_prime_ = beta_/welltemp_biasf_;
+  plumed_massert(fes_wt_coeffs_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the CoeffsVector for the well-tempered FES has already been defined");
   fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
   std::string fes_wt_label = bias_coeffs_pntr_->getLabel();
   if(fes_wt_label.find("coeffs")!=std::string::npos){
@@ -389,6 +396,7 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
     fes_wt_label += "_fes_wt";
   }
   fes_wt_coeffs_pntr_->setLabels(fes_wt_label);
+  plumed_massert(welltemp_ps_grid_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the grid for the well-tempered p(s) has already been defined");
   welltemp_ps_grid_pntr_ = setupGeneralGrid("ps_wt",grid_bins_,false);
 }
 

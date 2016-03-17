@@ -141,7 +141,7 @@ void TargetDistribution::calculateDistributionOnGrid(Grid* grid_pntr) const {
 }
 
 
-void TargetDistribution::writeProbGridToFile(const std::string filepath, Grid* grid_pntr, const bool do_projections) {
+void TargetDistribution::writeProbGridToFile(const std::string& filepath, Grid* grid_pntr, const bool do_projections) {
   OFile file;
   file.setBackupString("bck");
   file.open(filepath);
