@@ -337,14 +337,13 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     Tools::convert(basisf_pntrs_[k]->intervalMin(),min[0]);
     Tools::convert(basisf_pntrs_[k]->intervalMax(),max[0]);
     std::vector<unsigned int> nbins(1);
-    nbins[0]=300;
+    nbins[0]=grid_bins_[k];
     std::string ks; Tools::convert(k+1,ks);
     std::string filename = "targetdist.arg-" + ks + ".data";
     if(nargs_==1){filename = "targetdist.data";}
     if(targetdist_pntrs[k]!=NULL){
       targetdist_pntrs[k]->writeDistributionToFile(filename,min,max,nbins);
     }
-
   }
   //
   std::vector< std::vector <double> > bf_integrals(0);
