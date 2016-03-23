@@ -135,6 +135,7 @@ public:
   // Well-Tempered p(s) stuff
   void setupWellTemperedTargetDistribution(const double);
   double getWellTemperedBiasFactor() const {return welltemp_biasf_;}
+  void setWellTemperedBiasFactor(const double);
   void updateWellTemperedTargetDistribution();
 private:
   //
