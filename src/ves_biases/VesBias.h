@@ -94,6 +94,7 @@ private:
   std::vector<double> grid_max_;
   //
   std::string bias_filename_;
+  std::string fes_filename_;
   //
 private:
   void initializeCoeffs(CoeffsVector*);
@@ -194,9 +195,13 @@ public:
   //
   std::string getBiasOutputFilename() const {return bias_filename_;}
   std::string getCurrentBiasOutputFilename() const;
+  std::string getFesOutputFilename() const {return fes_filename_;}
+  std::string getCurrentFesOutputFilename() const;
   //
-  virtual void setupBiasFileOutput();
-  virtual void writeBiasToFile();
+  virtual void setupBiasFileOutput() {};
+  virtual void writeBiasToFile() {};
+  virtual void setupFesFileOutput() {};
+  virtual void writeFesToFile() {};
 };
 
 inline

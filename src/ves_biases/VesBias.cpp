@@ -65,7 +65,8 @@ welltemp_targetdist_(false),
 grid_bins_(0),
 grid_min_(0),
 grid_max_(0),
-bias_filename_("")
+bias_filename_(""),
+fes_filename_("")
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -133,6 +134,12 @@ bias_filename_("")
       bias_filename_ = "bias." + getLabel() + ".data";
     }
   }
+  if(keywords.exists("FES_FILENAME")){
+    parse("FES_FILENAME",fes_filename_);
+    if(fes_filename_.size()==0){
+      fes_filename_ = "fes." + getLabel() + ".data";
+    }
+  }
 
 }
 
@@ -174,6 +181,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","GRID_MAX","the upper bounds used for the grid.");
   //
   keys.add("optional","BIAS_FILENAME","filename of the file on which the bias should be written out. By default it is bias.LABEL.data");
+  keys.add("optional","FES_FILENAME","filename of the file on which the FES should be written out. By default it is fes.LABEL.data");  
 }
 
 
@@ -481,10 +489,21 @@ std::string VesBias::getCurrentBiasOutputFilename() const {
 }
 
 
-void VesBias::setupBiasFileOutput() {}
+std::string VesBias::getCurrentFesOutputFilename() const {
+  std::string filename;
+  if(optimizeCoeffs()){
+    std::string iter_str;
+    Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
+    iter_str = "iter-" + iter_str;
+    filename = FileBase::appendSuffix(fes_filename_,"."+iter_str);
+  }
+  else{
+    filename = fes_filename_;
+  }
+  return filename;
+}
 
 
-void VesBias::writeBiasToFile() {}
 
 
 }
