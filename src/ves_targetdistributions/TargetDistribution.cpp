@@ -165,7 +165,7 @@ void TargetDistribution::writeProbGridToFile(const std::string& filepath, Grid* 
       OFile file2;
       file2.setBackupString("bck");
       std::string proj_fname = argnames[i];
-      proj_fname = FileBase::appendSuffix(filepath,"."+proj_fname);
+      proj_fname = FileBase::appendSuffix(filepath,".proj-"+proj_fname);
       file2.open(proj_fname);
       proj_grid.writeToFile(file2);
       file2.close();
@@ -179,6 +179,7 @@ void TargetDistribution::calculateSeperableDistributionOnGrid(Grid* grid_pntr, s
   unsigned int ntargetdist = targetdist_pntrs.size();
   plumed_massert(grid_pntr->getDimension()==ntargetdist,"dimension of Grid doesn't match the number of seperable one-dimensional target distribtions");
   for(unsigned int k=0; k<ntargetdist; k++){
+    plumed_massert(targetdist_pntrs[k]!=NULL,"all the target distribtions must be defined");
     plumed_massert(targetdist_pntrs[k]->getDimension()==1,"all the target distribtions must be one-dimensional");
   }
   for(unsigned int l=0; l<grid_pntr->getSize(); l++)
