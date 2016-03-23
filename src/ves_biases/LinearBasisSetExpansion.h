@@ -72,6 +72,7 @@ private:
   Grid* bias_grid_pntr_;
   Grid* fes_grid_pntr_;
   Grid* ps_grid_pntr_;
+  Grid* log_ps_grid_pntr_;
   Grid* welltemp_ps_grid_pntr_;
 public:
   static void registerKeywords( Keywords& keys );
@@ -116,10 +117,14 @@ public:
   //
   static void getBasisSetValues(const std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   void getBasisSetValues(const std::vector<double>&, std::vector<double>&, const bool parallel=true);
-  // Grid stuff
+  // Bias grid and output stuff
   void setupBiasGrid(const bool usederiv=false);
   void updateBiasGrid();
   void writeBiasGridToFile(const std::string&, const bool append=false);
+  // Bias grid and output stuff
+  void setupFesGrid();
+  void updateFesGrid();
+  void writeFesGridToFile(const std::string&, const bool append=false);
   //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);

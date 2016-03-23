@@ -74,6 +74,7 @@ grid_bins_(nargs_,100),
 bias_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
 ps_grid_pntr_(NULL),
+log_ps_grid_pntr_(NULL),
 welltemp_ps_grid_pntr_(NULL)
 {
   plumed_massert(args_pntrs_.size()==basisf_pntrs_.size(),"number of arguments and basis functions do not match");
@@ -113,6 +114,9 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   }
   if(ps_grid_pntr_!=NULL){
     delete ps_grid_pntr_;
+  }
+  if(log_ps_grid_pntr_!=NULL){
+    delete log_ps_grid_pntr_;
   }
   if(welltemp_ps_grid_pntr_!=NULL){
     delete welltemp_ps_grid_pntr_;
@@ -163,6 +167,15 @@ void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
 }
 
 
+void LinearBasisSetExpansion::setupFesGrid() {
+  plumed_massert(fes_grid_pntr_==NULL,"setupFesGrid should only be called once: the fes grid has already been defined.");
+  if(bias_grid_pntr_==NULL){
+    setupBiasGrid(false);
+  }
+  fes_grid_pntr_ = setupGeneralGrid("fes",grid_bins_,false);
+}
+
+
 void LinearBasisSetExpansion::updateBiasGrid() {
   for(unsigned int l=0; l<bias_grid_pntr_->getSize(); l++){
     std::vector<double> forces(nargs_);
@@ -179,6 +192,21 @@ void LinearBasisSetExpansion::updateBiasGrid() {
 }
 
 
+void LinearBasisSetExpansion::updateFesGrid() {
+  updateBiasGrid();
+  double fes_scalingf = -1.0;
+  bool log_ps_term = false;
+  if(log_ps_grid_pntr_!=NULL){log_ps_term = true;}
+  for(unsigned int l=0; l<fes_grid_pntr_->getSize(); l++){
+    double fes_value = fes_scalingf*bias_grid_pntr_->getValue(l);
+    if(log_ps_term){
+      fes_value += log_ps_grid_pntr_->getValue(l);
+    }
+    fes_grid_pntr_->setValue(l,fes_value);
+  }
+}
+
+
 void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) {
   OFile file;
   if(append_file){file.enforceRestart();}
@@ -187,6 +215,18 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
   }
   file.open(filepath);
   bias_grid_pntr_->writeToFile(file);
+  file.close();
+}
+
+
+void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, const bool append_file) {
+  OFile file;
+  if(append_file){file.enforceRestart();}
+  if(action_pntr_!=NULL){
+    file.link(*action_pntr_);
+  }
+  file.open(filepath);
+  fes_grid_pntr_->writeToFile(file);
   file.close();
 }
 
@@ -394,6 +434,8 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
         delete targetdist_pntrs_modifed[k];
       }
     }
+    log_ps_grid_pntr_ = new Grid(*ps_grid_pntr);
+    log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
     delete ps_grid_pntr;
   }
 }
@@ -408,6 +450,8 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
   targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
   calculateCoeffDerivsAverFromGrid(ps_grid_pntr);
   TargetDistribution::writeProbGridToFile("targetdist.data",ps_grid_pntr,true);
+  log_ps_grid_pntr_ = new Grid(*ps_grid_pntr);
+  log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
   delete ps_grid_pntr;
 }
 

@@ -61,6 +61,8 @@ public:
   void updateTargetDistributions();
   void setupBiasFileOutput();
   void writeBiasToFile();
+  void setupFesFileOutput();
+  void writeFesToFile();
   static void registerKeywords( Keywords& keys );
 };
 
@@ -174,6 +176,17 @@ void VesLinearExpansion::setupBiasFileOutput() {
 void VesLinearExpansion::writeBiasToFile() {
   bias_expansion_pntr_->updateBiasGrid();
   bias_expansion_pntr_->writeBiasGridToFile(getCurrentBiasOutputFilename());
+}
+
+
+void VesLinearExpansion::setupFesFileOutput() {
+  bias_expansion_pntr_->setupFesGrid();
+}
+
+
+void VesLinearExpansion::writeFesToFile() {
+  bias_expansion_pntr_->updateFesGrid();
+  bias_expansion_pntr_->writeFesGridToFile(getCurrentFesOutputFilename());
 }
 
 }
