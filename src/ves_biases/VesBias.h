@@ -81,8 +81,6 @@ private:
   std::vector<TargetDistribution*> targetdist_pntrs_;
   bool dynamic_targetdist_;
   //
-  std::string fname_coeffderivs_aver_ps;
-  //
   double aver_counter;
   double kbt_;
   //
@@ -98,6 +96,7 @@ private:
   std::string bias_filename_;
   std::string fes_filename_;
   std::string targetdist_filename_;
+  std::string targetdist_averages_filename_;
   //
 private:
   void initializeCoeffs(CoeffsVector*);
@@ -206,6 +205,7 @@ public:
   std::string getCurrentFesOutputFilename() const;
   std::string getTargetDistOutputFilename() const {return targetdist_filename_;}
   std::string getCurrentTargetDistOutputFilename(const std::string suffix="") const;
+  std::string getTargetDistAveragesOutputFilename() const {return targetdist_averages_filename_;}
   //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};

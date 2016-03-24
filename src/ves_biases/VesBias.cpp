@@ -57,7 +57,6 @@ diagonal_hessian_(true),
 targetdist_keywords_(0),
 targetdist_pntrs_(0),
 dynamic_targetdist_(false),
-fname_coeffderivs_aver_ps("targetdist_averages.data"),
 aver_counter(0.0),
 kbt_(0.0),
 uniform_targetdist_(false),
@@ -68,7 +67,8 @@ grid_min_(0),
 grid_max_(0),
 bias_filename_(""),
 fes_filename_(""),
-targetdist_filename_("")
+targetdist_filename_(""),
+targetdist_averages_filename_("")
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -85,10 +85,6 @@ targetdist_filename_("")
 
   if(keywords.exists("COEFFS")){
     parseVector("COEFFS",coeffs_fnames);
-  }
-
-  if(keywords.exists("TARGETDISTRIBUTION_AVERAGES_FILE")){
-    parse("TARGETDISTRIBUTION_AVERAGES_FILE",fname_coeffderivs_aver_ps);
   }
 
   if(keywords.exists("GRID_BINS")){
@@ -149,6 +145,15 @@ targetdist_filename_("")
     }
   }
 
+  if(keywords.exists("TARGETDIST_AVERAGES_FILENAME")){
+    parse("TARGETDIST_AVERAGES_FILENAME",targetdist_averages_filename_);
+    if(targetdist_averages_filename_.size()==0){
+      targetdist_averages_filename_ = "targetdist-averages." + getLabel() + ".data";
+    }
+
+  }
+
+
 
 }
 
@@ -178,9 +183,6 @@ void VesBias::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   //
-  keys.add("optional","TARGETDISTRIBUTION_AVERAGES_FILE","file for writing out the averages over the target distribution.");
-  //
-  //
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
     //
   keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
@@ -192,6 +194,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.add("optional","BIAS_FILENAME","filename of the file on which the bias should be written out. By default it is bias.LABEL.data");
   keys.add("optional","FES_FILENAME","filename of the file on which the FES should be written out. By default it is fes.LABEL.data");
   keys.add("optional","TARGETDIST_FILENAME","filename of the file on which the target distribution info should be written out. By default it is targetdist.LABEL.data");
+  keys.add("optional","TARGETDIST_AVERAGES_FILENAME","filename of the file for writing out the averages over the target distribution. By default it is targetdist-averages.LABEL.data");
 }
 
 
@@ -456,7 +459,7 @@ void VesBias::updateTargetDistributions() {}
 
 void VesBias::writeCoeffDerivsAverTargetDistToFile(const bool append, const unsigned int iteration) {
   getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(iteration,this->getTime());
-  getCoeffDerivsAverTargetDistPntr()->writeToFile(fname_coeffderivs_aver_ps,true,append,static_cast<Action*>(this));
+  getCoeffDerivsAverTargetDistPntr()->writeToFile(getTargetDistAveragesOutputFilename(),true,append,static_cast<Action*>(this));
 }
 
 
