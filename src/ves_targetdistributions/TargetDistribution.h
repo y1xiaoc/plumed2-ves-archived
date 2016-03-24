@@ -106,6 +106,7 @@ public:
   static void writeDistributionToFile(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   void calculateDistributionOnGrid(Grid*) const;
   static void writeProbGridToFile(const std::string&, Grid*, const bool do_projections=false);
+  static Grid getMarginalGrid(Grid*, const std::string);
   static void calculateSeperableDistributionOnGrid(Grid* grid_pntr, std::vector<TargetDistribution*> targetdist_pntrs);
   virtual void update() {};
   virtual double getNormalization() const {return 1.0;}

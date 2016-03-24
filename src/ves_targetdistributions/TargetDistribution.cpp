@@ -148,20 +148,9 @@ void TargetDistribution::writeProbGridToFile(const std::string& filepath, Grid* 
   grid_pntr->writeToFile(file);
   file.close();
   if(do_projections && grid_pntr->getDimension()>1){
-    MarginalWeight* Pw = new MarginalWeight();
     std::vector<std::string> argnames = grid_pntr->getArgNames();
-    std::vector<double> binDeltas = grid_pntr->getDx();
     for(unsigned int i=0; i<argnames.size(); i++){
-      std::vector<std::string> arg(1,argnames[i]);
-      Grid proj_grid = grid_pntr->project(arg,Pw);
-      // scale with the bin volume used for the integral such that the
-      // marginals are proberly normalized
-      double intVol = 1.0;
-      for(unsigned int l=0; l<binDeltas.size(); l++){
-        if(l!=i){intVol*=binDeltas[l];}
-      }
-      proj_grid.scaleAllValuesAndDerivatives(intVol);
-      //
+      Grid proj_grid = getMarginalGrid(grid_pntr,argnames[i]);
       OFile file2;
       file2.setBackupString("bck");
       std::string proj_fname = argnames[i];
@@ -170,8 +159,35 @@ void TargetDistribution::writeProbGridToFile(const std::string& filepath, Grid* 
       proj_grid.writeToFile(file2);
       file2.close();
     }
-    delete Pw;
   }
+}
+
+
+Grid TargetDistribution::getMarginalGrid(Grid* grid_pntr, const std::string arg) {
+  plumed_massert(grid_pntr->getDimension()>1,"doesn't make sense calculating the marginal for a one-dimensional grid");
+  MarginalWeight* Pw = new MarginalWeight();
+  std::vector<std::string> argnames = grid_pntr->getArgNames();
+  std::vector<double> binDeltas = grid_pntr->getDx();
+  bool arg_found = false;
+  unsigned int arg_index = 0;
+  for(unsigned int i=0; i<argnames.size(); i++){
+    if(argnames[i]==arg){
+      arg_found=true;
+      arg_index=i;
+    }
+  }
+  plumed_massert(arg_found,"getMarginalGrid: the argument given is not one of grid arguments");
+  std::vector<std::string> argv(1,arg);
+  Grid proj_grid = grid_pntr->project(argv,Pw);
+  // scale with the bin volume used for the integral such that the
+  // marginals are proberly normalized
+  double intVol = 1.0;
+  for(unsigned int l=0; l<binDeltas.size(); l++){
+    if(l!=arg_index){intVol*=binDeltas[l];}
+  }
+  proj_grid.scaleAllValuesAndDerivatives(intVol);
+  delete Pw;
+  return proj_grid;
 }
 
 
