@@ -398,16 +398,23 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     Tools::convert(basisf_pntrs_[k]->intervalMax(),max[0]);
     std::vector<unsigned int> nbins(1);
     nbins[0]=grid_bins_[k];
+    //
     std::string grid_label = "projection";
-    std::string filename = "targetdist.proj-" + args_pntrs_[k]->getName() + ".data";
+    std::string fname_suffix = "proj-" + args_pntrs_[k]->getName();
+    std::string ps_filename = "targetdist." + fname_suffix + ".data";
     if(nargs_==1){
-      filename = "targetdist.data";
+      fname_suffix = "";
       grid_label = "target_distribution";
+      ps_filename = "targetdist.data";
     }
+    if(vesbias_pntr_!=NULL){
+      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename(fname_suffix);
+    }
+    //
     Grid grid1d_tmp = Grid(grid_label,arg,min,max,nbins,false,false);
     if(targetdist_pntrs[k]!=NULL){
       targetdist_pntrs[k]->calculateDistributionOnGrid(&grid1d_tmp);
-      TargetDistribution::writeProbGridToFile(filename,&grid1d_tmp,false);
+      TargetDistribution::writeProbGridToFile(ps_filename,&grid1d_tmp,false);
     }
   }
   //
@@ -428,7 +435,11 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     }
     Grid* ps_grid_pntr = setupGeneralGrid("target_distribution",grid_bins_,false);
     TargetDistribution::calculateSeperableDistributionOnGrid(ps_grid_pntr,targetdist_pntrs_modifed);
-    TargetDistribution::writeProbGridToFile("targetdist.data",ps_grid_pntr,false);
+    std::string ps_filename = "targetdist.data";
+    if(vesbias_pntr_!=NULL){
+      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
+    }
+    TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr,false);
     for(unsigned int k=0;k<nargs_;k++){
       if(targetdist_pntrs[k]==NULL && targetdist_pntrs_modifed[k]!=NULL){
         delete targetdist_pntrs_modifed[k];
@@ -449,7 +460,21 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
   Grid* ps_grid_pntr = setupGeneralGrid("target_distribution",grid_bins_,false);
   targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
   calculateCoeffDerivsAverFromGrid(ps_grid_pntr);
-  TargetDistribution::writeProbGridToFile("targetdist.data",ps_grid_pntr,true);
+  //
+  std::string ps_filename = "targetdist.data";
+  if(vesbias_pntr_!=NULL){
+    ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
+  }
+  TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr,false);
+  //
+  for(unsigned int k=0; k<args_pntrs_.size(); k++){
+    Grid proj_grid = TargetDistribution::getMarginalGrid(ps_grid_pntr,args_pntrs_[k]->getName());
+    std::string proj_fname = "targetdist.proj-" + args_pntrs_[k]->getName() + ".data";
+    if(vesbias_pntr_!=NULL){
+      proj_fname = vesbias_pntr_->getCurrentTargetDistOutputFilename("proj-"+args_pntrs_[k]->getName());
+    }
+    TargetDistribution::writeProbGridToFile(proj_fname,&proj_grid,false);
+  }
   log_ps_grid_pntr_ = new Grid(*ps_grid_pntr);
   log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
   delete ps_grid_pntr;
@@ -459,10 +484,13 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
 void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf) {
   plumed_massert(welltemp_biasf_<0.0,"setupWellTemperedTargetDistribution should only be run once.");
   plumed_massert(biasf>1.0,"setupWellTemperedTargetDistribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
+  plumed_massert(fes_wt_coeffs_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the CoeffsVector for the well-tempered FES has already been defined");
+  plumed_massert(welltemp_ps_grid_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the grid for the well-tempered p(s) has already been defined");
+  //
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
   beta_prime_ = beta_/welltemp_biasf_;
-  plumed_massert(fes_wt_coeffs_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the CoeffsVector for the well-tempered FES has already been defined");
+  //
   fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
   std::string fes_wt_label = bias_coeffs_pntr_->getLabel();
   if(fes_wt_label.find("coeffs")!=std::string::npos){
@@ -472,7 +500,7 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
     fes_wt_label += "_fes_wt";
   }
   fes_wt_coeffs_pntr_->setLabels(fes_wt_label);
-  plumed_massert(welltemp_ps_grid_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the grid for the well-tempered p(s) has already been defined");
+  //
   welltemp_ps_grid_pntr_ = setupGeneralGrid("ps_wt",grid_bins_,false);
 }
 
