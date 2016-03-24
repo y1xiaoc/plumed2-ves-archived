@@ -60,13 +60,15 @@ dynamic_targetdist_(false),
 fname_coeffderivs_aver_ps("targetdist_averages.data"),
 aver_counter(0.0),
 kbt_(0.0),
+uniform_targetdist_(false),
 welltemp_biasf_(1.0),
 welltemp_targetdist_(false),
 grid_bins_(0),
 grid_min_(0),
 grid_max_(0),
 bias_filename_(""),
-fes_filename_("")
+fes_filename_(""),
+targetdist_filename_("")
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -140,6 +142,13 @@ fes_filename_("")
       fes_filename_ = "fes." + getLabel() + ".data";
     }
   }
+  if(keywords.exists("TARGETDIST_FILENAME")){
+    parse("TARGETDIST_FILENAME",targetdist_filename_);
+    if(targetdist_filename_.size()==0){
+      targetdist_filename_ = "targetdist." + getLabel() + ".data";
+    }
+  }
+
 
 }
 
@@ -181,7 +190,8 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","GRID_MAX","the upper bounds used for the grid.");
   //
   keys.add("optional","BIAS_FILENAME","filename of the file on which the bias should be written out. By default it is bias.LABEL.data");
-  keys.add("optional","FES_FILENAME","filename of the file on which the FES should be written out. By default it is fes.LABEL.data");  
+  keys.add("optional","FES_FILENAME","filename of the file on which the FES should be written out. By default it is fes.LABEL.data");
+  keys.add("optional","TARGETDIST_FILENAME","filename of the file on which the target distribution info should be written out. By default it is targetdist.LABEL.data");
 }
 
 
@@ -475,30 +485,39 @@ void VesBias::setGridMax(const std::vector<double>& grid_max_in) {
 
 
 std::string VesBias::getCurrentBiasOutputFilename() const {
-  std::string filename;
+  std::string filename = bias_filename_;
   if(optimizeCoeffs()){
     std::string iter_str;
     Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
     iter_str = "iter-" + iter_str;
-    filename = FileBase::appendSuffix(bias_filename_,"."+iter_str);
-  }
-  else{
-    filename = bias_filename_;
+    filename = FileBase::appendSuffix(filename,"."+iter_str);
   }
   return filename;
 }
 
 
 std::string VesBias::getCurrentFesOutputFilename() const {
-  std::string filename;
+  std::string filename = fes_filename_;
   if(optimizeCoeffs()){
     std::string iter_str;
     Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
     iter_str = "iter-" + iter_str;
-    filename = FileBase::appendSuffix(fes_filename_,"."+iter_str);
+    filename = FileBase::appendSuffix(filename,"."+iter_str);
   }
-  else{
-    filename = fes_filename_;
+  return filename;
+}
+
+
+std::string VesBias::getCurrentTargetDistOutputFilename(const std::string suffix) const {
+  std::string filename = targetdist_filename_;
+  if(suffix.size()>0){
+    filename = FileBase::appendSuffix(filename,"."+suffix);
+  }
+  if(optimizeCoeffs() && dynamicTargetDistribution()){
+    std::string iter_str;
+    Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
+    iter_str = "iter-" + iter_str;
+    filename = FileBase::appendSuffix(filename,"."+iter_str);
   }
   return filename;
 }

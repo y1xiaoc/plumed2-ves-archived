@@ -86,6 +86,8 @@ private:
   double aver_counter;
   double kbt_;
   //
+  bool uniform_targetdist_;
+  //
   double welltemp_biasf_;
   bool welltemp_targetdist_;
   //
@@ -95,6 +97,7 @@ private:
   //
   std::string bias_filename_;
   std::string fes_filename_;
+  std::string targetdist_filename_;
   //
 private:
   void initializeCoeffs(CoeffsVector*);
@@ -182,6 +185,10 @@ public:
   void disableDynamicTargetDistribution() {dynamic_targetdist_=false;}
   bool dynamicTargetDistribution() const {return dynamic_targetdist_;}
   //
+  void enableUniformTargetDistribution() {uniform_targetdist_=true;}
+  void disableUniformTargetDistribution() {uniform_targetdist_=false;}
+  bool uniformTargetDistribution() const {return uniform_targetdist_;}
+    //
   double getWellTemperedBiasFactor() const;
   bool wellTemperdTargetDistribution() const {return welltemp_targetdist_;}
   //
@@ -197,6 +204,8 @@ public:
   std::string getCurrentBiasOutputFilename() const;
   std::string getFesOutputFilename() const {return fes_filename_;}
   std::string getCurrentFesOutputFilename() const;
+  std::string getTargetDistOutputFilename() const {return targetdist_filename_;}
+  std::string getCurrentTargetDistOutputFilename(const std::string suffix="") const;
   //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};
