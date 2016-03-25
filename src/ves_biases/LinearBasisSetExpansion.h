@@ -63,7 +63,7 @@ private:
   CoeffsVector* coeffderivs_aver_ps_pntr_;
   CoeffsVector* fes_wt_coeffs_pntr_;
   //
-  double bias2fes_scalingf_;
+  double bias_fes_scalingf_;
   //
   double welltemp_biasf_;
   double inv_welltemp_biasf_;
@@ -146,7 +146,7 @@ public:
   void setupTargetDistribution(const std::string&);
   //
   //
-  double getBiasToFesScalingFactor() const {return bias2fes_scalingf_;}
+  double getBiasToFesScalingFactor() const {return bias_fes_scalingf_;}
   // Well-Tempered p(s) stuff
   void setupWellTemperedTargetDistribution(const double);
   double getWellTemperedBiasFactor() const {return welltemp_biasf_;}
