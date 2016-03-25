@@ -412,8 +412,10 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     coeffderivs_aver_ps_pntr_->setValue(i,value);
   }
   //
+  bool all_targetdist_uniform = true;
   for(unsigned int k=0;k<nargs_;k++){
     if(targetdist_pntrs[k]!=NULL){
+      all_targetdist_uniform = false;
       Grid* grid1d_pntr_tmp = setupOneDimensionalMarginalGrid(targetdist_grid_label_+"_proj",grid_bins_[k],k);
       targetdist_pntrs[k]->calculateDistributionOnGrid(grid1d_pntr_tmp);
       //
@@ -427,41 +429,43 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     }
   }
   //
-  std::vector<TargetDistribution*> targetdist_pntrs_modifed(nargs_);
-  for(unsigned int k=0;k<nargs_;k++){
-    targetdist_pntrs_modifed[k]=targetdist_pntrs[k];
-    if(targetdist_pntrs[k]==NULL){
-      std::vector<std::string> words;
-      std::string tmp1;
-      words.push_back("UNIFORM");
-      VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMin(),tmp1);
-      words.push_back("MINIMA=" + tmp1);
-      VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMax(),tmp1);
-      words.push_back("MAXIMA=" + tmp1);
-      targetdist_pntrs_modifed[k] = targetDistributionRegister().create(words);
+  if(!all_targetdist_uniform){
+    std::vector<TargetDistribution*> targetdist_pntrs_modifed(nargs_);
+    for(unsigned int k=0;k<nargs_;k++){
+      targetdist_pntrs_modifed[k]=targetdist_pntrs[k];
+      if(targetdist_pntrs[k]==NULL){
+        std::vector<std::string> words;
+        std::string tmp1;
+        words.push_back("UNIFORM");
+        VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMin(),tmp1);
+        words.push_back("MINIMA=" + tmp1);
+        VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMax(),tmp1);
+        words.push_back("MAXIMA=" + tmp1);
+        targetdist_pntrs_modifed[k] = targetDistributionRegister().create(words);
+      }
     }
-  }
-  Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
-  TargetDistribution::calculateSeperableDistributionOnGrid(ps_grid_pntr,targetdist_pntrs_modifed);
-  std::string ps_filename = "targetdist.data";
-  if(vesbias_pntr_!=NULL){
-    ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
-  }
-  TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
-  delete ps_grid_pntr;
+    Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
+    TargetDistribution::calculateSeperableDistributionOnGrid(ps_grid_pntr,targetdist_pntrs_modifed);
+    std::string ps_filename = "targetdist.data";
+    if(vesbias_pntr_!=NULL){
+      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
+    }
+    TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
+    delete ps_grid_pntr;
     //
-  Grid* log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
-  TargetDistribution::calculateSeperableDistributionOnGrid(log_ps_grid_pntr_,targetdist_pntrs_modifed);
-  log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
-  ps_filename = "targetdist.log-beta.data";
-  if(vesbias_pntr_!=NULL){
-    ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
-  }
-  TargetDistribution::writeProbGridToFile(ps_filename,log_ps_grid_pntr_);
-  //
-  for(unsigned int k=0;k<nargs_;k++){
-    if(targetdist_pntrs[k]==NULL && targetdist_pntrs_modifed[k]!=NULL){
-      delete targetdist_pntrs_modifed[k];
+    Grid* log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
+    TargetDistribution::calculateSeperableDistributionOnGrid(log_ps_grid_pntr_,targetdist_pntrs_modifed);
+    log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
+    ps_filename = "targetdist.log-beta.data";
+    if(vesbias_pntr_!=NULL){
+      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
+    }
+    TargetDistribution::writeProbGridToFile(ps_filename,log_ps_grid_pntr_);
+    //
+    for(unsigned int k=0;k<nargs_;k++){
+      if(targetdist_pntrs[k]==NULL && targetdist_pntrs_modifed[k]!=NULL){
+        delete targetdist_pntrs_modifed[k];
+      }
     }
   }
 }
