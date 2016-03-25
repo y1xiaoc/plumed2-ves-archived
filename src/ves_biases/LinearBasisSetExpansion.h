@@ -50,6 +50,7 @@ private:
   bool serial_;
   //
   double beta_;
+  double kbt_;
   //
   std::vector<Value*> args_pntrs_;
   unsigned int nargs_;
@@ -68,6 +69,8 @@ private:
   //
   //
   std::vector<unsigned int> grid_bins_;
+  //
+  std::string targetdist_grid_label_;
   //
   Grid* bias_grid_pntr_;
   Grid* fes_grid_pntr_;
@@ -130,6 +133,9 @@ public:
   void setGridBins(const std::vector<unsigned int>&);
   void setGridBins(const unsigned int);
   //
+  double getBeta() const {return beta_;}
+  double getKbT() const {return kbt_;}
+  //
   void setupUniformTargetDistribution();
   //
   void setupTargetDistribution(const std::vector<TargetDistribution*>&);
@@ -140,6 +146,7 @@ public:
   // Well-Tempered p(s) stuff
   void setupWellTemperedTargetDistribution(const double);
   double getWellTemperedBiasFactor() const {return welltemp_biasf_;}
+  double getWellTemperedBetaPrime() const {return beta_prime_;}
   void setWellTemperedBiasFactor(const double);
   void updateWellTemperedTargetDistribution();
 private:
