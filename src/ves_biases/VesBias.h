@@ -77,12 +77,12 @@ private:
   bool compute_hessian_;
   bool diagonal_hessian_;
   //
+  double aver_counter;
+  double kbt_;
+  //
   std::vector<std::string> targetdist_keywords_;
   std::vector<TargetDistribution*> targetdist_pntrs_;
   bool dynamic_targetdist_;
-  //
-  double aver_counter;
-  double kbt_;
   //
   bool uniform_targetdist_;
   //
