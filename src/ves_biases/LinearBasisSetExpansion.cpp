@@ -68,6 +68,7 @@ bias_coeffs_pntr_(bias_coeffs_pntr_in),
 ncoeffs_(0),
 coeffderivs_aver_ps_pntr_(NULL),
 fes_wt_coeffs_pntr_(NULL),
+bias_scalingf_(-1.0),
 welltemp_biasf_(-1.0),
 inv_welltemp_biasf_(-1.0),
 beta_prime_(0.0),
@@ -196,7 +197,7 @@ void LinearBasisSetExpansion::updateBiasGrid() {
 
 void LinearBasisSetExpansion::updateFesGrid() {
   updateBiasGrid();
-  double fes_scalingf = -1.0;
+  double fes_scalingf = getBiasToFesScalingFactor();
   bool log_ps_term = false;
   if(log_ps_grid_pntr_!=NULL){log_ps_term = true;}
   for(unsigned int l=0; l<fes_grid_pntr_->getSize(); l++){
@@ -508,6 +509,7 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
   beta_prime_ = beta_/welltemp_biasf_;
+  bias2fes_scalingf_ = -(welltemp_biasf_)/(welltemp_biasf_-1.0);
   //
   fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
   std::string fes_wt_label = bias_coeffs_pntr_->getLabel();
@@ -528,6 +530,7 @@ void LinearBasisSetExpansion::setWellTemperedBiasFactor(const double biasf) {
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
   beta_prime_ = beta_/welltemp_biasf_;
+  bias2fes_scalingf_ = -(welltemp_biasf_)/(welltemp_biasf_-1.0);
 }
 
 
