@@ -96,18 +96,18 @@ private:
 public:
   ~LinearBasisSetExpansion();
   //
-  std::vector<Value*> getPntrsToArguments() const ;
-  std::vector<BasisFunctions*> getPntrsToBasisFunctions() const ;
-  CoeffsVector* getPntrToBiasCoeffs() const ;
-  Grid* getPntrToBiasGrid() const ;
+  std::vector<Value*> getPntrsToArguments() const {return args_pntrs_;}
+  std::vector<BasisFunctions*> getPntrsToBasisFunctions() const {return basisf_pntrs_;}
+  CoeffsVector* getPntrToBiasCoeffs() const {return bias_coeffs_pntr_;}
+  Grid* getPntrToBiasGrid() const {return bias_grid_pntr_;};
   //
-  unsigned int getNumberOfArguments() const ;
-  std::vector<unsigned int> getNumberOfBasisFunctions() const ;
-  size_t getNumberOfCoeffs() const ;
+  unsigned int getNumberOfArguments() const {return nargs_;};
+  std::vector<unsigned int> getNumberOfBasisFunctions() const {return nbasisf_;};
+  size_t getNumberOfCoeffs() const {return ncoeffs_;};
   //
-  CoeffsVector& BiasCoeffs() const;
-  CoeffsVector& FesWTCoeffs() const;
-  CoeffsVector& CoeffDerivsAverTargetDist() const;
+  CoeffsVector& BiasCoeffs() const {return *bias_coeffs_pntr_;};
+  CoeffsVector& FesWTCoeffs() const {return *fes_wt_coeffs_pntr_;};
+  CoeffsVector& CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr_;};
   //
   void setSerial() {serial_=true;}
   void setParallel() {serial_=false;}
@@ -168,35 +168,6 @@ private:
   //
 };
 
-inline
-std::vector<Value*> LinearBasisSetExpansion::getPntrsToArguments() const {return args_pntrs_;}
-
-inline
-std::vector<BasisFunctions*> LinearBasisSetExpansion::getPntrsToBasisFunctions() const {return basisf_pntrs_;}
-
-inline
-CoeffsVector* LinearBasisSetExpansion::getPntrToBiasCoeffs() const {return bias_coeffs_pntr_;}
-
-inline
-Grid* LinearBasisSetExpansion::getPntrToBiasGrid() const {return bias_grid_pntr_;}
-
-inline
-unsigned int LinearBasisSetExpansion::getNumberOfArguments() const {return nargs_;}
-
-inline
-std::vector<unsigned int> LinearBasisSetExpansion::getNumberOfBasisFunctions() const {return nbasisf_;}
-
-inline
-size_t LinearBasisSetExpansion::getNumberOfCoeffs() const {return ncoeffs_;}
-
-inline
-CoeffsVector& LinearBasisSetExpansion::BiasCoeffs() const {return *bias_coeffs_pntr_;}
-
-inline
-CoeffsVector& LinearBasisSetExpansion::FesWTCoeffs() const {return *fes_wt_coeffs_pntr_;}
-
-inline
-CoeffsVector& LinearBasisSetExpansion::CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr_;}
 
 inline
 void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_keyword) {
