@@ -156,7 +156,9 @@ public:
 private:
   //
   Grid* setupGeneralGrid(const std::string&, const std::vector<unsigned int>&, const bool usederiv=false);
+  Grid* setupOneDimensionalMarginalGrid(const std::string&, const unsigned int, const unsigned int);
   void setupSeperableTargetDistribution(const std::vector<TargetDistribution*>&);
+  void setupOneDimensionalTargetDistribution(const std::vector<TargetDistribution*>&);
   void setupNonSeperableTargetDistribution(const TargetDistribution*);
   //
   void calculateCoeffDerivsAverFromGrid(const Grid*, const bool normalize_dist=false);

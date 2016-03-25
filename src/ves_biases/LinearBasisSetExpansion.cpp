@@ -164,6 +164,22 @@ Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string& label_suffix,
 }
 
 
+Grid* LinearBasisSetExpansion::setupOneDimensionalMarginalGrid(const std::string& label_suffix, const unsigned int nbins, const unsigned int dim) {
+  plumed_assert(dim<nargs_);
+  std::vector<Value*> arg(1);
+  arg[0]=args_pntrs_[dim];
+  std::vector<std::string> min(1);
+  std::vector<std::string> max(1);
+  Tools::convert(basisf_pntrs_[dim]->intervalMin(),min[0]);
+  Tools::convert(basisf_pntrs_[dim]->intervalMax(),max[0]);
+  std::vector<unsigned int> nbinsv(1);
+  nbinsv[0]=nbins;
+  //
+  Grid* grid_pntr = new Grid(label_+"."+label_suffix,arg,min,max,nbinsv,false,false);
+  return grid_pntr;
+}
+
+
 void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
   plumed_massert(bias_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias grid has already been defined.");
   bias_grid_pntr_ = setupGeneralGrid("bias",grid_bins_,usederiv);
@@ -330,7 +346,7 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
 
 void LinearBasisSetExpansion::setupUniformTargetDistribution() {
   std::vector<TargetDistribution*> targetdist_dummy(nargs_,NULL);
-  setupSeperableTargetDistribution(targetdist_dummy);
+  setupTargetDistribution(targetdist_dummy);
 }
 
 
@@ -361,7 +377,10 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDi
   if(targetdist_pntrs.size()!=1 && targetdist_pntrs.size()!=nargs_){
     plumed_merror("the number of target distribution pointers needs to be either 1 or equal to the number of arguments");
   }
-  if(nargs_>1 && targetdist_pntrs.size()==1){
+  if(nargs_==1){
+    setupOneDimensionalTargetDistribution(targetdist_pntrs);
+  }
+  else if(nargs_>1 && targetdist_pntrs.size()==1){
     setupNonSeperableTargetDistribution(targetdist_pntrs[0]);
   }
   else{
@@ -372,6 +391,7 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDi
 
 void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
   plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
+  plumed_massert(nargs_>1,"setupSeperableTargetDistribution should not be used for one-dimensional cases");
   //
   std::vector< std::vector <double> > bf_integrals(0);
   for(unsigned int k=0;k<nargs_;k++){
@@ -393,51 +413,77 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
   }
   //
   for(unsigned int k=0;k<nargs_;k++){
-    std::vector<Value*> arg(1);
-    arg[0]=args_pntrs_[k];
-    std::vector<std::string> min(1);
-    std::vector<std::string> max(1);
-    Tools::convert(basisf_pntrs_[k]->intervalMin(),min[0]);
-    Tools::convert(basisf_pntrs_[k]->intervalMax(),max[0]);
-    std::vector<unsigned int> nbins(1);
-    nbins[0]=grid_bins_[k];
-    //
-    std::string proj_grid_label = targetdist_grid_label_ + "_proj";
-    std::string fname_suffix = "proj-" + args_pntrs_[k]->getName();
-    std::string ps_filename = "targetdist." + fname_suffix + ".data";
-    if(nargs_==1){
-      fname_suffix = "";
-      proj_grid_label = targetdist_grid_label_;
-      ps_filename = "targetdist.data";
-    }
-    if(vesbias_pntr_!=NULL){
-      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename(fname_suffix);
-    }
-    //
-    Grid grid1d_tmp = Grid(proj_grid_label,arg,min,max,nbins,false,false);
     if(targetdist_pntrs[k]!=NULL){
-      targetdist_pntrs[k]->calculateDistributionOnGrid(&grid1d_tmp);
-      TargetDistribution::writeProbGridToFile(ps_filename,&grid1d_tmp);
+      Grid* grid1d_pntr_tmp = setupOneDimensionalMarginalGrid(targetdist_grid_label_+"_proj",grid_bins_[k],k);
+      targetdist_pntrs[k]->calculateDistributionOnGrid(grid1d_pntr_tmp);
+      //
+      std::string fname_suffix = "proj-" + args_pntrs_[k]->getName();
+      std::string ps_filename = "targetdist." + fname_suffix + ".data";
+      if(vesbias_pntr_!=NULL){
+        ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename(fname_suffix);
+      }
+      TargetDistribution::writeProbGridToFile(ps_filename,grid1d_pntr_tmp);
+      delete grid1d_pntr_tmp;
     }
   }
   //
-  if(nargs_!=1){
-    std::vector<TargetDistribution*> targetdist_pntrs_modifed(nargs_);
-    for(unsigned int k=0;k<nargs_;k++){
-      targetdist_pntrs_modifed[k]=targetdist_pntrs[k];
-      if(targetdist_pntrs[k]==NULL){
-        std::vector<std::string> words;
-        std::string tmp1;
-        words.push_back("UNIFORM");
-        VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMin(),tmp1);
-        words.push_back("MINIMA=" + tmp1);
-        VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMax(),tmp1);
-        words.push_back("MAXIMA=" + tmp1);
-        targetdist_pntrs_modifed[k] = targetDistributionRegister().create(words);
-      }
+  std::vector<TargetDistribution*> targetdist_pntrs_modifed(nargs_);
+  for(unsigned int k=0;k<nargs_;k++){
+    targetdist_pntrs_modifed[k]=targetdist_pntrs[k];
+    if(targetdist_pntrs[k]==NULL){
+      std::vector<std::string> words;
+      std::string tmp1;
+      words.push_back("UNIFORM");
+      VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMin(),tmp1);
+      words.push_back("MINIMA=" + tmp1);
+      VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMax(),tmp1);
+      words.push_back("MAXIMA=" + tmp1);
+      targetdist_pntrs_modifed[k] = targetDistributionRegister().create(words);
     }
+  }
+  Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
+  TargetDistribution::calculateSeperableDistributionOnGrid(ps_grid_pntr,targetdist_pntrs_modifed);
+  std::string ps_filename = "targetdist.data";
+  if(vesbias_pntr_!=NULL){
+    ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
+  }
+  TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
+  delete ps_grid_pntr;
+    //
+  Grid* log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
+  TargetDistribution::calculateSeperableDistributionOnGrid(log_ps_grid_pntr_,targetdist_pntrs_modifed);
+  log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
+  ps_filename = "targetdist.log-beta.data";
+  if(vesbias_pntr_!=NULL){
+    ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
+  }
+  TargetDistribution::writeProbGridToFile(ps_filename,log_ps_grid_pntr_);
+  //
+  for(unsigned int k=0;k<nargs_;k++){
+    if(targetdist_pntrs[k]==NULL && targetdist_pntrs_modifed[k]!=NULL){
+      delete targetdist_pntrs_modifed[k];
+    }
+  }
+}
+
+
+void LinearBasisSetExpansion::setupOneDimensionalTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
+  plumed_massert(nargs_==1,"setupOneDimensionalTargetDistribution should only be used for one-dimensional cases");
+  plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
+  //
+  std::vector<double> bf_integrals;
+  if(targetdist_pntrs[0]!=NULL){
+    bf_integrals = basisf_pntrs_[0]->getTargetDistributionIntegrals(targetdist_pntrs[0]);
+  }
+  else{
+    bf_integrals = basisf_pntrs_[0]->getUniformIntegrals();
+  }
+  plumed_massert(bf_integrals.size()==ncoeffs_,"something wrong in setupOneDimensionalTargetDistribution");
+  coeffderivs_aver_ps_pntr_->setValues(bf_integrals);
+  //
+  if(targetdist_pntrs[0]!=NULL){
     Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
-    TargetDistribution::calculateSeperableDistributionOnGrid(ps_grid_pntr,targetdist_pntrs_modifed);
+    targetdist_pntrs[0]->calculateDistributionOnGrid(ps_grid_pntr);
     std::string ps_filename = "targetdist.data";
     if(vesbias_pntr_!=NULL){
       ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
@@ -446,19 +492,13 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     delete ps_grid_pntr;
     //
     Grid* log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
-    TargetDistribution::calculateSeperableDistributionOnGrid(log_ps_grid_pntr_,targetdist_pntrs_modifed);
+    targetdist_pntrs[0]->calculateDistributionOnGrid(log_ps_grid_pntr_);
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
     ps_filename = "targetdist.log-beta.data";
     if(vesbias_pntr_!=NULL){
       ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
     }
     TargetDistribution::writeProbGridToFile(ps_filename,log_ps_grid_pntr_);
-    //
-    for(unsigned int k=0;k<nargs_;k++){
-      if(targetdist_pntrs[k]==NULL && targetdist_pntrs_modifed[k]!=NULL){
-        delete targetdist_pntrs_modifed[k];
-      }
-    }
   }
 }
 
@@ -468,6 +508,7 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
     setupUniformTargetDistribution();
     return;
   }
+  plumed_massert(nargs_>1,"setupNonSeperableTargetDistribution should not be used for one-dimensional cases");
   Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
   targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
   calculateCoeffDerivsAverFromGrid(ps_grid_pntr);
