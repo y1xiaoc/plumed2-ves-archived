@@ -69,6 +69,7 @@ ncoeffs_(0),
 coeffderivs_aver_ps_pntr_(NULL),
 fes_wt_coeffs_pntr_(NULL),
 bias_fes_scalingf_(-1.0),
+log_ps_fes_contribution_(false),
 welltemp_biasf_(-1.0),
 inv_welltemp_biasf_(-1.0),
 beta_prime_(0.0),
@@ -214,11 +215,9 @@ void LinearBasisSetExpansion::updateBiasGrid() {
 void LinearBasisSetExpansion::updateFesGrid() {
   updateBiasGrid();
   double fes_scalingf = getBiasToFesScalingFactor();
-  bool log_ps_term = false;
-  if(log_ps_grid_pntr_!=NULL){log_ps_term = true;}
   for(unsigned int l=0; l<fes_grid_pntr_->getSize(); l++){
     double fes_value = fes_scalingf*bias_grid_pntr_->getValue(l);
-    if(log_ps_term){
+    if(log_ps_fes_contribution_){
       fes_value += log_ps_grid_pntr_->getValue(l);
     }
     fes_grid_pntr_->setValue(l,fes_value);
@@ -453,9 +452,10 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
     delete ps_grid_pntr;
     //
-    Grid* log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
+    log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
     TargetDistribution::calculateSeperableDistributionOnGrid(log_ps_grid_pntr_,targetdist_pntrs_modifed);
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
+    log_ps_fes_contribution_ = true;
     ps_filename = "targetdist.log-beta.data";
     if(vesbias_pntr_!=NULL){
       ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
@@ -495,9 +495,10 @@ void LinearBasisSetExpansion::setupOneDimensionalTargetDistribution(const std::v
     TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
     delete ps_grid_pntr;
     //
-    Grid* log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
+    log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
     targetdist_pntrs[0]->calculateDistributionOnGrid(log_ps_grid_pntr_);
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
+    log_ps_fes_contribution_ = true;
     ps_filename = "targetdist.log-beta.data";
     if(vesbias_pntr_!=NULL){
       ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
@@ -523,9 +524,10 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
   }
   TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
   //
-  Grid* log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"_log-beta",grid_bins_,false);
+  log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"_log-beta",grid_bins_,false);
   targetdist_pntr->calculateDistributionOnGrid(log_ps_grid_pntr_);
   log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
+  log_ps_fes_contribution_ = true;
   //
   ps_filename = "targetdist.log-beta.data";
   if(vesbias_pntr_!=NULL){

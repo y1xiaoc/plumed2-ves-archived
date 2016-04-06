@@ -64,6 +64,7 @@ private:
   CoeffsVector* fes_wt_coeffs_pntr_;
   //
   double bias_fes_scalingf_;
+  bool log_ps_fes_contribution_;
   //
   double welltemp_biasf_;
   double inv_welltemp_biasf_;
