@@ -163,7 +163,7 @@ void TargetDistribution::writeProbGridToFile(const std::string& filepath, Grid* 
 }
 
 
-Grid TargetDistribution::getMarginalGrid(Grid* grid_pntr, const std::string arg) {
+Grid TargetDistribution::getMarginalGrid(Grid* grid_pntr, const std::string& arg) {
   plumed_massert(grid_pntr->getDimension()>1,"doesn't make sense calculating the marginal for a one-dimensional grid");
   MarginalWeight* Pw = new MarginalWeight();
   std::vector<std::string> argnames = grid_pntr->getArgNames();
