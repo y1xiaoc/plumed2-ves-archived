@@ -199,12 +199,13 @@ public:
   std::vector<double> getGridMin() const {return grid_min_;}
   void setGridMin(const std::vector<double>&);
   //
+  std::string getCurrentOutputFilename(const std::string&) const;
   std::string getBiasOutputFilename() const {return bias_filename_;}
   std::string getCurrentBiasOutputFilename() const;
   std::string getFesOutputFilename() const {return fes_filename_;}
   std::string getCurrentFesOutputFilename() const;
   std::string getTargetDistOutputFilename() const {return targetdist_filename_;}
-  std::string getCurrentTargetDistOutputFilename(const std::string suffix="") const;
+  std::string getCurrentTargetDistOutputFilename(const std::string& suffix="") const;
   std::string getTargetDistAveragesOutputFilename() const {return targetdist_averages_filename_;}
   //
   virtual void setupBiasFileOutput() {};
@@ -253,6 +254,18 @@ inline
 double VesBias::getBeta() const {
   plumed_massert(kbt_!=0.0,"you are requesting beta=1/(kB*T) when kB*T has not been defined. You need to give the temperature using the TEMP keyword as the MD engine does not pass it to PLUMED.");
   return 1.0/kbt_;
+}
+
+
+inline
+std::string VesBias::getCurrentBiasOutputFilename() const {
+  return getCurrentOutputFilename(bias_filename_);
+}
+
+
+inline
+std::string VesBias::getCurrentFesOutputFilename() const {
+  return getCurrentOutputFilename(fes_filename_);
 }
 
 

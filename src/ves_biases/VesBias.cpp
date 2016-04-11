@@ -487,8 +487,8 @@ void VesBias::setGridMax(const std::vector<double>& grid_max_in) {
 }
 
 
-std::string VesBias::getCurrentBiasOutputFilename() const {
-  std::string filename = bias_filename_;
+std::string VesBias::getCurrentOutputFilename(const std::string& base_filename) const {
+  std::string filename = base_filename;
   if(optimizeCoeffs()){
     std::string iter_str;
     Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
@@ -499,19 +499,7 @@ std::string VesBias::getCurrentBiasOutputFilename() const {
 }
 
 
-std::string VesBias::getCurrentFesOutputFilename() const {
-  std::string filename = fes_filename_;
-  if(optimizeCoeffs()){
-    std::string iter_str;
-    Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
-    iter_str = "iter-" + iter_str;
-    filename = FileBase::appendSuffix(filename,"."+iter_str);
-  }
-  return filename;
-}
-
-
-std::string VesBias::getCurrentTargetDistOutputFilename(const std::string suffix) const {
+std::string VesBias::getCurrentTargetDistOutputFilename(const std::string& suffix) const {
   std::string filename = targetdist_filename_;
   if(suffix.size()>0){
     filename = FileBase::appendSuffix(filename,"."+suffix);
