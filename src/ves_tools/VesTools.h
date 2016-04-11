@@ -35,17 +35,22 @@ namespace PLMD{
 class VesTools{
 public:
 /// Convert double into a string with more digits
-  static void convertDbl2Str(const double value,std::string & str, unsigned int precision=0);
+  static void convertDbl2Str(const double value,std::string& str, unsigned int precision);
+  static void convertDbl2Str(const double value,std::string& str);
 };
 
 inline
-void VesTools::convertDbl2Str(double value,std::string & str, unsigned int precision){
-        if(precision==0){
-          precision = std::numeric_limits<double>::digits10 + 1;
-        }
-        std::ostringstream ostr;
-        ostr<<std::setprecision(precision)<<value;
-        str=ostr.str();
+void VesTools::convertDbl2Str(const double value,std::string& str, unsigned int precision){
+  std::ostringstream ostr;
+  ostr<<std::setprecision(precision)<<value;
+  str=ostr.str();
+}
+
+
+inline
+void VesTools::convertDbl2Str(const double value,std::string& str){
+  unsigned int precision = std::numeric_limits<double>::digits10 + 1;
+  convertDbl2Str(value,str,precision);
 }
 
 
