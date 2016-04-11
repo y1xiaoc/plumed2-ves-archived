@@ -37,7 +37,7 @@ namespace PLMD{
 
 void FermiSwitchingFunction::registerKeywords( Keywords& keys ){
   keys.add("compulsory","R_0","the value of R_0 in the switching function");
-  keys.add("compulsory","LAMBDA","the value of lambda in the Fermi-type switching function (only needed for TYPE=FERMI).");
+  keys.add("compulsory","FERMI_LAMBDA","the value of lambda in the Fermi-type switching function (only needed for TYPE=FERMI).");
   keys.add("optional","FERMI_EXP_MAX","only needed for TYPE=FERMI");
 }
 
@@ -56,8 +56,8 @@ void FermiSwitchingFunction::set(const std::string & definition,std::string& err
   fermi_exp_max_=std::numeric_limits<double>::max();
   Tools::parse(data,"FERMI_EXP_MAX",fermi_exp_max_);
   //
-  bool found_lambda=Tools::parse(data,"LAMBDA",fermi_lambda_);
-  if(!found_lambda){errormsg="LAMBDA is required for FERMI";}
+  bool found_lambda=Tools::parse(data,"FERMI_LAMBDA",fermi_lambda_);
+  if(!found_lambda){errormsg="FERMI_LAMBDA is required for FERMI";}
   if( !data.empty() ){
       errormsg="found the following rogue keywords in switching function input : ";
       for(unsigned i=0;i<data.size();++i) errormsg = errormsg + data[i] + " ";
