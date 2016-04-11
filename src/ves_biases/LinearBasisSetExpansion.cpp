@@ -635,6 +635,75 @@ void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_gr
   CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
 }
 
+
+void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
+  plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
+  plumed_massert(bias_grid_pntr_!=NULL,"the bias grid has to be defined");
+  double norm = 0.0;
+  size_t stride=mycomm_.Get_size();
+  size_t rank=mycomm_.Get_rank();
+  for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
+    std::vector<double> args_values = dynamic_ps_grid_pntr_->getPoint(l);
+    double bias = bias_grid_pntr_->getValue(l);
+    double deriv_factor_sf = 0.0;
+    // this comes from the p(s)
+    double value = vesbias_pntr_->getBiasCutoffSwitchingFunction(bias,deriv_factor_sf);
+    // this comes from the derivative of V(s)
+    value *= deriv_factor_sf;
+    norm += value;
+    dynamic_ps_grid_pntr_->setValue(l,value);
+  }
+  mycomm_.Sum(norm);
+  norm = 1.0/(dynamic_ps_grid_pntr_->getBinVolume()*norm);
+  dynamic_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
+  dynamic_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
+}
+
+
+void LinearBasisSetExpansion::updateBiasMaximumValue() {
+  plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
+  plumed_massert(bias_grid_pntr_!=NULL,"the bias grid has to be defined");
+  //
+  double bias_max = bias_grid_pntr_->getMaxValue();
+  vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
+  //
+  if(vesbias_pntr_->biasCutoffActive()){
+    double bias_min = bias_grid_pntr_->getMinValue();
+    if(bias_min < 0.0){
+      BiasCoeffs()[0] -= bias_min;
+      bias_max -= bias_min;
+    }
+    if(bias_max > vesbias_pntr_->getBiasCutoffValue()){
+      BiasCoeffs()[0] -= (bias_max-vesbias_pntr_->getBiasCutoffValue());
+      bias_max -= (bias_max-vesbias_pntr_->getBiasCutoffValue());
+    }
+  }
+  vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
+}
+
+
+void LinearBasisSetExpansion::updateBiasCutoffTargetDistribution() {
+  plumed_massert(bias_grid_pntr_!=NULL,"the bias grid has to be defined");
+  plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the p(s) grid has to be defined");
+  updateBiasGrid();
+  updateBiasMaximumValue();
+  updateBiasCutoffPsGrid();
+  calculateCoeffDerivsAverFromGrid(dynamic_ps_grid_pntr_);
+}
+
+
+void LinearBasisSetExpansion::setupBiasCutoffTargetDistribution() {
+  plumed_massert(dynamic_ps_grid_pntr_==NULL,"setupBiasCutoffTargetDistribution should only be called once: the grid for the p(s) has already been defined");
+  dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_cutoff",grid_bins_,false);
+}
+
+
+
+
+
+
+
+
 }
 
 }

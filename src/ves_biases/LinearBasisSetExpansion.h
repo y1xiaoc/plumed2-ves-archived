@@ -153,6 +153,9 @@ public:
   double getWellTemperedBetaPrime() const {return beta_prime_;}
   void setWellTemperedBiasFactor(const double);
   void updateWellTemperedTargetDistribution();
+  //
+  void setupBiasCutoffTargetDistribution();
+  void updateBiasCutoffTargetDistribution();
 private:
   //
   Grid* setupGeneralGrid(const std::string&, const std::vector<unsigned int>&, const bool usederiv=false);
@@ -166,6 +169,8 @@ private:
   void updateWellTemperedFESCoeffs();
   void updateWellTemperedPsGrid();
   //
+  void updateBiasMaximumValue();
+  void updateBiasCutoffPsGrid();
 };
 
 
