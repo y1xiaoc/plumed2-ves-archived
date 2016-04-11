@@ -117,7 +117,7 @@ public:
   // calculate bias and derivatives
   static double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
-  double getBias(const std::vector<double>&);
+  double getBias(const std::vector<double>&, const bool parallel=true);
   double getFES_WellTempered(const std::vector<double>&, const bool parallel=true);
   //
   static void getBasisSetValues(const std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
@@ -191,10 +191,15 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args
 
 
 inline
-double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values) {
+double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values, const bool parallel) {
   std::vector<double> forces_dummy(nargs_);
   std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
-  return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+  if(parallel){
+    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+  }
+  else{
+    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, NULL);
+  }
 }
 
 
