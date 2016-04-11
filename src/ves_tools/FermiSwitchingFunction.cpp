@@ -36,9 +36,9 @@ namespace PLMD{
 //+ENDPLUMEDOC
 
 void FermiSwitchingFunction::registerKeywords( Keywords& keys ){
-  keys.add("compulsory","F_CUTOFF","the value of F_c in the Fermi-type switching function");
-  keys.add("compulsory","LAMBDA","the value of lambda in the Fermi-type switching function.");
-  keys.add("optional","F_MAX","only needed for TYPE=FERMI");
+  keys.add("compulsory","R_0","the value of R_0 in the switching function");
+  keys.add("compulsory","LAMBDA","the value of lambda in the Fermi-type switching function (only needed for TYPE=FERMI).");
+  keys.add("optional","FERMI_EXP_MAX","only needed for TYPE=FERMI");
 }
 
 void FermiSwitchingFunction::set(const std::string & definition,std::string& errormsg){
@@ -49,14 +49,15 @@ void FermiSwitchingFunction::set(const std::string & definition,std::string& err
   if(name!="FERMI"){errormsg="only FERMI is supported";}
   type=fermi;
   //
-  bool found_fcutoff=Tools::parse(data,"F_CUTOFF",fermi_cutoff_);
-  if(!found_fcutoff){errormsg="F_CUTOFF is required";}
+  bool found_r0=Tools::parse(data,"R_0",r0_);
+  if(!found_r0){errormsg="R_0 is required";}
+
   //
-  fermi_rdist_max_=std::numeric_limits<double>::max();
-  Tools::parse(data,"F_MAX",fermi_rdist_max_);
+  fermi_exp_max_=std::numeric_limits<double>::max();
+  Tools::parse(data,"FERMI_EXP_MAX",fermi_exp_max_);
   //
   bool found_lambda=Tools::parse(data,"LAMBDA",fermi_lambda_);
-  if(!found_lambda) errormsg="LAMBDA is required for FERMI";
+  if(!found_lambda){errormsg="LAMBDA is required for FERMI";}
   if( !data.empty() ){
       errormsg="found the following rogue keywords in switching function input : ";
       for(unsigned i=0;i<data.size();++i) errormsg = errormsg + data[i] + " ";
@@ -67,10 +68,10 @@ void FermiSwitchingFunction::set(const std::string & definition,std::string& err
 
 std::string FermiSwitchingFunction::description() const {
   std::ostringstream ostr;
+  ostr<<1./invr0_<<".  Using ";
   if(type==fermi){
-    ostr<< "Fermi function: ";
-    ostr<< "F_cutoff="<<fermi_cutoff_;
-    ostr<< "lambda "<<fermi_lambda_;
+    ostr<< "fermi switching function with parameter";
+    ostr<< " lambda="<<fermi_lambda_;
   }
   else {
     plumed_merror("Unknown switching function type");
@@ -80,13 +81,11 @@ std::string FermiSwitchingFunction::description() const {
 
 
 double FermiSwitchingFunction::calculate(double distance, double& dfunc) const {
-  plumed_massert(init,"you are trying to use an unset FermiFermiSwitchingFunction");
-
-  double rdist=fermi_lambda_*(distance-fermi_cutoff_);
-  if(rdist >= fermi_rdist_max_){rdist = fermi_rdist_max_;}
+  plumed_massert(init,"you are trying to use an unset FermiSwitchingFunction");
+  double rdist=fermi_lambda_*(distance-r0_);
+  if(rdist >= fermi_exp_max_){rdist = fermi_exp_max_;}
   double result = 1.0/(1.0+exp(rdist));
   dfunc=-fermi_lambda_*exp(rdist)*result*result;
-  //
   // this is because calculate() sets dfunc to the derivative divided times the distance.
   // (I think this is misleading and I would like to modify it - GB)
   dfunc/=distance;
@@ -98,37 +97,39 @@ double FermiSwitchingFunction::calculate(double distance, double& dfunc) const {
 FermiSwitchingFunction::FermiSwitchingFunction():
 init(false),
 type(fermi),
-fermi_cutoff_(0.0),
+r0_(0.0),
+invr0_(0.0),
 fermi_lambda_(1.0),
-fermi_rdist_max_(100.0)
+fermi_exp_max_(100.0)
 {
 }
 
 FermiSwitchingFunction::FermiSwitchingFunction(const FermiSwitchingFunction&sf):
 init(sf.init),
 type(sf.type),
-fermi_cutoff_(sf.fermi_cutoff_),
+r0_(sf.r0_),
+invr0_(sf.invr0_),
 fermi_lambda_(sf.fermi_lambda_),
-fermi_rdist_max_(sf.fermi_rdist_max_)
+fermi_exp_max_(sf.fermi_exp_max_)
 {
 }
 
-void FermiSwitchingFunction::set(const double fermi_cutoff, const double fermi_lambda, const double fermi_rdist_max){
+void FermiSwitchingFunction::set(const double r0, const double fermi_lambda, const double fermi_exp_max){
   init=true;
   type=fermi;
-  fermi_cutoff_=fermi_cutoff;
+  r0_=r0;
   fermi_lambda_=fermi_lambda;
-  if(fermi_rdist_max>0.0){
-    fermi_rdist_max_=fermi_rdist_max;
+  if(fermi_exp_max>0.0){
+    fermi_exp_max_=fermi_exp_max;
   }
   else{
-    fermi_rdist_max_=std::numeric_limits<double>::max();
+    fermi_exp_max_=100.0;
   }
 
 }
 
 double FermiSwitchingFunction::get_r0() const {
-  return fermi_cutoff_;
+  return r0_;
 }
 
 

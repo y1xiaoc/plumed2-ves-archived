@@ -37,9 +37,10 @@ class FermiSwitchingFunction{
 /// Type of function
   enum {fermi} type;
 /// Parameters for fermi function
-  double fermi_cutoff_;
+  double r0_;
+  double invr0_;
   double fermi_lambda_;
-  double fermi_rdist_max_;
+  double fermi_exp_max_;
 public:
   static void registerKeywords( Keywords& keys );
 /// Constructor
