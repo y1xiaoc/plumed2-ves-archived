@@ -77,9 +77,8 @@ grid_bins_(nargs_,100),
 targetdist_grid_label_("targetdist"),
 bias_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
-ps_grid_pntr_(NULL),
 log_ps_grid_pntr_(NULL),
-welltemp_ps_grid_pntr_(NULL)
+dynamic_ps_grid_pntr_(NULL)
 {
   plumed_massert(args_pntrs_.size()==basisf_pntrs_.size(),"number of arguments and basis functions do not match");
   for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs_[k]->getNumberOfBasisFunctions();}
@@ -116,14 +115,11 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   if(fes_grid_pntr_!=NULL){
     delete fes_grid_pntr_;
   }
-  if(ps_grid_pntr_!=NULL){
-    delete ps_grid_pntr_;
-  }
   if(log_ps_grid_pntr_!=NULL){
     delete log_ps_grid_pntr_;
   }
-  if(welltemp_ps_grid_pntr_!=NULL){
-    delete welltemp_ps_grid_pntr_;
+  if(dynamic_ps_grid_pntr_!=NULL){
+    delete dynamic_ps_grid_pntr_;
   }
 
 }
@@ -551,7 +547,7 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
   plumed_massert(welltemp_biasf_<0.0,"setupWellTemperedTargetDistribution should only be run once.");
   plumed_massert(biasf>1.0,"setupWellTemperedTargetDistribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   plumed_massert(fes_wt_coeffs_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the CoeffsVector for the well-tempered FES has already been defined");
-  plumed_massert(welltemp_ps_grid_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the grid for the well-tempered p(s) has already been defined");
+  plumed_massert(dynamic_ps_grid_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the grid for the well-tempered p(s) has already been defined");
   //
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
@@ -568,7 +564,7 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
   }
   fes_wt_coeffs_pntr_->setLabels(fes_wt_label);
   //
-  welltemp_ps_grid_pntr_ = setupGeneralGrid("ps_wt",grid_bins_,false);
+  dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_wt",grid_bins_,false);
 }
 
 void LinearBasisSetExpansion::setWellTemperedBiasFactor(const double biasf) {
@@ -585,17 +581,17 @@ void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
   double norm = 0.0;
   size_t stride=mycomm_.Get_size();
   size_t rank=mycomm_.Get_rank();
-  for(unsigned int l=rank; l<welltemp_ps_grid_pntr_->getSize(); l+=stride){
-    std::vector<double> args_values = welltemp_ps_grid_pntr_->getPoint(l);
+  for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
+    std::vector<double> args_values = dynamic_ps_grid_pntr_->getPoint(l);
     double value = -beta_prime_ * getFES_WellTempered(args_values,false);
     value = exp(value);
     norm += value;
-    welltemp_ps_grid_pntr_->setValue(l,value);
+    dynamic_ps_grid_pntr_->setValue(l,value);
   }
   mycomm_.Sum(norm);
-  norm = 1.0/(welltemp_ps_grid_pntr_->getBinVolume()*norm);
-  welltemp_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
-  welltemp_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
+  norm = 1.0/(dynamic_ps_grid_pntr_->getBinVolume()*norm);
+  dynamic_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
+  dynamic_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
 }
 
 
@@ -606,7 +602,7 @@ void LinearBasisSetExpansion::updateWellTemperedTargetDistribution() {
   // Update p(s) grid
   updateWellTemperedPsGrid();
   // calcuate coeffs derivs from grid
-  calculateCoeffDerivsAverFromGrid(welltemp_ps_grid_pntr_);
+  calculateCoeffDerivsAverFromGrid(dynamic_ps_grid_pntr_);
 }
 
 

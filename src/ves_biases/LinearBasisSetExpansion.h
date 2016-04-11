@@ -77,9 +77,8 @@ private:
   //
   Grid* bias_grid_pntr_;
   Grid* fes_grid_pntr_;
-  Grid* ps_grid_pntr_;
   Grid* log_ps_grid_pntr_;
-  Grid* welltemp_ps_grid_pntr_;
+  Grid* dynamic_ps_grid_pntr_;
 public:
   static void registerKeywords( Keywords& keys );
   // Constructor
