@@ -24,6 +24,8 @@
 #include "ves_tools/CoeffsVector.h"
 #include "ves_tools/CoeffsMatrix.h"
 #include "ves_optimizers/Optimizer.h"
+#include "ves_tools/FermiSwitchingFunction.h"
+#include "ves_tools/VesTools.h"
 
 #include "tools/Communicator.h"
 #include "core/PlumedMain.h"
@@ -68,7 +70,11 @@ grid_max_(0),
 bias_filename_(""),
 fes_filename_(""),
 targetdist_filename_(""),
-targetdist_averages_filename_("")
+targetdist_averages_filename_(""),
+bias_cutoff_active_(false),
+bias_cutoff_value_(0.0),
+bias_current_max_value(0.0),
+bias_cutoff_swfunc_pntr_(NULL)
 {
   double temp=0.0;
   parse("TEMP",temp);
@@ -153,7 +159,13 @@ targetdist_averages_filename_("")
 
   }
 
+  if(keywords.exists("BIAS_CUTOFF")){
+    double cutoff_value=0.0;
+    parse("BIAS_CUTOFF",cutoff_value);
+    double fermi_lambda=1.0;
+    parse("BIAS_CUTOFF_FERMI_LAMBDA",fermi_lambda);
 
+  }
 
 }
 
@@ -170,6 +182,9 @@ VesBias::~VesBias(){
   }
   for(unsigned int i=0; i<hessian_pntrs_.size(); i++){
     delete hessian_pntrs_[i];
+  }
+  if(bias_cutoff_swfunc_pntr_!=NULL){
+    delete bias_cutoff_swfunc_pntr_;
   }
 }
 
@@ -195,6 +210,9 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.add("optional","FES_FILENAME","filename of the file on which the FES should be written out. By default it is fes.LABEL.data");
   keys.add("optional","TARGETDIST_FILENAME","filename of the file on which the target distribution info should be written out. By default it is targetdist.LABEL.data");
   keys.add("optional","TARGETDIST_AVERAGES_FILENAME","filename of the file for writing out the averages over the target distribution. By default it is targetdist-averages.LABEL.data");
+  //
+  keys.reserve("optional","BIAS_CUTOFF","cutoff the bias such that it only fills the free energy surface up to certain level F_cutoff, here you should give the value of the F_cutoff.");
+  keys.reserve("optional","BIAS_CUTOFF_FERMI_LAMBDA","the lambda value used in the Fermi switching function for the bias cutoff (BIAS_CUTOFF). Lambda is by default 1.0.");
 }
 
 
@@ -221,6 +239,12 @@ void VesBias::useGridBinKeywords(Keywords& keys) {
 void VesBias::useGridLimitsKeywords(Keywords& keys) {
   keys.use("GRID_MIN");
   keys.use("GRID_MAX");
+}
+
+
+void VesBias::useBiasCutoffKeywords(Keywords& keys) {
+  keys.use("BIAS_CUTOFF_SW");
+  keys.use("BIAS_CUTOFF_FERMI_LAMBDA");
 }
 
 
@@ -513,6 +537,39 @@ std::string VesBias::getCurrentTargetDistOutputFilename(const std::string& suffi
   return filename;
 }
 
+
+void VesBias::setupBiasCutoff(const double bias_cutoff_value, const double fermi_lambda) {
+  //
+  double fermi_exp_max = 100.0;
+  //
+  std::string str_bias_cutoff_value; VesTools::convertDbl2Str(bias_cutoff_value,str_bias_cutoff_value);
+  std::string str_fermi_lambda; VesTools::convertDbl2Str(fermi_lambda,str_fermi_lambda);
+  std::string str_fermi_exp_max; VesTools::convertDbl2Str(fermi_exp_max,str_fermi_exp_max);
+  std::string swfunc_keywords = "FERMI R_0=" + str_bias_cutoff_value + " FERMI_LAMBDA=" + str_fermi_lambda + " FERMI_EXP_MAX=" + str_fermi_exp_max;
+  //
+  if(bias_cutoff_swfunc_pntr_!=NULL){delete bias_cutoff_swfunc_pntr_;}
+  std::string swfunc_errors="";
+  bias_cutoff_swfunc_pntr_ = new FermiSwitchingFunction();
+  bias_cutoff_swfunc_pntr_->set(swfunc_keywords,swfunc_errors);
+  if(swfunc_errors.size()>0){
+    plumed_merror("problem with setting up Fermi switching function: " + swfunc_errors);
+  }
+  //
+  bias_cutoff_value_=bias_cutoff_value;
+  bias_cutoff_active_=true;
+  enableDynamicTargetDistribution();
+}
+
+
+double VesBias::getBiasCutoffSwitchingFunction(const double bias, double& deriv_factor) const {
+  plumed_massert(bias_cutoff_active_,"The bias cutoff is not active so you cannot call this function");
+  double arg = -(bias-bias_current_max_value);
+  double deriv=0.0;
+  double value = bias_cutoff_swfunc_pntr_->calculate(arg,deriv);
+  deriv *= arg;
+  deriv_factor = value-bias*deriv;
+  return value;
+}
 
 
 

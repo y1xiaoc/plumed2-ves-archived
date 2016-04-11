@@ -45,6 +45,7 @@ namespace PLMD{
   class Value;
   class Optimizer;
   class TargetDistribution;
+  class FermiSwitchingFunction;
 
 namespace bias{
 
@@ -98,6 +99,11 @@ private:
   std::string targetdist_filename_;
   std::string targetdist_averages_filename_;
   //
+  bool bias_cutoff_active_;
+  double bias_cutoff_value_;
+  double bias_current_max_value;
+  FermiSwitchingFunction* bias_cutoff_swfunc_pntr_;
+  //
 private:
   void initializeCoeffs(CoeffsVector*);
 protected:
@@ -132,6 +138,7 @@ public:
   static void useWellTemperdKeywords(Keywords&);
   static void useGridBinKeywords(Keywords&);
   static void useGridLimitsKeywords(Keywords&);
+  static void useBiasCutoffKeywords(Keywords&);
   //
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
@@ -208,6 +215,14 @@ public:
   std::string getCurrentTargetDistOutputFilename(const std::string& suffix="") const;
   std::string getTargetDistAveragesOutputFilename() const {return targetdist_averages_filename_;}
   //
+  void setupBiasCutoff(const double, const double);
+  bool biasCutoffActive() const {return bias_cutoff_active_;}
+  double getBiasCutoffValue() const {return bias_cutoff_value_;}
+  void setCurrentBiasMaxValue(const double max_value){bias_current_max_value=max_value;}
+  double getCurrentBiasMaxValue() const {return bias_current_max_value;}
+  double getBiasCutoffSwitchingFunction(const double, double&) const;
+  double getBiasCutoffSwitchingFunction(const double) const;
+  //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};
   virtual void setupFesFileOutput() {};
@@ -266,6 +281,13 @@ std::string VesBias::getCurrentBiasOutputFilename() const {
 inline
 std::string VesBias::getCurrentFesOutputFilename() const {
   return getCurrentOutputFilename(fes_filename_);
+}
+
+
+inline
+double VesBias::getBiasCutoffSwitchingFunction(const double bias) const {
+  double dummy=0.0;
+  return getBiasCutoffSwitchingFunction(bias,dummy);
 }
 
 
