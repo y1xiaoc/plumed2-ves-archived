@@ -243,7 +243,7 @@ void VesBias::useGridLimitsKeywords(Keywords& keys) {
 
 
 void VesBias::useBiasCutoffKeywords(Keywords& keys) {
-  keys.use("BIAS_CUTOFF_SW");
+  keys.use("BIAS_CUTOFF");
   keys.use("BIAS_CUTOFF_FERMI_LAMBDA");
 }
 
