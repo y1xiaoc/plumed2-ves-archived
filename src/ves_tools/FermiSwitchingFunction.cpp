@@ -41,7 +41,7 @@ void FermiSwitchingFunction::registerKeywords( Keywords& keys ){
   keys.add("optional","FERMI_EXP_MAX","only needed for TYPE=FERMI");
 }
 
-void FermiSwitchingFunction::set(const std::string & definition,std::string& errormsg){
+void FermiSwitchingFunction::set(const std::string& definition,std::string& errormsg){
   vector<string> data=Tools::getWords(definition);
   if( data.size()<1 ) errormsg="missing all input for switching function";
   string name=data[0];
