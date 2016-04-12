@@ -218,6 +218,7 @@ void LinearBasisSetExpansion::updateFesGrid() {
     }
     fes_grid_pntr_->setValue(l,fes_value);
   }
+  fes_grid_pntr_->setMinToZero();
 }
 
 
