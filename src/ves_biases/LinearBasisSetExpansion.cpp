@@ -225,9 +225,6 @@ void LinearBasisSetExpansion::updateFesGrid() {
 void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) {
   OFile file;
   if(append_file){file.enforceRestart();}
-  if(action_pntr_!=NULL){
-    file.link(*action_pntr_);
-  }
   file.open(filepath);
   bias_grid_pntr_->writeToFile(file);
   file.close();
@@ -237,9 +234,6 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
 void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, const bool append_file) {
   OFile file;
   if(append_file){file.enforceRestart();}
-  if(action_pntr_!=NULL){
-    file.link(*action_pntr_);
-  }
   file.open(filepath);
   fes_grid_pntr_->writeToFile(file);
   file.close();
