@@ -442,7 +442,8 @@ fes_output_stride_(0)
         plumed_massert(mask_fnames_out[i]!=mask_fnames_in[i],"MASK_FILE and OUTPUT_MASK_FILE cannot be the same");
       }
       OFile maskOFile;
-      maskOFile.link(*this);
+      // comment the below link otherwise the file is not backed up correctly during restarts. 
+      // maskOFile.link(*this);
       if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
         unsigned int r=0;
         if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
@@ -593,7 +594,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","TARGETDISTRIBUTION_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
   //
   keys.add("optional","BIAS_OUTPUT_STRIDE","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
-  keys.add("optional","FES_OUTPUT_STRIDE","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");  
+  keys.add("optional","FES_OUTPUT_STRIDE","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
