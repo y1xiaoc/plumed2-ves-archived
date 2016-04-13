@@ -162,7 +162,9 @@ void VesLinearExpansion::calculate() {
 
 
 void VesLinearExpansion::updateTargetDistributions() {
-  bias_expansion_pntr_->updateWellTemperedTargetDistribution();
+  if(wellTemperdTargetDistribution()){
+    bias_expansion_pntr_->updateWellTemperedTargetDistribution();    
+  }
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
   writeCoeffDerivsAverTargetDistToFile(true,getOptimizerPntr()->getIterationCounter());
 }

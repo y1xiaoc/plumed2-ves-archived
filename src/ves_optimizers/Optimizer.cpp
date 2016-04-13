@@ -304,6 +304,13 @@ fes_output_stride_(0)
       log.printf("  Optimization restarted at iteration %u\n",getIterationCounter());
     }
     setAllCoeffsSetIterationCounters();
+    if(ustride_targetdist_>0){
+      for(unsigned int i=0; i<nbiases_; i++){
+        if(dynamic_targetdists_[i]){
+          bias_pntrs_[i]->updateTargetDistributions();
+        }
+      }
+    }
   }
 
 
