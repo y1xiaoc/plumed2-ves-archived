@@ -70,12 +70,14 @@ private:
   double inv_welltemp_biasf_;
   double beta_prime_;
   //
+  bool bias_cutoff_active_;
   //
   std::vector<unsigned int> grid_bins_;
   //
   std::string targetdist_grid_label_;
   //
   Grid* bias_grid_pntr_;
+  Grid* bias_wcutoff_grid_pntr_;
   Grid* fes_grid_pntr_;
   Grid* log_ps_grid_pntr_;
   Grid* dynamic_ps_grid_pntr_;
@@ -154,6 +156,7 @@ public:
   void setWellTemperedBiasFactor(const double);
   void updateWellTemperedTargetDistribution();
   //
+  bool biasCutoffActive() const {return bias_cutoff_active_;}
   void setupBiasCutoffTargetDistribution();
   void updateBiasCutoffTargetDistribution();
 private:
