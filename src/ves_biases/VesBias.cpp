@@ -572,6 +572,5 @@ double VesBias::getBiasCutoffSwitchingFunction(const double bias, double& deriv_
 }
 
 
-
 }
 }

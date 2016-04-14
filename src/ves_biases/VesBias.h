@@ -222,6 +222,8 @@ public:
   double getCurrentBiasMaxValue() const {return bias_current_max_value;}
   double getBiasCutoffSwitchingFunction(const double, double&) const;
   double getBiasCutoffSwitchingFunction(const double) const;
+  void applyBiasCutoff(double&, std::vector<double>&) const;
+  void applyBiasCutoff(double&, std::vector<double>&, std::vector<double>&) const;
   //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};
@@ -291,6 +293,30 @@ double VesBias::getBiasCutoffSwitchingFunction(const double bias) const {
 }
 
 
+inline
+void VesBias::applyBiasCutoff(double& bias, std::vector<double>& forces) const {
+  std::vector<double> dummy(0);
+  applyBiasCutoff(bias,forces,dummy);
+}
+
+
+inline
+void VesBias::applyBiasCutoff(double& bias, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) const {
+  double deriv_factor_sf=0.0;
+  double value_sf = getBiasCutoffSwitchingFunction(bias,deriv_factor_sf);
+  bias *= value_sf;
+  for(unsigned int i=0; i<forces.size(); i++){
+    forces[i] *= deriv_factor_sf;
+  }
+  //
+  for(unsigned int i=0; i<coeffsderivs_values.size(); i++){
+    coeffsderivs_values[i] *= deriv_factor_sf;
+  }
+}
+
+
+
+
 template<class T>
 bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& values, unsigned int nvalues) {
   plumed_assert(nvalues>0);
@@ -318,7 +344,6 @@ bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& va
   }
   return identical_values;
 }
-
 
 
 }
