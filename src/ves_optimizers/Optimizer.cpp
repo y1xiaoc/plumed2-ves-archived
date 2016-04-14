@@ -304,13 +304,6 @@ fes_output_stride_(0)
       log.printf("  Optimization restarted at iteration %u\n",getIterationCounter());
     }
     setAllCoeffsSetIterationCounters();
-    if(ustride_targetdist_>0){
-      for(unsigned int i=0; i<nbiases_; i++){
-        if(dynamic_targetdists_[i]){
-          bias_pntrs_[i]->updateTargetDistributions();
-        }
-      }
-    }
   }
 
 
@@ -442,7 +435,7 @@ fes_output_stride_(0)
         plumed_massert(mask_fnames_out[i]!=mask_fnames_in[i],"MASK_FILE and OUTPUT_MASK_FILE cannot be the same");
       }
       OFile maskOFile;
-      // comment the below link otherwise the file is not backed up correctly during restarts. 
+      // comment the below link otherwise the file is not backed up correctly during restarts.
       // maskOFile.link(*this);
       if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
         unsigned int r=0;
@@ -522,6 +515,14 @@ fes_output_stride_(0)
       if(!fixed_stepsize_){
         log.printf(" ");
         addComponent("stepsize"+is); componentIsNotPeriodic("stepsize"+is);
+      }
+    }
+  }
+
+  if(getRestart() && ustride_targetdist_>0){
+    for(unsigned int i=0; i<nbiases_; i++){
+      if(dynamic_targetdists_[i]){
+        bias_pntrs_[i]->updateTargetDistributions();
       }
     }
   }
