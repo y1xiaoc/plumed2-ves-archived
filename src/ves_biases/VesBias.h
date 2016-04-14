@@ -99,6 +99,9 @@ private:
   std::string targetdist_filename_;
   std::string targetdist_averages_filename_;
   //
+  bool fes_fileoutput_active_;
+  bool bias_fileoutput_active_;
+  //
   bool bias_cutoff_active_;
   double bias_cutoff_value_;
   double bias_current_max_value;
@@ -214,6 +217,13 @@ public:
   std::string getTargetDistOutputFilename() const {return targetdist_filename_;}
   std::string getCurrentTargetDistOutputFilename(const std::string& suffix="") const;
   std::string getTargetDistAveragesOutputFilename() const {return targetdist_averages_filename_;}
+  //
+  void enableBiasFileOutput() {bias_fileoutput_active_=true;}
+  void disableBiasFileOutput() {bias_fileoutput_active_=false;}
+  bool isBiasFileOutputActive() const {return bias_fileoutput_active_;}
+  void enableFesFileOutput() {fes_fileoutput_active_=true;}
+  void disableFesFileOutput() {fes_fileoutput_active_=false;}
+  bool isFesFileOutputActive() const {return fes_fileoutput_active_;}
   //
   void setupBiasCutoff(const double, const double);
   bool biasCutoffActive() const {return bias_cutoff_active_;}

@@ -455,6 +455,7 @@ fes_output_stride_(0)
     if(bias_output_stride_>0){
       bias_output_active_=true;
       for(unsigned int i=0; i<nbiases_; i++){
+        bias_pntrs_[i]->enableBiasFileOutput();
         bias_pntrs_[i]->setupBiasFileOutput();
         bias_pntrs_[i]->writeBiasToFile();
       }
@@ -470,6 +471,7 @@ fes_output_stride_(0)
     if(fes_output_stride_>0){
       fes_output_active_=true;
       for(unsigned int i=0; i<nbiases_; i++){
+        bias_pntrs_[i]->enableFesFileOutput();
         bias_pntrs_[i]->setupFesFileOutput();
         bias_pntrs_[i]->writeFesToFile();
       }
