@@ -76,6 +76,8 @@ beta_prime_(0.0),
 bias_cutoff_active_(false),
 grid_bins_(nargs_,100),
 targetdist_grid_label_("targetdist"),
+step_of_last_biasgrid_update(-1000),
+step_of_last_fesgrid_update(-1000),
 bias_grid_pntr_(NULL),
 bias_wcutoff_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
@@ -202,6 +204,9 @@ void LinearBasisSetExpansion::setupFesGrid() {
 
 void LinearBasisSetExpansion::updateBiasGrid() {
   plumed_massert(bias_grid_pntr_!=NULL,"the bias grid is not defined");
+  if(getStepOfLastBiasGridUpdate() == action_pntr_->getStep()){
+    return;
+  }
   for(unsigned int l=0; l<bias_grid_pntr_->getSize(); l++){
     std::vector<double> forces(nargs_);
     std::vector<double> coeffsderivs_values(ncoeffs_);
@@ -223,12 +228,18 @@ void LinearBasisSetExpansion::updateBiasGrid() {
         bias_wcutoff_grid_pntr_->setValue(l,bias);
       }
     }
- }
+  }
+  setStepOfLastBiasGridUpdate(action_pntr_->getStep());
 }
 
 
 void LinearBasisSetExpansion::updateFesGrid() {
+  plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
   updateBiasGrid();
+  if(getStepOfLastFesGridUpdate() == action_pntr_->getStep()){
+    return;
+  }
+  //
   double fes_scalingf = getBiasToFesScalingFactor();
   for(unsigned int l=0; l<fes_grid_pntr_->getSize(); l++){
     double fes_value = fes_scalingf*bias_grid_pntr_->getValue(l);
@@ -238,10 +249,12 @@ void LinearBasisSetExpansion::updateFesGrid() {
     fes_grid_pntr_->setValue(l,fes_value);
   }
   fes_grid_pntr_->setMinToZero();
+  setStepOfLastFesGridUpdate(action_pntr_->getStep());
 }
 
 
 void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) {
+  plumed_massert(bias_grid_pntr_!=NULL,"the bias grid is not defined");
   OFile file;
   if(append_file){file.enforceRestart();}
   file.open(filepath);
@@ -251,6 +264,7 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
 
 
 void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, const bool append_file) {
+  plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
   OFile file;
   if(append_file){file.enforceRestart();}
   file.open(filepath);

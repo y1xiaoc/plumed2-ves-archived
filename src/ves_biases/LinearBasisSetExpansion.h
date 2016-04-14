@@ -76,6 +76,9 @@ private:
   //
   std::string targetdist_grid_label_;
   //
+  long int step_of_last_biasgrid_update;
+  long int step_of_last_fesgrid_update;
+  //
   Grid* bias_grid_pntr_;
   Grid* bias_wcutoff_grid_pntr_;
   Grid* fes_grid_pntr_;
@@ -127,10 +130,16 @@ public:
   // Bias grid and output stuff
   void setupBiasGrid(const bool usederiv=false);
   void updateBiasGrid();
+  void resetStepOfLastBiasGridUpdate() {step_of_last_biasgrid_update = -1000;}
+  void setStepOfLastBiasGridUpdate(long int step) {step_of_last_biasgrid_update = step;}
+  long int getStepOfLastBiasGridUpdate() const {return step_of_last_biasgrid_update;}
   void writeBiasGridToFile(const std::string&, const bool append=false);
   // Bias grid and output stuff
   void setupFesGrid();
   void updateFesGrid();
+  void resetStepOfLastFesGridUpdate() {step_of_last_fesgrid_update = -1000;}
+  void setStepOfLastFesGridUpdate(long int step) {step_of_last_fesgrid_update = step;}
+  long int getStepOfLastFesGridUpdate() const {return step_of_last_fesgrid_update;}
   void writeFesGridToFile(const std::string&, const bool append=false);
   //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
