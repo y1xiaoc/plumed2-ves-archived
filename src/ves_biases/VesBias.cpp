@@ -164,9 +164,11 @@ bias_cutoff_swfunc_pntr_(NULL)
   if(keywords.exists("BIAS_CUTOFF")){
     double cutoff_value=0.0;
     parse("BIAS_CUTOFF",cutoff_value);
-    double fermi_lambda=1.0;
-    parse("BIAS_CUTOFF_FERMI_LAMBDA",fermi_lambda);
-
+    if(cutoff_value>0.0){
+      double fermi_lambda=1.0;
+      parse("BIAS_CUTOFF_FERMI_LAMBDA",fermi_lambda);
+      setupBiasCutoff(cutoff_value,fermi_lambda);
+    }
   }
 
 }
