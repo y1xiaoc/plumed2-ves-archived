@@ -75,6 +75,7 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
   VesBias::useInitialCoeffsKeywords(keys);
   VesBias::useTargetDistributionKeywords(keys);
   VesBias::useWellTemperdKeywords(keys);
+  VesBias::useBiasCutoffKeywords(keys);
   VesBias::useGridBinKeywords(keys);
 }
 
@@ -115,8 +116,12 @@ valueForce2_(NULL)
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
+
   if(this->wellTemperdTargetDistribution()){
     bias_expansion_pntr_->setupWellTemperedTargetDistribution(this->getWellTemperedBiasFactor());
+  }
+  else if(this->biasCutoffActive()){
+    bias_expansion_pntr_->setupBiasCutoffTargetDistribution();
   }
 
   writeCoeffDerivsAverTargetDistToFile();
