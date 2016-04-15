@@ -157,6 +157,7 @@ void VesLinearExpansion::calculate() {
   double bias = bias_expansion_pntr_->getBiasAndForces(cv_values,forces,coeffsderivs_values);
   if(biasCutoffActive()){
     applyBiasCutoff(bias,forces,coeffsderivs_values);
+    coeffsderivs_values[0]=1.0;
   }
   double totalForce2 = 0.0;
   for(unsigned int k=0; k<nargs_; k++){
