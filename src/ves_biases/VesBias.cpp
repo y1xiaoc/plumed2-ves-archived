@@ -581,7 +581,9 @@ double VesBias::getBiasCutoffSwitchingFunction(const double bias, double& deriv_
   double arg = -(bias-bias_current_max_value);
   double deriv=0.0;
   double value = bias_cutoff_swfunc_pntr_->calculate(arg,deriv);
-  deriv *= arg;
+  // as FermiSwitchingFunction class has different behavior from normal SwitchingFunction class
+  // I was having problems with NaN as it was dividing with zero
+  // deriv *= arg;
   deriv_factor = value-bias*deriv;
   return value;
 }

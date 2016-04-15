@@ -88,7 +88,7 @@ double FermiSwitchingFunction::calculate(double distance, double& dfunc) const {
   dfunc=-fermi_lambda_*exp(rdist)*result*result;
   // this is because calculate() sets dfunc to the derivative divided times the distance.
   // (I think this is misleading and I would like to modify it - GB)
-  dfunc/=distance;
+  // dfunc/=distance;
   //
   return result;
 }
