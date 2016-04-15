@@ -70,7 +70,9 @@ identical_coeffs_shape_(true),
 bias_output_active_(false),
 bias_output_stride_(0),
 fes_output_active_(false),
-fes_output_stride_(0)
+fes_output_stride_(0),
+targetdist_output_active_(false),
+targetdist_output_stride_(0)
 {
   std::vector<std::string> bias_labels(0);
   parseVector("BIAS",bias_labels);
@@ -200,18 +202,18 @@ fes_output_stride_(0)
   }
 
   dynamic_targetdists_.resize(nbiases_,false);
-  if(keywords.exists("TARGETDISTRIBUTION_STRIDE")){
+  if(keywords.exists("TARGETDIST_UPDATE_STRIDE")){
     bool need_stride = false;
     for(unsigned int i=0; i<nbiases_; i++){
       dynamic_targetdists_[i] = bias_pntrs_[i]->dynamicTargetDistribution();
       if(dynamic_targetdists_[i]){need_stride = true;}
     }
-    parse("TARGETDISTRIBUTION_STRIDE",ustride_targetdist_);
+    parse("TARGETDIST_UPDATE_STRIDE",ustride_targetdist_);
     if(need_stride && ustride_targetdist_==0){
-      plumed_merror("one of the biases has a dynamic target distribution so you need to give stride for updating it by using the TARGETDISTRIBUTION_STRIDE keyword");
+      plumed_merror("one of the biases has a dynamic target distribution so you need to give stride for updating it by using the TARGETDIST_UPDATE_STRIDE keyword");
     }
     if(!need_stride && ustride_targetdist_!=0){
-      plumed_merror("using the TARGETDISTRIBUTION_STRIDE keyword doesn't make sense as there is no dynamic target distribution to update");
+      plumed_merror("using the TARGETDIST_UPDATE_STRIDE keyword doesn't make sense as there is no dynamic target distribution to update");
     }
     if(ustride_targetdist_>0){
       if(nbiases_==1){
@@ -483,6 +485,32 @@ fes_output_stride_(0)
   }
 
 
+  if(keywords.exists("TARGETDIST_OUTPUT_STRIDE")){
+    parse("TARGETDIST_OUTPUT_STRIDE",targetdist_output_stride_);
+    if(targetdist_output_stride_>0){
+      if(ustride_targetdist_==0){
+        plumed_merror("it doesn't make sense to use the TARGETDIST_OUTPUT_STRIDE keyword if you don't have a target distribution that needs to be updated");
+      }
+      if(targetdist_output_stride_%ustride_targetdist_==0){
+        plumed_merror("the value given in TARGETDIST_OUTPUT_STRIDE doesn't make sense, it should be multiple of TARGETDIST_UPDATE_STRIDE");
+      }
+
+      targetdist_output_active_=true;
+      for(unsigned int i=0; i<nbiases_; i++){
+        if(dynamic_targetdists_[i]){
+          bias_pntrs_[i]->enableTargetDistFileOutput();
+          bias_pntrs_[i]->setupTargetDistFileOutput();
+          bias_pntrs_[i]->writeTargetDistToFile();
+        }
+      }
+    }
+    else{
+      targetdist_output_active_=false;
+      targetdist_output_stride_=1000;
+    }
+  }
+
+
   if(ncoeffssets_==1){
     log.printf("  Output Components:\n");
     log.printf(" ");
@@ -525,6 +553,9 @@ fes_output_stride_(0)
     for(unsigned int i=0; i<nbiases_; i++){
       if(dynamic_targetdists_[i]){
         bias_pntrs_[i]->updateTargetDistributions();
+        if(targetdist_output_active_){
+          bias_pntrs_[i]->writeTargetDistToFile();
+        }
       }
     }
   }
@@ -594,7 +625,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserveFlag("MONITOR_AVERAGE_GRADIENT",false,"if the averaged gradient should be monitored.");
   keys.reserve("optional","MONITOR_AVERAGES_EXP_DECAY","use an exponentially decaying averaging with a given time constant when monitoring the averaged gradient");
   //
-  keys.reserve("optional","TARGETDISTRIBUTION_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
+  keys.reserve("optional","TARGETDIST_UPDATE_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
+  keys.reserve("optional","TARGETDIST_OUTPUT_STRIDE","how often the dynamic target distribution(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   //
   keys.add("optional","BIAS_OUTPUT_STRIDE","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   keys.add("optional","FES_OUTPUT_STRIDE","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
@@ -648,7 +680,8 @@ void Optimizer::useMonitorAveragesKeywords(Keywords& keys) {
 
 
 void Optimizer::useDynamicTargetDistributionKeywords(Keywords& keys) {
-  keys.use("TARGETDISTRIBUTION_STRIDE");
+  keys.use("TARGETDIST_UPDATE_STRIDE");
+  keys.use("TARGETDIST_OUTPUT_STRIDE");
 }
 
 
@@ -775,6 +808,16 @@ void Optimizer::update() {
         bias_pntrs_[i]->writeFesToFile();
       }
     }
+    if(targetdist_output_active_ && getIterationCounter()%targetdist_output_stride_==0){
+      for(unsigned int i=0; i<nbiases_; i++){
+        if(dynamic_targetdists_[i]){
+          bias_pntrs_[i]->writeTargetDistToFile();
+        }
+      }
+    }
+
+
+
   }
 }
 
