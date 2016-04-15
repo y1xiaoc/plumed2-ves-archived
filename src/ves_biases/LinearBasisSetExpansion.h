@@ -133,14 +133,14 @@ public:
   void resetStepOfLastBiasGridUpdate() {step_of_last_biasgrid_update = -1000;}
   void setStepOfLastBiasGridUpdate(long int step) {step_of_last_biasgrid_update = step;}
   long int getStepOfLastBiasGridUpdate() const {return step_of_last_biasgrid_update;}
-  void writeBiasGridToFile(const std::string&, const bool append=false);
-  // Bias grid and output stuff
+  void writeBiasGridToFile(const std::string&, const bool append=false) const;
+  //
   void setupFesGrid();
   void updateFesGrid();
   void resetStepOfLastFesGridUpdate() {step_of_last_fesgrid_update = -1000;}
   void setStepOfLastFesGridUpdate(long int step) {step_of_last_fesgrid_update = step;}
   long int getStepOfLastFesGridUpdate() const {return step_of_last_fesgrid_update;}
-  void writeFesGridToFile(const std::string&, const bool append=false);
+  void writeFesGridToFile(const std::string&, const bool append=false) const;
   //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);
@@ -168,6 +168,9 @@ public:
   bool biasCutoffActive() const {return bias_cutoff_active_;}
   void setupBiasCutoffTargetDistribution();
   void updateBiasCutoffTargetDistribution();
+  //
+  void writeTargetDistGridToFile(const std::string&, const bool append=false) const;
+  //
 private:
   //
   Grid* setupGeneralGrid(const std::string&, const std::vector<unsigned int>&, const bool usederiv=false);

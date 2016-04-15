@@ -287,7 +287,7 @@ void LinearBasisSetExpansion::updateFesGrid() {
 }
 
 
-void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) {
+void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) const {
   plumed_massert(bias_grid_pntr_!=NULL,"the bias grid is not defined");
   OFile file;
   if(append_file){file.enforceRestart();}
@@ -297,7 +297,7 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
 }
 
 
-void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, const bool append_file) {
+void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, const bool append_file) const {
   plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
   OFile file;
   if(append_file){file.enforceRestart();}
@@ -740,6 +740,16 @@ void LinearBasisSetExpansion::setupBiasCutoffTargetDistribution() {
   bias_cutoff_active_=true;
   dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_cutoff",grid_bins_,false);
   bias_withoutcutoff_grid_pntr_ = setupGeneralGrid("bias_withoutcutoff",grid_bins_,false);
+}
+
+
+void LinearBasisSetExpansion::writeTargetDistGridToFile(const std::string& filepath, const bool append_file) const {
+  plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the dynamic target distribution grid is not defined");
+  OFile file;
+  if(append_file){file.enforceRestart();}
+  file.open(filepath);
+  dynamic_ps_grid_pntr_->writeToFile(file);
+  file.close();
 }
 
 
