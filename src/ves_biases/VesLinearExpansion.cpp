@@ -155,14 +155,16 @@ void VesLinearExpansion::calculate() {
   }
 
   double bias = bias_expansion_pntr_->getBiasAndForces(cv_values,forces,coeffsderivs_values);
-  valueBias_->set(bias);
-
+  if(biasCutoffActive()){
+    applyBiasCutoff(bias,forces,coeffsderivs_values);
+  }
   double totalForce2 = 0.0;
   for(unsigned int k=0; k<nargs_; k++){
     setOutputForce(k,forces[k]);
     totalForce2 += forces[k]*forces[k];
   }
 
+  valueBias_->set(bias);
   valueForce2_->set(totalForce2);
   setCoeffsDerivs(coeffsderivs_values);
 }
