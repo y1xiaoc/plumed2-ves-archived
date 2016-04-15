@@ -294,6 +294,15 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
   file.open(filepath);
   bias_grid_pntr_->writeToFile(file);
   file.close();
+  //
+  if(biasCutoffActive()){
+    OFile file2;
+    if(append_file){file2.enforceRestart();}
+    std::string filename = FileBase::appendSuffix(filepath,".without-cutoff");
+    file2.open(filename);
+    bias_withoutcutoff_grid_pntr_->writeToFile(file2);
+    file2.close();
+  }
 }
 
 
