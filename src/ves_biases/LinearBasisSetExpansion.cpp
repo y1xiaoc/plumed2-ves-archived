@@ -79,7 +79,7 @@ targetdist_grid_label_("targetdist"),
 step_of_last_biasgrid_update(-1000),
 step_of_last_fesgrid_update(-1000),
 bias_grid_pntr_(NULL),
-bias_wcutoff_grid_pntr_(NULL),
+bias_withoutcutoff_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
 log_ps_grid_pntr_(NULL),
 dynamic_ps_grid_pntr_(NULL)
@@ -116,8 +116,8 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   if(bias_grid_pntr_!=NULL){
     delete bias_grid_pntr_;
   }
-  if(bias_wcutoff_grid_pntr_!=NULL){
-    delete bias_wcutoff_grid_pntr_;
+  if(bias_withoutcutoff_grid_pntr_!=NULL){
+    delete bias_withoutcutoff_grid_pntr_;
   }
   if(fes_grid_pntr_!=NULL){
     delete fes_grid_pntr_;
@@ -186,10 +186,6 @@ Grid* LinearBasisSetExpansion::setupOneDimensionalMarginalGrid(const std::string
 void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
   plumed_massert(bias_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias grid has already been defined.");
   bias_grid_pntr_ = setupGeneralGrid("bias",grid_bins_,usederiv);
-  if(biasCutoffActive()){
-    plumed_massert(bias_wcutoff_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias with cutoff grid has already been defined.");
-    bias_wcutoff_grid_pntr_ = setupGeneralGrid("bias_wcutoff",grid_bins_,bias_grid_pntr_->hasDerivatives());
-  }
 }
 
 
@@ -212,6 +208,11 @@ void LinearBasisSetExpansion::updateBiasGrid() {
     std::vector<double> coeffsderivs_values(ncoeffs_);
     std::vector<double> args = bias_grid_pntr_->getPoint(l);
     double bias=getBiasAndForces(args,forces,coeffsderivs_values);
+    //
+    if(biasCutoffActive()){
+      vesbias_pntr_->applyBiasCutoff(bias,forces);
+    }
+    //
     if(bias_grid_pntr_->hasDerivatives()){
       bias_grid_pntr_->setValueAndDerivatives(l,bias,forces);
     }
@@ -219,17 +220,50 @@ void LinearBasisSetExpansion::updateBiasGrid() {
       bias_grid_pntr_->setValue(l,bias);
     }
     //
-    if(biasCutoffActive() && bias_wcutoff_grid_pntr_!=NULL){
-      vesbias_pntr_->applyBiasCutoff(bias,forces);
-      if(bias_wcutoff_grid_pntr_->hasDerivatives()){
-        bias_wcutoff_grid_pntr_->setValueAndDerivatives(l,bias,forces);
-      }
-      else{
-        bias_wcutoff_grid_pntr_->setValue(l,bias);
-      }
-    }
+  }
+  if(vesbias_pntr_!=NULL){
+    vesbias_pntr_->setCurrentBiasMaxValue(bias_grid_pntr_->getMaxValue());
   }
   setStepOfLastBiasGridUpdate(action_pntr_->getStep());
+}
+
+
+void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
+  plumed_massert(bias_withoutcutoff_grid_pntr_!=NULL,"the bias without cutoff grid is not defined");
+  plumed_massert(biasCutoffActive(),"the bias cutoff has to be active");
+  plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
+  //
+  for(unsigned int l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
+    std::vector<double> args = bias_withoutcutoff_grid_pntr_->getPoint(l);
+    double bias=getBias(args);
+    bias_withoutcutoff_grid_pntr_->setValue(l,bias);
+  }
+  //
+  double bias_max = bias_withoutcutoff_grid_pntr_->getMaxValue();
+  double bias_min = bias_withoutcutoff_grid_pntr_->getMinValue();
+  double shift = 0.0;
+  bool bias_shifted=false;
+  if(bias_min < 0.0){
+    shift += -bias_min;
+    bias_shifted=true;
+    BiasCoeffs()[0] -= bias_min;
+    bias_max -= bias_min;
+  }
+  if(bias_max > vesbias_pntr_->getBiasCutoffValue()){
+    shift += -(bias_max-vesbias_pntr_->getBiasCutoffValue());
+    bias_shifted=true;
+    BiasCoeffs()[0] -= (bias_max-vesbias_pntr_->getBiasCutoffValue());
+    bias_max -= (bias_max-vesbias_pntr_->getBiasCutoffValue());
+  }
+  if(bias_shifted){
+    // this should be done inside a grid function really,
+    // need to define my grid class for that
+    for(unsigned int l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
+      double value = bias_withoutcutoff_grid_pntr_->getValue(l) + shift;
+      bias_withoutcutoff_grid_pntr_->setValue(l,value);
+    }
+  }
+  vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
 }
 
 
@@ -610,8 +644,8 @@ void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
   size_t stride=mycomm_.Get_size();
   size_t rank=mycomm_.Get_rank();
   for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
-    std::vector<double> args_values = dynamic_ps_grid_pntr_->getPoint(l);
-    double value = -beta_prime_ * getFES_WellTempered(args_values,false);
+    std::vector<double> args = dynamic_ps_grid_pntr_->getPoint(l);
+    double value = -beta_prime_ * getFES_WellTempered(args,false);
     value = exp(value);
     norm += value;
     dynamic_ps_grid_pntr_->setValue(l,value);
@@ -666,13 +700,14 @@ void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_gr
 
 void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
   plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
-  plumed_massert(bias_grid_pntr_!=NULL,"the bias grid has to be defined");
+  plumed_massert(bias_withoutcutoff_grid_pntr_!=NULL,"the bias grid has to be defined");
+  plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the p(s) grid has to be defined");
   double norm = 0.0;
   size_t stride=mycomm_.Get_size();
   size_t rank=mycomm_.Get_rank();
   for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
-    std::vector<double> args_values = dynamic_ps_grid_pntr_->getPoint(l);
-    double bias = bias_grid_pntr_->getValue(l);
+    std::vector<double> args = dynamic_ps_grid_pntr_->getPoint(l);
+    double bias = bias_withoutcutoff_grid_pntr_->getValue(l);
     double deriv_factor_sf = 0.0;
     // this comes from the p(s)
     double value = vesbias_pntr_->getBiasCutoffSwitchingFunction(bias,deriv_factor_sf);
@@ -688,39 +723,9 @@ void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
 }
 
 
-void LinearBasisSetExpansion::updateBiasMaximumValue() {
-  plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
-  plumed_massert(bias_grid_pntr_!=NULL,"the bias grid has to be defined");
-  //
-  double bias_max = bias_grid_pntr_->getMaxValue();
-  vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
-  //
-  if(vesbias_pntr_->biasCutoffActive()){
-    double bias_min = bias_grid_pntr_->getMinValue();
-    if(bias_min < 0.0){
-      BiasCoeffs()[0] -= bias_min;
-      bias_max -= bias_min;
-    }
-    if(bias_max > vesbias_pntr_->getBiasCutoffValue()){
-      BiasCoeffs()[0] -= (bias_max-vesbias_pntr_->getBiasCutoffValue());
-      bias_max -= (bias_max-vesbias_pntr_->getBiasCutoffValue());
-    }
-  }
-  vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
-}
-
-
 void LinearBasisSetExpansion::updateBiasCutoffTargetDistribution() {
   plumed_massert(biasCutoffActive(),"the bias cutoff is not active");
-  plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the p(s) grid has to be defined");
-  //
-  if(bias_grid_pntr_==NULL){
-    setupBiasGrid(false);
-    delete bias_wcutoff_grid_pntr_;
-  }
-  //
-  updateBiasGrid();
-  updateBiasMaximumValue();
+  updateBiasWithoutCutoffGrid();
   updateBiasCutoffPsGrid();
   calculateCoeffDerivsAverFromGrid(dynamic_ps_grid_pntr_);
 }
@@ -728,10 +733,12 @@ void LinearBasisSetExpansion::updateBiasCutoffTargetDistribution() {
 
 void LinearBasisSetExpansion::setupBiasCutoffTargetDistribution() {
   plumed_massert(dynamic_ps_grid_pntr_==NULL,"setupBiasCutoffTargetDistribution should only be called once: the grid for the p(s) has already been defined");
+  plumed_massert(bias_withoutcutoff_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias with cutoff grid has already been defined.");
   plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
-  // if the bias grid is not defined we create it
+  plumed_massert(!bias_cutoff_active_,"setupBiasCutoffTargetDistribution should only be called once");
+  //
   bias_cutoff_active_=true;
-  dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_cutoff",grid_bins_,false);
+  bias_withoutcutoff_grid_pntr_ = setupGeneralGrid("bias_withoutcutoff",grid_bins_,false);
 }
 
 

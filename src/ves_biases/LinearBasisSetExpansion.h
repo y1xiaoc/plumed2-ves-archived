@@ -80,7 +80,7 @@ private:
   long int step_of_last_fesgrid_update;
   //
   Grid* bias_grid_pntr_;
-  Grid* bias_wcutoff_grid_pntr_;
+  Grid* bias_withoutcutoff_grid_pntr_;
   Grid* fes_grid_pntr_;
   Grid* log_ps_grid_pntr_;
   Grid* dynamic_ps_grid_pntr_;
@@ -181,7 +181,7 @@ private:
   void updateWellTemperedFESCoeffs();
   void updateWellTemperedPsGrid();
   //
-  void updateBiasMaximumValue();
+  void updateBiasWithoutCutoffGrid();
   void updateBiasCutoffPsGrid();
 };
 
