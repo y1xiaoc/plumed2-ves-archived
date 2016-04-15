@@ -738,6 +738,7 @@ void LinearBasisSetExpansion::setupBiasCutoffTargetDistribution() {
   plumed_massert(!bias_cutoff_active_,"setupBiasCutoffTargetDistribution should only be called once");
   //
   bias_cutoff_active_=true;
+  dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_cutoff",grid_bins_,false);
   bias_withoutcutoff_grid_pntr_ = setupGeneralGrid("bias_withoutcutoff",grid_bins_,false);
 }
 
