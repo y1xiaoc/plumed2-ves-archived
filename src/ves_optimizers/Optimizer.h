@@ -96,8 +96,7 @@ private:
   //
 private:
   void updateOutputComponents();
-  void writeOutputFiles();
-  void writeOutputFiles(const unsigned int);
+  void writeOutputFiles(const unsigned int coeffs_id = 0);
   void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&);
   void readCoeffsFromFiles(const std::vector<std::string>&, const bool);
   void setAllCoeffsSetIterationCounters();

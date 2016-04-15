@@ -754,7 +754,9 @@ void Optimizer::update() {
     }
     increaseIterationCounter();
     updateOutputComponents();
-    writeOutputFiles();
+    for(unsigned int i=0; i<ncoeffssets_; i++){
+      writeOutputFiles(i);
+    }
     if(ustride_targetdist_>0 && getIterationCounter()%ustride_targetdist_==0){
       for(unsigned int i=0; i<nbiases_; i++){
         if(dynamic_targetdists_[i]){
@@ -808,26 +810,6 @@ void Optimizer::updateOutputComponents() {
 }
 
 
-void Optimizer::writeOutputFiles() {
-  for(unsigned int i=0; i<ncoeffssets_; i++){
-    if(coeffsOFiles_.size()>0 && iter_counter%coeffs_wstride_==0){
-      coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
-    }
-    if(gradientOFiles_.size()>0 && iter_counter%gradient_wstride_==0){
-      if(aver_gradient_pntrs_.size()==0){
-        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],false);
-      }
-      else{
-        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs_[i],false);
-      }
-    }
-    if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
-      hessian_pntrs_[i]->writeToFile(*hessianOFiles_[i]);
-    }
-  }
-}
-
-
 void Optimizer::turnOffCoeffsOutputFiles() {
   for(unsigned int i=0; i<coeffsOFiles_.size(); i++){
     coeffsOFiles_[i]->close();
@@ -842,7 +824,12 @@ void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
     coeffs_pntrs_[coeffs_id]->writeToFile(*coeffsOFiles_[coeffs_id],aux_coeffs_pntrs_[coeffs_id],false);
   }
   if(gradientOFiles_.size()>0 && iter_counter%gradient_wstride_==0){
-    gradient_pntrs_[coeffs_id]->writeToFile(*gradientOFiles_[coeffs_id],false);
+    if(aver_gradient_pntrs_.size()==0){
+      gradient_pntrs_[coeffs_id]->writeToFile(*gradientOFiles_[coeffs_id],false);
+    }
+    else{
+      gradient_pntrs_[coeffs_id]->writeToFile(*gradientOFiles_[coeffs_id],aver_gradient_pntrs_[coeffs_id],false);
+    }
   }
   if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
     hessian_pntrs_[coeffs_id]->writeToFile(*hessianOFiles_[coeffs_id]);
