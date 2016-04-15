@@ -185,7 +185,7 @@ void VesLinearExpansion::updateTargetDistributions() {
 
 
 void VesLinearExpansion::setupBiasFileOutput() {
-  bias_expansion_pntr_->setupBiasGrid(false);
+  bias_expansion_pntr_->setupBiasGrid(true);
 }
 
 

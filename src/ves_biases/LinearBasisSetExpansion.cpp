@@ -234,9 +234,16 @@ void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
   plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
   //
   for(unsigned int l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
+    std::vector<double> forces(nargs_);
+    std::vector<double> coeffsderivs_values(ncoeffs_);
     std::vector<double> args = bias_withoutcutoff_grid_pntr_->getPoint(l);
-    double bias=getBias(args);
-    bias_withoutcutoff_grid_pntr_->setValue(l,bias);
+    double bias=getBiasAndForces(args,forces,coeffsderivs_values);
+    if(bias_withoutcutoff_grid_pntr_->hasDerivatives()){
+      bias_withoutcutoff_grid_pntr_->setValueAndDerivatives(l,bias,forces);
+    }
+    else{
+      bias_withoutcutoff_grid_pntr_->setValue(l,bias);
+    }
   }
   //
   double bias_max = bias_withoutcutoff_grid_pntr_->getMaxValue();
@@ -720,9 +727,9 @@ void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
     double deriv_factor_sf = 0.0;
     // this comes from the p(s)
     double value = vesbias_pntr_->getBiasCutoffSwitchingFunction(bias,deriv_factor_sf);
+    norm += value;
     // this comes from the derivative of V(s)
     value *= deriv_factor_sf;
-    norm += value;
     dynamic_ps_grid_pntr_->setValue(l,value);
   }
   mycomm_.Sum(norm);
@@ -748,7 +755,7 @@ void LinearBasisSetExpansion::setupBiasCutoffTargetDistribution() {
   //
   bias_cutoff_active_=true;
   dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_cutoff",grid_bins_,false);
-  bias_withoutcutoff_grid_pntr_ = setupGeneralGrid("bias_withoutcutoff",grid_bins_,false);
+  bias_withoutcutoff_grid_pntr_ = setupGeneralGrid("bias_withoutcutoff",grid_bins_,true);
 }
 
 
