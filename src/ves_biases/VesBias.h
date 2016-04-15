@@ -333,8 +333,6 @@ void VesBias::applyBiasCutoff(double& bias, std::vector<double>& forces, std::ve
 }
 
 
-
-
 template<class T>
 bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& values, unsigned int nvalues) {
   plumed_assert(nvalues>0);
