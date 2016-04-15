@@ -491,7 +491,7 @@ targetdist_output_stride_(0)
       if(ustride_targetdist_==0){
         plumed_merror("it doesn't make sense to use the TARGETDIST_OUTPUT_STRIDE keyword if you don't have a target distribution that needs to be updated");
       }
-      if(targetdist_output_stride_%ustride_targetdist_==0){
+      if(targetdist_output_stride_%ustride_targetdist_!=0){
         plumed_merror("the value given in TARGETDIST_OUTPUT_STRIDE doesn't make sense, it should be multiple of TARGETDIST_UPDATE_STRIDE");
       }
 
