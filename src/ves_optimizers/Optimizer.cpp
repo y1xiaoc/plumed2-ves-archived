@@ -202,18 +202,18 @@ targetdist_output_stride_(0)
   }
 
   dynamic_targetdists_.resize(nbiases_,false);
-  if(keywords.exists("TARGETDIST_UPDATE_STRIDE")){
+  if(keywords.exists("TARGETDIST_STRIDE")){
     bool need_stride = false;
     for(unsigned int i=0; i<nbiases_; i++){
       dynamic_targetdists_[i] = bias_pntrs_[i]->dynamicTargetDistribution();
       if(dynamic_targetdists_[i]){need_stride = true;}
     }
-    parse("TARGETDIST_UPDATE_STRIDE",ustride_targetdist_);
+    parse("TARGETDIST_STRIDE",ustride_targetdist_);
     if(need_stride && ustride_targetdist_==0){
-      plumed_merror("one of the biases has a dynamic target distribution so you need to give stride for updating it by using the TARGETDIST_UPDATE_STRIDE keyword");
+      plumed_merror("one of the biases has a dynamic target distribution so you need to give stride for updating it by using the TARGETDIST_STRIDE keyword");
     }
     if(!need_stride && ustride_targetdist_!=0){
-      plumed_merror("using the TARGETDIST_UPDATE_STRIDE keyword doesn't make sense as there is no dynamic target distribution to update");
+      plumed_merror("using the TARGETDIST_STRIDE keyword doesn't make sense as there is no dynamic target distribution to update");
     }
     if(ustride_targetdist_>0){
       if(nbiases_==1){
@@ -280,7 +280,7 @@ targetdist_output_stride_(0)
 
 
   std::vector<std::string> coeffs_fnames;
-  parseFilenames("FILE",coeffs_fnames,"coeffs.data");
+  parseFilenames("COEFFS_FILE",coeffs_fnames,"coeffs.data");
   bool start_opt_afresh=false;
   if(keywords.exists("START_OPTIMIZATION_AFRESH")){
     parseFlag("START_OPTIMIZATION_AFRESH",start_opt_afresh);
@@ -310,7 +310,7 @@ targetdist_output_stride_(0)
 
 
   std::string coeffs_wstride_tmpstr="";
-  parse("OUTPUT_STRIDE",coeffs_wstride_tmpstr);
+  parse("COEFFS_OUTPUT",coeffs_wstride_tmpstr);
   if(coeffs_wstride_tmpstr!="OFF" && coeffs_wstride_tmpstr.size()>0){
     Tools::convert(coeffs_wstride_tmpstr,coeffs_wstride_);
   }
@@ -340,7 +340,7 @@ targetdist_output_stride_(0)
 
   std::vector<std::string> gradient_fnames;
   parseFilenames("GRADIENT_FILE",gradient_fnames);
-  parse("GRADIENT_OUTPUT_STRIDE",gradient_wstride_);
+  parse("GRADIENT_OUTPUT",gradient_wstride_);
 
   for(unsigned int i=0; i<gradient_fnames.size(); i++){
     plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"FILE and GRADIENT_FILE cannot be the same");
@@ -452,8 +452,8 @@ targetdist_output_stride_(0)
     }
   }
 
-  if(keywords.exists("BIAS_OUTPUT_STRIDE")){
-    parse("BIAS_OUTPUT_STRIDE",bias_output_stride_);
+  if(keywords.exists("BIAS_OUTPUT")){
+    parse("BIAS_OUTPUT",bias_output_stride_);
     if(bias_output_stride_>0){
       bias_output_active_=true;
       for(unsigned int i=0; i<nbiases_; i++){
@@ -468,8 +468,8 @@ targetdist_output_stride_(0)
     }
   }
 
-  if(keywords.exists("FES_OUTPUT_STRIDE")){
-    parse("FES_OUTPUT_STRIDE",fes_output_stride_);
+  if(keywords.exists("FES_OUTPUT")){
+    parse("FES_OUTPUT",fes_output_stride_);
     if(fes_output_stride_>0){
       fes_output_active_=true;
       for(unsigned int i=0; i<nbiases_; i++){
@@ -485,14 +485,14 @@ targetdist_output_stride_(0)
   }
 
 
-  if(keywords.exists("TARGETDIST_OUTPUT_STRIDE")){
-    parse("TARGETDIST_OUTPUT_STRIDE",targetdist_output_stride_);
+  if(keywords.exists("TARGETDIST_OUTPUT")){
+    parse("TARGETDIST_OUTPUT",targetdist_output_stride_);
     if(targetdist_output_stride_>0){
       if(ustride_targetdist_==0){
-        plumed_merror("it doesn't make sense to use the TARGETDIST_OUTPUT_STRIDE keyword if you don't have a target distribution that needs to be updated");
+        plumed_merror("it doesn't make sense to use the TARGETDIST_OUTPUT keyword if you don't have a target distribution that needs to be updated");
       }
       if(targetdist_output_stride_%ustride_targetdist_!=0){
-        plumed_merror("the value given in TARGETDIST_OUTPUT_STRIDE doesn't make sense, it should be multiple of TARGETDIST_UPDATE_STRIDE");
+        plumed_merror("the value given in TARGETDIST_OUTPUT doesn't make sense, it should be multiple of TARGETDIST_STRIDE");
       }
 
       targetdist_output_active_=true;
@@ -598,21 +598,21 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   // Default always active keywords
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
-  keys.add("compulsory","FILE","COEFFS","the name of output file for the coefficients");
-  keys.add("compulsory","OUTPUT_STRIDE","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
+  keys.add("compulsory","COEFFS_FILE","COEFFS","the name of output file for the coefficients");
+  keys.add("compulsory","COEFFS_OUTPUT","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
   keys.add("optional","COEFFS_SET_ID_PREFIX","suffix to add to the filename given in FILE to identfy the bias, should only be given if a single filename is given in FILE when optimizing multiple biases.");
   //
   keys.add("optional","INITIAL_COEFFS","the name(s) of file(s) with the initial coefficents");
   // Hidden keywords to output the gradient to a file.
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
-  keys.add("hidden","GRADIENT_OUTPUT_STRIDE","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
+  keys.add("hidden","GRADIENT_OUTPUT","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
   // Either use a fixed stepsize (useFixedStepSizeKeywords) or changing stepsize (useDynamicsStepSizeKeywords)
   keys.reserve("compulsory","STEPSIZE","the step size used for the optimization");
   keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
   // Keywords related to the Hessian, actived with the useHessianKeywords function
   keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
-  keys.reserve("hidden","HESSIAN_OUTPUT_STRIDE","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
+  keys.reserve("hidden","HESSIAN_OUTPUT","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
   // Keywords related to the multiple walkers, actived with the useMultipleWalkersKeywords function
   keys.reserveFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
   keys.reserveFlag("MWALKERS_SEPARATE_FILES",false,"DEBUG OPTION: if separate files should be outputted to file when using MPI multiple walkers");
@@ -625,11 +625,11 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserveFlag("MONITOR_AVERAGE_GRADIENT",false,"if the averaged gradient should be monitored.");
   keys.reserve("optional","MONITOR_AVERAGES_EXP_DECAY","use an exponentially decaying averaging with a given time constant when monitoring the averaged gradient");
   //
-  keys.reserve("optional","TARGETDIST_UPDATE_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
-  keys.reserve("optional","TARGETDIST_OUTPUT_STRIDE","how often the dynamic target distribution(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  keys.reserve("optional","TARGETDIST_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
+  keys.reserve("optional","TARGETDIST_OUTPUT","how often the dynamic target distribution(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   //
-  keys.add("optional","BIAS_OUTPUT_STRIDE","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
-  keys.add("optional","FES_OUTPUT_STRIDE","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  keys.add("optional","BIAS_OUTPUT","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  keys.add("optional","FES_OUTPUT","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
@@ -641,7 +641,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
 void Optimizer::useHessianKeywords(Keywords& keys) {
   keys.use("FULL_HESSIAN");
   keys.use("HESSIAN_FILE");
-  keys.use("HESSIAN_OUTPUT_STRIDE");
+  keys.use("HESSIAN_OUTPUT");
 }
 
 
@@ -680,8 +680,8 @@ void Optimizer::useMonitorAveragesKeywords(Keywords& keys) {
 
 
 void Optimizer::useDynamicTargetDistributionKeywords(Keywords& keys) {
-  keys.use("TARGETDIST_UPDATE_STRIDE");
-  keys.use("TARGETDIST_OUTPUT_STRIDE");
+  keys.use("TARGETDIST_STRIDE");
+  keys.use("TARGETDIST_OUTPUT");
 }
 
 
