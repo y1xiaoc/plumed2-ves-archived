@@ -64,7 +64,7 @@ public:
   void setupFesFileOutput();
   void writeFesToFile();
   void setupTargetDistFileOutput() {};
-  void writeTargetDistToFile();
+  void writeDynamicTargetDistToFile();
   static void registerKeywords( Keywords& keys );
 };
 
@@ -206,7 +206,7 @@ void VesLinearExpansion::writeFesToFile() {
 }
 
 
-void VesLinearExpansion::writeTargetDistToFile() {
+void VesLinearExpansion::writeDynamicTargetDistToFile() {
   bias_expansion_pntr_->writeTargetDistGridToFile(getCurrentTargetDistOutputFilename());
 }
 
