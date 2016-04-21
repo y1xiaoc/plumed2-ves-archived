@@ -73,7 +73,8 @@ targetdist_filename_(""),
 targetdist_averages_filename_(""),
 fes_fileoutput_active_(false),
 bias_fileoutput_active_(false),
-targetdist_fileoutput_active_(false),
+dynamic_targetdist_fileoutput_active_(false),
+static_targetdist_fileoutput_active_(true),
 bias_cutoff_active_(false),
 bias_cutoff_value_(0.0),
 bias_current_max_value(0.0),
@@ -119,6 +120,10 @@ bias_cutoff_swfunc_pntr_(NULL)
       }
       targetdist_keywords_.push_back(str_ps);
     }
+  }
+
+  if(getNumberOfArguments()>2){
+    disableStaticTargetDistFileOutput();
   }
 
   if(keywords.exists("BIAS_FACTOR")){

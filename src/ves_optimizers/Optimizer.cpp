@@ -498,9 +498,9 @@ targetdist_output_stride_(0)
       targetdist_output_active_=true;
       for(unsigned int i=0; i<nbiases_; i++){
         if(dynamic_targetdists_[i]){
-          bias_pntrs_[i]->enableTargetDistFileOutput();
-          bias_pntrs_[i]->setupTargetDistFileOutput();
-          bias_pntrs_[i]->writeTargetDistToFile();
+          bias_pntrs_[i]->enableDynamicTargetDistFileOutput();
+          bias_pntrs_[i]->setupDynamicTargetDistFileOutput();
+          bias_pntrs_[i]->writeDynamicTargetDistToFile();
         }
       }
     }
@@ -554,7 +554,7 @@ targetdist_output_stride_(0)
       if(dynamic_targetdists_[i]){
         bias_pntrs_[i]->updateTargetDistributions();
         if(targetdist_output_active_){
-          bias_pntrs_[i]->writeTargetDistToFile();
+          bias_pntrs_[i]->writeDynamicTargetDistToFile();
         }
       }
     }
@@ -811,7 +811,7 @@ void Optimizer::update() {
     if(targetdist_output_active_ && getIterationCounter()%targetdist_output_stride_==0){
       for(unsigned int i=0; i<nbiases_; i++){
         if(dynamic_targetdists_[i]){
-          bias_pntrs_[i]->writeTargetDistToFile();
+          bias_pntrs_[i]->writeDynamicTargetDistToFile();
         }
       }
     }

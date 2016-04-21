@@ -101,7 +101,9 @@ private:
   //
   bool fes_fileoutput_active_;
   bool bias_fileoutput_active_;
-  bool targetdist_fileoutput_active_;
+  bool dynamic_targetdist_fileoutput_active_;
+  bool static_targetdist_fileoutput_active_;
+
   //
   bool bias_cutoff_active_;
   double bias_cutoff_value_;
@@ -222,14 +224,18 @@ public:
   void enableBiasFileOutput() {bias_fileoutput_active_=true;}
   void disableBiasFileOutput() {bias_fileoutput_active_=false;}
   bool isBiasFileOutputActive() const {return bias_fileoutput_active_;}
+  //
   void enableFesFileOutput() {fes_fileoutput_active_=true;}
   void disableFesFileOutput() {fes_fileoutput_active_=false;}
   bool isFesFileOutputActive() const {return fes_fileoutput_active_;}
-  void enableTargetDistFileOutput() {targetdist_fileoutput_active_=true;}
-  void disableTargetDistFileOutput() {targetdist_fileoutput_active_=false;}
-  bool isTargetDistFileOutputActive() const {return targetdist_fileoutput_active_;}
-
-
+  //
+  void enableDynamicTargetDistFileOutput() {dynamic_targetdist_fileoutput_active_=true;}
+  void disableDynamicTargetDistFileOutput() {dynamic_targetdist_fileoutput_active_=false;}
+  bool isDynamicTargetDistFileOutputActive() const {return dynamic_targetdist_fileoutput_active_;}
+  //
+  void enableStaticTargetDistFileOutput() {static_targetdist_fileoutput_active_=true;}
+  void disableStaticTargetDistFileOutput() {static_targetdist_fileoutput_active_=false;}
+  bool isStaticTargetDistFileOutputActive() const {return static_targetdist_fileoutput_active_;}
   //
   void setupBiasCutoff(const double, const double);
   bool biasCutoffActive() const {return bias_cutoff_active_;}
@@ -245,8 +251,8 @@ public:
   virtual void writeBiasToFile() {};
   virtual void setupFesFileOutput() {};
   virtual void writeFesToFile() {};
-  virtual void setupTargetDistFileOutput() {};
-  virtual void writeTargetDistToFile() {};
+  virtual void setupDynamicTargetDistFileOutput() {};
+  virtual void writeDynamicTargetDistToFile() {};
 };
 
 inline
