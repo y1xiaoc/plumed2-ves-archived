@@ -763,6 +763,18 @@ void LinearBasisSetExpansion::writeTargetDistGridToFile(Grid* grid_pntr, const s
 }
 
 
+void LinearBasisSetExpansion::writeDynamicTargetDistGridToFile(const bool do_projections, const std::string& suffix) const {
+  writeTargetDistGridToFile(dynamic_ps_grid_pntr_);
+  if(do_projections){
+    for(unsigned int k=0; k<args_pntrs_.size(); k++){
+      Grid proj_grid = TargetDistribution::getMarginalGrid(dynamic_ps_grid_pntr_,args_pntrs_[k]->getName());
+      writeTargetDistGridToFile(&proj_grid,"proj-"+args_pntrs_[k]->getName());
+    }
+  }
+}
+
+
+
 
 
 

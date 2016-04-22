@@ -169,7 +169,7 @@ public:
   void setupBiasCutoffTargetDistribution();
   void updateBiasCutoffTargetDistribution();
   //
-  void writeDynamicTargetDistGridToFile(const std::string& suffix="") const;
+  void writeDynamicTargetDistGridToFile(const bool do_projections=false, const std::string& suffix="") const;
   //
 private:
   //
@@ -248,13 +248,6 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
     getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, NULL);
   }
 }
-
-
-inline
-void LinearBasisSetExpansion::writeDynamicTargetDistGridToFile(const std::string& suffix) const {
-  writeTargetDistGridToFile(dynamic_ps_grid_pntr_);
-}
-
 
 
 }
