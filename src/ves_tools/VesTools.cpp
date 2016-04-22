@@ -19,43 +19,23 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#ifndef __PLUMED_ves_tools_VesTools_h
-#define __PLUMED_ves_tools_VesTools_h
 
-
-#include <string>
-#include <sstream>
-#include <iomanip>
+include "tools/Grid.h"
 
 namespace PLMD{
 
 
-/// \ingroup TOOLBOX
-/// Empty class which just contains several (static) tools
-class VesTools{
-public:
-  // Convert double into a string with more digits
-  static void convertDbl2Str(const double value,std::string& str, unsigned int precision);
-  static void convertDbl2Str(const double value,std::string& str);
-  // copy grid values
-  static void copyGridValues(Grid* grid_pntr_orig, Grid* grid_pntr_copy);
-};
-
-inline
-void VesTools::convertDbl2Str(const double value,std::string& str, unsigned int precision){
-  std::ostringstream ostr;
-  ostr<<std::setprecision(precision)<<value;
-  str=ostr.str();
-}
-
-
-inline
-void VesTools::convertDbl2Str(const double value,std::string& str){
-  unsigned int precision = std::numeric_limits<double>::digits10 + 1;
-  convertDbl2Str(value,str,precision);
+void VesTools::copyGridValues(Grid* grid_pntr_orig, Grid* grid_pntr_copy) {
+  plumed_massert(grid_pntr_orig!=NULL,"grid not defined");
+  plumed_massert(grid_pntr_copy!=NULL,"grid not defined");
+  plumed_massert(grid_pntr_orig->getSize()==grid_pntr_copy->getSize(),"the two grids are not of the same size");
+  plumed_massert(grid_pntr_orig->getDimension()==grid_pntr_copy->getDimension()(),"the two grids are not of the same dimension");
+  //
+  for(index_t i=0; i<grid_pntr_orig->getSize(); i++){
+    double value = grid_pntr_orig->getValue(i);
+    grid_pntr_copy->setValue(i,value);
+  }
 }
 
 
 }
-
-#endif
