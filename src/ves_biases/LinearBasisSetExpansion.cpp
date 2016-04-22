@@ -131,9 +131,19 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
 }
 
 
+bool LinearBasisSetExpansion::isStaticTargetDistFileOutputActive() const {
+  bool output_static_targetdist_files=true;
+  if(vesbias_pntr_!=NULL){
+    output_static_targetdist_files = vesbias_pntr_->isStaticTargetDistFileOutputActive();
+  }
+  return output_static_targetdist_files;
+}
+
+
 void LinearBasisSetExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in) {
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
+
 }
 
 
@@ -489,16 +499,12 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
   for(unsigned int k=0;k<nargs_;k++){
     if(targetdist_pntrs[k]!=NULL){
       all_targetdist_uniform = false;
-      Grid* grid1d_pntr_tmp = setupOneDimensionalMarginalGrid(targetdist_grid_label_+"_proj",grid_bins_[k],k);
-      targetdist_pntrs[k]->calculateDistributionOnGrid(grid1d_pntr_tmp);
-      //
-      std::string fname_suffix = "proj-" + args_pntrs_[k]->getName();
-      std::string ps_filename = "targetdist." + fname_suffix + ".data";
-      if(vesbias_pntr_!=NULL){
-        ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename(fname_suffix);
+      if(isStaticTargetDistFileOutputActive()){
+        Grid* grid1d_pntr_tmp = setupOneDimensionalMarginalGrid(targetdist_grid_label_+"_proj",grid_bins_[k],k);
+        targetdist_pntrs[k]->calculateDistributionOnGrid(grid1d_pntr_tmp);
+        writeTargetDistGridToFile(grid1d_pntr_tmp,"proj-" + args_pntrs_[k]->getName());
+        delete grid1d_pntr_tmp;
       }
-      TargetDistribution::writeProbGridToFile(ps_filename,grid1d_pntr_tmp);
-      delete grid1d_pntr_tmp;
     }
   }
   //
@@ -519,22 +525,18 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     }
     Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
     TargetDistribution::calculateSeperableDistributionOnGrid(ps_grid_pntr,targetdist_pntrs_modifed);
-    std::string ps_filename = "targetdist.data";
-    if(vesbias_pntr_!=NULL){
-      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
+    if(isStaticTargetDistFileOutputActive()){
+      writeTargetDistGridToFile(ps_grid_pntr);
     }
-    TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
     delete ps_grid_pntr;
     //
     log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
     TargetDistribution::calculateSeperableDistributionOnGrid(log_ps_grid_pntr_,targetdist_pntrs_modifed);
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
     log_ps_fes_contribution_ = true;
-    ps_filename = "targetdist.log-beta.data";
-    if(vesbias_pntr_!=NULL){
-      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
+    if(isStaticTargetDistFileOutputActive()){
+      writeTargetDistGridToFile(log_ps_grid_pntr_,"log-beta");
     }
-    TargetDistribution::writeProbGridToFile(ps_filename,log_ps_grid_pntr_);
     //
     for(unsigned int k=0;k<nargs_;k++){
       if(targetdist_pntrs[k]==NULL && targetdist_pntrs_modifed[k]!=NULL){
@@ -562,22 +564,18 @@ void LinearBasisSetExpansion::setupOneDimensionalTargetDistribution(const std::v
   if(targetdist_pntrs[0]!=NULL){
     Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
     targetdist_pntrs[0]->calculateDistributionOnGrid(ps_grid_pntr);
-    std::string ps_filename = "targetdist.data";
-    if(vesbias_pntr_!=NULL){
-      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
+    if(isStaticTargetDistFileOutputActive()){
+      writeTargetDistGridToFile(ps_grid_pntr);
     }
-    TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
     delete ps_grid_pntr;
     //
     log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
     targetdist_pntrs[0]->calculateDistributionOnGrid(log_ps_grid_pntr_);
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
     log_ps_fes_contribution_ = true;
-    ps_filename = "targetdist.log-beta.data";
-    if(vesbias_pntr_!=NULL){
-      ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
+    if(isStaticTargetDistFileOutputActive()){
+      writeTargetDistGridToFile(log_ps_grid_pntr_,"log-beta");
     }
-    TargetDistribution::writeProbGridToFile(ps_filename,log_ps_grid_pntr_);
   }
 }
 
@@ -591,31 +589,19 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
   Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
   targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
   calculateCoeffDerivsAverFromGrid(ps_grid_pntr);
-  //
-  std::string ps_filename = "targetdist.data";
-  if(vesbias_pntr_!=NULL){
-    ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename();
+  if(isStaticTargetDistFileOutputActive()){
+    writeTargetDistGridToFile(ps_grid_pntr);
   }
-  TargetDistribution::writeProbGridToFile(ps_filename,ps_grid_pntr);
-  //
   log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"_log-beta",grid_bins_,false);
   targetdist_pntr->calculateDistributionOnGrid(log_ps_grid_pntr_);
   log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
   log_ps_fes_contribution_ = true;
-  //
-  ps_filename = "targetdist.log-beta.data";
-  if(vesbias_pntr_!=NULL){
-    ps_filename = vesbias_pntr_->getCurrentTargetDistOutputFilename("log-beta");
-  }
-  TargetDistribution::writeProbGridToFile(ps_filename,log_ps_grid_pntr_);
-  //
-  for(unsigned int k=0; k<args_pntrs_.size(); k++){
-    Grid proj_grid = TargetDistribution::getMarginalGrid(ps_grid_pntr,args_pntrs_[k]->getName());
-    std::string proj_fname = "targetdist.proj-" + args_pntrs_[k]->getName() + ".data";
-    if(vesbias_pntr_!=NULL){
-      proj_fname = vesbias_pntr_->getCurrentTargetDistOutputFilename("proj-"+args_pntrs_[k]->getName());
+  if(isStaticTargetDistFileOutputActive()){
+    writeTargetDistGridToFile(log_ps_grid_pntr_,"log-beta");
+    for(unsigned int k=0; k<args_pntrs_.size(); k++){
+      Grid proj_grid = TargetDistribution::getMarginalGrid(ps_grid_pntr,args_pntrs_[k]->getName());
+      writeTargetDistGridToFile(&proj_grid,"proj-"+args_pntrs_[k]->getName());
     }
-    TargetDistribution::writeProbGridToFile(proj_fname,&proj_grid);
   }
   delete ps_grid_pntr;
 }
@@ -759,14 +745,23 @@ void LinearBasisSetExpansion::setupBiasCutoffTargetDistribution() {
 }
 
 
-void LinearBasisSetExpansion::writeTargetDistGridToFile(const std::string& filepath, const bool append_file) const {
-  plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the dynamic target distribution grid is not defined");
+void LinearBasisSetExpansion::writeTargetDistGridToFile(Grid* grid_pntr, const std::string& suffix) const {
+  plumed_massert(grid_pntr!=NULL,"the grid is not defined");
+  //
+  std::string filepath = "targetdist.data";
+  if(suffix.size()>0){
+    filepath = FileBase::appendSuffix(filepath,"."+suffix);
+  }
+  if(vesbias_pntr_!=NULL){
+    filepath = vesbias_pntr_->getCurrentTargetDistOutputFilename(suffix);
+  }
   OFile file;
-  if(append_file){file.enforceRestart();}
+  file.setBackupString("bck");
   file.open(filepath);
-  dynamic_ps_grid_pntr_->writeToFile(file);
+  grid_pntr->writeToFile(file);
   file.close();
 }
+
 
 
 

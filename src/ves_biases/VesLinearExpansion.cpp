@@ -207,7 +207,7 @@ void VesLinearExpansion::writeFesToFile() {
 
 
 void VesLinearExpansion::writeDynamicTargetDistToFile() {
-  bias_expansion_pntr_->writeTargetDistGridToFile(getCurrentTargetDistOutputFilename());
+  bias_expansion_pntr_->writeDynamicTargetDistGridToFile();
 }
 
 
