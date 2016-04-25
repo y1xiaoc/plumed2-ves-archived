@@ -99,8 +99,9 @@ private:
   std::string targetdist_filename_;
   std::string targetdist_averages_filename_;
   //
-  bool fes_fileoutput_active_;
   bool bias_fileoutput_active_;
+  bool fes_fileoutput_active_;
+  bool fesproj_fileoutput_active_;  
   bool dynamic_targetdist_fileoutput_active_;
   bool static_targetdist_fileoutput_active_;
 
@@ -229,6 +230,10 @@ public:
   void disableFesFileOutput() {fes_fileoutput_active_=false;}
   bool isFesFileOutputActive() const {return fes_fileoutput_active_;}
   //
+  void enableFesProjFileOutput() {fesproj_fileoutput_active_=true;}
+  void disableFesFileProjOutput() {fesproj_fileoutput_active_=false;}
+  bool isFesProjFileOutputActive() const {return fesproj_fileoutput_active_;}
+  //
   void enableDynamicTargetDistFileOutput() {dynamic_targetdist_fileoutput_active_=true;}
   void disableDynamicTargetDistFileOutput() {dynamic_targetdist_fileoutput_active_=false;}
   bool isDynamicTargetDistFileOutputActive() const {return dynamic_targetdist_fileoutput_active_;}
@@ -251,6 +256,8 @@ public:
   virtual void writeBiasToFile() {};
   virtual void setupFesFileOutput() {};
   virtual void writeFesToFile() {};
+  virtual void setupFesProjFileOutput() {};
+  virtual void writeFesProjToFile() {};
   virtual void setupDynamicTargetDistFileOutput() {};
   virtual void writeDynamicTargetDistToFile() {};
 };
