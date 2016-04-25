@@ -30,6 +30,9 @@
 namespace PLMD{
 
 
+class Grid;
+
+
 /// \ingroup TOOLBOX
 /// Empty class which just contains several (static) tools
 class VesTools{
