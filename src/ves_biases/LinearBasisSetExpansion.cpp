@@ -528,10 +528,10 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     if(isStaticTargetDistFileOutputActive()){
       writeTargetDistGridToFile(ps_grid_pntr);
     }
-    delete ps_grid_pntr;
     //
     log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
-    TargetDistribution::calculateSeperableDistributionOnGrid(log_ps_grid_pntr_,targetdist_pntrs_modifed);
+    VesTools::copyGridValues(ps_grid_pntr,log_ps_grid_pntr_);
+    delete ps_grid_pntr;
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
     log_ps_fes_contribution_ = true;
     if(isStaticTargetDistFileOutputActive()){
@@ -567,10 +567,10 @@ void LinearBasisSetExpansion::setupOneDimensionalTargetDistribution(const std::v
     if(isStaticTargetDistFileOutputActive()){
       writeTargetDistGridToFile(ps_grid_pntr);
     }
-    delete ps_grid_pntr;
     //
     log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
-    targetdist_pntrs[0]->calculateDistributionOnGrid(log_ps_grid_pntr_);
+    VesTools::copyGridValues(ps_grid_pntr,log_ps_grid_pntr_);
+    delete ps_grid_pntr;    
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
     log_ps_fes_contribution_ = true;
     if(isStaticTargetDistFileOutputActive()){
@@ -593,7 +593,7 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
     writeTargetDistGridToFile(ps_grid_pntr);
   }
   log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"_log-beta",grid_bins_,false);
-  targetdist_pntr->calculateDistributionOnGrid(log_ps_grid_pntr_);
+  VesTools::copyGridValues(ps_grid_pntr,log_ps_grid_pntr_);
   log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
   log_ps_fes_contribution_ = true;
   if(isStaticTargetDistFileOutputActive()){
