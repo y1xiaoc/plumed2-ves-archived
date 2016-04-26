@@ -263,11 +263,15 @@ targetdist_output_stride_(0)
 
   if(ncoeffssets_>1){
     coeffssetid_prefix_="c-";
-    parse("COEFFS_SET_ID_PREFIX",coeffssetid_prefix_);
+    if(keywords.exists("COEFFS_SET_ID_PREFIX")){
+      parse("COEFFS_SET_ID_PREFIX",coeffssetid_prefix_);
+    }
   }
   else{
     coeffssetid_prefix_="";
-    parse("COEFFS_SET_ID_PREFIX",coeffssetid_prefix_);
+    if(keywords.exists("COEFFS_SET_ID_PREFIX")){
+      parse("COEFFS_SET_ID_PREFIX",coeffssetid_prefix_);
+    }
     if(coeffssetid_prefix_.size()>0){
       plumed_merror("COEFFS_SET_ID_PREFIX should only be given if optimizing multiple coefficent sets");
     }
@@ -283,103 +287,111 @@ targetdist_output_stride_(0)
   }
   //
 
-
   std::vector<std::string> coeffs_fnames;
-  parseFilenames("COEFFS_FILE",coeffs_fnames,"coeffs.data");
-  bool start_opt_afresh=false;
-  if(keywords.exists("START_OPTIMIZATION_AFRESH")){
-    parseFlag("START_OPTIMIZATION_AFRESH",start_opt_afresh);
-    if(start_opt_afresh && !getRestart()){
-      plumed_merror("the START_OPTIMIZATION_AFRESH keyword should only be used when a restart has been triggered by the RESTART keyword or the MD code");
-    }
-  }
-  if(getRestart()){
-    readCoeffsFromFiles(coeffs_fnames,true);
-    unsigned int iter_opt_tmp = coeffs_pntrs_[0]->getIterationCounter();
-    for(unsigned int i=1; i<ncoeffssets_; i++){
-      plumed_massert(coeffs_pntrs_[i]->getIterationCounter()==iter_opt_tmp,"the iteraton counter should be the same for all files when restarting from previous coefficient files\n");
-    }
-    if(start_opt_afresh){
-      setIterationCounter(0);
-      log.printf("  Optimization started afresh at iteration %u\n",getIterationCounter());
-      for(unsigned int i=0; i<ncoeffssets_; i++){
-        AuxCoeffs(i) = Coeffs(i);
+  if(keywords.exists("COEFFS_FILE")){
+    parseFilenames("COEFFS_FILE",coeffs_fnames,"coeffs.data");
+    bool start_opt_afresh=false;
+    if(keywords.exists("START_OPTIMIZATION_AFRESH")){
+      parseFlag("START_OPTIMIZATION_AFRESH",start_opt_afresh);
+      if(start_opt_afresh && !getRestart()){
+        plumed_merror("the START_OPTIMIZATION_AFRESH keyword should only be used when a restart has been triggered by the RESTART keyword or the MD code");
       }
     }
-    else{
-      setIterationCounter(coeffs_pntrs_[0]->getIterationCounter());
-      log.printf("  Optimization restarted at iteration %u\n",getIterationCounter());
+    if(getRestart()){
+      readCoeffsFromFiles(coeffs_fnames,true);
+      unsigned int iter_opt_tmp = coeffs_pntrs_[0]->getIterationCounter();
+      for(unsigned int i=1; i<ncoeffssets_; i++){
+        plumed_massert(coeffs_pntrs_[i]->getIterationCounter()==iter_opt_tmp,"the iteraton counter should be the same for all files when restarting from previous coefficient files\n");
+      }
+      if(start_opt_afresh){
+        setIterationCounter(0);
+        log.printf("  Optimization started afresh at iteration %u\n",getIterationCounter());
+        for(unsigned int i=0; i<ncoeffssets_; i++){
+          AuxCoeffs(i) = Coeffs(i);
+        }
+      }
+      else{
+        setIterationCounter(coeffs_pntrs_[0]->getIterationCounter());
+        log.printf("  Optimization restarted at iteration %u\n",getIterationCounter());
+      }
+      setAllCoeffsSetIterationCounters();
     }
-    setAllCoeffsSetIterationCounters();
-  }
 
+    std::string coeffs_wstride_tmpstr="";
+    parse("COEFFS_OUTPUT",coeffs_wstride_tmpstr);
+    if(coeffs_wstride_tmpstr!="OFF" && coeffs_wstride_tmpstr.size()>0){
+      Tools::convert(coeffs_wstride_tmpstr,coeffs_wstride_);
+    }
+    if(coeffs_wstride_tmpstr=="OFF"){
+      coeffs_fnames.clear();
+    }
+    setupOFiles(coeffs_fnames,coeffsOFiles_);
+    for(unsigned int i=0; i<coeffsOFiles_.size();i++){
+      coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
+    }
 
-  std::string coeffs_wstride_tmpstr="";
-  parse("COEFFS_OUTPUT",coeffs_wstride_tmpstr);
-  if(coeffs_wstride_tmpstr!="OFF" && coeffs_wstride_tmpstr.size()>0){
-    Tools::convert(coeffs_wstride_tmpstr,coeffs_wstride_);
-  }
-  if(coeffs_wstride_tmpstr=="OFF"){
-    coeffs_fnames.clear();
-  }
-  setupOFiles(coeffs_fnames,coeffsOFiles_);
-  for(unsigned int i=0; i<coeffsOFiles_.size();i++){
-    coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
-  }
-
-  if(coeffs_fnames.size()>0){
-    if(ncoeffssets_==1){
-      log.printf("  Coefficients will be written out to file %s every %u iterations\n",coeffsOFiles_[0]->getPath().c_str(),coeffs_wstride_);
+    if(coeffs_fnames.size()>0){
+      if(ncoeffssets_==1){
+        log.printf("  Coefficients will be written out to file %s every %u iterations\n",coeffsOFiles_[0]->getPath().c_str(),coeffs_wstride_);
+      }
+      else {
+        log.printf("  Coefficients will be written out to the following files every %u iterations:\n",coeffs_wstride_);
+        for(unsigned int i=0; i<coeffs_fnames.size(); i++){
+          log.printf("   coefficient set %u: %s\n",i,coeffsOFiles_[i]->getPath().c_str());
+        }
+      }
     }
     else {
-      log.printf("  Coefficients will be written out to the following files every %u iterations:\n",coeffs_wstride_);
-      for(unsigned int i=0; i<coeffs_fnames.size(); i++){
-        log.printf("   coefficient set %u: %s\n",i,coeffsOFiles_[i]->getPath().c_str());
-      }
+      log.printf("  Output of coefficients to file has been disabled\n");
     }
   }
-  else {
-    log.printf("  Output of coefficients to file has been disabled\n");
-  }
-
 
   std::vector<std::string> gradient_fnames;
-  parseFilenames("GRADIENT_FILE",gradient_fnames);
-  parse("GRADIENT_OUTPUT",gradient_wstride_);
+  if(keywords.exists("GRADIENT_FILE")){
+    parseFilenames("GRADIENT_FILE",gradient_fnames);
+    parse("GRADIENT_OUTPUT",gradient_wstride_);
 
-  for(unsigned int i=0; i<gradient_fnames.size(); i++){
-    plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"FILE and GRADIENT_FILE cannot be the same");
-  }
-  setupOFiles(gradient_fnames,gradientOFiles_);
-  for(unsigned int i=0; i<gradientOFiles_.size(); i++){
-    if(aver_gradient_pntrs_.size()==0){
-      gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],false);
-    }
-    else{
-      gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs_[i],false);
-    }
-  }
-
-  if(gradient_fnames.size()>0){
-    if(ncoeffssets_==1){
-      log.printf("  Gradient will be written out to file %s every %u iterations\n",gradientOFiles_[0]->getPath().c_str(),gradient_wstride_);
-    }
-    else {
-      log.printf("  Gradient will be written out to the following files every %u iterations:\n",gradient_wstride_);
+    if(coeffs_fnames.size()>0){
       for(unsigned int i=0; i<gradient_fnames.size(); i++){
-        log.printf("   coefficient set %u: %s\n",i,gradientOFiles_[i]->getPath().c_str());
+        plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"FILE and GRADIENT_FILE cannot be the same");
+      }
+    }
+    setupOFiles(gradient_fnames,gradientOFiles_);
+    for(unsigned int i=0; i<gradientOFiles_.size(); i++){
+      if(aver_gradient_pntrs_.size()==0){
+        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],false);
+      }
+      else{
+        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs_[i],false);
+      }
+    }
+
+    if(gradient_fnames.size()>0){
+      if(ncoeffssets_==1){
+        log.printf("  Gradient will be written out to file %s every %u iterations\n",gradientOFiles_[0]->getPath().c_str(),gradient_wstride_);
+      }
+      else {
+        log.printf("  Gradient will be written out to the following files every %u iterations:\n",gradient_wstride_);
+        for(unsigned int i=0; i<gradient_fnames.size(); i++){
+          log.printf("   coefficient set %u: %s\n",i,gradientOFiles_[i]->getPath().c_str());
+        }
       }
     }
   }
 
-
+  std::vector<std::string> hessian_fnames;
   if(keywords.exists("HESSIAN_FILE")){
-    std::vector<std::string> hessian_fnames;
     parseFilenames("HESSIAN_FILE",hessian_fnames);
 
-    for(unsigned int i=0; i<hessian_fnames.size(); i++){
-      plumed_massert(hessian_fnames[i]!=coeffs_fnames[i],"FILE and HESSIAN_FILE cannot be the same");
-      plumed_massert(hessian_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and HESSIAN_FILE cannot be the same");
+    if(coeffs_fnames.size()>0){
+      for(unsigned int i=0; i<hessian_fnames.size(); i++){
+        plumed_massert(hessian_fnames[i]!=coeffs_fnames[i],"FILE and HESSIAN_FILE cannot be the same");
+      }
+    }
+    if(gradient_fnames.size()>0){
+      for(unsigned int i=0; i<hessian_fnames.size(); i++){
+        plumed_massert(hessian_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and HESSIAN_FILE cannot be the same");
+      }
     }
     setupOFiles(hessian_fnames,hessianOFiles_);
 
