@@ -58,10 +58,15 @@ public:
   ~VesLinearExpansion();
   void calculate();
   void updateTargetDistributions();
+  //
   void setupBiasFileOutput();
   void writeBiasToFile();
+  void resetBiasFileOutput();
+  //
   void setupFesFileOutput();
   void writeFesToFile();
+  void resetFesFileOutput();
+  //
   void setupFesProjFileOutput();
   void writeFesProjToFile();
   void setupTargetDistFileOutput() {};
@@ -196,6 +201,10 @@ void VesLinearExpansion::writeBiasToFile() {
   bias_expansion_pntr_->writeBiasGridToFile(getCurrentBiasOutputFilename());
 }
 
+void VesLinearExpansion::resetBiasFileOutput() {
+  bias_expansion_pntr_->resetStepOfLastBiasGridUpdate();
+}
+
 
 void VesLinearExpansion::setupFesFileOutput() {
   bias_expansion_pntr_->setupFesGrid();
@@ -205,6 +214,11 @@ void VesLinearExpansion::setupFesFileOutput() {
 void VesLinearExpansion::writeFesToFile() {
   bias_expansion_pntr_->updateFesGrid();
   bias_expansion_pntr_->writeFesGridToFile(getCurrentFesOutputFilename());
+}
+
+
+void VesLinearExpansion::resetFesFileOutput() {
+  bias_expansion_pntr_->resetStepOfLastFesGridUpdate();
 }
 
 

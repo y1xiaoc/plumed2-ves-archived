@@ -261,12 +261,19 @@ public:
   //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};
+  virtual void resetBiasFileOutput() {};
+  //
   virtual void setupFesFileOutput() {};
   virtual void writeFesToFile() {};
+  virtual void resetFesFileOutput() {};
+  //
   virtual void setupFesProjFileOutput() {};
   virtual void writeFesProjToFile() {};
+  virtual void resetFesProjFileOutput() {};
+  //
   virtual void setupDynamicTargetDistFileOutput() {};
   virtual void writeDynamicTargetDistToFile() {};
+  virtual void resetDynamicTargetDistFileOutput() {};
 };
 
 inline
