@@ -93,6 +93,8 @@ private:
   unsigned int bias_output_stride_;
   bool fes_output_active_;
   unsigned int fes_output_stride_;
+  bool fesproj_output_active_;
+  unsigned int fesproj_output_stride_;
   bool targetdist_output_active_;
   unsigned int targetdist_output_stride_;
   //

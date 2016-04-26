@@ -71,6 +71,8 @@ bias_output_active_(false),
 bias_output_stride_(0),
 fes_output_active_(false),
 fes_output_stride_(0),
+fesproj_output_active_(false),
+fesproj_output_stride_(0),
 targetdist_output_active_(false),
 targetdist_output_stride_(0)
 {
@@ -484,6 +486,22 @@ targetdist_output_stride_(0)
     }
   }
 
+  if(keywords.exists("FES_PROJ_OUTPUT")){
+    parse("FES_PROJ_OUTPUT",fesproj_output_stride_);
+    if(fesproj_output_stride_>0){
+      fesproj_output_active_=true;
+      for(unsigned int i=0; i<nbiases_; i++){
+        bias_pntrs_[i]->enableFesProjFileOutput();
+        bias_pntrs_[i]->setupFesProjFileOutput();
+        bias_pntrs_[i]->writeFesProjToFile();
+      }
+    }
+    else{
+      fesproj_output_active_=false;
+      fesproj_output_stride_=1000;
+    }
+  }
+
 
   if(keywords.exists("TARGETDIST_OUTPUT")){
     parse("TARGETDIST_OUTPUT",targetdist_output_stride_);
@@ -630,6 +648,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.add("optional","BIAS_OUTPUT","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   keys.add("optional","FES_OUTPUT","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  keys.add("optional","FES_PROJ_OUTPUT","how often the projections of the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
@@ -806,6 +825,11 @@ void Optimizer::update() {
     if(fes_output_active_ && getIterationCounter()%fes_output_stride_==0){
       for(unsigned int i=0; i<nbiases_; i++){
         bias_pntrs_[i]->writeFesToFile();
+      }
+    }
+    if(fesproj_output_active_ && getIterationCounter()%fesproj_output_stride_==0){
+      for(unsigned int i=0; i<nbiases_; i++){
+        bias_pntrs_[i]->writeFesProjToFile();
       }
     }
     if(targetdist_output_active_ && getIterationCounter()%targetdist_output_stride_==0){
