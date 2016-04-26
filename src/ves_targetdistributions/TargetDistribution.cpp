@@ -25,17 +25,11 @@
 
 #include "core/Value.h"
 #include "tools/Grid.h"
+#include "ves_tools/GridProjWeights.h"
 #include "tools/File.h"
 #include "tools/Keywords.h"
 
 namespace PLMD {
-
-class MarginalWeight:public WeightBase{
-  public:
-    explicit MarginalWeight(){}
-    double projectInnerLoop(double &input, double &v){return  input+v;}
-    double projectOuterLoop(double &v){return v;}
-};
 
 TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
 words(input)
