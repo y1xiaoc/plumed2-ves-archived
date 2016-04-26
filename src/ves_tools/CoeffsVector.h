@@ -204,6 +204,7 @@ private:
 public:
   size_t readFromFile(IFile&, const bool ignore_missing_coeffs=false, const bool ignore_header=false);
   size_t readFromFile(const std::string&, const bool ignore_missing_coeffs=false, const bool ignore_header=false);
+  size_t readOneSetFromFile(IFile& ifile, const bool ignore_header=false);
 private:
   void readHeaderFromFile(IFile&, const bool ignore_coeffs_info=false);
   size_t readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);

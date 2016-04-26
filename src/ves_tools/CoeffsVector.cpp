@@ -795,6 +795,18 @@ size_t CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs
 }
 
 
+size_t CoeffsVector::readOneSetFromFile(IFile& ifile, const bool ignore_header) {
+  ifile.allowIgnoredFields();
+  size_t ncoeffs_read=0;
+  bool ignore_missing_coeffs=false;
+  if(ifile){
+    if(!ignore_header){readHeaderFromFile(ifile);}
+    if(ifile){ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);}
+  }
+  return ncoeffs_read;
+}
+
+
 size_t CoeffsVector::readFromFile(const std::string& filepath, const bool ignore_missing_coeffs, const bool ignore_header) {
   IFile file;
   file.link(mycomm);
@@ -855,7 +867,7 @@ size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_co
     }
   }
   // checks on the coeffs read
-  if(!ignore_missing_coeffs && ncoeffs_read < numberOfCoeffs()){
+  if(ncoeffs_read>0 &&!ignore_missing_coeffs && ncoeffs_read < numberOfCoeffs()){
     plumed_merror("ERROR: missing coefficients when reading from file");
   }
   //
