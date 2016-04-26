@@ -192,9 +192,26 @@ bias_cutoff_swfunc_pntr_(NULL)
     std::vector<std::string> proj_arg;
     for(int i=1;;i++){
       if(!parseNumberedVector("PROJ_ARG",i,proj_arg)){break;}
+      // checks
       if(proj_arg.size() > (getNumberOfArguments()-1) ){
         plumed_merror("PROJ_ARG must be a subset of ARG");
       }
+      //
+      for(unsigned int k=0; k<proj_arg.size(); k++){
+        bool found = false;
+        for(unsigned int l=0; l<getNumberOfArguments(); l++){
+          if(proj_arg[k]==getPntrToArgument(l)->getName()){
+            found = true;
+            break;
+          }
+        }
+        if(!found){
+          std::string s1; Tools::convert(i,s1);
+          std::string error = "PROJ_ARG" + s1 + ": label " + proj_arg[k] + " is not among the arguments given in ARG";
+          plumed_merror(error);
+        }
+      }
+      //
       projection_args_.push_back(proj_arg);
     }
   }
