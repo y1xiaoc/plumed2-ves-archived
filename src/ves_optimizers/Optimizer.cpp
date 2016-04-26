@@ -616,7 +616,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   // Default always active keywords
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
-  keys.add("compulsory","COEFFS_FILE","COEFFS","the name of output file for the coefficients");
+  keys.add("compulsory","COEFFS_FILE","coeffs.data","the name of output file for the coefficients");
   keys.add("compulsory","COEFFS_OUTPUT","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
   keys.add("optional","COEFFS_SET_ID_PREFIX","suffix to add to the filename given in FILE to identfy the bias, should only be given if a single filename is given in FILE when optimizing multiple biases.");
   //
