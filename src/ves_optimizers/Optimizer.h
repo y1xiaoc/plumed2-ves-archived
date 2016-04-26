@@ -178,6 +178,7 @@ public:
   //
   bool useMultipleWalkers() const {return use_mwalkers_mpi_;}
   //
+  std::vector<bias::VesBias*> getBiasPntrs() const {return bias_pntrs_;}
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getAuxCoeffsPntrs() const {return aux_coeffs_pntrs_;}
   std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}
