@@ -142,6 +142,9 @@ public:
   long int getStepOfLastFesGridUpdate() const {return step_of_last_fesgrid_update;}
   void writeFesGridToFile(const std::string&, const bool append=false) const;
   //
+  void setupFesProjGrid();
+  void writeFesProjGridToFile(const std::vector<std::string>&, const std::string&, const bool append=false) const;
+  //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);
   void setGridBins(const unsigned int);

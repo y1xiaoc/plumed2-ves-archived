@@ -30,6 +30,7 @@
 
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
+#include "ves_tools/GridProjWeights.h"
 #include "tools/Communicator.h"
 
 
@@ -208,6 +209,13 @@ void LinearBasisSetExpansion::setupFesGrid() {
 }
 
 
+void LinearBasisSetExpansion::setupFesProjGrid() {
+  if(fes_grid_pntr_==NULL){
+    setupFesGrid();
+  }
+}
+
+
 void LinearBasisSetExpansion::updateBiasGrid() {
   plumed_massert(bias_grid_pntr_!=NULL,"the bias grid is not defined");
   if(getStepOfLastBiasGridUpdate() == action_pntr_->getStep()){
@@ -330,6 +338,20 @@ void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, co
   file.open(filepath);
   fes_grid_pntr_->writeToFile(file);
   file.close();
+}
+
+
+void LinearBasisSetExpansion::writeFesProjGridToFile(const std::vector<std::string>& proj_arg, const std::string& filepath, const bool append_file) const {
+  plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
+  FesWeight* Fw = new FesWeight(beta_);
+  Grid proj_grid = fes_grid_pntr_->project(proj_arg,Fw);
+  proj_grid.setMinToZero();
+  OFile file;
+  if(append_file){file.enforceRestart();}
+  file.open(filepath);
+  proj_grid.writeToFile(file);
+  file.close();
+  delete Fw;
 }
 
 
@@ -570,7 +592,7 @@ void LinearBasisSetExpansion::setupOneDimensionalTargetDistribution(const std::v
     //
     log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
     VesTools::copyGridValues(ps_grid_pntr,log_ps_grid_pntr_);
-    delete ps_grid_pntr;    
+    delete ps_grid_pntr;
     log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
     log_ps_fes_contribution_ = true;
     if(isStaticTargetDistFileOutputActive()){

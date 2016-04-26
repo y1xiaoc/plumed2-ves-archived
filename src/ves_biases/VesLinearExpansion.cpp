@@ -32,7 +32,6 @@
 #include "core/PlumedMain.h"
 
 
-
 using namespace std;
 
 
@@ -63,6 +62,8 @@ public:
   void writeBiasToFile();
   void setupFesFileOutput();
   void writeFesToFile();
+  void setupFesProjFileOutput();
+  void writeFesProjToFile();
   void setupTargetDistFileOutput() {};
   void writeDynamicTargetDistToFile();
   static void registerKeywords( Keywords& keys );
@@ -79,6 +80,7 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
   VesBias::useWellTemperdKeywords(keys);
   VesBias::useBiasCutoffKeywords(keys);
   VesBias::useGridBinKeywords(keys);
+  VesBias::useProjectionArgKeywords(keys);
 }
 
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
@@ -203,6 +205,24 @@ void VesLinearExpansion::setupFesFileOutput() {
 void VesLinearExpansion::writeFesToFile() {
   bias_expansion_pntr_->updateFesGrid();
   bias_expansion_pntr_->writeFesGridToFile(getCurrentFesOutputFilename());
+}
+
+
+void VesLinearExpansion::setupFesProjFileOutput() {
+  bias_expansion_pntr_->setupFesProjGrid();
+}
+
+
+void VesLinearExpansion::writeFesProjToFile() {
+  bias_expansion_pntr_->updateFesGrid();
+  for(unsigned int i=0; i<getNumberOfProjectionArguments(); i++){
+    std::string fname;
+    Tools::convert(i+1,fname);
+    fname = "proj-" + fname;
+    fname = getCurrentFesOutputFilename(fname);
+    std::vector<std::string> args = getProjectionArgument(i);
+    bias_expansion_pntr_->writeFesProjGridToFile(args,fname);
+  }
 }
 
 
