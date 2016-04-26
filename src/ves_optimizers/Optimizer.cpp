@@ -817,31 +817,18 @@ void Optimizer::update() {
       }
     }
     //
-    if(bias_output_active_ && getIterationCounter()%bias_output_stride_==0){
-      for(unsigned int i=0; i<nbiases_; i++){
-        bias_pntrs_[i]->writeBiasToFile();
-      }
+    if(isBiasOutputActive() && getIterationCounter()%getBiasOutputStride()==0){
+      writeBiasOutputFiles();
     }
-    if(fes_output_active_ && getIterationCounter()%fes_output_stride_==0){
-      for(unsigned int i=0; i<nbiases_; i++){
-        bias_pntrs_[i]->writeFesToFile();
-      }
+    if(isFesOutputActive() && getIterationCounter()%getFesOutputStride()==0){
+      writeFesOutputFiles();
     }
-    if(fesproj_output_active_ && getIterationCounter()%fesproj_output_stride_==0){
-      for(unsigned int i=0; i<nbiases_; i++){
-        bias_pntrs_[i]->writeFesProjToFile();
-      }
+    if(isFesProjOutputActive() && getIterationCounter()%getFesProjOutputStride()==0){
+      writeFesProjOutputFiles();
     }
-    if(targetdist_output_active_ && getIterationCounter()%targetdist_output_stride_==0){
-      for(unsigned int i=0; i<nbiases_; i++){
-        if(dynamic_targetdists_[i]){
-          bias_pntrs_[i]->writeDynamicTargetDistToFile();
-        }
-      }
+    if(isTargetDistOutputActive() && getIterationCounter()%getTargetDistOutputStride()==0){
+      writeTargetDistOutputFiles();
     }
-
-
-
   }
 }
 
@@ -989,6 +976,36 @@ void Optimizer::setAllCoeffsSetIterationCounters(){
     gradient_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     if(use_hessian_){
       hessian_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    }
+  }
+}
+
+
+void Optimizer::writeBiasOutputFiles() const {
+  for(unsigned int i=0; i<nbiases_; i++){
+    bias_pntrs_[i]->writeBiasToFile();
+  }
+}
+
+
+void Optimizer::writeFesOutputFiles() const {
+  for(unsigned int i=0; i<nbiases_; i++){
+    bias_pntrs_[i]->writeFesToFile();
+  }
+}
+
+
+void Optimizer::writeFesProjOutputFiles() const {
+  for(unsigned int i=0; i<nbiases_; i++){
+    bias_pntrs_[i]->writeFesProjToFile();
+  }
+}
+
+
+void Optimizer::writeTargetDistOutputFiles() const {
+  for(unsigned int i=0; i<nbiases_; i++){
+    if(dynamic_targetdists_[i]){
+      bias_pntrs_[i]->writeDynamicTargetDistToFile();
     }
   }
 }

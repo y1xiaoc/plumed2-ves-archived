@@ -179,7 +179,27 @@ public:
   std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}
   std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs_;}
   std::vector<CoeffsVector*> getCoeffsMaskPntrs() const {return coeffs_mask_pntrs_;}
-  };
+  //
+  bool isBiasOutputActive() const {return bias_output_active_;}
+  unsigned int getBiasOutputStride() const {return bias_output_stride_;}
+  void setBiasOutputStride(unsigned int stride) {bias_output_stride_=stride;}
+  void writeBiasOutputFiles() const;
+  //
+  bool isFesOutputActive() const {return fes_output_active_;}
+  unsigned int getFesOutputStride() const {return fes_output_stride_;}
+  void setFesOutputStride(unsigned int stride) {fes_output_stride_=stride;}
+  void writeFesOutputFiles() const;
+  //
+  bool isFesProjOutputActive() const {return fesproj_output_active_;}
+  unsigned int getFesProjOutputStride() const {return fesproj_output_stride_;}
+  void setFesProjOutputStride(unsigned int stride) {fesproj_output_stride_=stride;}
+  void writeFesProjOutputFiles() const;
+  //
+  bool isTargetDistOutputActive() const {return targetdist_output_active_;}
+  unsigned int getTargetDistOutputStride() const {return targetdist_output_stride_;}
+  void setTargetDistOutputStride(unsigned int stride) {targetdist_output_stride_=stride;}
+  void writeTargetDistOutputFiles() const;
+};
 
 inline
 double Optimizer::StepSize(const unsigned int coeffs_id) const {return stepsizes_[coeffs_id];}
