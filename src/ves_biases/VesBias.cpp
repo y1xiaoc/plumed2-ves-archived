@@ -188,6 +188,18 @@ bias_cutoff_swfunc_pntr_(NULL)
     }
   }
 
+  if(keywords.exists("PROJ_ARG")){
+    std::vector<std::string> proj_arg;
+    for(int i=1;;i++){
+      if(!parseNumberedVector("PROJ_ARG",i,proj_arg)){break;}
+      if(proj_arg.size() > (getNumberOfArguments()-1) ){
+        plumed_merror("PROJ_ARG must be a subset of ARG");
+      }
+      projection_args_.push_back(proj_arg);
+    }
+  }
+
+
 }
 
 
@@ -234,6 +246,8 @@ void VesBias::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","BIAS_CUTOFF","cutoff the bias such that it only fills the free energy surface up to certain level F_cutoff, here you should give the value of the F_cutoff.");
   keys.reserve("optional","BIAS_CUTOFF_FERMI_LAMBDA","the lambda value used in the Fermi switching function for the bias cutoff (BIAS_CUTOFF). Lambda is by default 1.0.");
+  //
+  keys.reserve("numbered","PROJ_ARG","arguments for doing projections of the FES or the target distribution.");
 }
 
 
@@ -266,6 +280,11 @@ void VesBias::useGridLimitsKeywords(Keywords& keys) {
 void VesBias::useBiasCutoffKeywords(Keywords& keys) {
   keys.use("BIAS_CUTOFF");
   keys.use("BIAS_CUTOFF_FERMI_LAMBDA");
+}
+
+
+void VesBias::useProjectionArgKeywords(Keywords& keys) {
+  keys.use("PROJ_ARG");
 }
 
 
@@ -532,8 +551,11 @@ void VesBias::setGridMax(const std::vector<double>& grid_max_in) {
 }
 
 
-std::string VesBias::getCurrentOutputFilename(const std::string& base_filename) const {
+std::string VesBias::getCurrentOutputFilename(const std::string& base_filename, const std::string& suffix) const {
   std::string filename = base_filename;
+  if(suffix.size()>0){
+    filename = FileBase::appendSuffix(filename,"."+suffix);
+  }
   if(optimizeCoeffs()){
     std::string iter_str;
     Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);

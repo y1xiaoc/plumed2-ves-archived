@@ -101,7 +101,7 @@ private:
   //
   bool bias_fileoutput_active_;
   bool fes_fileoutput_active_;
-  bool fesproj_fileoutput_active_;  
+  bool fesproj_fileoutput_active_;
   bool dynamic_targetdist_fileoutput_active_;
   bool static_targetdist_fileoutput_active_;
 
@@ -110,6 +110,8 @@ private:
   double bias_cutoff_value_;
   double bias_current_max_value;
   FermiSwitchingFunction* bias_cutoff_swfunc_pntr_;
+  //
+  std::vector< std::vector<std::string> > projection_args_;
   //
 private:
   void initializeCoeffs(CoeffsVector*);
@@ -146,6 +148,7 @@ public:
   static void useGridBinKeywords(Keywords&);
   static void useGridLimitsKeywords(Keywords&);
   static void useBiasCutoffKeywords(Keywords&);
+  static void useProjectionArgKeywords(Keywords&);
   //
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
@@ -213,11 +216,11 @@ public:
   std::vector<double> getGridMin() const {return grid_min_;}
   void setGridMin(const std::vector<double>&);
   //
-  std::string getCurrentOutputFilename(const std::string&) const;
+  std::string getCurrentOutputFilename(const std::string&, const std::string& suffix="") const;
   std::string getBiasOutputFilename() const {return bias_filename_;}
   std::string getCurrentBiasOutputFilename() const;
   std::string getFesOutputFilename() const {return fes_filename_;}
-  std::string getCurrentFesOutputFilename() const;
+  std::string getCurrentFesOutputFilename(const std::string& suffix="") const;
   std::string getTargetDistOutputFilename() const {return targetdist_filename_;}
   std::string getCurrentTargetDistOutputFilename(const std::string& suffix="") const;
   std::string getTargetDistAveragesOutputFilename() const {return targetdist_averages_filename_;}
@@ -241,6 +244,10 @@ public:
   void enableStaticTargetDistFileOutput() {static_targetdist_fileoutput_active_=true;}
   void disableStaticTargetDistFileOutput() {static_targetdist_fileoutput_active_=false;}
   bool isStaticTargetDistFileOutputActive() const {return static_targetdist_fileoutput_active_;}
+  //
+  std::vector< std::vector<std::string> > getProjectionArguments() const {return projection_args_;}
+  std::vector<std::string> getProjectionArgument(unsigned int i) const {return projection_args_[i];}
+  unsigned int getNumberOfProjectionArguments() const {return projection_args_.size();}
   //
   void setupBiasCutoff(const double, const double);
   bool biasCutoffActive() const {return bias_cutoff_active_;}
@@ -312,8 +319,8 @@ std::string VesBias::getCurrentBiasOutputFilename() const {
 
 
 inline
-std::string VesBias::getCurrentFesOutputFilename() const {
-  return getCurrentOutputFilename(fes_filename_);
+std::string VesBias::getCurrentFesOutputFilename(const std::string& suffix) const {
+  return getCurrentOutputFilename(fes_filename_,suffix);
 }
 
 
