@@ -209,7 +209,9 @@ void VesLinearExpansion::writeFesToFile() {
 
 
 void VesLinearExpansion::setupFesProjFileOutput() {
-  bias_expansion_pntr_->setupFesProjGrid();
+  if(getNumberOfProjectionArguments()>0){
+    bias_expansion_pntr_->setupFesProjGrid();
+  }
 }
 
 
