@@ -133,7 +133,7 @@ valueForce2_(NULL)
     bias_expansion_pntr_->setupBiasCutoffTargetDistribution();
   }
 
-  writeCoeffDerivsAverTargetDistToFile();
+  writeCoeffDerivsAverTargetDistToFile(0,false);
   //
   readCoeffsFromFiles();
   //
@@ -187,7 +187,7 @@ void VesLinearExpansion::updateTargetDistributions() {
   }
   setCoeffsDerivsOverTargetDist(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
   // this output should be optional or with a stride
-  writeCoeffDerivsAverTargetDistToFile(true,getOptimizerPntr()->getIterationCounter());
+  writeCoeffDerivsAverTargetDistToFile(getOptimizerPntr()->getIterationCounter());
 }
 
 

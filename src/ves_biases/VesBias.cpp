@@ -538,7 +538,7 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 void VesBias::updateTargetDistributions() {}
 
 
-void VesBias::writeCoeffDerivsAverTargetDistToFile(const bool append, const unsigned int iteration) {
+void VesBias::writeCoeffDerivsAverTargetDistToFile(const unsigned int iteration, const bool append) {
   getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(iteration,this->getTime());
   getCoeffDerivsAverTargetDistPntr()->writeToFile(getTargetDistAveragesOutputFilename(),true,append,static_cast<Action*>(this));
 }
