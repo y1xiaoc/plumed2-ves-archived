@@ -67,7 +67,7 @@ basisf_pntrs_(basisf_pntrs_in),
 nbasisf_(basisf_pntrs_.size()),
 bias_coeffs_pntr_(bias_coeffs_pntr_in),
 ncoeffs_(0),
-coeffderivs_aver_ps_pntr_(NULL),
+targetdist_averages_pntr_(NULL),
 fes_wt_coeffs_pntr_(NULL),
 bias_fes_scalingf_(-1.0),
 log_ps_fes_contribution_(false),
@@ -94,22 +94,22 @@ dynamic_ps_grid_pntr_(NULL)
   plumed_massert(bias_coeffs_pntr_->numberOfDimensions()==basisf_pntrs_.size(),"dimension of coeffs does not match with number of basis functions ");
   //
   ncoeffs_ = bias_coeffs_pntr_->numberOfCoeffs();
-  coeffderivs_aver_ps_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
+  targetdist_averages_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
 
-  std::string coeffderivs_aver_ps_label = bias_coeffs_pntr_->getLabel();
-  if(coeffderivs_aver_ps_label.find("coeffs")!=std::string::npos){
-    coeffderivs_aver_ps_label.replace(coeffderivs_aver_ps_label.find("coeffs"), std::string("coeffs").length(), "coeffderivs_aver_ps");
+  std::string targetdist_averages_label = bias_coeffs_pntr_->getLabel();
+  if(targetdist_averages_label.find("coeffs")!=std::string::npos){
+    targetdist_averages_label.replace(targetdist_averages_label.find("coeffs"), std::string("coeffs").length(), "targetdist_averages");
   }
   else {
-    coeffderivs_aver_ps_label += "_aver_ps";
+    targetdist_averages_label += "_targetdist_averages";
   }
-  coeffderivs_aver_ps_pntr_->setLabels(coeffderivs_aver_ps_label);
+  targetdist_averages_pntr_->setLabels(targetdist_averages_label);
   //
 }
 
 LinearBasisSetExpansion::~LinearBasisSetExpansion() {
-  if(coeffderivs_aver_ps_pntr_!=NULL){
-    delete coeffderivs_aver_ps_pntr_;
+  if(targetdist_averages_pntr_!=NULL){
+    delete targetdist_averages_pntr_;
   }
   if(fes_wt_coeffs_pntr_!=NULL){
     delete fes_wt_coeffs_pntr_;
@@ -514,7 +514,7 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     for(unsigned int k=0;k<nargs_;k++){
       value*=bf_integrals[k][indices[k]];
     }
-    coeffderivs_aver_ps_pntr_->setValue(i,value);
+    targetdist_averages_pntr_->setValue(i,value);
   }
   //
   bool all_targetdist_uniform = true;
@@ -581,7 +581,7 @@ void LinearBasisSetExpansion::setupOneDimensionalTargetDistribution(const std::v
     bf_integrals = basisf_pntrs_[0]->getUniformIntegrals();
   }
   plumed_massert(bf_integrals.size()==ncoeffs_,"something wrong in setupOneDimensionalTargetDistribution");
-  coeffderivs_aver_ps_pntr_->setValues(bf_integrals);
+  targetdist_averages_pntr_->setValues(bf_integrals);
   //
   if(targetdist_pntrs[0]!=NULL){
     Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
@@ -610,7 +610,7 @@ void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDi
   plumed_massert(nargs_>1,"setupNonSeperableTargetDistribution should not be used for one-dimensional cases");
   Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
   targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
-  calculateCoeffDerivsAverFromGrid(ps_grid_pntr);
+  calculateTargetDistAveragesFromGrid(ps_grid_pntr);
   if(isStaticTargetDistFileOutputActive()){
     writeTargetDistGridToFile(ps_grid_pntr);
   }
@@ -688,13 +688,13 @@ void LinearBasisSetExpansion::updateWellTemperedTargetDistribution() {
   // Update p(s) grid
   updateWellTemperedPsGrid();
   // calcuate coeffs derivs from grid
-  calculateCoeffDerivsAverFromGrid(dynamic_ps_grid_pntr_);
+  calculateTargetDistAveragesFromGrid(dynamic_ps_grid_pntr_);
 }
 
 
-void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_grid_pntr, const bool normalize_dist) {
+void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* ps_grid_pntr, const bool normalize_dist) {
   plumed_assert(ps_grid_pntr!=NULL);
-  std::vector<double> coeffderivs_aver_ps(ncoeffs_,0.0);
+  std::vector<double> targetdist_averages(ncoeffs_,0.0);
   double sum_grid = 0.0;
   double binVol = ps_grid_pntr->getBinVolume();
   size_t stride=mycomm_.Get_size();
@@ -706,19 +706,19 @@ void LinearBasisSetExpansion::calculateCoeffDerivsAverFromGrid(const Grid* ps_gr
     double weight = ps_grid_pntr->getValue(l)*binVol;
     sum_grid += weight;
     for(unsigned int i=0; i<ncoeffs_; i++){
-      coeffderivs_aver_ps[i] += weight*basisset_values[i];
+      targetdist_averages[i] += weight*basisset_values[i];
     }
   }
   if(normalize_dist){
     mycomm_.Sum(sum_grid);
     for(unsigned int i=0; i<ncoeffs_; i++){
-      coeffderivs_aver_ps[i] /= sum_grid;
+      targetdist_averages[i] /= sum_grid;
     }
   }
+  mycomm_.Sum(targetdist_averages);
   // the overall constant;
-  mycomm_.Sum(coeffderivs_aver_ps);
-  coeffderivs_aver_ps[0] = 1.0;
-  CoeffDerivsAverTargetDist() = coeffderivs_aver_ps;
+  targetdist_averages[0] = 1.0;
+  TargetDistAverages() = targetdist_averages;
 }
 
 
@@ -751,7 +751,7 @@ void LinearBasisSetExpansion::updateBiasCutoffTargetDistribution() {
   plumed_massert(biasCutoffActive(),"the bias cutoff is not active");
   updateBiasWithoutCutoffGrid();
   updateBiasCutoffPsGrid();
-  calculateCoeffDerivsAverFromGrid(dynamic_ps_grid_pntr_);
+  calculateTargetDistAveragesFromGrid(dynamic_ps_grid_pntr_);
 }
 
 

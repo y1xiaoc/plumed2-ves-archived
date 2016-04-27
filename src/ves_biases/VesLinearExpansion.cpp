@@ -124,7 +124,7 @@ valueForce2_(NULL)
   else{
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
-  setTargetDistAverages(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
+  setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
 
   if(this->wellTemperdTargetDistribution()){
     bias_expansion_pntr_->setupWellTemperedTargetDistribution(this->getWellTemperedBiasFactor());
@@ -185,7 +185,7 @@ void VesLinearExpansion::updateTargetDistributions() {
   else if(biasCutoffActive()){
     bias_expansion_pntr_->updateBiasCutoffTargetDistribution();
   }
-  setTargetDistAverages(bias_expansion_pntr_->CoeffDerivsAverTargetDist());
+  setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
   // this output should be optional or with a stride
   writeTargetDistAveragesToFile(getOptimizerPntr()->getIterationCounter());
 }

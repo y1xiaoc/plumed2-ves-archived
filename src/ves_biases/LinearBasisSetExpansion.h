@@ -60,7 +60,7 @@ private:
   //
   CoeffsVector* bias_coeffs_pntr_;
   size_t ncoeffs_;
-  CoeffsVector* coeffderivs_aver_ps_pntr_;
+  CoeffsVector* targetdist_averages_pntr_;
   CoeffsVector* fes_wt_coeffs_pntr_;
   //
   double bias_fes_scalingf_;
@@ -112,7 +112,7 @@ public:
   //
   CoeffsVector& BiasCoeffs() const {return *bias_coeffs_pntr_;};
   CoeffsVector& FesWTCoeffs() const {return *fes_wt_coeffs_pntr_;};
-  CoeffsVector& CoeffDerivsAverTargetDist() const {return *coeffderivs_aver_ps_pntr_;};
+  CoeffsVector& TargetDistAverages() const {return *targetdist_averages_pntr_;};
   //
   void setSerial() {serial_=true;}
   void setParallel() {serial_=false;}
@@ -182,7 +182,7 @@ private:
   void setupOneDimensionalTargetDistribution(const std::vector<TargetDistribution*>&);
   void setupNonSeperableTargetDistribution(const TargetDistribution*);
   //
-  void calculateCoeffDerivsAverFromGrid(const Grid*, const bool normalize_dist=false);
+  void calculateTargetDistAveragesFromGrid(const Grid*, const bool normalize_dist=false);
   //
   void updateWellTemperedFESCoeffs();
   void updateWellTemperedPsGrid();
