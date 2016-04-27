@@ -98,6 +98,7 @@ private:
   std::string fes_filename_;
   std::string targetdist_filename_;
   std::string targetdist_averages_filename_;
+  std::string coeffs_id_prefix_;
   //
   bool bias_fileoutput_active_;
   bool fes_fileoutput_active_;
@@ -216,6 +217,8 @@ public:
   std::vector<double> getGridMin() const {return grid_min_;}
   void setGridMin(const std::vector<double>&);
   //
+  std::string getIterationSuffix() const;
+  std::string getCoeffsSetSuffix(const unsigned int coeffs_id) const;
   std::string getCurrentOutputFilename(const std::string&, const std::string& suffix="") const;
   std::string getBiasOutputFilename() const {return bias_filename_;}
   std::string getCurrentBiasOutputFilename() const;
@@ -223,7 +226,7 @@ public:
   std::string getCurrentFesOutputFilename(const std::string& suffix="") const;
   std::string getTargetDistOutputFilename() const {return targetdist_filename_;}
   std::string getCurrentTargetDistOutputFilename(const std::string& suffix="") const;
-  std::string getTargetDistAveragesOutputFilename() const {return targetdist_averages_filename_;}
+  std::string getTargetDistAveragesOutputFilename(const std::string& suffix="") const;
   //
   void enableBiasFileOutput() {bias_fileoutput_active_=true;}
   void disableBiasFileOutput() {bias_fileoutput_active_=false;}

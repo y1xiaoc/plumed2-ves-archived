@@ -71,6 +71,7 @@ bias_filename_(""),
 fes_filename_(""),
 targetdist_filename_(""),
 targetdist_averages_filename_(""),
+coeffs_id_prefix_("c-"),
 bias_fileoutput_active_(false),
 fes_fileoutput_active_(false),
 fesproj_fileoutput_active_(false),
@@ -574,10 +575,7 @@ std::string VesBias::getCurrentOutputFilename(const std::string& base_filename, 
     filename = FileBase::appendSuffix(filename,"."+suffix);
   }
   if(optimizeCoeffs()){
-    std::string iter_str;
-    Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
-    iter_str = "iter-" + iter_str;
-    filename = FileBase::appendSuffix(filename,"."+iter_str);
+    filename = FileBase::appendSuffix(filename,"."+getIterationSuffix());
   }
   return filename;
 }
@@ -589,10 +587,34 @@ std::string VesBias::getCurrentTargetDistOutputFilename(const std::string& suffi
     filename = FileBase::appendSuffix(filename,"."+suffix);
   }
   if(optimizeCoeffs() && dynamicTargetDistribution()){
-    std::string iter_str;
-    Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
-    iter_str = "iter-" + iter_str;
-    filename = FileBase::appendSuffix(filename,"."+iter_str);
+    filename = FileBase::appendSuffix(filename,"."+getIterationSuffix());
+  }
+  return filename;
+}
+
+
+std::string VesBias::getIterationSuffix() const {
+  std::string iter_str;
+  Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
+  iter_str = "iter-" + iter_str;
+  return iter_str;
+}
+
+
+std::string VesBias::getCoeffsSetSuffix(const unsigned int coeffs_id) const {
+  std::string coeffs_id_str="";
+  if(use_multiple_coeffssets_ && ncoeffssets_>1){
+    Tools::convert(coeffs_id,coeffs_id_str);
+    coeffs_id_str = coeffs_id_prefix_ + coeffs_id_str;
+  }
+  return coeffs_id_str;
+}
+
+
+std::string VesBias::getTargetDistAveragesOutputFilename(const std::string& suffix) const {
+  std::string filename = targetdist_averages_filename_;
+  if(suffix.size()>0){
+    filename = FileBase::appendSuffix(filename,"."+suffix);
   }
   return filename;
 }
