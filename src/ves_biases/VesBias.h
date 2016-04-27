@@ -61,11 +61,11 @@ public Bias
 private:
   unsigned int ncoeffssets_;
   std::vector<CoeffsVector*> coeffs_pntrs_;
-  std::vector<CoeffsVector*> coeffderivs_aver_ps_pntrs_;
+  std::vector<CoeffsVector*> targetdist_averages_pntrs_;
   std::vector<CoeffsVector*> gradient_pntrs_;
   std::vector<CoeffsMatrix*> hessian_pntrs_;
-  std::vector<std::vector<double> > coeffderivs_aver_sampled;
-  std::vector<std::vector<double> >coeffderivs_cov_sampled;
+  std::vector<std::vector<double> > sampled_averages;
+  std::vector<std::vector<double> >sampled_covariance;
   bool use_multiple_coeffssets_;
   //
   std::vector<std::string> coeffs_fnames;
@@ -124,10 +124,10 @@ protected:
   void addCoeffsSet(CoeffsVector*);
   std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0);
   void clearCoeffsPntrsVector();
-  void setCoeffsDerivs(const std::vector<double>&, const unsigned int c_id = 0);
-  void setCoeffsDerivsOverTargetDist(const std::vector<double>&, const unsigned int coeffs_id = 0);
-  void setCoeffsDerivsOverTargetDist(const CoeffsVector&, const unsigned coeffs_id= 0);
-  void setCoeffsDerivsOverTargetDistToZero(const unsigned coeffs_id= 0);
+  void addToSampledAverages(const std::vector<double>&, const unsigned int c_id = 0);
+  void setTargetDistAverages(const std::vector<double>&, const unsigned int coeffs_id = 0);
+  void setTargetDistAverages(const CoeffsVector&, const unsigned coeffs_id= 0);
+  void setTargetDistAveragesToZero(const unsigned coeffs_id= 0);
 
   void readCoeffsFromFiles();
   //
@@ -151,13 +151,13 @@ public:
   static void useProjectionArgKeywords(Keywords&);
   //
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
-  std::vector<CoeffsVector*> getCoeffDerivsAverTargetDistPntrs() const {return coeffderivs_aver_ps_pntrs_;}
+  std::vector<CoeffsVector*> getTargetDistAveragesPntrs() const {return targetdist_averages_pntrs_;}
   std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}
   std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs_;}
   std::vector<TargetDistribution*> getTargetDistributionPntrs() const {return targetdist_pntrs_;}
   //
   CoeffsVector* getCoeffsPntr(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id];}
-  CoeffsVector* getCoeffDerivsAverTargetDistPntr(const unsigned int coeffs_id = 0) const {return coeffderivs_aver_ps_pntrs_[coeffs_id];}
+  CoeffsVector* getTargetDistAveragesPntr(const unsigned int coeffs_id = 0) const {return targetdist_averages_pntrs_[coeffs_id];}
   CoeffsVector* getGradientPntr(const unsigned int coeffs_id = 0)const {return gradient_pntrs_[coeffs_id];}
   CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs_[coeffs_id];}
   //
@@ -171,7 +171,7 @@ public:
   double getBeta() const;
   //
   CoeffsVector& Coeffs(const unsigned int coeffs_id = 0) const;
-  CoeffsVector& CoeffDerivsAverTargetDist(const unsigned int coeffs_id = 0) const;
+  CoeffsVector& TargetDistAverages(const unsigned int coeffs_id = 0) const;
   CoeffsVector& Gradient(const unsigned int coeffs_id = 0) const;
   CoeffsMatrix& Hessian(const unsigned int coeffs_id = 0) const;
   //
@@ -189,7 +189,7 @@ public:
   void clearGradientAndHessian();
   //
   virtual void updateTargetDistributions();
-  void writeCoeffDerivsAverTargetDistToFile(const unsigned int iteration = 0, const bool append = true);
+  void writeTargetDistAveragesToFile(const unsigned int iteration = 0, const bool append = true);
   //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);
@@ -289,7 +289,7 @@ inline
 CoeffsVector& VesBias::Coeffs(const unsigned int coeffs_id) const {return *coeffs_pntrs_[coeffs_id];}
 
 inline
-CoeffsVector& VesBias::CoeffDerivsAverTargetDist(const unsigned int coeffs_id) const {return *coeffderivs_aver_ps_pntrs_[coeffs_id];}
+CoeffsVector& VesBias::TargetDistAverages(const unsigned int coeffs_id) const {return *targetdist_averages_pntrs_[coeffs_id];}
 
 inline
 CoeffsVector& VesBias::Gradient(const unsigned int coeffs_id) const {return *gradient_pntrs_[coeffs_id];}

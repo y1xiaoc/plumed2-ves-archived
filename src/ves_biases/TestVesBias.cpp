@@ -88,7 +88,7 @@ bf_pointers(getNumberOfArguments(),NULL)
   }
 
   for(unsigned int i=0; i<numberOfCoeffsSets(); i++){
-    setCoeffsDerivsOverTargetDist(bf_pointers[i]->getUniformIntegrals(),i);
+    setTargetDistAverages(bf_pointers[i]->getUniformIntegrals(),i);
   }
 
   readCoeffsFromFiles();
@@ -116,7 +116,7 @@ void TestVesBias::calculate() {
     }
     total_bias += bias;
     setOutputForce(k,deriv);
-    setCoeffsDerivs(bf_values,k);
+    addToSampledAverages(bf_values,k);
   }
   valueBias->set(total_bias);
 }

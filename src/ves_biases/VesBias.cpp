@@ -44,11 +44,11 @@ Action(ao),
 Bias(ao),
 ncoeffssets_(0),
 coeffs_pntrs_(0),
-coeffderivs_aver_ps_pntrs_(0),
+targetdist_averages_pntrs_(0),
 gradient_pntrs_(0),
 hessian_pntrs_(0),
-coeffderivs_aver_sampled(0),
-coeffderivs_cov_sampled(0),
+sampled_averages(0),
+sampled_covariance(0),
 use_multiple_coeffssets_(false),
 coeffs_fnames(0),
 ncoeffs_total_(0),
@@ -224,8 +224,8 @@ VesBias::~VesBias(){
   for(unsigned int i=0; i<coeffs_pntrs_.size(); i++){
     delete coeffs_pntrs_[i];
   }
-  for(unsigned int i=0; i<coeffderivs_aver_ps_pntrs_.size(); i++){
-    delete coeffderivs_aver_ps_pntrs_[i];
+  for(unsigned int i=0; i<targetdist_averages_pntrs_.size(); i++){
+    delete targetdist_averages_pntrs_[i];
   }
   for(unsigned int i=0; i<gradient_pntrs_.size(); i++){
     delete gradient_pntrs_[i];
@@ -339,7 +339,7 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   label = getCoeffsSetLabelString("ps-aver",ncoeffssets_);
   aver_ps_tmp->setLabels(label);
   aver_ps_tmp->setValues(0.0);
-  coeffderivs_aver_ps_pntrs_.push_back(aver_ps_tmp);
+  targetdist_averages_pntrs_.push_back(aver_ps_tmp);
   //
   CoeffsVector* gradient_tmp = new CoeffsVector(*coeffs_pntr_in);
   label = getCoeffsSetLabelString("gradient",ncoeffssets_);
@@ -352,11 +352,11 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   //
   std::vector<double> aver_sampled_tmp;
   aver_sampled_tmp.assign(coeffs_pntr_in->numberOfCoeffs(),0.0);
-  coeffderivs_aver_sampled.push_back(aver_sampled_tmp);
+  sampled_averages.push_back(aver_sampled_tmp);
   //
   std::vector<double> cov_sampled_tmp;
   cov_sampled_tmp.assign(hessian_tmp->getSize(),0.0);
-  coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
+  sampled_covariance.push_back(cov_sampled_tmp);
   //
   ncoeffssets_++;
 }
@@ -402,13 +402,13 @@ void VesBias::readCoeffsFromFiles() {
 
 void VesBias::updateGradientAndHessian() {
   for(unsigned int i=0; i<ncoeffssets_; i++){
-    comm.Sum(coeffderivs_aver_sampled[i]);
-    comm.Sum(coeffderivs_cov_sampled[i]);
-    Gradient(i) = CoeffDerivsAverTargetDist(i) - coeffderivs_aver_sampled[i];
-    Hessian(i) = coeffderivs_cov_sampled[i];
+    comm.Sum(sampled_averages[i]);
+    comm.Sum(sampled_covariance[i]);
+    Gradient(i) = TargetDistAverages(i) - sampled_averages[i];
+    Hessian(i) = sampled_covariance[i];
     Hessian(i) *= getBeta();
-    std::fill(coeffderivs_aver_sampled[i].begin(), coeffderivs_aver_sampled[i].end(), 0.0);
-    std::fill(coeffderivs_cov_sampled[i].begin(), coeffderivs_cov_sampled[i].end(), 0.0);
+    std::fill(sampled_averages[i].begin(), sampled_averages[i].end(), 0.0);
+    std::fill(sampled_covariance[i].begin(), sampled_covariance[i].end(), 0.0);
   }
   aver_counter=0.0;
 }
@@ -417,7 +417,7 @@ void VesBias::updateGradientAndHessian() {
 void VesBias::clearGradientAndHessian() {}
 
 
-void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsigned c_id) {
+void VesBias::addToSampledAverages(const std::vector<double>& values, const unsigned c_id) {
   /*
   use the following online equation to calculate the average and covariance (see wikipedia)
       xm[n+1] = xm[n] + (x[n+1]-xm[n])/(n+1)
@@ -432,9 +432,9 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsi
   // update average and diagonal part of Hessian
   for(size_t i=rank; i<ncoeffs;i+=stride){
     size_t midx = getHessianIndex(i,i,c_id);
-    deltas[i] = (coeffderivs[i]-coeffderivs_aver_sampled[c_id][i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
-    coeffderivs_aver_sampled[c_id][i] += deltas[i];
-    coeffderivs_cov_sampled[c_id][midx] = coeffderivs_cov_sampled[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
+    deltas[i] = (values[i]-sampled_averages[c_id][i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
+    sampled_averages[c_id][i] += deltas[i];
+    sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
   }
   comm.Sum(deltas);
   // update off-diagonal part of the Hessian
@@ -442,27 +442,27 @@ void VesBias::setCoeffsDerivs(const std::vector<double>& coeffderivs, const unsi
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
         size_t midx = getHessianIndex(i,j,c_id);
-        coeffderivs_cov_sampled[c_id][midx] = coeffderivs_cov_sampled[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
+        sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
       }
     }
   }
-  // NOTE: the MPI sum for coeffderivs_aver_sampled and coeffderivs_cov_sampled is done later
+  // NOTE: the MPI sum for sampled_averages and sampled_covariance is done later
   //aver_counter += 1.0;
 }
 
 
-void VesBias::setCoeffsDerivsOverTargetDist(const std::vector<double>& coeffderivs_aver_ps, const unsigned coeffs_id) {
-  CoeffDerivsAverTargetDist(coeffs_id) = coeffderivs_aver_ps;
+void VesBias::setTargetDistAverages(const std::vector<double>& coeffderivs_aver_ps, const unsigned coeffs_id) {
+  TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
 }
 
 
-void VesBias::setCoeffsDerivsOverTargetDist(const CoeffsVector& coeffderivs_aver_ps, const unsigned coeffs_id) {
-  CoeffDerivsAverTargetDist(coeffs_id) = coeffderivs_aver_ps;
+void VesBias::setTargetDistAverages(const CoeffsVector& coeffderivs_aver_ps, const unsigned coeffs_id) {
+  TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
 }
 
 
-void VesBias::setCoeffsDerivsOverTargetDistToZero(const unsigned coeffs_id) {
-  CoeffDerivsAverTargetDist(coeffs_id).setAllValuesToZero();
+void VesBias::setTargetDistAveragesToZero(const unsigned coeffs_id) {
+  TargetDistAverages(coeffs_id).setAllValuesToZero();
 }
 
 
@@ -491,14 +491,14 @@ void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
 void VesBias::enableHessian(const bool diagonal_hessian) {
   compute_hessian_=true;
   diagonal_hessian_=diagonal_hessian;
-  coeffderivs_cov_sampled.clear();
+  sampled_covariance.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
     delete hessian_pntrs_[i];
     std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
     std::vector<double> cov_sampled_tmp;
     cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
-    coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
+    sampled_covariance.push_back(cov_sampled_tmp);
   }
 }
 
@@ -506,14 +506,14 @@ void VesBias::enableHessian(const bool diagonal_hessian) {
 void VesBias::disableHessian() {
   compute_hessian_=false;
   diagonal_hessian_=true;
-  coeffderivs_cov_sampled.clear();
+  sampled_covariance.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
     delete hessian_pntrs_[i];
     std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
     std::vector<double> cov_sampled_tmp;
     cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
-    coeffderivs_cov_sampled.push_back(cov_sampled_tmp);
+    sampled_covariance.push_back(cov_sampled_tmp);
   }
 }
 
@@ -538,9 +538,9 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 void VesBias::updateTargetDistributions() {}
 
 
-void VesBias::writeCoeffDerivsAverTargetDistToFile(const unsigned int iteration, const bool append) {
-  getCoeffDerivsAverTargetDistPntr()->setIterationCounterAndTime(iteration,this->getTime());
-  getCoeffDerivsAverTargetDistPntr()->writeToFile(getTargetDistAveragesOutputFilename(),true,append,static_cast<Action*>(this));
+void VesBias::writeTargetDistAveragesToFile(const unsigned int iteration, const bool append) {
+  getTargetDistAveragesPntr()->setIterationCounterAndTime(iteration,this->getTime());
+  getTargetDistAveragesPntr()->writeToFile(getTargetDistAveragesOutputFilename(),true,append,static_cast<Action*>(this));
 }
 
 
