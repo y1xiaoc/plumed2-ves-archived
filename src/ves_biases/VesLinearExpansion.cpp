@@ -187,7 +187,6 @@ void VesLinearExpansion::updateTargetDistributions() {
   }
   setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
   // this output should be optional or with a stride
-  writeTargetDistAveragesToFile(getOptimizerPntr()->getIterationCounter());
 }
 
 

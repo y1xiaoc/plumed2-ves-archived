@@ -192,7 +192,7 @@ public:
   void clearGradientAndHessian();
   //
   virtual void updateTargetDistributions();
-  void writeTargetDistAveragesToFile(const unsigned int iteration = 0, const bool append = true);
+  void writeTargetDistAveragesToFile(const unsigned int coeffs_id = 0, const bool append = true);
   //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);

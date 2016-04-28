@@ -454,16 +454,22 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
 
 void VesBias::setTargetDistAverages(const std::vector<double>& coeffderivs_aver_ps, const unsigned coeffs_id) {
   TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
+  TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
+  writeTargetDistAveragesToFile(coeffs_id);
 }
 
 
 void VesBias::setTargetDistAverages(const CoeffsVector& coeffderivs_aver_ps, const unsigned coeffs_id) {
   TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
+  TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
+  writeTargetDistAveragesToFile(coeffs_id);
 }
 
 
 void VesBias::setTargetDistAveragesToZero(const unsigned coeffs_id) {
   TargetDistAverages(coeffs_id).setAllValuesToZero();
+  TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
+  writeTargetDistAveragesToFile(coeffs_id);
 }
 
 
@@ -548,9 +554,10 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 void VesBias::updateTargetDistributions() {}
 
 
-void VesBias::writeTargetDistAveragesToFile(const unsigned int iteration, const bool append) {
-  getTargetDistAveragesPntr()->setIterationCounterAndTime(iteration,this->getTime());
-  getTargetDistAveragesPntr()->writeToFile(getTargetDistAveragesOutputFilename(),true,append,static_cast<Action*>(this));
+void VesBias::writeTargetDistAveragesToFile(const unsigned int coeffs_id, const bool append) {
+  std::string fname = getCoeffsSetFilenameSuffix(coeffs_id);
+  fname = getTargetDistAveragesOutputFilename(fname);
+  getTargetDistAveragesPntr()->writeToFile(fname,true,append,static_cast<Action*>(this));
 }
 
 
