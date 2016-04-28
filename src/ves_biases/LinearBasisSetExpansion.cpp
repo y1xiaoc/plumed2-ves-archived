@@ -73,7 +73,7 @@ bias_fes_scalingf_(-1.0),
 log_ps_fes_contribution_(false),
 welltemp_biasf_(-1.0),
 inv_welltemp_biasf_(-1.0),
-beta_prime_(0.0),
+welltemp_beta_prime_(0.0),
 bias_cutoff_active_(false),
 grid_bins_(nargs_,100),
 targetdist_grid_label_("targetdist"),
@@ -637,7 +637,7 @@ void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double b
   //
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
-  beta_prime_ = beta_/welltemp_biasf_;
+  welltemp_beta_prime_ = beta_/welltemp_biasf_;
   bias_fes_scalingf_ = -(welltemp_biasf_)/(welltemp_biasf_-1.0);
   //
   fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
@@ -658,7 +658,7 @@ void LinearBasisSetExpansion::setWellTemperedBiasFactor(const double biasf) {
   plumed_massert(biasf>1.0,"setWellTemperedBiasFactor: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   welltemp_biasf_=biasf;
   inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
-  beta_prime_ = beta_/welltemp_biasf_;
+  welltemp_beta_prime_ = beta_/welltemp_biasf_;
   bias_fes_scalingf_ = -(welltemp_biasf_)/(welltemp_biasf_-1.0);
 }
 
@@ -669,7 +669,7 @@ void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
   size_t rank=mycomm_.Get_rank();
   for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
     std::vector<double> args = dynamic_ps_grid_pntr_->getPoint(l);
-    double value = -beta_prime_ * getFES_WellTempered(args,false);
+    double value = -welltemp_beta_prime_ * getFES_WellTempered(args,false);
     value = exp(value);
     norm += value;
     dynamic_ps_grid_pntr_->setValue(l,value);

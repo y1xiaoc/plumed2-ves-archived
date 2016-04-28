@@ -68,7 +68,7 @@ private:
   //
   double welltemp_biasf_;
   double inv_welltemp_biasf_;
-  double beta_prime_;
+  double welltemp_beta_prime_;
   //
   bool bias_cutoff_active_;
   //
@@ -164,7 +164,7 @@ public:
   // Well-Tempered p(s) stuff
   void setupWellTemperedTargetDistribution(const double);
   double getWellTemperedBiasFactor() const {return welltemp_biasf_;}
-  double getWellTemperedBetaPrime() const {return beta_prime_;}
+  double getWellTemperedBetaPrime() const {return welltemp_beta_prime_;}
   void setWellTemperedBiasFactor(const double);
   void updateWellTemperedTargetDistribution();
   //
