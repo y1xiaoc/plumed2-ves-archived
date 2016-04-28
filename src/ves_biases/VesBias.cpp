@@ -475,6 +475,15 @@ void VesBias::checkThatTemperatureIsGiven() {
 }
 
 
+unsigned int VesBias::getIterationCounter() const {
+  unsigned int iteration = 0;
+  if(optimizeCoeffs()){
+    iteration = getOptimizerPntr()->getIterationCounter();
+  }
+  return iteration;
+}
+
+
 void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
   //
   if(optimizer_pntr_==NULL){

@@ -185,7 +185,9 @@ public:
   //
   bool optimizeCoeffs() const {return optimize_coeffs_;}
   Optimizer* getOptimizerPntr() const {return optimizer_pntr_;}
-
+  //
+  unsigned int getIterationCounter() const;
+  //
   void updateGradientAndHessian();
   void clearGradientAndHessian();
   //
