@@ -35,8 +35,8 @@ class MarginalWeight:public WeightBase{
 
 class FesWeight:public WeightBase{
     public:
-      explicit double beta,invbeta;
-      FesWeight(double v){beta=v;invbeta=1./beta;}
+      double beta,invbeta;
+      explicit FesWeight(double v){beta=v;invbeta=1./beta;}
       double projectInnerLoop(double &input, double &v){return  input+exp(-beta*v);}
       double projectOuterLoop(double &v){return -invbeta*std::log(v);}
 };
