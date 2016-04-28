@@ -191,9 +191,9 @@ public:
   unsigned int getIterationCounter() const;
   //
   void updateGradientAndHessian();
-  void clearGradientAndHessian();
+  void clearGradientAndHessian() {};
   //
-  virtual void updateTargetDistributions();
+  virtual void updateTargetDistributions() {};
   //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);

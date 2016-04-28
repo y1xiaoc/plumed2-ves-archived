@@ -415,9 +415,6 @@ void VesBias::updateGradientAndHessian() {
 }
 
 
-void VesBias::clearGradientAndHessian() {}
-
-
 void VesBias::addToSampledAverages(const std::vector<double>& values, const unsigned c_id) {
   /*
   use the following online equation to calculate the average and covariance (see wikipedia)
@@ -546,9 +543,6 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
   }
   return label_prefix+type+label_postfix;
 }
-
-
-void VesBias::updateTargetDistributions() {}
 
 
 void VesBias::writeTargetDistAveragesToFile(const bool append) {
