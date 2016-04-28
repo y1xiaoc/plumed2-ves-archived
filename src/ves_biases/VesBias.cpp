@@ -525,7 +525,7 @@ void VesBias::apply() {
 }
 
 
-std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsigned int coeffs_id) {
+std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsigned int coeffs_id) const {
   std::string label_prefix = getLabel() + ".";
   std::string label_postfix = "";
   if(use_multiple_coeffssets_){
@@ -575,7 +575,7 @@ std::string VesBias::getCurrentOutputFilename(const std::string& base_filename, 
     filename = FileBase::appendSuffix(filename,"."+suffix);
   }
   if(optimizeCoeffs()){
-    filename = FileBase::appendSuffix(filename,"."+getIterationSuffix());
+    filename = FileBase::appendSuffix(filename,"."+getIterationFilenameSuffix());
   }
   return filename;
 }
@@ -587,13 +587,13 @@ std::string VesBias::getCurrentTargetDistOutputFilename(const std::string& suffi
     filename = FileBase::appendSuffix(filename,"."+suffix);
   }
   if(optimizeCoeffs() && dynamicTargetDistribution()){
-    filename = FileBase::appendSuffix(filename,"."+getIterationSuffix());
+    filename = FileBase::appendSuffix(filename,"."+getIterationFilenameSuffix());
   }
   return filename;
 }
 
 
-std::string VesBias::getIterationSuffix() const {
+std::string VesBias::getIterationFilenameSuffix() const {
   std::string iter_str;
   Tools::convert(getOptimizerPntr()->getIterationCounter(),iter_str);
   iter_str = "iter-" + iter_str;
@@ -601,13 +601,13 @@ std::string VesBias::getIterationSuffix() const {
 }
 
 
-std::string VesBias::getCoeffsSetSuffix(const unsigned int coeffs_id) const {
-  std::string coeffs_id_str="";
-  if(use_multiple_coeffssets_ && ncoeffssets_>1){
-    Tools::convert(coeffs_id,coeffs_id_str);
-    coeffs_id_str = coeffs_id_prefix_ + coeffs_id_str;
+std::string VesBias::getCoeffsSetFilenameSuffix(const unsigned int coeffs_id) const {
+  std::string suffix = "";
+  if(use_multiple_coeffssets_){
+    Tools::convert(coeffs_id,suffix);
+    suffix = coeffs_id_prefix_ + suffix;
   }
-  return coeffs_id_str;
+  return suffix;
 }
 
 

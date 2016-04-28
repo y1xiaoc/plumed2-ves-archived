@@ -123,7 +123,7 @@ protected:
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
   void addCoeffsSet(CoeffsVector*);
-  std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0);
+  std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0) const;
   void clearCoeffsPntrsVector();
   void addToSampledAverages(const std::vector<double>&, const unsigned int c_id = 0);
   void setTargetDistAverages(const std::vector<double>&, const unsigned int coeffs_id = 0);
@@ -217,8 +217,8 @@ public:
   std::vector<double> getGridMin() const {return grid_min_;}
   void setGridMin(const std::vector<double>&);
   //
-  std::string getIterationSuffix() const;
-  std::string getCoeffsSetSuffix(const unsigned int coeffs_id) const;
+  std::string getIterationFilenameSuffix() const;
+  std::string getCoeffsSetFilenameSuffix(const unsigned int coeffs_id) const;
   std::string getCurrentOutputFilename(const std::string&, const std::string& suffix="") const;
   std::string getBiasOutputFilename() const {return bias_filename_;}
   std::string getCurrentBiasOutputFilename() const;
