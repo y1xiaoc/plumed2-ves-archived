@@ -133,7 +133,6 @@ valueForce2_(NULL)
     bias_expansion_pntr_->setupBiasCutoffTargetDistribution();
   }
 
-  writeTargetDistAveragesToFile(0,false);
   //
   readCoeffsFromFiles();
   //

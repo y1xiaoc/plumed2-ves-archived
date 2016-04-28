@@ -337,7 +337,7 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
 
   coeffs_pntrs_.push_back(coeffs_pntr_in);
   CoeffsVector* aver_ps_tmp = new CoeffsVector(*coeffs_pntr_in);
-  label = getCoeffsSetLabelString("ps-aver",ncoeffssets_);
+  label = getCoeffsSetLabelString("targetdist_averages",ncoeffssets_);
   aver_ps_tmp->setLabels(label);
   aver_ps_tmp->setValues(0.0);
   targetdist_averages_pntrs_.push_back(aver_ps_tmp);
@@ -455,21 +455,18 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
 void VesBias::setTargetDistAverages(const std::vector<double>& coeffderivs_aver_ps, const unsigned coeffs_id) {
   TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
   TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
-  writeTargetDistAveragesToFile(coeffs_id);
 }
 
 
 void VesBias::setTargetDistAverages(const CoeffsVector& coeffderivs_aver_ps, const unsigned coeffs_id) {
   TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
   TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
-  writeTargetDistAveragesToFile(coeffs_id);
 }
 
 
 void VesBias::setTargetDistAveragesToZero(const unsigned coeffs_id) {
   TargetDistAverages(coeffs_id).setAllValuesToZero();
   TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
-  writeTargetDistAveragesToFile(coeffs_id);
 }
 
 
@@ -554,10 +551,13 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 void VesBias::updateTargetDistributions() {}
 
 
-void VesBias::writeTargetDistAveragesToFile(const unsigned int coeffs_id, const bool append) {
-  std::string fname = getCoeffsSetFilenameSuffix(coeffs_id);
-  fname = getTargetDistAveragesOutputFilename(fname);
-  getTargetDistAveragesPntr()->writeToFile(fname,true,append,static_cast<Action*>(this));
+void VesBias::writeTargetDistAveragesToFile(const bool append) {
+  for(unsigned int i=0; i<ncoeffssets_; i++){
+    std::string fname = getCoeffsSetFilenameSuffix(i);
+    getTargetDistAveragesPntr(i)->setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
+    fname = getTargetDistAveragesOutputFilename(fname);
+    getTargetDistAveragesPntr(i)->writeToFile(fname,true,append,static_cast<Action*>(this));
+  }
 }
 
 

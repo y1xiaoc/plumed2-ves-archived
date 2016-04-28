@@ -97,6 +97,8 @@ private:
   unsigned int fesproj_output_stride_;
   bool targetdist_output_active_;
   unsigned int targetdist_output_stride_;
+  bool targetdist_averages_output_active_;
+  unsigned int targetdist_averages_output_stride_;
   //
 private:
   void updateOutputComponents();
@@ -204,6 +206,12 @@ public:
   unsigned int getTargetDistOutputStride() const {return targetdist_output_stride_;}
   void setTargetDistOutputStride(unsigned int stride) {targetdist_output_stride_=stride;}
   void writeTargetDistOutputFiles() const;
+  //
+  bool isTargetDistAveragesOutputActive() const {return targetdist_averages_output_active_;}
+  unsigned int getTargetDistAveragesOutputStride() const {return targetdist_averages_output_stride_;}
+  void setTargetDistAveragesOutputStride(unsigned int stride) {targetdist_averages_output_stride_=stride;}
+  void writeTargetDistAveragesOutputFiles() const;
+  //
 };
 
 inline

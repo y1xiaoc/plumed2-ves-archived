@@ -74,7 +74,9 @@ fes_output_stride_(0),
 fesproj_output_active_(false),
 fesproj_output_stride_(0),
 targetdist_output_active_(false),
-targetdist_output_stride_(0)
+targetdist_output_stride_(0),
+targetdist_averages_output_active_(false),
+targetdist_averages_output_stride_(0)
 {
   std::vector<std::string> bias_labels(0);
   parseVector("BIAS",bias_labels);
@@ -543,7 +545,6 @@ targetdist_output_stride_(0)
     }
   }
 
-
   if(ncoeffssets_==1){
     log.printf("  Output Components:\n");
     log.printf(" ");
@@ -589,7 +590,30 @@ targetdist_output_stride_(0)
         if(targetdist_output_active_){
           bias_pntrs_[i]->writeDynamicTargetDistToFile();
         }
+        if(targetdist_averages_output_active_){
+          bias_pntrs_[i]->writeTargetDistAveragesToFile();
+        }
       }
+    }
+  }
+
+  if(keywords.exists("TARGETDIST_AVERAGES_OUTPUT")){
+    parse("TARGETDIST_AVERAGES_OUTPUT",targetdist_averages_output_stride_);
+    for(unsigned int i=0; i<nbiases_; i++){
+      bias_pntrs_[i]->enableTargetDistAveragesFileOutput();
+      bias_pntrs_[i]->setupTargetDistAveragesFileOutput();
+      // append if restarting
+      bias_pntrs_[i]->writeTargetDistAveragesToFile(getRestart());
+    }
+    if(targetdist_averages_output_stride_>0){
+      targetdist_averages_output_active_=true;
+    }
+    else{
+      for(unsigned int i=0; i<nbiases_; i++){
+        bias_pntrs_[i]->disableTargetDistAveragesFileOutput();
+      }
+      targetdist_averages_output_active_=false;
+      targetdist_averages_output_stride_=1000;
     }
   }
 }
@@ -660,6 +684,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","TARGETDIST_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
   keys.reserve("optional","TARGETDIST_OUTPUT","how often the dynamic target distribution(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  keys.add("optional","TARGETDIST_AVERAGES_OUTPUT","how often the target distribution averages should be written out to file. Note that the value is given in terms of coefficent iterations. If no value is given are the averages only written at the begining of the optimization");
   //
   keys.add("optional","BIAS_OUTPUT","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   keys.add("optional","FES_OUTPUT","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
@@ -844,6 +869,9 @@ void Optimizer::update() {
     if(isTargetDistOutputActive() && getIterationCounter()%getTargetDistOutputStride()==0){
       writeTargetDistOutputFiles();
     }
+    if(isTargetDistAveragesOutputActive() && getIterationCounter()%getTargetDistAveragesOutputStride()==0){
+      writeTargetDistAveragesOutputFiles();
+    }
   }
 }
 
@@ -1024,6 +1052,14 @@ void Optimizer::writeTargetDistOutputFiles() const {
     }
   }
 }
+
+
+void Optimizer::writeTargetDistAveragesOutputFiles() const {
+  for(unsigned int i=0; i<nbiases_; i++){
+    bias_pntrs_[i]->writeTargetDistAveragesToFile();
+  }
+}
+
 
 
 }

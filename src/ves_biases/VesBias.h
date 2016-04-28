@@ -105,6 +105,7 @@ private:
   bool fesproj_fileoutput_active_;
   bool dynamic_targetdist_fileoutput_active_;
   bool static_targetdist_fileoutput_active_;
+  bool targetdist_averages_fileoutput_active_;
 
   //
   bool bias_cutoff_active_;
@@ -136,6 +137,7 @@ protected:
   bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int);
   template<class T>
   bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int, const T&);
+  //
 public:
   static void registerKeywords(Keywords&);
   explicit VesBias(const ActionOptions&ao);
@@ -192,7 +194,6 @@ public:
   void clearGradientAndHessian();
   //
   virtual void updateTargetDistributions();
-  void writeTargetDistAveragesToFile(const unsigned int coeffs_id = 0, const bool append = true);
   //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);
@@ -250,6 +251,10 @@ public:
   void disableStaticTargetDistFileOutput() {static_targetdist_fileoutput_active_=false;}
   bool isStaticTargetDistFileOutputActive() const {return static_targetdist_fileoutput_active_;}
   //
+  void enableTargetDistAveragesFileOutput() {targetdist_averages_fileoutput_active_=true;}
+  void disableTargetDistAveragesFileOutput() {targetdist_averages_fileoutput_active_=false;}
+  bool isTargetDistAveragesFileOutputActive() const {return targetdist_averages_fileoutput_active_;}
+  //
   std::vector< std::vector<std::string> > getProjectionArguments() const {return projection_args_;}
   std::vector<std::string> getProjectionArgument(unsigned int i) const {return projection_args_[i];}
   unsigned int getNumberOfProjectionArguments() const {return projection_args_.size();}
@@ -279,6 +284,9 @@ public:
   virtual void setupDynamicTargetDistFileOutput() {};
   virtual void writeDynamicTargetDistToFile() {};
   virtual void resetDynamicTargetDistFileOutput() {};
+  //
+  void setupTargetDistAveragesFileOutput() {};
+  void writeTargetDistAveragesToFile(const bool append=true);
 };
 
 
