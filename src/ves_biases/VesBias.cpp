@@ -142,27 +142,27 @@ bias_cutoff_swfunc_pntr_(NULL)
     }
   }
 
-  if(keywords.exists("BIAS_FILENAME")){
-    parse("BIAS_FILENAME",bias_filename_);
+  if(keywords.exists("BIAS_FILE")){
+    parse("BIAS_FILE",bias_filename_);
     if(bias_filename_.size()==0){
       bias_filename_ = "bias." + getLabel() + ".data";
     }
   }
-  if(keywords.exists("FES_FILENAME")){
-    parse("FES_FILENAME",fes_filename_);
+  if(keywords.exists("FES_FILE")){
+    parse("FES_FILE",fes_filename_);
     if(fes_filename_.size()==0){
       fes_filename_ = "fes." + getLabel() + ".data";
     }
   }
-  if(keywords.exists("TARGETDIST_FILENAME")){
-    parse("TARGETDIST_FILENAME",targetdist_filename_);
+  if(keywords.exists("TARGETDIST_FILE")){
+    parse("TARGETDIST_FILE",targetdist_filename_);
     if(targetdist_filename_.size()==0){
       targetdist_filename_ = "targetdist." + getLabel() + ".data";
     }
   }
 
-  if(keywords.exists("TARGETDIST_AVERAGES_FILENAME")){
-    parse("TARGETDIST_AVERAGES_FILENAME",targetdist_averages_filename_);
+  if(keywords.exists("TARGETDIST_AVERAGES_FILE")){
+    parse("TARGETDIST_AVERAGES_FILE",targetdist_averages_filename_);
     if(targetdist_averages_filename_.size()==0){
       targetdist_averages_filename_ = "targetdist-averages." + getLabel() + ".data";
     }
@@ -257,10 +257,10 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","GRID_MIN","the lower bounds used for the grid.");
   keys.reserve("optional","GRID_MAX","the upper bounds used for the grid.");
   //
-  keys.add("optional","BIAS_FILENAME","filename of the file on which the bias should be written out. By default it is bias.LABEL.data");
-  keys.add("optional","FES_FILENAME","filename of the file on which the FES should be written out. By default it is fes.LABEL.data");
-  keys.add("optional","TARGETDIST_FILENAME","filename of the file on which the target distribution info should be written out. By default it is targetdist.LABEL.data");
-  keys.add("optional","TARGETDIST_AVERAGES_FILENAME","filename of the file for writing out the averages over the target distribution. By default it is targetdist-averages.LABEL.data");
+  keys.add("optional","BIAS_FILE","filename of the file on which the bias should be written out. By default it is bias.LABEL.data. Note that suffixes indicating the iteration number (iter-#) are added to the filename when optimizing coefficients.");
+  keys.add("optional","FES_FILE","filename of the file on which the FES should be written out. By default it is fes.LABEL.data. Note that suffixes indicating the iteration number (iter-#) are added to the filename when optimizing coefficients.");
+  keys.add("optional","TARGETDIST_FILE","filename of the file on which the target distribution should be written out. By default it is targetdist.LABEL.data. Note that suffixes indicating the iteration number (iter-#) are added to the filename when optimizing coefficients.");
+  keys.add("optional","TARGETDIST_AVERAGES_FILE","filename of the file for writing out the averages over the target distribution. By default it is targetdist-averages.LABEL.data");
   //
   keys.reserve("optional","BIAS_CUTOFF","cutoff the bias such that it only fills the free energy surface up to certain level F_cutoff, here you should give the value of the F_cutoff.");
   keys.reserve("optional","BIAS_CUTOFF_FERMI_LAMBDA","the lambda value used in the Fermi switching function for the bias cutoff (BIAS_CUTOFF). Lambda is by default 1.0.");
