@@ -120,7 +120,7 @@ targetdist_output_stride_(0)
 
   if(keywords.exists("STRIDE")){
     parse("STRIDE",stride_);
-   log.printf("  with stride %d\n",stride_);
+   log.printf("  with stride %u\n",stride_);
   }
 
   //
