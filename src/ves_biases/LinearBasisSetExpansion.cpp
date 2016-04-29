@@ -315,6 +315,7 @@ void LinearBasisSetExpansion::updateFesGrid() {
 void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) const {
   plumed_massert(bias_grid_pntr_!=NULL,"the bias grid is not defined");
   OFile file;
+  file.link(*action_pntr_);
   if(append_file){file.enforceRestart();}
   file.open(filepath);
   bias_grid_pntr_->writeToFile(file);
@@ -322,6 +323,7 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
   //
   if(biasCutoffActive()){
     OFile file2;
+    file2.link(*action_pntr_);
     if(append_file){file2.enforceRestart();}
     std::string filename = FileBase::appendSuffix(filepath,".without-cutoff");
     file2.open(filename);
@@ -334,6 +336,7 @@ void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, c
 void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, const bool append_file) const {
   plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
   OFile file;
+  file.link(*action_pntr_);
   if(append_file){file.enforceRestart();}
   file.open(filepath);
   fes_grid_pntr_->writeToFile(file);
@@ -347,6 +350,7 @@ void LinearBasisSetExpansion::writeFesProjGridToFile(const std::vector<std::stri
   Grid proj_grid = fes_grid_pntr_->project(proj_arg,Fw);
   proj_grid.setMinToZero();
   OFile file;
+  file.link(*action_pntr_);
   if(append_file){file.enforceRestart();}
   file.open(filepath);
   proj_grid.writeToFile(file);
@@ -778,7 +782,8 @@ void LinearBasisSetExpansion::writeTargetDistGridToFile(Grid* grid_pntr, const s
     filepath = vesbias_pntr_->getCurrentTargetDistOutputFilename(suffix);
   }
   OFile file;
-  file.setBackupString("bck");
+  file.link(*action_pntr_);
+  // file.setBackupString("bck");
   file.open(filepath);
   grid_pntr->writeToFile(file);
   file.close();
