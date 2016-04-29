@@ -363,11 +363,6 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
 }
 
 
-void VesBias::clearCoeffsPntrsVector() {
-  coeffs_pntrs_.clear();
-}
-
-
 void VesBias::readCoeffsFromFiles() {
   plumed_assert(ncoeffssets_>0);
   plumed_massert(keywords.exists("COEFFS"),"you are not allowed to use this function as the COEFFS keyword is not enabled");
