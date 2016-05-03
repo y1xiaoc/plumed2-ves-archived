@@ -70,7 +70,6 @@ grid_max_(0),
 bias_filename_(""),
 fes_filename_(""),
 targetdist_filename_(""),
-targetdist_averages_filename_(""),
 coeffs_id_prefix_("c-"),
 bias_fileoutput_active_(false),
 fes_fileoutput_active_(false),
@@ -159,14 +158,6 @@ bias_cutoff_swfunc_pntr_(NULL)
     if(targetdist_filename_.size()==0){
       targetdist_filename_ = "targetdist." + getLabel() + ".data";
     }
-  }
-
-  if(keywords.exists("TARGETDIST_AVERAGES_FILE")){
-    parse("TARGETDIST_AVERAGES_FILE",targetdist_averages_filename_);
-    if(targetdist_averages_filename_.size()==0){
-      targetdist_averages_filename_ = "targetdist-averages." + getLabel() + ".data";
-    }
-
   }
 
   if(keywords.exists("BIAS_CUTOFF")){
@@ -260,7 +251,6 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.add("optional","BIAS_FILE","filename of the file on which the bias should be written out. By default it is bias.LABEL.data. Note that suffixes indicating the iteration number (iter-#) are added to the filename when optimizing coefficients.");
   keys.add("optional","FES_FILE","filename of the file on which the FES should be written out. By default it is fes.LABEL.data. Note that suffixes indicating the iteration number (iter-#) are added to the filename when optimizing coefficients.");
   keys.add("optional","TARGETDIST_FILE","filename of the file on which the target distribution should be written out. By default it is targetdist.LABEL.data. Note that suffixes indicating the iteration number (iter-#) are added to the filename when optimizing coefficients.");
-  keys.add("optional","TARGETDIST_AVERAGES_FILE","filename of the file for writing out the averages over the target distribution. By default it is targetdist-averages.LABEL.data");
   //
   keys.reserve("optional","BIAS_CUTOFF","cutoff the bias such that it only fills the free energy surface up to certain level F_cutoff, here you should give the value of the F_cutoff.");
   keys.reserve("optional","BIAS_CUTOFF_FERMI_LAMBDA","the lambda value used in the Fermi switching function for the bias cutoff (BIAS_CUTOFF). Lambda is by default 1.0.");
@@ -540,13 +530,19 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 }
 
 
-void VesBias::writeTargetDistAveragesToFile(const bool append) {
-  for(unsigned int i=0; i<ncoeffssets_; i++){
-    std::string fname = getCoeffsSetFilenameSuffix(i);
-    getTargetDistAveragesPntr(i)->setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
-    fname = getTargetDistAveragesOutputFilename(fname);
-    getTargetDistAveragesPntr(i)->writeToFile(fname,true,append,static_cast<Action*>(this));
+OFile* VesBias::getOFile(const std::string& filepath) {
+  OFile* ofile_pntr = new OFile();
+  std::string fp = filepath;
+  ofile_pntr->link(*static_cast<Action*>(this));
+  if(optimizeCoeffs() && getOptimizerPntr()->useMultipleWalkers()){
+    unsigned int r=0;
+    if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+    comm.Bcast(r,0);
+    if(r>0){fp="/dev/null";}
+    ofile_pntr->enforceSuffix("");
   }
+  ofile_pntr->open(fp);
+  return ofile_pntr;
 }
 
 
@@ -613,15 +609,6 @@ std::string VesBias::getCoeffsSetFilenameSuffix(const unsigned int coeffs_id) co
     suffix = coeffs_id_prefix_ + suffix;
   }
   return suffix;
-}
-
-
-std::string VesBias::getTargetDistAveragesOutputFilename(const std::string& suffix) const {
-  std::string filename = targetdist_averages_filename_;
-  if(suffix.size()>0){
-    filename = FileBase::appendSuffix(filename,"."+suffix);
-  }
-  return filename;
 }
 
 

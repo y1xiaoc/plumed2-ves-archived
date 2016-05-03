@@ -312,50 +312,42 @@ void LinearBasisSetExpansion::updateFesGrid() {
 }
 
 
-void LinearBasisSetExpansion::writeBiasGridToFile(const std::string& filepath, const bool append_file) const {
+void LinearBasisSetExpansion::writeBiasGridToFile(OFile& ofile, const bool append_file) const {
   plumed_massert(bias_grid_pntr_!=NULL,"the bias grid is not defined");
-  OFile file;
-  file.link(*action_pntr_);
-  if(append_file){file.enforceRestart();}
-  file.open(filepath);
-  bias_grid_pntr_->writeToFile(file);
-  file.close();
-  //
-  if(biasCutoffActive()){
-    OFile file2;
-    file2.link(*action_pntr_);
-    if(append_file){file2.enforceRestart();}
-    std::string filename = FileBase::appendSuffix(filepath,".without-cutoff");
-    file2.open(filename);
-    bias_withoutcutoff_grid_pntr_->writeToFile(file2);
-    file2.close();
-  }
+  if(append_file){ofile.enforceRestart();}
+  bias_grid_pntr_->writeToFile(ofile);
 }
 
 
-void LinearBasisSetExpansion::writeFesGridToFile(const std::string& filepath, const bool append_file) const {
+void LinearBasisSetExpansion::writeBiasWithoutCutoffGridToFile(OFile& ofile, const bool append_file) const {
+  plumed_massert(bias_withoutcutoff_grid_pntr_!=NULL,"the bias without cutoff grid is not defined");
+  if(append_file){ofile.enforceRestart();}
+  bias_withoutcutoff_grid_pntr_->writeToFile(ofile);
+}
+
+
+void LinearBasisSetExpansion::writeFesGridToFile(OFile& ofile, const bool append_file) const {
   plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
-  OFile file;
-  file.link(*action_pntr_);
-  if(append_file){file.enforceRestart();}
-  file.open(filepath);
-  fes_grid_pntr_->writeToFile(file);
-  file.close();
+  if(append_file){ofile.enforceRestart();}
+  fes_grid_pntr_->writeToFile(ofile);
 }
 
 
-void LinearBasisSetExpansion::writeFesProjGridToFile(const std::vector<std::string>& proj_arg, const std::string& filepath, const bool append_file) const {
+void LinearBasisSetExpansion::writeFesProjGridToFile(const std::vector<std::string>& proj_arg, OFile& ofile, const bool append_file) const {
   plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
   FesWeight* Fw = new FesWeight(beta_);
   Grid proj_grid = fes_grid_pntr_->project(proj_arg,Fw);
   proj_grid.setMinToZero();
-  OFile file;
-  file.link(*action_pntr_);
-  if(append_file){file.enforceRestart();}
-  file.open(filepath);
-  proj_grid.writeToFile(file);
-  file.close();
+  if(append_file){ofile.enforceRestart();}
+  proj_grid.writeToFile(ofile);
   delete Fw;
+}
+
+
+void LinearBasisSetExpansion::writeDynamicTargetDistGridToFile(OFile& ofile, const bool append_file) const {
+    plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the FES grid is not defined");
+    if(append_file){ofile.enforceRestart();}
+    dynamic_ps_grid_pntr_->writeToFile(ofile);
 }
 
 
@@ -787,24 +779,6 @@ void LinearBasisSetExpansion::writeTargetDistGridToFile(Grid* grid_pntr, const s
   grid_pntr->writeToFile(file);
   file.close();
 }
-
-
-void LinearBasisSetExpansion::writeDynamicTargetDistGridToFile(const bool do_projections, const std::string& suffix) const {
-  writeTargetDistGridToFile(dynamic_ps_grid_pntr_);
-  if(do_projections){
-    for(unsigned int k=0; k<args_pntrs_.size(); k++){
-      Grid proj_grid = TargetDistribution::getMarginalGrid(dynamic_ps_grid_pntr_,args_pntrs_[k]->getName());
-      writeTargetDistGridToFile(&proj_grid,"proj-"+args_pntrs_[k]->getName());
-    }
-  }
-}
-
-
-
-
-
-
-
 
 
 

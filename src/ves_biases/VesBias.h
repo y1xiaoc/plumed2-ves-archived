@@ -105,7 +105,6 @@ private:
   bool fesproj_fileoutput_active_;
   bool dynamic_targetdist_fileoutput_active_;
   bool static_targetdist_fileoutput_active_;
-  bool targetdist_averages_fileoutput_active_;
 
   //
   bool bias_cutoff_active_;
@@ -224,12 +223,11 @@ public:
   std::string getCoeffsSetFilenameSuffix(const unsigned int coeffs_id) const;
   std::string getCurrentOutputFilename(const std::string&, const std::string& suffix="") const;
   std::string getBiasOutputFilename() const {return bias_filename_;}
-  std::string getCurrentBiasOutputFilename() const;
+  std::string getCurrentBiasOutputFilename(const std::string& suffix="") const;
   std::string getFesOutputFilename() const {return fes_filename_;}
   std::string getCurrentFesOutputFilename(const std::string& suffix="") const;
   std::string getTargetDistOutputFilename() const {return targetdist_filename_;}
   std::string getCurrentTargetDistOutputFilename(const std::string& suffix="") const;
-  std::string getTargetDistAveragesOutputFilename(const std::string& suffix="") const;
   //
   void enableBiasFileOutput() {bias_fileoutput_active_=true;}
   void disableBiasFileOutput() {bias_fileoutput_active_=false;}
@@ -251,10 +249,6 @@ public:
   void disableStaticTargetDistFileOutput() {static_targetdist_fileoutput_active_=false;}
   bool isStaticTargetDistFileOutputActive() const {return static_targetdist_fileoutput_active_;}
   //
-  void enableTargetDistAveragesFileOutput() {targetdist_averages_fileoutput_active_=true;}
-  void disableTargetDistAveragesFileOutput() {targetdist_averages_fileoutput_active_=false;}
-  bool isTargetDistAveragesFileOutputActive() const {return targetdist_averages_fileoutput_active_;}
-  //
   std::vector< std::vector<std::string> > getProjectionArguments() const {return projection_args_;}
   std::vector<std::string> getProjectionArgument(unsigned int i) const {return projection_args_[i];}
   unsigned int getNumberOfProjectionArguments() const {return projection_args_.size();}
@@ -268,6 +262,8 @@ public:
   double getBiasCutoffSwitchingFunction(const double) const;
   void applyBiasCutoff(double&, std::vector<double>&) const;
   void applyBiasCutoff(double&, std::vector<double>&, std::vector<double>&) const;
+  //
+  OFile* getOFile(const std::string& filename);
   //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};
@@ -284,9 +280,6 @@ public:
   virtual void setupDynamicTargetDistFileOutput() {};
   virtual void writeDynamicTargetDistToFile() {};
   virtual void resetDynamicTargetDistFileOutput() {};
-  //
-  void setupTargetDistAveragesFileOutput() {};
-  void writeTargetDistAveragesToFile(const bool append=true);
 };
 
 
@@ -313,8 +306,8 @@ double VesBias::getBeta() const {
 
 
 inline
-std::string VesBias::getCurrentBiasOutputFilename() const {
-  return getCurrentOutputFilename(bias_filename_);
+std::string VesBias::getCurrentBiasOutputFilename(const std::string& suffix) const {
+  return getCurrentOutputFilename(bias_filename_,suffix);
 }
 
 

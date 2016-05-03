@@ -76,6 +76,9 @@ private:
   unsigned int hessian_wstride_;
   std::vector<OFile*> hessianOFiles_;
   //
+  unsigned int targetdist_averages_wstride_;
+  std::vector<OFile*> targetdist_averagesOFiles_;
+  //
   unsigned int nbiases_;
   std::vector<bias::VesBias*> bias_pntrs_;
   //
@@ -86,6 +89,7 @@ private:
   std::vector<CoeffsVector*> aver_gradient_pntrs_;
   std::vector<CoeffsMatrix*> hessian_pntrs_;
   std::vector<CoeffsVector*> coeffs_mask_pntrs_;
+  std::vector<CoeffsVector*> targetdist_averages_pntrs_;
   //
   bool identical_coeffs_shape_;
   //
@@ -97,8 +101,6 @@ private:
   unsigned int fesproj_output_stride_;
   bool targetdist_output_active_;
   unsigned int targetdist_output_stride_;
-  bool targetdist_averages_output_active_;
-  unsigned int targetdist_averages_output_stride_;
   //
 private:
   void updateOutputComponents();
@@ -118,6 +120,7 @@ protected:
   CoeffsVector& Gradient(const unsigned int coeffs_id = 0) const;
   CoeffsMatrix& Hessian(const unsigned int coeffs_id = 0) const;
   CoeffsVector& CoeffsMask(const unsigned int coeffs_id = 0) const;
+  CoeffsVector& TargetDistAverages(const unsigned int coeffs_id = 0) const;
   double StepSize(const unsigned int coeffs_id = 0) const;
   virtual void coeffsUpdate(const unsigned int coeffs_id = 0) = 0;
   void setCurrentStepSize(const double,const unsigned int i = 0);
@@ -186,6 +189,7 @@ public:
   std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}
   std::vector<CoeffsMatrix*> getHessianPntrs() const {return hessian_pntrs_;}
   std::vector<CoeffsVector*> getCoeffsMaskPntrs() const {return coeffs_mask_pntrs_;}
+  std::vector<CoeffsVector*> getTargetDistAveragesPntrs() const {return targetdist_averages_pntrs_;}
   //
   bool isBiasOutputActive() const {return bias_output_active_;}
   unsigned int getBiasOutputStride() const {return bias_output_stride_;}
@@ -206,11 +210,6 @@ public:
   unsigned int getTargetDistOutputStride() const {return targetdist_output_stride_;}
   void setTargetDistOutputStride(unsigned int stride) {targetdist_output_stride_=stride;}
   void writeTargetDistOutputFiles() const;
-  //
-  bool isTargetDistAveragesOutputActive() const {return targetdist_averages_output_active_;}
-  unsigned int getTargetDistAveragesOutputStride() const {return targetdist_averages_output_stride_;}
-  void setTargetDistAveragesOutputStride(unsigned int stride) {targetdist_averages_output_stride_=stride;}
-  void writeTargetDistAveragesOutputFiles() const;
   //
 };
 

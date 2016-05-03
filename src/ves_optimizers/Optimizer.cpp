@@ -58,6 +58,8 @@ gradient_wstride_(100),
 gradientOFiles_(0),
 hessian_wstride_(100),
 hessianOFiles_(0),
+targetdist_averages_wstride_(100),
+targetdist_averagesOFiles_(0),
 nbiases_(0),
 bias_pntrs_(0),
 ncoeffssets_(0),
@@ -67,6 +69,7 @@ gradient_pntrs_(0),
 aver_gradient_pntrs_(0),
 hessian_pntrs_(0),
 coeffs_mask_pntrs_(0),
+targetdist_averages_pntrs_(0),
 identical_coeffs_shape_(true),
 bias_output_active_(false),
 bias_output_stride_(0),
@@ -75,9 +78,7 @@ fes_output_stride_(0),
 fesproj_output_active_(false),
 fesproj_output_stride_(0),
 targetdist_output_active_(false),
-targetdist_output_stride_(0),
-targetdist_averages_output_active_(false),
-targetdist_averages_output_stride_(0)
+targetdist_output_stride_(0)
 {
   std::vector<std::string> bias_labels(0);
   parseVector("BIAS",bias_labels);
@@ -94,14 +95,19 @@ targetdist_averages_output_stride_(0)
     //
     std::vector<CoeffsVector*> pntrs_coeffs = bias_pntrs_[i]->getCoeffsPntrs();
     std::vector<CoeffsVector*> pntrs_gradient = bias_pntrs_[i]->getGradientPntrs();
+    std::vector<CoeffsVector*> pntrs_targetdist_averages = bias_pntrs_[i]->getTargetDistAveragesPntrs();
     plumed_massert(pntrs_coeffs.size()==pntrs_gradient.size(),"something wrong in the coefficients and gradient passed from VES bias");
+    plumed_massert(pntrs_coeffs.size()==pntrs_targetdist_averages.size(),"something wrong in the coefficients and target distribution averages passed from VES bias");
     for(unsigned int k=0; k<pntrs_coeffs.size(); k++){
       plumed_massert(pntrs_coeffs[k] != NULL,"some coefficient is not linked correctly");
       plumed_massert(pntrs_gradient[k] != NULL,"some gradient is not linked correctly");
+      plumed_massert(pntrs_targetdist_averages[k] != NULL,"some target distribution average is not linked correctly");
       pntrs_coeffs[k]->turnOnIterationCounter();
       coeffs_pntrs_.push_back(pntrs_coeffs[k]);
       pntrs_gradient[k]->turnOnIterationCounter();
       gradient_pntrs_.push_back(pntrs_gradient[k]);
+      pntrs_targetdist_averages[k]->turnOnIterationCounter();
+      targetdist_averages_pntrs_.push_back(pntrs_targetdist_averages[k]);
       //
       CoeffsVector* aux_coeffs_tmp = new CoeffsVector(*pntrs_coeffs[k]);
       std::string aux_label = pntrs_coeffs[k]->getLabel();
@@ -363,7 +369,7 @@ targetdist_averages_output_stride_(0)
 
     if(coeffs_fnames.size()>0){
       for(unsigned int i=0; i<gradient_fnames.size(); i++){
-        plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"FILE and GRADIENT_FILE cannot be the same");
+        plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"COEFFS_FILE and GRADIENT_FILE cannot be the same");
       }
     }
     setupOFiles(gradient_fnames,gradientOFiles_);
@@ -396,7 +402,7 @@ targetdist_averages_output_stride_(0)
 
     if(coeffs_fnames.size()>0){
       for(unsigned int i=0; i<hessian_fnames.size(); i++){
-        plumed_massert(hessian_fnames[i]!=coeffs_fnames[i],"FILE and HESSIAN_FILE cannot be the same");
+        plumed_massert(hessian_fnames[i]!=coeffs_fnames[i],"COEFFS_FILE and HESSIAN_FILE cannot be the same");
       }
     }
     if(gradient_fnames.size()>0){
@@ -418,6 +424,43 @@ targetdist_averages_output_stride_(0)
       }
     }
   }
+
+
+  std::vector<std::string> targetdist_averages_fnames;
+  if(keywords.exists("TARGETDIST_AVERAGES_FILE")){
+    parseFilenames("TARGETDIST_AVERAGES_FILE",targetdist_averages_fnames,"targetdist-averages.data");
+    parse("TARGETDIST_AVERAGES_OUTPUT",targetdist_averages_wstride_);
+
+    if(coeffs_fnames.size()>0){
+      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+        plumed_massert(targetdist_averages_fnames[i]!=coeffs_fnames[i],"COEFFS_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
+      }
+    }
+    if(gradient_fnames.size()>0){
+      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+        plumed_massert(targetdist_averages_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
+      }
+    }
+    if(hessian_fnames.size()>0){
+      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+        plumed_massert(targetdist_averages_fnames[i]!=hessian_fnames[i],"HESSIAN_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
+      }
+    }
+    setupOFiles(targetdist_averages_fnames,targetdist_averagesOFiles_);
+
+    if(targetdist_averages_fnames.size()>0 && targetdist_averages_wstride_ > 0){
+      if(ncoeffssets_==1){
+        log.printf("  Target distribution averages will be written out to file %s every %u iterations\n",targetdist_averagesOFiles_[0]->getPath().c_str(),targetdist_averages_wstride_);
+      }
+      else {
+        log.printf("  Target distribution averages will be written out to the following files every %u iterations:\n",targetdist_averages_wstride_);
+        for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+          log.printf("   coefficient set %u: %s\n",i,targetdist_averagesOFiles_[i]->getPath().c_str());
+        }
+      }
+    }
+  }
+
 
   //
   if(keywords.exists("MASK_FILE")){
@@ -599,32 +642,11 @@ targetdist_averages_output_stride_(0)
         if(targetdist_output_active_){
           bias_pntrs_[i]->writeDynamicTargetDistToFile();
         }
-        if(targetdist_averages_output_active_){
-          bias_pntrs_[i]->writeTargetDistAveragesToFile();
-        }
       }
     }
   }
 
-  if(keywords.exists("TARGETDIST_AVERAGES_OUTPUT")){
-    parse("TARGETDIST_AVERAGES_OUTPUT",targetdist_averages_output_stride_);
-    for(unsigned int i=0; i<nbiases_; i++){
-      bias_pntrs_[i]->enableTargetDistAveragesFileOutput();
-      bias_pntrs_[i]->setupTargetDistAveragesFileOutput();
-      // append if restarting
-      bias_pntrs_[i]->writeTargetDistAveragesToFile(getRestart());
-    }
-    if(targetdist_averages_output_stride_>0){
-      targetdist_averages_output_active_=true;
-    }
-    else{
-      for(unsigned int i=0; i<nbiases_; i++){
-        bias_pntrs_[i]->disableTargetDistAveragesFileOutput();
-      }
-      targetdist_averages_output_active_=false;
-      targetdist_averages_output_stride_=1000;
-    }
-  }
+
 }
 
 
@@ -654,6 +676,11 @@ Optimizer::~Optimizer() {
     delete hessianOFiles_[i];
   }
   hessianOFiles_.clear();
+  for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
+    targetdist_averagesOFiles_[i]->close();
+    delete targetdist_averagesOFiles_[i];
+  }
+  targetdist_averagesOFiles_.clear();
 }
 
 
@@ -693,6 +720,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","TARGETDIST_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
   keys.reserve("optional","TARGETDIST_OUTPUT","how often the dynamic target distribution(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  //
+  keys.add("optional","TARGETDIST_AVERAGES_FILE","the name of output file for the target distribution averages. By default it is targetdist-averages.data.");
   keys.add("optional","TARGETDIST_AVERAGES_OUTPUT","how often the target distribution averages should be written out to file. Note that the value is given in terms of coefficent iterations. If no value is given are the averages only written at the begining of the optimization");
   //
   keys.add("optional","BIAS_OUTPUT","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
@@ -883,9 +912,6 @@ void Optimizer::update() {
     if(isTargetDistOutputActive() && getIterationCounter()%getTargetDistOutputStride()==0){
       writeTargetDistOutputFiles();
     }
-    if(isTargetDistAveragesOutputActive() && getIterationCounter()%getTargetDistAveragesOutputStride()==0){
-      writeTargetDistAveragesOutputFiles();
-    }
   }
 }
 
@@ -944,6 +970,9 @@ void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
   }
   if(hessianOFiles_.size()>0 && iter_counter%hessian_wstride_==0){
     hessian_pntrs_[coeffs_id]->writeToFile(*hessianOFiles_[coeffs_id]);
+  }
+  if(targetdist_averagesOFiles_.size()>0 && iter_counter%targetdist_averages_wstride_==0){
+    targetdist_averages_pntrs_[coeffs_id]->writeToFile(*targetdist_averagesOFiles_[coeffs_id]);
   }
 }
 
@@ -1064,13 +1093,6 @@ void Optimizer::writeTargetDistOutputFiles() const {
     if(dynamic_targetdists_[i]){
       bias_pntrs_[i]->writeDynamicTargetDistToFile();
     }
-  }
-}
-
-
-void Optimizer::writeTargetDistAveragesOutputFiles() const {
-  for(unsigned int i=0; i<nbiases_; i++){
-    bias_pntrs_[i]->writeTargetDistAveragesToFile();
   }
 }
 
