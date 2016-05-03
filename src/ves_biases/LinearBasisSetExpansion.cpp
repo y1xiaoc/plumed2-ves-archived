@@ -734,7 +734,6 @@ void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
   size_t stride=mycomm_.Get_size();
   size_t rank=mycomm_.Get_rank();
   for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
-    std::vector<double> args = dynamic_ps_grid_pntr_->getPoint(l);
     double bias = bias_withoutcutoff_grid_pntr_->getValue(l);
     double deriv_factor_sf = 0.0;
     // this comes from the p(s)

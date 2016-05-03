@@ -798,10 +798,9 @@ size_t CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs
 size_t CoeffsVector::readOneSetFromFile(IFile& ifile, const bool ignore_header) {
   ifile.allowIgnoredFields();
   size_t ncoeffs_read=0;
-  bool ignore_missing_coeffs=false;
   if(ifile){
     if(!ignore_header){readHeaderFromFile(ifile);}
-    if(ifile){ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);}
+    if(ifile){ncoeffs_read=readDataFromFile(ifile,false);}
   }
   return ncoeffs_read;
 }
