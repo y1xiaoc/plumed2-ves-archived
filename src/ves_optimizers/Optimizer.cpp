@@ -29,6 +29,7 @@
 #include "core/ActionSet.h"
 #include "tools/Communicator.h"
 #include "tools/File.h"
+#include "tools/FileBase.h"
 
 
 
@@ -300,6 +301,13 @@ targetdist_averages_output_stride_(0)
       }
     }
     if(getRestart()){
+      for(unsigned int i=0; i<coeffs_fnames.size(); i++){
+        IFile ifile;
+        bool file_exist = ifile.FileExist(coeffs_fnames[i]);
+        if(!file_exist){
+          plumed_merror("Cannot find coefficient file "+coeffs_fnames[i]+" when trying to restart an optimzation. If you don't want to restart the optimzation please remove the RESTART keyword or use the RESTART=NO within the "+getName()+" action to locally disable the restart.");
+        }
+      }
       readCoeffsFromFiles(coeffs_fnames,true);
       unsigned int iter_opt_tmp = coeffs_pntrs_[0]->getIterationCounter();
       for(unsigned int i=1; i<ncoeffssets_; i++){
@@ -689,6 +697,11 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.add("optional","BIAS_OUTPUT","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   keys.add("optional","FES_OUTPUT","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   keys.add("optional","FES_PROJ_OUTPUT","how often the projections of the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  //
+  keys.use("RESTART");
+  //
+  keys.use("UPDATE_FROM");
+  keys.use("UPDATE_UNTIL");
   // Components that are always active
   keys.addOutputComponent("gradrms","default","the root mean square value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradrms-#.");
   keys.addOutputComponent("gradmax","default","the largest absolute value of the coefficent gradient. For multiple biases this component is labeled using the number of the bias as gradmax-#.");
