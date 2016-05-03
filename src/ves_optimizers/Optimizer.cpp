@@ -1060,6 +1060,7 @@ void Optimizer::setAllCoeffsSetIterationCounters(){
     coeffs_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     aux_coeffs_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     gradient_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
+    targetdist_averages_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     if(use_hessian_){
       hessian_pntrs_[i]->setIterationCounterAndTime(getIterationCounter(),getTime());
     }
