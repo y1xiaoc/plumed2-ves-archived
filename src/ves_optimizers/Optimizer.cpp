@@ -392,6 +392,7 @@ targetdist_averages_output_stride_(0)
   std::vector<std::string> hessian_fnames;
   if(keywords.exists("HESSIAN_FILE")){
     parseFilenames("HESSIAN_FILE",hessian_fnames);
+    parse("HESSIAN_OUTPUT",hessian_wstride_);
 
     if(coeffs_fnames.size()>0){
       for(unsigned int i=0; i<hessian_fnames.size(); i++){
