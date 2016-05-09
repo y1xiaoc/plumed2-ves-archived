@@ -263,7 +263,7 @@ public:
   void applyBiasCutoff(double&, std::vector<double>&) const;
   void applyBiasCutoff(double&, std::vector<double>&, std::vector<double>&) const;
   //
-  OFile* getOFile(const std::string& filename);
+  OFile* getOFile(const std::string& filename, const bool enforce_backup=true);
   //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};

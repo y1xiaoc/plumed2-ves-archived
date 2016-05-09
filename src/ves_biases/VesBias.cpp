@@ -530,10 +530,11 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 }
 
 
-OFile* VesBias::getOFile(const std::string& filepath) {
+OFile* VesBias::getOFile(const std::string& filepath, const bool enforce_backup) {
   OFile* ofile_pntr = new OFile();
   std::string fp = filepath;
   ofile_pntr->link(*static_cast<Action*>(this));
+  if(enforce_backup){ofile_pntr->enforceBackup();}
   if(optimizeCoeffs() && getOptimizerPntr()->useMultipleWalkers()){
     unsigned int r=0;
     if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
