@@ -102,6 +102,8 @@ private:
   bool targetdist_output_active_;
   unsigned int targetdist_output_stride_;
   //
+  bool isFirstStep;
+  //
 private:
   void updateOutputComponents();
   void writeOutputFiles(const unsigned int coeffs_id = 0);

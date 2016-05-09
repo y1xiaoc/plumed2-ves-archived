@@ -58,7 +58,7 @@ gradient_wstride_(100),
 gradientOFiles_(0),
 hessian_wstride_(100),
 hessianOFiles_(0),
-targetdist_averages_wstride_(100),
+targetdist_averages_wstride_(0),
 targetdist_averagesOFiles_(0),
 nbiases_(0),
 bias_pntrs_(0),
@@ -78,7 +78,8 @@ fes_output_stride_(0),
 fesproj_output_active_(false),
 fesproj_output_stride_(0),
 targetdist_output_active_(false),
-targetdist_output_stride_(0)
+targetdist_output_stride_(0),
+isFirstStep(true)
 {
   std::vector<std::string> bias_labels(0);
   parseVector("BIAS",bias_labels);
@@ -342,10 +343,11 @@ targetdist_output_stride_(0)
       coeffs_fnames.clear();
     }
     setupOFiles(coeffs_fnames,coeffsOFiles_);
-    for(unsigned int i=0; i<coeffsOFiles_.size();i++){
-      coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
+    if(!getRestart()){
+      for(unsigned int i=0; i<coeffsOFiles_.size();i++){
+        coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
+      }
     }
-
     if(coeffs_fnames.size()>0){
       if(ncoeffssets_==1){
         log.printf("  Coefficients will be written out to file %s every %u iterations\n",coeffsOFiles_[0]->getPath().c_str(),coeffs_wstride_);
@@ -373,14 +375,6 @@ targetdist_output_stride_(0)
       }
     }
     setupOFiles(gradient_fnames,gradientOFiles_);
-    for(unsigned int i=0; i<gradientOFiles_.size(); i++){
-      if(aver_gradient_pntrs_.size()==0){
-        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],false);
-      }
-      else{
-        gradient_pntrs_[i]->writeToFile(*gradientOFiles_[i],aver_gradient_pntrs_[i],false);
-      }
-    }
 
     if(gradient_fnames.size()>0){
       if(ncoeffssets_==1){
@@ -447,6 +441,18 @@ targetdist_output_stride_(0)
       }
     }
     setupOFiles(targetdist_averages_fnames,targetdist_averagesOFiles_);
+
+    for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
+      targetdist_averages_pntrs_[i]->writeToFile(*targetdist_averagesOFiles_[i]);
+    }
+
+    if(targetdist_averages_wstride_==0){
+      for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
+        targetdist_averagesOFiles_[i]->close();
+        delete targetdist_averagesOFiles_[i];
+      }
+      targetdist_averagesOFiles_.clear();
+    }
 
     if(targetdist_averages_fnames.size()>0 && targetdist_averages_wstride_ > 0){
       if(ncoeffssets_==1){
@@ -807,9 +813,6 @@ void Optimizer::turnOnHessian() {
     log.printf("  Optimization performed using full Hessian matrix\n");
   }
   //
-  for(unsigned int i=0; i<hessianOFiles_.size(); i++){
-    hessian_pntrs_[i]->writeToFile(*hessianOFiles_[i]);
-  }
 }
 
 
@@ -863,7 +866,7 @@ std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in,
 
 
 void Optimizer::update() {
-  if(onStep() && getStep()!=0){
+  if(onStep() && !isFirstStep){
     for(unsigned int i=0; i<nbiases_; i++){
       bias_pntrs_[i]->updateGradientAndHessian();
     }
@@ -879,6 +882,7 @@ void Optimizer::update() {
       coeffs_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
       aux_coeffs_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
       gradient_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
+      targetdist_averages_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
       if(use_hessian_){
         hessian_pntrs_[i]->setIterationCounterAndTime(curr_iter,curr_time);
       }
@@ -912,6 +916,9 @@ void Optimizer::update() {
     if(isTargetDistOutputActive() && getIterationCounter()%getTargetDistOutputStride()==0){
       writeTargetDistOutputFiles();
     }
+  }
+  else {
+    isFirstStep=false;
   }
 }
 
