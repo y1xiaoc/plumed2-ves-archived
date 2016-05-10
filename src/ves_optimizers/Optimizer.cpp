@@ -514,8 +514,8 @@ isFirstStep(true)
         plumed_massert(mask_fnames_out[i]!=mask_fnames_in[i],"MASK_FILE and OUTPUT_MASK_FILE cannot be the same");
       }
       OFile maskOFile;
-      // comment the below link otherwise the file is not backed up correctly during restarts.
-      // maskOFile.link(*this);
+      maskOFile.link(*this);
+      maskOFile.enforceBackup();
       if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
         unsigned int r=0;
         if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
