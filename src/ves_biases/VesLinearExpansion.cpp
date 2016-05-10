@@ -185,7 +185,6 @@ void VesLinearExpansion::updateTargetDistributions() {
     bias_expansion_pntr_->updateBiasCutoffTargetDistribution();
   }
   setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
-  // this output should be optional or with a stride
 }
 
 
