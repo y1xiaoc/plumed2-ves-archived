@@ -164,7 +164,9 @@ public:
   virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const = 0;
   //virtual void get2ndDerivaties(const double, std::vector<double>&)=0;
   void printInfo() const;
-
+  //
+  void getMultipleValue(const std::vector<double>&, std::vector<double>&, std::vector<std::vector<double> >&, std::vector<std::vector<double> >&) const;
+  void writeBasisFunctionsToFile(OFile&, OFile&, unsigned int nbins=1000) const;
 };
 
 

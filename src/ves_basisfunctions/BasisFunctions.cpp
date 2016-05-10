@@ -266,4 +266,47 @@ std::string BasisFunctions::getKeywordString() const {
 }
 
 
+void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vector<double>& argsT, std::vector<std::vector<double> >& values, std::vector<std::vector<double> >& derivs) const {
+  argsT.resize(args.size());
+  values.clear();
+  derivs.clear();
+  for(unsigned int i=0; i<args.size(); i++){
+    std::vector<double> tmp_values(getNumberOfBasisFunctions());
+    std::vector<double> tmp_derivs(getNumberOfBasisFunctions());
+    bool inside_interval=true;
+    getAllValues(args[i],argsT[i],inside_interval,tmp_values,tmp_derivs);
+    values.push_back(tmp_values);
+    derivs.push_back(tmp_derivs);
+  }
+}
+
+
+void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins) const {
+  double h=(intervalMax()-intervalMin())/nbins;
+  std::vector<double> args(nbins+1,0.0);
+  //
+  for(unsigned int i=0; i<(nbins+1); i++){
+    args[i] = intervalMin()+i*h;
+  }
+  std::vector<double> argsT;
+  std::vector<std::vector<double> > values;
+  std::vector<std::vector<double> > derivs;
+
+  ofile_values.fmtField("%12.8f");
+  ofile_derivs.fmtField("%12.8f");
+
+  getMultipleValue(args,argsT,values,derivs);
+  for(unsigned int i=0; i<args.size(); i++){
+    ofile_values.printField("arg",args[i]);
+    ofile_derivs.printField("arg",args[i]);
+    for(unsigned int k=0; k<getNumberOfBasisFunctions(); k++){
+      ofile_values.printField(getBasisFunctionLabel(k),values[i][k]);
+      ofile_derivs.printField("der_"+getBasisFunctionLabel(k),derivs[i][k]);
+    }
+    ofile_values.printField();
+    ofile_derivs.printField();
+  }
+}
+
+
 }
