@@ -310,9 +310,12 @@ isFirstStep(true)
     if(getRestart()){
       for(unsigned int i=0; i<coeffs_fnames.size(); i++){
         IFile ifile;
+        ifile.link(*this);
+        if(use_mwalkers_mpi_){ifile.enforceSuffix("");}
         bool file_exist = ifile.FileExist(coeffs_fnames[i]);
         if(!file_exist){
-          plumed_merror("Cannot find coefficient file "+coeffs_fnames[i]+" when trying to restart an optimzation. If you don't want to restart the optimzation please remove the RESTART keyword or use the RESTART=NO within the "+getName()+" action to locally disable the restart.");
+          std::string fname = FileBase::appendSuffix(coeffs_fnames[i],ifile.getSuffix());
+          plumed_merror("Cannot find coefficient file " + fname + " when trying to restart an optimzation. If you don't want to restart the optimzation please remove the RESTART keyword or use the RESTART=NO within the "+getName()+" action to locally disable the restart.");
         }
       }
       readCoeffsFromFiles(coeffs_fnames,true);
