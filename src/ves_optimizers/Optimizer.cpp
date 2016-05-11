@@ -205,16 +205,20 @@ isFirstStep(true)
     mwalkers_mpi_single_files_ = !mw_separate_files;
   }
 
+  int numwalkers;
+  int walker_rank;
   if(comm.Get_rank()==0){
-    if(use_mwalkers_mpi_ && multi_sim_comm.Get_size()==1){
-      plumed_merror("using the MULTIPLE_WALKERS keyword does not make sense if running the MD code with a single replica");
-    }
-    if(use_mwalkers_mpi_ ){
-      log.printf("  optimization performed using multiple walkers connected via MPI:\n");
-      log.printf("   number of walkers: %d\n",multi_sim_comm.Get_size());
-      log.printf("   walker number: %d\n",multi_sim_comm.Get_rank());
-    }
+    numwalkers = multi_sim_comm.Get_size();
+    walker_rank = multi_sim_comm.Get_rank();
   }
+  comm.Bcast(numwalkers,0);
+  comm.Bcast(walker_rank,0);
+  if(use_mwalkers_mpi_ && numwalkers==1){
+      plumed_merror("using the MULTIPLE_WALKERS keyword does not make sense if running the MD code with a single replica");
+  }
+  log.printf("  optimization performed using multiple walkers connected via MPI:\n");
+  log.printf("   number of walkers: %d\n",numwalkers);
+  log.printf("   walker number: %d\n",walker_rank);
 
   dynamic_targetdists_.resize(nbiases_,false);
   if(keywords.exists("TARGETDIST_STRIDE")){
