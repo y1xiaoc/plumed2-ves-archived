@@ -138,6 +138,10 @@ public:
   double intervalRange() const;
   double intervalMean() const;
   double intervalDerivf() const;
+  std::string intervalMinStr() const;
+  std::string intervalMaxStr() const;
+  std::string intervalRangeStr() const;
+  std::string intervalMeanStr() const;
   std::vector<double> getUniformIntegrals() const;
   std::vector<double> getTargetDistributionIntegrals(TargetDistribution*) const;
   std::vector<double> getTargetDistributionIntegrals(const std::string&) const;

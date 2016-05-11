@@ -266,6 +266,34 @@ std::string BasisFunctions::getKeywordString() const {
 }
 
 
+std::string BasisFunctions::intervalMinStr() const {
+  std::string str;
+  Tools::convert(interval_min_,str);
+  return str;
+}
+
+
+std::string BasisFunctions::intervalMaxStr() const {
+  std::string str;
+  Tools::convert(interval_max_,str);
+  return str;
+}
+
+
+std::string BasisFunctions::intervalRangeStr() const {
+  std::string str;
+  Tools::convert(interval_range_,str);
+  return str;
+}
+
+
+std::string BasisFunctions::intervalMeanStr() const {
+  std::string str;
+  Tools::convert(interval_mean_,str);
+  return str;
+}
+
+
 void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vector<double>& argsT, std::vector<std::vector<double> >& values, std::vector<std::vector<double> >& derivs) const {
   argsT.resize(args.size());
   values.clear();
