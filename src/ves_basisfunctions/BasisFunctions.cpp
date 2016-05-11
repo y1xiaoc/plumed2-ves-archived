@@ -310,30 +310,53 @@ void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vect
 
 
 void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins) const {
-  double h=(intervalMax()-intervalMin())/nbins;
-  std::vector<double> args(nbins+1,0.0);
+  double h=(intervalMax()-intervalMin())/(nbins-1);
+  std::vector<double> args(nbins,0.0);
   //
-  for(unsigned int i=0; i<(nbins+1); i++){
+  for(unsigned int i=0; i<args.size(); i++){
     args[i] = intervalMin()+i*h;
   }
   std::vector<double> argsT;
   std::vector<std::vector<double> > values;
   std::vector<std::vector<double> > derivs;
 
-  ofile_values.fmtField("%12.8f");
-  ofile_derivs.fmtField("%12.8f");
+  ofile_values.addConstantField("bf_keywords").printField("bf_keywords","{"+getKeywordString()+"}");
+  ofile_derivs.addConstantField("bf_keywords").printField("bf_keywords","{"+getKeywordString()+"}");
+
+  ofile_values.addConstantField("min").printField("min",intervalMinStr());
+  ofile_values.addConstantField("max").printField("max",intervalMaxStr());
+
+  ofile_derivs.addConstantField("min").printField("min",intervalMinStr());
+  ofile_derivs.addConstantField("max").printField("max",intervalMaxStr());
+
+  ofile_values.addConstantField("nbins").printField("nbins",static_cast<int>(nbins));
+  ofile_derivs.addConstantField("nbins").printField("nbins",static_cast<int>(nbins));
+
+  if(arePeriodic()){
+    ofile_values.addConstantField("periodic").printField("periodic","true");
+    ofile_derivs.addConstantField("periodic").printField("periodic","true");
+  }
+  else{
+    ofile_values.addConstantField("periodic").printField("periodic","false");
+    ofile_derivs.addConstantField("periodic").printField("periodic","false");
+  }
 
   getMultipleValue(args,argsT,values,derivs);
+  ofile_values.fmtField("%15.8f");
+  ofile_derivs.fmtField("%15.8f");
   for(unsigned int i=0; i<args.size(); i++){
     ofile_values.printField("arg",args[i]);
     ofile_derivs.printField("arg",args[i]);
     for(unsigned int k=0; k<getNumberOfBasisFunctions(); k++){
       ofile_values.printField(getBasisFunctionLabel(k),values[i][k]);
-      ofile_derivs.printField("der_"+getBasisFunctionLabel(k),derivs[i][k]);
+      ofile_derivs.printField("d_"+getBasisFunctionLabel(k),derivs[i][k]);
     }
     ofile_values.printField();
     ofile_derivs.printField();
   }
+  ofile_values.fmtField();
+  ofile_derivs.fmtField();
+
 }
 
 
