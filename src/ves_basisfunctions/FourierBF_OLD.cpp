@@ -48,7 +48,7 @@ FourierBF_OLD::FourierBF_OLD(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(2*getOrder()+1);
-  setIntrinsicInterval(-pi,+pi);
+  setIntrinsicInterval("-pi","+pi");
   setPeriodic();
   setIntervalBounded();
   setType("trigonometric_cos-sin");

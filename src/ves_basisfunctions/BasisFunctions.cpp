@@ -23,6 +23,7 @@
 #include "ves_targetdistributions/TargetDistribution.h"
 #include "ves_targetdistributions/TargetDistributionRegister.h"
 #include "ves_biases/VesBias.h"
+#include "ves_tools/VesTools.h"
 
 
 namespace PLMD{
@@ -52,10 +53,14 @@ bf_label_prefix_("f"),
 bf_labels_(nbasis_,"f0"),
 periodic_(false),
 interval_bounded_(true),
+interval_intrinsic_min_str_("1.0"),
+interval_intrinsic_max_str_("-1.0"),
 interval_intrinsic_min_(1.0),
 interval_intrinsic_max_(-1.0),
 interval_intrinsic_range_(0.0),
 interval_intrinsic_mean_(0.0),
+interval_min_str_(""),
+interval_max_str_(""),
 interval_min_(0.0),
 interval_max_(0.0),
 interval_range_(0.0),
@@ -71,10 +76,12 @@ action_pntr_(NULL)
   parse("ORDER",norder_); addKeywordToList("ORDER",norder_);
   nbasis_=norder_+1;
   //
-  std::string str_imin_; std::string str_imax_;
-  parse("INTERVAL_MIN",str_imin_); addKeywordToList("INTERVAL_MIN",str_imin_);
-  parse("INTERVAL_MAX",str_imax_); addKeywordToList("INTERVAL_MAX",str_imax_);
-  Tools::convert(str_imin_,interval_min_); Tools::convert(str_imax_,interval_max_);
+  std::string str_imin; std::string str_imax;
+  parse("INTERVAL_MIN",str_imin); addKeywordToList("INTERVAL_MIN",str_imin);
+  parse("INTERVAL_MAX",str_imax); addKeywordToList("INTERVAL_MAX",str_imax);
+  interval_min_str_ = str_imin;
+  interval_max_str_ = str_imax;
+  Tools::convert(str_imin,interval_min_); Tools::convert(str_imax,interval_max_);
   if(interval_min_>interval_max_){plumed_merror("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
   //
   parseFlag("DEBUG_INFO",print_debug_info_);
@@ -83,6 +90,25 @@ action_pntr_(NULL)
   // log.printf(" %s \n",getKeywordString().c_str());
 
 }
+
+
+void BasisFunctions::setIntrinsicInterval(const double interval_intrinsic_min_in, const double interval_intrinsic_max_in) {
+  interval_intrinsic_min_ = interval_intrinsic_min_in;
+  interval_intrinsic_max_ = interval_intrinsic_max_in;
+  VesTools::convertDbl2Str(interval_intrinsic_min_,interval_intrinsic_min_str_);
+  VesTools::convertDbl2Str(interval_intrinsic_max_,interval_intrinsic_max_str_);
+  plumed_massert(interval_intrinsic_min_<interval_intrinsic_max_,"intrinsic intervals are not defined correctly");
+}
+
+
+void BasisFunctions::setIntrinsicInterval(const std::string interval_intrinsic_min_str_in, const std::string interval_intrinsic_max_str_in) {
+  interval_intrinsic_min_str_ = interval_intrinsic_min_str_in;
+  interval_intrinsic_max_str_ = interval_intrinsic_max_str_in;
+  Tools::convert(interval_intrinsic_min_str_,interval_intrinsic_min_);
+  Tools::convert(interval_intrinsic_max_str_,interval_intrinsic_max_);
+  plumed_massert(interval_intrinsic_min_<interval_intrinsic_max_,"intrinsic intervals are not defined correctly");
+}
+
 
 
 void BasisFunctions::setNumberOfBasisFunctions(const unsigned int nbasis_in) {
@@ -146,9 +172,11 @@ void BasisFunctions::printInfo() const {
   //
   if(print_debug_info_){
     log.printf("  Debug information:\n");
-    log.printf("   Default interval of basis set: [%f,%f]\n",interval_intrinsic_min_,interval_intrinsic_max_);
+    // log.printf("   Default interval of basis set: [%f,%f]\n",interval_intrinsic_min_,interval_intrinsic_max_);
+    log.printf("   Default interval of basis set: [%s,%s]\n",interval_intrinsic_min_str_.c_str(),interval_intrinsic_max_str_.c_str());
     log.printf("   Default interval of basis set: range=%f,  mean=%f\n",interval_intrinsic_range_,interval_intrinsic_mean_);
-    log.printf("   Defined interval of basis set: [%f,%f]\n",interval_min_,interval_max_);
+    // log.printf("   Defined interval of basis set: [%f,%f]\n",interval_min_,interval_max_);
+    log.printf("   Defined interval of basis set: [%s,%s]\n",interval_min_str_.c_str(),interval_max_str_.c_str());
     log.printf("   Defined interval of basis set: range=%f,  mean=%f\n",interval_range_,interval_mean_);
     log.printf("   Derivative factor due to interval translation: %f\n",argT_derivf_);
     log.printf("   Integral of basis functions over the interval:\n");
@@ -263,34 +291,6 @@ std::string BasisFunctions::getKeywordString() const {
   std::string str_keywords=bf_keywords_[0];
   for(unsigned int i=1; i<bf_keywords_.size();i++){str_keywords+=" "+bf_keywords_[i];}
   return str_keywords;
-}
-
-
-std::string BasisFunctions::intervalMinStr() const {
-  std::string str;
-  Tools::convert(interval_min_,str);
-  return str;
-}
-
-
-std::string BasisFunctions::intervalMaxStr() const {
-  std::string str;
-  Tools::convert(interval_max_,str);
-  return str;
-}
-
-
-std::string BasisFunctions::intervalRangeStr() const {
-  std::string str;
-  Tools::convert(interval_range_,str);
-  return str;
-}
-
-
-std::string BasisFunctions::intervalMeanStr() const {
-  std::string str;
-  Tools::convert(interval_mean_,str);
-  return str;
 }
 
 

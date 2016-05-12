@@ -71,11 +71,15 @@ private:
   // if the basis functions are defined on a bounded interval or not
   bool interval_bounded_;
   // the intrinsic interval of the basis functions
+  std::string interval_intrinsic_min_str_;
+  std::string interval_intrinsic_max_str_;
   double interval_intrinsic_min_;
   double interval_intrinsic_max_;
   double interval_intrinsic_range_;
   double interval_intrinsic_mean_;
   // the defined (translated) interval of the basis functions
+  std::string interval_min_str_;
+  std::string interval_max_str_;
   double interval_min_;
   double interval_max_;
   double interval_range_;
@@ -112,6 +116,7 @@ protected:
   //
   void setNumberOfBasisFunctions(const unsigned int);
   void setIntrinsicInterval(const double, const double);
+  void setIntrinsicInterval(const std::string, const std::string);
   //
   void setUniformIntegral(const unsigned int, const double);
   void setUniformIntegrals(const std::vector<double>&);
@@ -138,10 +143,8 @@ public:
   double intervalRange() const;
   double intervalMean() const;
   double intervalDerivf() const;
-  std::string intervalMinStr() const;
-  std::string intervalMaxStr() const;
-  std::string intervalRangeStr() const;
-  std::string intervalMeanStr() const;
+  std::string intervalMinStr() const {return interval_min_str_;}
+  std::string intervalMaxStr() const {return interval_max_str_;}
   std::vector<double> getUniformIntegrals() const;
   std::vector<double> getTargetDistributionIntegrals(TargetDistribution*) const;
   std::vector<double> getTargetDistributionIntegrals(const std::string&) const;
@@ -299,13 +302,6 @@ void BasisFunctions::setLabel(const unsigned int index, const std::string& label
 inline
 void BasisFunctions::setLabels(const std::vector<std::string>& bf_labels_in) {
   bf_labels_ = bf_labels_in;
-}
-
-
-inline
-void BasisFunctions::setIntrinsicInterval(const double interval_intrinsic_min_in, const double interval_intrinsic_max_in) {
-  interval_intrinsic_min_ = interval_intrinsic_min_in;
-  interval_intrinsic_max_ = interval_intrinsic_max_in;
 }
 
 
