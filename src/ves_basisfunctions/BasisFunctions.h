@@ -173,7 +173,7 @@ public:
   void printInfo() const;
   //
   void getMultipleValue(const std::vector<double>&, std::vector<double>&, std::vector<std::vector<double> >&, std::vector<std::vector<double> >&) const;
-  void writeBasisFunctionsToFile(OFile&, OFile&, unsigned int nbins=1000) const;
+  void writeBasisFunctionsToFile(OFile&, OFile&, unsigned int nbins=1000, const bool ignore_periodicity=false) const;
 };
 
 

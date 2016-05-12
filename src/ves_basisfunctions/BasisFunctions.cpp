@@ -24,6 +24,7 @@
 #include "ves_targetdistributions/TargetDistributionRegister.h"
 #include "ves_biases/VesBias.h"
 #include "ves_tools/VesTools.h"
+#include "tools/Grid.h"
 
 
 namespace PLMD{
@@ -310,12 +311,20 @@ void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vect
 }
 
 
-void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins) const {
-  double h=(intervalMax()-intervalMin())/(nbins-1);
-  std::vector<double> args(nbins,0.0);
-  //
+void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins_in, const bool ignore_periodicity) const {
+
+  std::vector<std::string> min(1); min[0]=intervalMinStr();
+  std::vector<std::string> max(1); max[0]=intervalMaxStr();  
+  std::vector<unsigned int> nbins(1); nbins[0]=nbins_in;
+  std::vector<Value*> value_pntr(1);
+  value_pntr[0]= new Value(NULL,"arg",false);
+  if(arePeriodic() && !ignore_periodicity){value_pntr[0]->setDomain(intervalMinStr(),intervalMaxStr());}
+  else {value_pntr[0]->setNotPeriodic();}
+  Grid args_grid = Grid("grid",value_pntr,min,max,nbins,false,false);
+
+  std::vector<double> args(args_grid.getSize(),0.0);
   for(unsigned int i=0; i<args.size(); i++){
-    args[i] = intervalMin()+i*h;
+    args[i] = args_grid.getPoint(i)[0];
   }
   std::vector<double> argsT;
   std::vector<std::vector<double> > values;
@@ -330,8 +339,8 @@ void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile
   ofile_derivs.addConstantField("min").printField("min",intervalMinStr());
   ofile_derivs.addConstantField("max").printField("max",intervalMaxStr());
 
-  ofile_values.addConstantField("nbins").printField("nbins",static_cast<int>(nbins));
-  ofile_derivs.addConstantField("nbins").printField("nbins",static_cast<int>(nbins));
+  ofile_values.addConstantField("nbins").printField("nbins",static_cast<int>(args_grid.getNbin()[0]));
+  ofile_derivs.addConstantField("nbins").printField("nbins",static_cast<int>(args_grid.getNbin()[0]));
 
   if(arePeriodic()){
     ofile_values.addConstantField("periodic").printField("periodic","true");
