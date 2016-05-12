@@ -129,32 +129,32 @@ protected:
 public:
   static void registerKeywords(Keywords&);
   explicit BasisFunctions(const ActionOptions&ao);
-  bool hasBeenSet() const;
-  std::string getType() const;
-  std::string getDescription() const;
-  unsigned int getOrder() const;
-  unsigned int getNumberOfBasisFunctions() const;
-  unsigned int numberOfBasisFunctions() const;
-  unsigned int getSize() const;
-  bool arePeriodic() const;
-  bool intervalBounded() const;
-  double intervalMin() const;
-  double intervalMax() const;
-  double intervalRange() const;
-  double intervalMean() const;
-  double intervalDerivf() const;
+  bool hasBeenSet() const {return has_been_set;}
+  std::string getType() const {return type_;}
+  std::string getDescription() const {return description_;}
+  unsigned int getOrder() const {return norder_;}
+  unsigned int getNumberOfBasisFunctions() const {return nbasis_;}
+  unsigned int numberOfBasisFunctions() const {return nbasis_;}
+  unsigned int getSize() const {return nbasis_;}
+  bool arePeriodic() const {return periodic_;}
+  bool intervalBounded() const {return interval_bounded_;}
+  double intervalMin() const {return interval_min_;}
+  double intervalMax() const {return interval_max_;}
+  double intervalRange() const {return interval_range_;}
+  double intervalMean() const {return interval_mean_;}
+  double intervalDerivf() const {return argT_derivf_;}
   std::string intervalMinStr() const {return interval_min_str_;}
   std::string intervalMaxStr() const {return interval_max_str_;}
-  std::vector<double> getUniformIntegrals() const;
+  std::vector<double> getUniformIntegrals() const {return uniform_integrals_;}
   std::vector<double> getTargetDistributionIntegrals(TargetDistribution*) const;
   std::vector<double> getTargetDistributionIntegrals(const std::string&) const;
   unsigned getNumberOfDerivatives(){return 0;}
   //
-  std::vector<std::string> getKeywordList() const;
+  std::vector<std::string> getKeywordList() const {return bf_keywords_;}
   std::string getKeywordString() const;
   //
-  std::string getBasisFunctionLabel(const unsigned int) const;
-  std::vector<std::string> getBasisFunctionLabels() const;
+  std::string getBasisFunctionLabel(const unsigned int index) const {return bf_labels_[index];}
+  std::vector<std::string> getBasisFunctionLabels() const {return bf_labels_;}
   //
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
@@ -192,81 +192,9 @@ Action* BasisFunctions::getPntrToAction() const {
 
 
 inline
-bool BasisFunctions::hasBeenSet() const {return has_been_set;}
-
-
-inline
-std::string BasisFunctions::getType() const {return type_;}
-
-
-inline
-std::string BasisFunctions::getDescription() const {return description_;}
-
-
-inline
-unsigned int BasisFunctions::getOrder() const {return norder_;}
-
-
-inline
-unsigned int BasisFunctions::getNumberOfBasisFunctions() const  {return nbasis_;}
-
-
-inline
-unsigned int BasisFunctions::numberOfBasisFunctions() const  {return nbasis_;}
-
-
-inline
-unsigned int BasisFunctions::getSize() const {return nbasis_;}
-
-
-inline
-bool BasisFunctions::arePeriodic() const {return periodic_;}
-
-
-inline
-bool BasisFunctions::intervalBounded() const {return interval_bounded_;}
-
-
-inline
-double BasisFunctions::intervalMin() const {return interval_min_;}
-
-
-inline
-double BasisFunctions::intervalMax() const {return interval_max_;}
-
-
-inline
-double BasisFunctions::intervalRange() const {return interval_range_;}
-
-
-inline
-double BasisFunctions::intervalMean() const {return interval_mean_;}
-
-
-inline
-double BasisFunctions::intervalDerivf() const {return argT_derivf_;}
-
-
-inline
-std::vector<double> BasisFunctions::getUniformIntegrals() const {return uniform_integrals_;}
-
-
-inline
 std::vector<double> BasisFunctions::getTargetDistributionIntegrals(TargetDistribution* targetdist_in) const {
   return numericalTargetDistributionIntegrals(targetdist_in);
 }
-
-
-inline
-std::vector<std::string> BasisFunctions::getKeywordList() const {return bf_keywords_;}
-
-
-inline
-std::string BasisFunctions::getBasisFunctionLabel(const unsigned int index) const {return bf_labels_[index];}
-
-
-inline
-std::vector<std::string> BasisFunctions::getBasisFunctionLabels() const {return bf_labels_;}
 
 
 inline
