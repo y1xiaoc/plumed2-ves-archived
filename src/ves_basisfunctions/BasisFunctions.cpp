@@ -166,7 +166,8 @@ void BasisFunctions::printInfo() const {
   if(periodic_){log.printf("   The basis functions are periodic\n");}
   log.printf("   Order of basis set: %u\n",norder_);
   log.printf("   Number of basis functions: %u\n",nbasis_);
-  log.printf("   Interval of basis set: %f to %f\n",interval_min_,interval_max_);
+  // log.printf("   Interval of basis set: %f to %f\n",interval_min_,interval_max_);
+  log.printf("   Interval of basis set: %s to %s\n",interval_min_str_.c_str(),interval_max_str_.c_str());
   log.printf("   Description of basis functions:\n");
   for(unsigned int i=0; i < nbasis_;i++){log.printf("    %2u       %10s\n",i,bf_labels_[i].c_str());}
   //
