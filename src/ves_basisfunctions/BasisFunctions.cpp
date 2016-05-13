@@ -82,8 +82,13 @@ action_pntr_(NULL)
   parse("INTERVAL_MAX",str_imax); addKeywordToList("INTERVAL_MAX",str_imax);
   interval_min_str_ = str_imin;
   interval_max_str_ = str_imax;
-  Tools::convert(str_imin,interval_min_); Tools::convert(str_imax,interval_max_);
-  if(interval_min_>interval_max_){plumed_merror("INTERVAL_MIN and INTERVAL_MIX are not correctly defined");}
+  if(!Tools::convert(str_imin,interval_min_)){
+    plumed_merror("cannot convert the value given in INTERVAL_MIN to a double");
+  }
+  if(!Tools::convert(str_imax,interval_max_)){
+    plumed_merror("cannot convert the value given in INTERVAL_MAX to a double");
+  }
+  if(interval_min_>interval_max_){plumed_merror("INTERVAL_MIN and INTERVAL_MAX are not correctly defined");}
   //
   parseFlag("DEBUG_INFO",print_debug_info_);
   parseFlag("NUMERICAL_INTEGRALS",numerical_uniform_integrals_);
@@ -105,8 +110,12 @@ void BasisFunctions::setIntrinsicInterval(const double interval_intrinsic_min_in
 void BasisFunctions::setIntrinsicInterval(const std::string interval_intrinsic_min_str_in, const std::string interval_intrinsic_max_str_in) {
   interval_intrinsic_min_str_ = interval_intrinsic_min_str_in;
   interval_intrinsic_max_str_ = interval_intrinsic_max_str_in;
-  Tools::convert(interval_intrinsic_min_str_,interval_intrinsic_min_);
-  Tools::convert(interval_intrinsic_max_str_,interval_intrinsic_max_);
+  if(!Tools::convert(interval_intrinsic_min_str_,interval_intrinsic_min_)){
+    plumed_merror("setIntrinsicInterval: cannot convert value given for the minimum of the intrinsic interval to a double");
+  }
+  if(!Tools::convert(interval_intrinsic_max_str_,interval_intrinsic_max_)){
+    plumed_merror("setIntrinsicInterval: cannot convert value given for the maximum of the intrinsic interval to a double");
+  }
   plumed_massert(interval_intrinsic_min_<interval_intrinsic_max_,"intrinsic intervals are not defined correctly");
 }
 
@@ -314,7 +323,7 @@ void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vect
 void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins_in, const bool ignore_periodicity) const {
 
   std::vector<std::string> min(1); min[0]=intervalMinStr();
-  std::vector<std::string> max(1); max[0]=intervalMaxStr();  
+  std::vector<std::string> max(1); max[0]=intervalMaxStr();
   std::vector<unsigned int> nbins(1); nbins[0]=nbins_in;
   std::vector<Value*> value_pntr(1);
   value_pntr[0]= new Value(NULL,"arg",false);
