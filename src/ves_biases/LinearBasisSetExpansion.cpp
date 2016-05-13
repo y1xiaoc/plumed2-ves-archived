@@ -221,7 +221,7 @@ void LinearBasisSetExpansion::updateBiasGrid() {
   if(getStepOfLastBiasGridUpdate() == action_pntr_->getStep()){
     return;
   }
-  for(unsigned int l=0; l<bias_grid_pntr_->getSize(); l++){
+  for(Grid::index_t l=0; l<bias_grid_pntr_->getSize(); l++){
     std::vector<double> forces(nargs_);
     std::vector<double> coeffsderivs_values(ncoeffs_);
     std::vector<double> args = bias_grid_pntr_->getPoint(l);
@@ -251,7 +251,7 @@ void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
   plumed_massert(biasCutoffActive(),"the bias cutoff has to be active");
   plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
   //
-  for(unsigned int l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
+  for(Grid::index_t l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
     std::vector<double> forces(nargs_);
     std::vector<double> coeffsderivs_values(ncoeffs_);
     std::vector<double> args = bias_withoutcutoff_grid_pntr_->getPoint(l);
@@ -283,7 +283,7 @@ void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
   if(bias_shifted){
     // this should be done inside a grid function really,
     // need to define my grid class for that
-    for(unsigned int l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
+    for(Grid::index_t l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
       double value = bias_withoutcutoff_grid_pntr_->getValue(l) + shift;
       bias_withoutcutoff_grid_pntr_->setValue(l,value);
     }
@@ -300,7 +300,7 @@ void LinearBasisSetExpansion::updateFesGrid() {
   }
   //
   double fes_scalingf = getBiasToFesScalingFactor();
-  for(unsigned int l=0; l<fes_grid_pntr_->getSize(); l++){
+  for(Grid::index_t l=0; l<fes_grid_pntr_->getSize(); l++){
     double fes_value = fes_scalingf*bias_grid_pntr_->getValue(l);
     if(log_ps_fes_contribution_){
       fes_value += log_ps_grid_pntr_->getValue(l);
@@ -661,9 +661,9 @@ void LinearBasisSetExpansion::setWellTemperedBiasFactor(const double biasf) {
 
 void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
   double norm = 0.0;
-  size_t stride=mycomm_.Get_size();
-  size_t rank=mycomm_.Get_rank();
-  for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
+  Grid::index_t stride=mycomm_.Get_size();
+  Grid::index_t rank=mycomm_.Get_rank();
+  for(Grid::index_t l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
     std::vector<double> args = dynamic_ps_grid_pntr_->getPoint(l);
     double value = -welltemp_beta_prime_ * getFES_WellTempered(args,false);
     value = exp(value);
@@ -693,9 +693,9 @@ void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* ps
   std::vector<double> targetdist_averages(ncoeffs_,0.0);
   double sum_grid = 0.0;
   double binVol = ps_grid_pntr->getBinVolume();
-  size_t stride=mycomm_.Get_size();
-  size_t rank=mycomm_.Get_rank();
-  for(unsigned int l=rank; l<ps_grid_pntr->getSize(); l+=stride){
+  Grid::index_t stride=mycomm_.Get_size();
+  Grid::index_t rank=mycomm_.Get_rank();
+  for(Grid::index_t l=rank; l<ps_grid_pntr->getSize(); l+=stride){
     std::vector<double> args_values = ps_grid_pntr->getPoint(l);
     std::vector<double> basisset_values(ncoeffs_);
     getBasisSetValues(args_values,basisset_values,false);
@@ -723,9 +723,9 @@ void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
   plumed_massert(bias_withoutcutoff_grid_pntr_!=NULL,"the bias grid has to be defined");
   plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the p(s) grid has to be defined");
   double norm = 0.0;
-  size_t stride=mycomm_.Get_size();
-  size_t rank=mycomm_.Get_rank();
-  for(unsigned int l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
+  Grid::index_t stride=mycomm_.Get_size();
+  Grid::index_t rank=mycomm_.Get_rank();
+  for(Grid::index_t l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
     double bias = bias_withoutcutoff_grid_pntr_->getValue(l);
     double deriv_factor_sf = 0.0;
     // this comes from the p(s)
