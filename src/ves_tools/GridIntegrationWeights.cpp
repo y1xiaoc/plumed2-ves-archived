@@ -23,101 +23,41 @@
 #include "GridIntegrationWeights.h"
 #include "tools/Grid.h"
 #include "tools/File.h"
+#include "tools/Exception.h"
 
 
 namespace PLMD{
 
-
-std::vector<double> GridIntegrationWeights::getTrapezoidalIntegrationWeights(Grid* grid_pntr, const std::string& fname_weights_grid) {
-  Grid::index_t grid_size = grid_pntr->getSize();
-  unsigned int ndim = grid_pntr->getDimension();
-  double binVol = grid_pntr->getBinVolume();
+std::vector<double> GridIntegrationWeights::getIntegrationWeights(Grid* grid_pntr, const std::string& fname_weights_grid, const std::string& weights_type) {
+  std::vector<double> dx = grid_pntr->getDx();
   std::vector<bool> isPeriodic = grid_pntr->getIsPeriodic();
   std::vector<unsigned int> nbins = grid_pntr->getNbin();
-
-  std::vector<double> trapz_weights(grid_size,0.0);
-  if(ndim==1){
-    for(unsigned int i=1; i<(nbins[0]-1); i++){
-      trapz_weights[i] = binVol;
-    }
-    if(!isPeriodic[0]){
-      trapz_weights[0]= 0.5*binVol;
-      trapz_weights[(nbins[0]-1)]= 0.5*binVol;
+  std::vector<std::vector<double> > weights_perdim;
+  for(unsigned int k=0; k<grid_pntr->getDimension(); k++){
+    std::vector<double> weights_tmp;
+    if(weights_type=="trapezoidal"){
+      weights_tmp = getOneDimensionalTrapezoidalWeights(nbins[k],dx[k],isPeriodic[k]);
     }
     else {
-      // as for periodic arguments the first point should be counted twice as the
-      // grid doesn't include its periodic copy
-      trapz_weights[0]= binVol;
-      trapz_weights[(nbins[0]-1)]= binVol;
+      plumed_merror("getIntegrationWeights: unknown weight type, the available type is trapezoidal");
     }
+    weights_perdim.push_back(weights_tmp);
   }
-  else if(ndim==2){
-    // interior: 4*(binVol/4) = 1.0*binVol
-    for(unsigned int i=1; i<(nbins[0]-1); i++){
-      for(unsigned int j=1; j<(nbins[1]-1); j++){
-        std::vector<unsigned int> ind(2);
-        ind[0]=i; ind[1]=j;
-        trapz_weights[grid_pntr->getIndex(ind)] = binVol;
-      }
+
+  std::vector<double> weights_vector(grid_pntr->getSize(),0.0);
+  for(Grid::index_t l=0; l<grid_pntr->getSize(); l++){
+    std::vector<unsigned int> ind = grid_pntr->getIndices(l);
+    double value = 1.0;
+    for(unsigned int k=0; k<grid_pntr->getDimension(); k++){
+      value *= weights_perdim[k][ind[k]];
     }
-    // edges: 2*(binVol/4) = 0.5*binVol
-    // dimension 1 - x
-    for(unsigned int i=1; i<(nbins[0]-1); i++){
-      std::vector<unsigned int> ind(2);
-      ind[0]=i; ind[1]=0;
-      trapz_weights[grid_pntr->getIndex(ind)] = 0.5*binVol;
-      ind[0]=i; ind[1]=(nbins[1]-1);
-      trapz_weights[grid_pntr->getIndex(ind)] = 0.5*binVol;
-    }
-    // dimension 1 - y
-    for(unsigned int j=1; j<(nbins[1]-1); j++){
-      std::vector<unsigned int> ind(2);
-      ind[0]=0; ind[1]=j;
-      trapz_weights[grid_pntr->getIndex(ind)] = 0.5*binVol;
-      ind[0]=(nbins[0]-1); ind[1]=j;
-      trapz_weights[grid_pntr->getIndex(ind)] = 0.5*binVol;
-    }
-    // corners: 1*(binVol/4) = 0.25*binVol
-    std::vector<unsigned int> ind(2);
-    ind[0]=0; ind[1]=0;
-    trapz_weights[grid_pntr->getIndex(ind)] = 0.25*binVol;
-    ind[0]=0; ind[1]=(nbins[1]-1);
-    trapz_weights[grid_pntr->getIndex(ind)] = 0.25*binVol;
-    ind[0]=(nbins[0]-1); ind[1]=0;
-    trapz_weights[grid_pntr->getIndex(ind)] = 0.25*binVol;
-    ind[0]=(nbins[0]-1); ind[1]=(nbins[1]-1);
-    trapz_weights[grid_pntr->getIndex(ind)] = 0.25*binVol;
-    // special case for periodic arguments
-    if(isPeriodic[0] && !isPeriodic[1]){
-      for(unsigned int j=0; j<nbins[1]; j++){
-        std::vector<unsigned int> ind(2);
-        ind[0]=0; ind[1]=j;
-        trapz_weights[grid_pntr->getIndex(ind)] *= 2.0;
-        ind[0]=(nbins[0]-1); ind[1]=j;
-        trapz_weights[grid_pntr->getIndex(ind)] *= 2.0;
-      }
-    }
-    else if(!isPeriodic[0] && isPeriodic[1]){
-      for(unsigned int i=0; i<nbins[0]; i++){
-        std::vector<unsigned int> ind(2);
-        ind[0]=i; ind[1]=0;
-        trapz_weights[grid_pntr->getIndex(ind)] *= 2.0;
-        ind[0]=i; ind[1]=(nbins[1]-1);
-        trapz_weights[grid_pntr->getIndex(ind)] *= 2.0;
-      }
-    }
-    else if(isPeriodic[0] && isPeriodic[1]){
-      trapz_weights.assign(grid_size,binVol);
-    }
-  }
-  else {
-    trapz_weights.assign(grid_size,binVol);
+    weights_vector[l] = value;
   }
 
   if(fname_weights_grid.size()>0){
     Grid weights_grid = Grid(*grid_pntr);
     for(Grid::index_t l=0; l<weights_grid.getSize(); l++){
-      weights_grid.setValue(l,trapz_weights[l]);
+      weights_grid.setValue(l,weights_vector[l]);
     }
     OFile ofile;
     ofile.enforceBackup();
@@ -126,8 +66,33 @@ std::vector<double> GridIntegrationWeights::getTrapezoidalIntegrationWeights(Gri
     ofile.close();
   }
   //
-
-  return trapz_weights;
+  return weights_vector;
 }
+
+
+std::vector<double> GridIntegrationWeights::getOneDimensionalTrapezoidalWeights(const unsigned int nbins, const double dx, const bool periodic) {
+  std::vector<double> weights_1d(nbins);
+  for(unsigned int i=1; i<(nbins-1); i++){
+    weights_1d[i] = dx;
+  }
+  if(!periodic){
+    weights_1d[0]= 0.5*dx;
+    weights_1d[(nbins-1)]= 0.5*dx;
+  }
+  else {
+    // as for periodic arguments the first point should be counted twice as the
+    // grid doesn't include its periodic copy
+    weights_1d[0]= dx;
+    weights_1d[(nbins-1)]= dx;
+  }
+  return weights_1d;
+}
+
+
+
+
+
+
+
 
 }
