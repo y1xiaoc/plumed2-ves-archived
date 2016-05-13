@@ -21,12 +21,14 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
+#include "ves_tools/GridIntegrationWeights.h"
 
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
 #include "core/PlumedMain.h"
 #include "tools/File.h"
 #include "tools/Grid.h"
+
 
 
 
@@ -111,12 +113,16 @@ Action(ao)
   Grid ps_grid = Grid("targetdist",arguments,grid_min,grid_max,grid_bins,false,false);
   targetdist_pntr->calculateDistributionOnGrid(&ps_grid);
 
+  std::vector<double> integration_weights = GridIntegrationWeights::getTrapezoidalIntegrationWeights(&ps_grid,"weights_grid.data");
   double sum_grid=0.0;
+  double sum_grid2=0.0;
   for(unsigned int i=0; i<ps_grid.getSize(); i++){
-    sum_grid += ps_grid.getValue(i);
+    sum_grid  += ps_grid.getValue(i);
+    sum_grid2 += integration_weights[i]*ps_grid.getValue(i);
   }
   sum_grid *= ps_grid.getBinVolume();
-  log.printf("  target distribtion summed over the grid: %f\n",sum_grid);
+  log.printf("  target distribtion summed over the grid: %16.12f (normal sum)\n",sum_grid);
+  log.printf("  target distribtion summed over the grid: %16.12f (with weights)\n",sum_grid2);
   //
   OFile ofile;
   ofile.link(*this);
