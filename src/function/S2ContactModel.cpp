@@ -29,7 +29,7 @@ using namespace std;
 namespace PLMD{
 namespace function{
 
-//+PLUMEDOC FUNCTION S2_METHYL_CONTACT_MODEL
+//+PLUMEDOC FUNCTION S2_CONTACT_MODEL
 /*
 
 
@@ -39,7 +39,7 @@ namespace function{
 //+ENDPLUMEDOC
 
 
-class S2MethylContactModel :
+class S2ContactModel :
   public Function
 {
   double r_eff_;
@@ -50,15 +50,15 @@ class S2MethylContactModel :
   double n_i_;
   double total_prefactor_;
 public:
-  explicit S2MethylContactModel(const ActionOptions&);
+  explicit S2ContactModel(const ActionOptions&);
   void calculate();
   static void registerKeywords(Keywords& keys);
 };
 
 
-PLUMED_REGISTER_ACTION(S2MethylContactModel,"S2_METHYL_CONTACT_MODEL")
+PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODE")
 
-void S2MethylContactModel::registerKeywords(Keywords& keys){
+void S2ContactModel::registerKeywords(Keywords& keys){
   Function::registerKeywords(keys);
   keys.use("ARG");
   keys.add("compulsory","R_EFF","the effective distance, r_eff in the equation, given in nm.");
@@ -68,7 +68,7 @@ void S2MethylContactModel::registerKeywords(Keywords& keys){
   keys.add("compulsory","N_I"," n_i in the equation");
 }
 
-S2MethylContactModel::S2MethylContactModel(const ActionOptions&ao):
+S2ContactModel::S2ContactModel(const ActionOptions&ao):
 Action(ao),
 Function(ao),
 r_eff_(0.0),
@@ -95,7 +95,7 @@ total_prefactor_(0.0)
 
 }
 
-void S2MethylContactModel::calculate(){
+void S2ContactModel::calculate(){
 
   double contact_sum = 0.0;
   std::vector<double> exp_arg(getNumberOfArguments());
