@@ -28,7 +28,7 @@
 
 namespace PLMD{
 
-std::vector<double> GridIntegrationWeights::getIntegrationWeights(Grid* grid_pntr, const std::string& fname_weights_grid, const std::string& weights_type) {
+std::vector<double> GridIntegrationWeights::getIntegrationWeights(const Grid* grid_pntr, const std::string& fname_weights_grid, const std::string& weights_type) {
   std::vector<double> dx = grid_pntr->getDx();
   std::vector<bool> isPeriodic = grid_pntr->getIsPeriodic();
   std::vector<unsigned int> nbins = grid_pntr->getNbin();
