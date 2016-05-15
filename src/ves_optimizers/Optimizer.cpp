@@ -205,8 +205,8 @@ isFirstStep(true)
     mwalkers_mpi_single_files_ = !mw_separate_files;
   }
 
-  int numwalkers;
-  int walker_rank;
+  int numwalkers=1;
+  int walker_rank=0;
   if(comm.Get_rank()==0){
     numwalkers = multi_sim_comm.Get_size();
     walker_rank = multi_sim_comm.Get_rank();

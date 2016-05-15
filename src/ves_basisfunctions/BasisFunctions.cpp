@@ -107,7 +107,7 @@ void BasisFunctions::setIntrinsicInterval(const double interval_intrinsic_min_in
 }
 
 
-void BasisFunctions::setIntrinsicInterval(const std::string interval_intrinsic_min_str_in, const std::string interval_intrinsic_max_str_in) {
+void BasisFunctions::setIntrinsicInterval(const std::string& interval_intrinsic_min_str_in, const std::string& interval_intrinsic_max_str_in) {
   interval_intrinsic_min_str_ = interval_intrinsic_min_str_in;
   interval_intrinsic_max_str_ = interval_intrinsic_max_str_in;
   if(!Tools::convert(interval_intrinsic_min_str_,interval_intrinsic_min_)){
