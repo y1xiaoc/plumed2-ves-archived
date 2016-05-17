@@ -23,6 +23,7 @@
 #include "VesBias.h"
 #include "ves_tools/CoeffsVector.h"
 #include "ves_tools/VesTools.h"
+#include "ves_tools/GridIntegrationWeights.h"
 #include "ves_basisfunctions/BasisFunctions.h"
 #include "ves_targetdistributions/TargetDistribution.h"
 #include "ves_targetdistributions/TargetDistributionRegister.h"
@@ -660,18 +661,19 @@ void LinearBasisSetExpansion::setWellTemperedBiasFactor(const double biasf) {
 
 
 void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
-  double norm = 0.0;
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(dynamic_ps_grid_pntr_);
   Grid::index_t stride=mycomm_.Get_size();
   Grid::index_t rank=mycomm_.Get_rank();
+  double norm = 0.0;
   for(Grid::index_t l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
     std::vector<double> args = dynamic_ps_grid_pntr_->getPoint(l);
     double value = -welltemp_beta_prime_ * getFES_WellTempered(args,false);
     value = exp(value);
-    norm += value;
+    norm += integration_weights[l]*value;
     dynamic_ps_grid_pntr_->setValue(l,value);
   }
   mycomm_.Sum(norm);
-  norm = 1.0/(dynamic_ps_grid_pntr_->getBinVolume()*norm);
+  norm = 1.0/norm;
   dynamic_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
   dynamic_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
 }
@@ -691,15 +693,15 @@ void LinearBasisSetExpansion::updateWellTemperedTargetDistribution() {
 void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* ps_grid_pntr, const bool normalize_dist) {
   plumed_assert(ps_grid_pntr!=NULL);
   std::vector<double> targetdist_averages(ncoeffs_,0.0);
-  double sum_grid = 0.0;
-  double binVol = ps_grid_pntr->getBinVolume();
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(ps_grid_pntr);
   Grid::index_t stride=mycomm_.Get_size();
   Grid::index_t rank=mycomm_.Get_rank();
+  double sum_grid = 0.0;
   for(Grid::index_t l=rank; l<ps_grid_pntr->getSize(); l+=stride){
     std::vector<double> args_values = ps_grid_pntr->getPoint(l);
     std::vector<double> basisset_values(ncoeffs_);
     getBasisSetValues(args_values,basisset_values,false);
-    double weight = ps_grid_pntr->getValue(l)*binVol;
+    double weight = integration_weights[l]*ps_grid_pntr->getValue(l);
     sum_grid += weight;
     for(unsigned int i=0; i<ncoeffs_; i++){
       targetdist_averages[i] += weight*basisset_values[i];
@@ -722,21 +724,22 @@ void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
   plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
   plumed_massert(bias_withoutcutoff_grid_pntr_!=NULL,"the bias grid has to be defined");
   plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the p(s) grid has to be defined");
-  double norm = 0.0;
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(dynamic_ps_grid_pntr_);
   Grid::index_t stride=mycomm_.Get_size();
   Grid::index_t rank=mycomm_.Get_rank();
+  double norm = 0.0;
   for(Grid::index_t l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
     double bias = bias_withoutcutoff_grid_pntr_->getValue(l);
     double deriv_factor_sf = 0.0;
     // this comes from the p(s)
     double value = vesbias_pntr_->getBiasCutoffSwitchingFunction(bias,deriv_factor_sf);
-    norm += value;
+    norm += integration_weights[l]*value;
     // this comes from the derivative of V(s)
     value *= deriv_factor_sf;
     dynamic_ps_grid_pntr_->setValue(l,value);
   }
   mycomm_.Sum(norm);
-  norm = 1.0/(dynamic_ps_grid_pntr_->getBinVolume()*norm);
+  norm = 1.0/norm;
   dynamic_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
   dynamic_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
 }
