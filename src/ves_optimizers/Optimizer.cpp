@@ -296,6 +296,10 @@ isFirstStep(true)
     parseFilenames("INITIAL_COEFFS",initial_coeffs_fnames);
     if(initial_coeffs_fnames.size()>0){
       readCoeffsFromFiles(initial_coeffs_fnames,false);
+      comm.Barrier();
+      if(comm.Get_rank()==0 && use_mwalkers_mpi_){
+        multi_sim_comm.Barrier();
+      }
       setAllCoeffsSetIterationCounters();
     }
   }
@@ -323,6 +327,10 @@ isFirstStep(true)
         }
       }
       readCoeffsFromFiles(coeffs_fnames,true);
+      comm.Barrier();
+      if(comm.Get_rank()==0 && use_mwalkers_mpi_){
+        multi_sim_comm.Barrier();
+      }
       unsigned int iter_opt_tmp = coeffs_pntrs_[0]->getIterationCounter();
       for(unsigned int i=1; i<ncoeffssets_; i++){
         plumed_massert(coeffs_pntrs_[i]->getIterationCounter()==iter_opt_tmp,"the iteraton counter should be the same for all files when restarting from previous coefficient files\n");
