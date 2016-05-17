@@ -56,7 +56,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODE")
+PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODEL")
 
 void S2ContactModel::registerKeywords(Keywords& keys){
   Function::registerKeywords(keys);
