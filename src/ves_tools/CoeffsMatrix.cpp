@@ -371,10 +371,10 @@ CoeffsMatrix& CoeffsMatrix::operator=(const std::vector<double>& values) {
 }
 
 
-CoeffsMatrix& CoeffsMatrix::operator=(const CoeffsMatrix& other_coeffsmatrix) {
-  setValues(other_coeffsmatrix);
-  return *this;
-}
+// CoeffsMatrix& CoeffsMatrix::operator=(const CoeffsMatrix& other_coeffsmatrix) {
+//   setValues(other_coeffsmatrix);
+//   return *this;
+// }
 
 
 CoeffsMatrix CoeffsMatrix::operator+() const {

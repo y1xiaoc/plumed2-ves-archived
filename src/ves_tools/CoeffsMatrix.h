@@ -62,6 +62,7 @@ private:
   //
   void setupMatrix();
   //
+  CoeffsMatrix& operator=(const CoeffsMatrix&);
 public:
   explicit CoeffsMatrix(
     const std::string&,
@@ -147,7 +148,7 @@ public:
   void setValues(const CoeffsMatrix&);
   CoeffsMatrix& operator=(const double);
   CoeffsMatrix& operator=(const std::vector<double>&);
-  CoeffsMatrix& operator=(const CoeffsMatrix&);
+  // CoeffsMatrix& operator=(const CoeffsMatrix&);
   // add to all values
   CoeffsMatrix operator+() const;
   CoeffsMatrix operator-() const;
