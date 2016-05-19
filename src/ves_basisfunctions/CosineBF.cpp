@@ -35,7 +35,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(CosineBF,"BF_SINE")
+PLUMED_REGISTER_ACTION(CosineBF,"BF_COSINE")
 
 
 void CosineBF::registerKeywords(Keywords& keys){
