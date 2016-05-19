@@ -37,7 +37,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(CubicBsplineBF,"Cubic_Bsplines")
+PLUMED_REGISTER_ACTION(CubicBsplineBF,"BF_CUBIC_B_SPLINES")
 
 
 void CubicBsplineBF::registerKeywords(Keywords& keys){
@@ -47,6 +47,7 @@ void CubicBsplineBF::registerKeywords(Keywords& keys){
 CubicBsplineBF::CubicBsplineBF(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
+  plumed_merror("BF_CUBIC_B_SPLINES are not yet implented");
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval(intervalMin(),intervalMax());
   spacing_=(intervalMax()-intervalMin())/static_cast<double>(getOrder());
