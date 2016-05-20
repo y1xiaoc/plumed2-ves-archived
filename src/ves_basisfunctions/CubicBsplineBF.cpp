@@ -45,6 +45,7 @@ PLUMED_REGISTER_ACTION(CubicBsplineBF,"BF_CUBIC_B_SPLINES")
 
 void CubicBsplineBF::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
+  keys.add("optional","NORMALIZATION","the normalization factor that is used to normalize the basis functions by dividing the values. By default it is 2.");
 }
 
 CubicBsplineBF::CubicBsplineBF(const ActionOptions&ao):
@@ -56,6 +57,7 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   spacing_=(intervalMax()-intervalMin())/static_cast<double>(getOrder());
   inv_spacing_ = 1.0/spacing_;
   double normfactor_=2.0;
+  parse("NORMALIZATION",normfactor_);
   inv_normfactor_=1.0/normfactor_;
   setNonPeriodic();
   setIntervalBounded();
@@ -63,6 +65,7 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setDescription("Cubic B-splines (2nd order splines)");
   setLabelPrefix("S");
   setupBF();
+  log.printf("   normalization factor: %f\n",normfactor_);
 }
 
 
