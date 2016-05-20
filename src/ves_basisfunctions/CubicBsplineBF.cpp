@@ -29,6 +29,7 @@ namespace PLMD{
 class CubicBsplineBF : public BasisFunctions {
   double spacing_;
   double inv_spacing_;
+  double inv_normfactor_;
   double spline(const double, double&) const;
 public:
   static void registerKeywords( Keywords&);
@@ -53,6 +54,8 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setIntrinsicInterval(intervalMin(),intervalMax());
   spacing_=(intervalMax()-intervalMin())/static_cast<double>(getOrder());
   inv_spacing_ = 1.0/spacing_;
+  double normfactor_=2.0;
+  inv_normfactor_=1.0/normfactor_;
   setNonPeriodic();
   setIntervalBounded();
   setType("splines_2nd-order");
@@ -122,8 +125,8 @@ double CubicBsplineBF::spline(const double arg, double& deriv) const {
     // value=x*x*x*0.5-x*x+2.0/3.0;
     // deriv=(3.0/2.0)*x*x-2.0*x;
   }
-  deriv/=6.0;
-  value/=6.0;
+  value *= inv_normfactor_;
+  deriv *= inv_normfactor_;
   return value;
 }
 
