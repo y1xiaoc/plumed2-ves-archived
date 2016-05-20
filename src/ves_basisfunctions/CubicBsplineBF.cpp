@@ -99,7 +99,12 @@ void CubicBsplineBF::getAllValues(const double arg, double& argT, bool& inside_r
 double CubicBsplineBF::spline(const double arg, double& deriv) const {
   double value=0.0;
   double x=arg;
-  if(x < 0){x=-x;}
+  // derivative of abs(x);
+  double dx = 1.0;
+  if(x < 0){
+    x=-x;
+    dx = -1.0;
+  }
   //
   if(x > 2){
     value=0.0;
@@ -107,13 +112,13 @@ double CubicBsplineBF::spline(const double arg, double& deriv) const {
   }
   else if(x >= 1){
     value = ((2.0-x)*(2.0-x)*(2.0-x));
-    deriv = -3.0*(2.0-x)*(2.0-x);
+    deriv = dx*(-3.0*(2.0-x)*(2.0-x));
     // value=((2.0-x)*(2.0-x)*(2.0-x))/6.0;
     // deriv=-x*x*(2.0-x)*(2.0-x);
   }
   else{
     value = 4.0-6.0*x*x+3.0*x*x*x;
-    deriv = -12.0*x+9.0*x*x;
+    deriv = dx*(-12.0*x+9.0*x*x);
     // value=x*x*x*0.5-x*x+2.0/3.0;
     // deriv=(3.0/2.0)*x*x-2.0*x;
   }
