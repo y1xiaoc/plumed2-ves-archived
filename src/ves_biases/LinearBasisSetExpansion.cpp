@@ -395,7 +395,14 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args
     bias+=coeff*bf_curr;
     coeffsderivs_values[i] = bf_curr;
     for(unsigned int k=0;k<nargs;k++){
-      forces[k]-=coeff*bf_curr*(bf_derivs[k][indices[k]]/bf_values[k][indices[k]]);
+      double der = 1.0;
+      for(unsigned int l=0;l<nargs;l++){
+        if(l!=k){der*=bf_values[l][indices[l]];}
+        else{der*=bf_derivs[l][indices[l]];}
+      }
+      forces[k]-=coeff*der;
+      // maybe faster but dangerous
+      // forces[k]-=coeff*bf_curr*(bf_derivs[k][indices[k]]/bf_values[k][indices[k]]);
     }
   }
   //
