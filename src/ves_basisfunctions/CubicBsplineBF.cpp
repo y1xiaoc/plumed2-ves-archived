@@ -28,6 +28,7 @@ namespace PLMD{
 
 class CubicBsplineBF : public BasisFunctions {
   double spacing_;
+  double inv_spacing_;
   double spline(const double, double&) const;
 public:
   static void registerKeywords( Keywords&);
@@ -47,14 +48,15 @@ void CubicBsplineBF::registerKeywords(Keywords& keys){
 CubicBsplineBF::CubicBsplineBF(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
-  plumed_merror("BF_CUBIC_B_SPLINES are not yet implented");
-  setNumberOfBasisFunctions(getOrder()+1);
+  // plumed_merror("BF_CUBIC_B_SPLINES are not yet implented");
+  setNumberOfBasisFunctions((getOrder()+3)+1);
   setIntrinsicInterval(intervalMin(),intervalMax());
   spacing_=(intervalMax()-intervalMin())/static_cast<double>(getOrder());
+  inv_spacing_ = 1.0/spacing_;
   setNonPeriodic();
   setIntervalBounded();
   setType("splines_2nd-order");
-  setDescription("Cubic B-splines (2nd order splines");
+  setDescription("Cubic B-splines (2nd order splines)");
   setLabelPrefix("S");
   setupBF();
 }
@@ -69,8 +71,7 @@ double CubicBsplineBF::getValue(const double arg, const unsigned int n, double& 
     return 1.0;
   }
   else{
-    double no=n;
-    double argx = argT/spacing_-(no-1.0);
+    double argx = ((argT-intervalMin())/spacing_) - (static_cast<double>(n)-2.0);
     double tmp_dbl=0.0;
     return spline(argx, tmp_dbl);
   }
@@ -86,10 +87,10 @@ void CubicBsplineBF::getAllValues(const double arg, double& argT, bool& inside_r
   values[0]=1.0;
   derivs[0]=0.0;
   //
-  for(unsigned int i=1; i < getOrder();i++){
-    double io=i;
-    double argx = argT/spacing_-(io-1.0);
+  for(unsigned int i=1; i < getNumberOfBasisFunctions(); i++){
+    double argx = ((argT-intervalMin())/spacing_) - (static_cast<double>(i)-2.0);
     values[i]  = spline(argx, derivs[i]);
+    derivs[i]*=inv_spacing_;
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
 }
@@ -105,13 +106,19 @@ double CubicBsplineBF::spline(const double arg, double& deriv) const {
     deriv=0.0;
   }
   else if(x >= 1){
-    value=((2.0-x)*(2.0-x)*(2.0-x))/6.0;
-    deriv=-x*x*(2.0-x)*(2.0-x);
+    value = ((2.0-x)*(2.0-x)*(2.0-x));
+    deriv = -3.0*(2.0-x)*(2.0-x);
+    // value=((2.0-x)*(2.0-x)*(2.0-x))/6.0;
+    // deriv=-x*x*(2.0-x)*(2.0-x);
   }
   else{
-    value=x*x*x*0.5-x*x+2.0/3.0;
-    deriv=(3.0/2.0)*x*x-2.0*x;
+    value = 4.0-6.0*x*x+3.0*x*x*x;
+    deriv = -12.0*x+9.0*x*x;
+    // value=x*x*x*0.5-x*x+2.0/3.0;
+    // deriv=(3.0/2.0)*x*x-2.0*x;
   }
+  deriv/=6.0;
+  value/=6.0;
   return value;
 }
 
