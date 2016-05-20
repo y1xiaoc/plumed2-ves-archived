@@ -117,6 +117,8 @@ protected:
   void setNumberOfBasisFunctions(const unsigned int);
   void setIntrinsicInterval(const double, const double);
   void setIntrinsicInterval(const std::string&, const std::string&);
+  double intrinsicIntervalMin() const {return interval_intrinsic_min_;}
+  double intrinsicIntervalMax() const {return interval_intrinsic_max_;}
   //
   void setUniformIntegral(const unsigned int, const double);
   void setUniformIntegrals(const std::vector<double>&);
