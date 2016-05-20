@@ -23,7 +23,6 @@
 
 #include "core/ActionRegister.h"
 
-
 namespace PLMD{
 
 class CubicBsplineBF : public BasisFunctions {
@@ -70,13 +69,13 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
 double CubicBsplineBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
   plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
-  argT=translateArgument(arg, inside_range);
+  argT=checkIfArgumentInsideInterval(arg,inside_range);
   //
   if(n==0){
     return 1.0;
   }
   else{
-    double argx = ((argT-intervalMin())/spacing_) - (static_cast<double>(n)-2.0);
+    double argx = ((argT-intervalMin())*inv_spacing_) - (static_cast<double>(n)-2.0);
     double tmp_dbl=0.0;
     return spline(argx, tmp_dbl);
   }
@@ -87,13 +86,13 @@ void CubicBsplineBF::getAllValues(const double arg, double& argT, bool& inside_r
   // plumed_assert(values.size()==numberOfBasisFunctions());
   // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
-  argT=translateArgument(arg, inside_range);
+  argT=checkIfArgumentInsideInterval(arg,inside_range);
   //
   values[0]=1.0;
   derivs[0]=0.0;
   //
   for(unsigned int i=1; i < getNumberOfBasisFunctions(); i++){
-    double argx = ((argT-intervalMin())/spacing_) - (static_cast<double>(i)-2.0);
+    double argx = ((argT-intervalMin())*inv_spacing_) - (static_cast<double>(i)-2.0);
     values[i]  = spline(argx, derivs[i]);
     derivs[i]*=inv_spacing_;
   }
