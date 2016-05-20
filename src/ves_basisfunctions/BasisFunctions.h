@@ -164,6 +164,7 @@ public:
   Action* getPntrToAction() const;
   //
   double translateArgument(const double, bool&) const;
+  double checkIfArgumentInsideInterval(const double, bool&) const;
   //
   void apply(){};
   void calculate(){};
@@ -237,6 +238,7 @@ void BasisFunctions::setLabels(const std::vector<std::string>& bf_labels_in) {
 
 inline
 double BasisFunctions::translateArgument(const double arg, bool& inside_interval) const {
+  // NOTE: only works for symmetric intrinsic intervals
   inside_interval=true;
   double argT = (arg-interval_mean_)*argT_derivf_;
   if(argT < interval_intrinsic_min_){
@@ -249,6 +251,23 @@ double BasisFunctions::translateArgument(const double arg, bool& inside_interval
   }
   return argT;
 }
+
+
+inline
+double BasisFunctions::checkIfArgumentInsideInterval(const double arg, bool& inside_interval) const {
+  inside_interval=true;
+  double argT = arg;
+  if(arg < interval_min_){
+    inside_interval=false;
+    argT=interval_min_;
+  }
+  else if(arg > interval_max_){
+    inside_interval=false;
+    argT=interval_max_;
+  }
+  return argT;
+}
+
 
 
 template<typename T>
