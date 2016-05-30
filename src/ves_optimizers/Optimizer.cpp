@@ -216,9 +216,11 @@ isFirstStep(true)
   if(use_mwalkers_mpi_ && numwalkers==1){
       plumed_merror("using the MULTIPLE_WALKERS keyword does not make sense if running the MD code with a single replica");
   }
-  log.printf("  optimization performed using multiple walkers connected via MPI:\n");
-  log.printf("   number of walkers: %d\n",numwalkers);
-  log.printf("   walker number: %d\n",walker_rank);
+  if(use_mwalkers_mpi_){
+    log.printf("  optimization performed using multiple walkers connected via MPI:\n");
+    log.printf("   number of walkers: %d\n",numwalkers);
+    log.printf("   walker number: %d\n",walker_rank);
+  }
 
   dynamic_targetdists_.resize(nbiases_,false);
   if(keywords.exists("TARGETDIST_STRIDE")){
