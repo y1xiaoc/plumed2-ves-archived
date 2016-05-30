@@ -43,7 +43,7 @@ namespace function{
 class S2ContactModel :
   public Function
 {
-  bool serial;
+  bool serial_;
   double r_eff_;
   double inv_r_eff_;
   double prefactor_a_;
@@ -74,7 +74,7 @@ void S2ContactModel::registerKeywords(Keywords& keys){
 S2ContactModel::S2ContactModel(const ActionOptions&ao):
 Action(ao),
 Function(ao),
-serial(false),
+serial_(false),
 r_eff_(0.0),
 inv_r_eff_(0.0),
 prefactor_a_(0.0),
@@ -83,7 +83,7 @@ offset_c_(0.0),
 n_i_(0.0),
 total_prefactor_(0.0)
 {
-  parseFlag("SERIAL",serial);
+  parseFlag("SERIAL",serial_);
 
   parse("R_EFF",r_eff_);
   inv_r_eff_ = 1.0/r_eff_;
@@ -103,11 +103,11 @@ total_prefactor_(0.0)
 
 void S2ContactModel::calculate(){
 
-  unsigned int stride=1;
-  unsigned int rank=0;
-  if(!serial){
-    stride=comm.Get_size();
-    rank=comm.Get_rank();
+  unsigned int stride=comm.Get_size();
+  unsigned int rank=comm.Get_rank();
+  if(serial_){
+    stride=1;
+    rank=0;
   }
 
   double contact_sum = 0.0;
@@ -116,7 +116,7 @@ void S2ContactModel::calculate(){
     exp_arg[i] = exp(-getArgument(i)*inv_r_eff_);
     contact_sum += exp_arg[i];
   }
-  if(!serial){
+  if(!serial_){
     comm.Sum(exp_arg);
     comm.Sum(contact_sum);
   }
