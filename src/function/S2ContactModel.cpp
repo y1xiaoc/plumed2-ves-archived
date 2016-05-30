@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "Function.h"
 #include "ActionRegister.h"
+#include "tools/Communicator.h"
 
 #include <cmath>
 
@@ -42,6 +43,7 @@ namespace function{
 class S2ContactModel :
   public Function
 {
+  bool serial;
   double r_eff_;
   double inv_r_eff_;
   double prefactor_a_;
@@ -61,6 +63,7 @@ PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODEL")
 void S2ContactModel::registerKeywords(Keywords& keys){
   Function::registerKeywords(keys);
   keys.use("ARG");
+  keys.addFlag("SERIAL",false,"Perform the calculation in serial - for debug purpose");
   keys.add("compulsory","R_EFF","the effective distance, r_eff in the equation, given in nm.");
   keys.add("compulsory","PREFACTOR_A","the prefactor, a in the equation");
   keys.add("compulsory","EXPONENT_B","the exponent, b in the equation");
@@ -71,6 +74,7 @@ void S2ContactModel::registerKeywords(Keywords& keys){
 S2ContactModel::S2ContactModel(const ActionOptions&ao):
 Action(ao),
 Function(ao),
+serial(false),
 r_eff_(0.0),
 inv_r_eff_(0.0),
 prefactor_a_(0.0),
@@ -79,6 +83,8 @@ offset_c_(0.0),
 n_i_(0.0),
 total_prefactor_(0.0)
 {
+  parseFlag("SERIAL",serial);
+
   parse("R_EFF",r_eff_);
   inv_r_eff_ = 1.0/r_eff_;
   parse("PREFACTOR_A",prefactor_a_);
@@ -97,11 +103,22 @@ total_prefactor_(0.0)
 
 void S2ContactModel::calculate(){
 
+  unsigned int stride=1;
+  unsigned int rank=0;
+  if(!serial){
+    stride=comm.Get_size();
+    rank=comm.Get_rank();
+  }
+
   double contact_sum = 0.0;
   std::vector<double> exp_arg(getNumberOfArguments());
-  for(unsigned int i=0; i<getNumberOfArguments(); i++){
+  for(unsigned int i=rank; i<getNumberOfArguments(); i+=stride){
     exp_arg[i] = exp(-getArgument(i)*inv_r_eff_);
     contact_sum += exp_arg[i];
+  }
+  if(!serial){
+    comm.Sum(exp_arg);
+    comm.Sum(contact_sum);
   }
 
   double value = tanh(total_prefactor_*contact_sum);
