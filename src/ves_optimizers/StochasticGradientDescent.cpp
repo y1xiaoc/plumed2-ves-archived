@@ -68,6 +68,7 @@ decay_constant_(1.0)
 
 
 void StochasticGradientDescent::coeffsUpdate(const unsigned int c_id) {
+  // getIterationCounterDbl() gives n-1 as it is updated afterwards.
   double current_stepsize =  StepSize(c_id) /(1.0 + getIterationCounterDbl()/decay_constant_);
   setCurrentStepSize(current_stepsize,c_id);
   Coeffs(c_id) = Coeffs(c_id) - current_stepsize * CoeffsMask(c_id) * Gradient(c_id);
