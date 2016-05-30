@@ -633,6 +633,7 @@ isFirstStep(true)
     if(!fixed_stepsize_){
       log.printf(" ");
       addComponent("stepsize"); componentIsNotPeriodic("stepsize");
+      getPntrToComponent("stepsize")->set( getCurrentStepSize(0) );
     }
   }
   else {
@@ -652,6 +653,7 @@ isFirstStep(true)
       if(!fixed_stepsize_){
         log.printf(" ");
         addComponent("stepsize"+is); componentIsNotPeriodic("stepsize"+is);
+        getPntrToComponent("stepsize"+is)->set( getCurrentStepSize(i) );
       }
     }
   }
