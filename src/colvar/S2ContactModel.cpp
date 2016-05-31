@@ -1,10 +1,10 @@
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   Copyright (c) 2011-2016 The plumed team
-   (see the PEOPLE file at the root of the distribution for a list of names)
+   Copyright (c) 2016 The ves-code team
+   (see the PEOPLE-VES file at the root of the distribution for a list of names)
 
-   See http://www.plumed.org for more information.
+   See http://www.ves-code.org for more information.
 
-   This file is part of plumed, version 2.
+   This file is part of ves-code, version 1.
 
    plumed is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -28,10 +28,24 @@
 #include <string>
 #include <cmath>
 
-using namespace std;
-
 namespace PLMD{
 namespace colvar{
+
+
+// Model taken from 10.1021/ja027847a and 10.1023/B:JNMR.0000032612.70767.35
+
+//+PLUMEDOC COLVAR S2_CONTACT_MODEL
+/*
+
+
+*/
+//+ENDPLUMEDOC
+
+
+
+
+
+
 
 class S2ContactModel : public Colvar {
   bool pbc_;
@@ -47,6 +61,9 @@ class S2ContactModel : public Colvar {
   double offset_c_;
   double n_i_;
   double total_prefactor_;
+
+  enum ModelType {methyl,nh} modeltype_;
+
   //
 public:
   explicit S2ContactModel(const ActionOptions&);
@@ -56,7 +73,7 @@ public:
   static void registerKeywords( Keywords& keys );
 };
 
-PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODEL_CV")
+PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODEL")
 
 void S2ContactModel::registerKeywords( Keywords& keys ){
   Colvar::registerKeywords(keys);
@@ -64,8 +81,9 @@ void S2ContactModel::registerKeywords( Keywords& keys ){
   keys.addFlag("NLIST",false,"Use a neighbour list to speed up the calculation");
   keys.add("optional","NL_CUTOFF","The cutoff for the neighbour list");
   keys.add("optional","NL_STRIDE","The frequency with which we are updating the atoms in the neighbour list");
-  keys.add("atoms","MAIN_ATOMS","the atom(s) on the Methyl (1 atom) or the NH (2 atoms)");
-  keys.add("atoms","HEAVY_ATOMS","the other heavy atoms");
+  keys.add("atoms","METHYL_ATOM","the methyl carbon atom of the residue (i)");
+  keys.add("atoms","NH_ATOMS","the hydrogen atom of the NH group of the residue (i) and carbonyl oxygen of the preceding residue (i-1)");
+  keys.add("atoms","HEAVY_ATOMS","the heavy atoms to be included in the calculation");
   //
   keys.add("compulsory","R_EFF","the effective distance, r_eff in the equation, given in nm.");
   keys.add("compulsory","PREFACTOR_A","the prefactor, a in the equation");
@@ -87,17 +105,43 @@ prefactor_a_(0.0),
 exp_b_(0.0),
 offset_c_(0.0),
 n_i_(0.0),
-total_prefactor_(0.0)
+total_prefactor_(0.0),
+modeltype_(methyl)
 {
 
   parseFlag("SERIAL",serial_);
 
-  vector<AtomNumber> main_atoms,heavy_atoms;
-  parseAtomList("MAIN_ATOMS",main_atoms);
-  parseAtomList("HEAVY_ATOMS",heavy_atoms);
+  std::vector<AtomNumber> methyl_atom;
+  parseAtomList("METHYL_ATOM",methyl_atom);
+  std::vector<AtomNumber> nh_atoms;
+  parseAtomList("NH_ATOMS",nh_atoms);
 
-  if(main_atoms.size()>2){
-    error("MAIN_ATOMS should include either 1 atom (Methyl) or 2 atoms (NH)");
+  if(methyl_atom.size()==0 && nh_atoms.size()==0){
+    error("you have to give either METHYL_ATOM or NH_ATOMS");
+  }
+  if(methyl_atom.size()>0 && nh_atoms.size()>0){
+    error("you cannot give both METHYL_ATOM or NH_ATOMS");
+  }
+  if(methyl_atom.size()>0 && methyl_atom.size()!=1){
+    error("you should give one atom in METHYL_ATOM, the methyl carbon atom of the residue");
+  }
+  if(nh_atoms.size()>0 && nh_atoms.size()!=2){
+    error("you should give two atoms in NH_ATOMS, the hydrogen atom of the NH group of the residue (i) and carbonyl oxygen of the preceding residue (i-1)");
+  }
+
+  std::vector<AtomNumber> heavy_atoms;
+  parseAtomList("HEAVY_ATOMS",heavy_atoms);
+  if(heavy_atoms.size()==0){
+    error("HEAVY_ATOMS is not given");
+  }
+
+  std::vector<AtomNumber> main_atoms;
+  if(methyl_atom.size()>0){
+    modeltype_= methyl;
+    main_atoms = methyl_atom;
+  } else if(nh_atoms.size()>0){
+    modeltype_= nh;
+    main_atoms = nh_atoms;
   }
 
   bool nopbc=!pbc_;
@@ -140,23 +184,30 @@ total_prefactor_(0.0)
 
   requestAtoms(nl->getFullAtomList());
 
-  log.printf("  between two groups of %u and %u atoms\n",static_cast<unsigned>(main_atoms.size()),static_cast<unsigned>(heavy_atoms.size()));
-  log.printf("  main atoms:\n");
-  for(unsigned int i=0;i<main_atoms.size();++i){
-   if ( (i+1) % 25 == 0 ) log.printf("  \n");
-   log.printf("  %d", main_atoms[i].serial());
+  if(modeltype_==methyl){
+    log.printf("  calculation of methyl order parameter using atom %u \n",static_cast<unsigned int>(methyl_atom[0].serial()));
   }
-  log.printf("  \n  heavy atoms:\n");
+  else if(modeltype_==nh){
+    log.printf("  calculation of NH order parameter using atoms %u and %u\n",static_cast<unsigned int>(nh_atoms[0].serial(),nh_atoms[1].serial()));
+  }
+  log.printf("  heavy atoms used in the calculation (%u in total):\n",static_cast<unsigned int>(heavy_atoms.size()));
   for(unsigned int i=0;i<heavy_atoms.size();++i){
-   if ( (i+1) % 25 == 0 ) log.printf("  \n");
-   log.printf("  %d", heavy_atoms[i].serial());
+    if( (i+1) % 25 == 0 ){log.printf("  \n");}
+    log.printf("  %d", heavy_atoms[i].serial());
   }
   log.printf("  \n");
-  if(pbc_) log.printf("  using periodic boundary conditions\n");
-  else    log.printf("  without periodic boundary conditions\n");
+  log.printf("  total number of distances: %u\n",nl->size());
+  if(pbc_){
+    log.printf("  using periodic boundary conditions\n");
+  }else{
+    log.printf("  without periodic boundary conditions\n");
+  }
   if(doneigh){
-   log.printf("  using neighbor lists with\n");
-   log.printf("  update every %d steps and cutoff %f\n",nl_st,nl_cut);
+    log.printf("  using neighbor lists with\n");
+    log.printf("  update every %d steps and cutoff %f\n",nl_st,nl_cut);
+  }
+  if(serial_){
+    log.printf("  calculation done in serial\n");
   }
 }
 
@@ -183,7 +234,7 @@ void S2ContactModel::prepare(){
 void S2ContactModel::calculate(){
 
   Tensor virial;
-  vector<Vector> deriv(getNumberOfAtoms());
+  std::vector<Vector> deriv(getNumberOfAtoms());
 
   if(nl->getStride()>0 && invalidateList){
     nl->update(getPositions());
@@ -198,7 +249,7 @@ void S2ContactModel::calculate(){
 
   double contact_sum = 0.0;
 
-  const unsigned nn=nl->size();
+  const unsigned int nn=nl->size();
 
   for(unsigned int i=rank;i<nn;i+=stride) {
     Vector distance;
