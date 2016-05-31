@@ -185,10 +185,10 @@ modeltype_(methyl)
   requestAtoms(nl->getFullAtomList());
 
   if(modeltype_==methyl){
-    log.printf("  calculation of methyl order parameter using atom %u \n",static_cast<unsigned int>(methyl_atom[0].serial()));
+    log.printf("  calculation of methyl order parameter using atom %d \n",methyl_atom[0].serial());
   }
   else if(modeltype_==nh){
-    log.printf("  calculation of NH order parameter using atoms %u and %u\n",static_cast<unsigned int>(nh_atoms[0].serial(),nh_atoms[1].serial()));
+    log.printf("  calculation of NH order parameter using atoms %d and %d\n",nh_atoms[0].serial(),nh_atoms[0].serial());
   }
   log.printf("  heavy atoms used in the calculation (%u in total):\n",static_cast<unsigned int>(heavy_atoms.size()));
   for(unsigned int i=0;i<heavy_atoms.size();++i){
