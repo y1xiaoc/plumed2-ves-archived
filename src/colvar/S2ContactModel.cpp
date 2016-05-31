@@ -190,7 +190,7 @@ modeltype_(methyl)
   else if(modeltype_==nh){
     log.printf("  calculation of NH order parameter using atoms %d and %d\n",nh_atoms[0].serial(),nh_atoms[1].serial());
   }
-  log.printf("  heavy atoms used in the calculation (%u in total):\n ",static_cast<unsigned int>(heavy_atoms.size()));
+  log.printf("  heavy atoms used in the calculation (%u in total):\n",static_cast<unsigned int>(heavy_atoms.size()));
   for(unsigned int i=0;i<heavy_atoms.size();++i){
     if( (i+1) % 25 == 0 ){log.printf("  \n");}
     log.printf("  %d", heavy_atoms[i].serial());
