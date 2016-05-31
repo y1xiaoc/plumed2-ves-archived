@@ -198,10 +198,10 @@ modeltype_(methyl)
   log.printf("  \n");
   log.printf("  total number of distances: %u\n",nl->size());
   //
-  log.printf("  using the parameters");
-  log.printf(" a=%f",prefactor_a_);
-  log.printf(" b=%f",exp_b_);
-  log.printf(" c=%f",offset_c_);
+  log.printf("  using parameters");
+  log.printf(" a=%f,",prefactor_a_);
+  log.printf(" b=%f,",exp_b_);
+  log.printf(" c=%f,",offset_c_);
   log.printf(" n_i=%u\n",n_i_int);
   if(pbc_){
     log.printf("  using periodic boundary conditions\n");
