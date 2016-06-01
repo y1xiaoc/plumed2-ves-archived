@@ -25,6 +25,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include "core/ActionPilot.h"
 #include "core/ActionWithValue.h"
 #include "ves_biases/VesBias.h"
 
@@ -42,6 +43,7 @@ class VesBias;
 class OFile;
 
 class Optimizer :
+ public ActionPilot,
  public ActionWithValue
 {
 private:
@@ -51,8 +53,6 @@ private:
   std::vector<double> stepsizes_;
   std::vector<double> current_stepsizes;
   bool fixed_stepsize_;
-  //
-  unsigned int stride_;
   //
   unsigned int iter_counter;
   //
@@ -162,10 +162,6 @@ public:
   double getCurrentStepSize(const unsigned int coeffs_id = 0) const;
   void setStepSizes(const std::vector<double>&);
   void setStepSize(const double, const unsigned int coeffs_id = 0);
-  //
-  unsigned int getStride() const {return stride_;}
-  void setStride(const unsigned int stride_in) {stride_= stride_in;}
-  bool onStep() const {return getStep()%stride_==0;}
   //
   unsigned int getIterationCounter() const;
   double getIterationCounterDbl() const;

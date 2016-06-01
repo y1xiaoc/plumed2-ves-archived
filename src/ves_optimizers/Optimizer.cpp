@@ -37,13 +37,13 @@ namespace PLMD{
 
 Optimizer::Optimizer(const ActionOptions&ao):
 Action(ao),
+ActionPilot(ao),
 ActionWithValue(ao),
 description_("Undefined"),
 type_("Undefined"),
 stepsizes_(0),
 current_stepsizes(0),
 fixed_stepsize_(true),
-stride_(1),
 iter_counter(0),
 use_hessian_(false),
 diagonal_hessian_(true),
@@ -128,10 +128,6 @@ isFirstStep(true)
   plumed_massert(gradient_pntrs_.size()==ncoeffssets_,"problems in linking gradients");
   setAllCoeffsSetIterationCounters();
 
-  if(keywords.exists("STRIDE")){
-    parse("STRIDE",stride_);
-   log.printf("  with stride %u\n",stride_);
-  }
 
   //
   identical_coeffs_shape_ = true;
