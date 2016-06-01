@@ -69,12 +69,15 @@ private:
   //
   unsigned int coeffs_wstride_;
   std::vector<OFile*> coeffsOFiles_;
+  std::string coeffs_output_fmt_;
   //
   unsigned int gradient_wstride_;
   std::vector<OFile*> gradientOFiles_;
+  std::string gradient_output_fmt_;
   //
   unsigned int hessian_wstride_;
   std::vector<OFile*> hessianOFiles_;
+  std::string hessian_output_fmt_;
   //
   unsigned int targetdist_averages_wstride_;
   std::vector<OFile*> targetdist_averagesOFiles_;

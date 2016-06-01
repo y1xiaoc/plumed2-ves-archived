@@ -54,10 +54,13 @@ ustride_targetdist_(0),
 coeffssetid_prefix_(""),
 coeffs_wstride_(100),
 coeffsOFiles_(0),
+coeffs_output_fmt_(""),
 gradient_wstride_(100),
 gradientOFiles_(0),
+gradient_output_fmt_(""),
 hessian_wstride_(100),
 hessianOFiles_(0),
+hessian_output_fmt_(""),
 targetdist_averages_wstride_(0),
 targetdist_averagesOFiles_(0),
 nbiases_(0),
@@ -356,6 +359,12 @@ isFirstStep(true)
       coeffs_fnames.clear();
     }
     setupOFiles(coeffs_fnames,coeffsOFiles_);
+    parse("COEFFS_FMT",coeffs_output_fmt_);
+    if(coeffs_output_fmt_.size()>0){
+      for(unsigned int i=0; i<ncoeffssets_; i++){
+        coeffs_pntrs_[i]->setOutputFmt(coeffs_output_fmt_);
+      }
+    }
     if(!getRestart()){
       for(unsigned int i=0; i<coeffsOFiles_.size();i++){
         coeffs_pntrs_[i]->writeToFile(*coeffsOFiles_[i],aux_coeffs_pntrs_[i],false);
@@ -388,6 +397,12 @@ isFirstStep(true)
       }
     }
     setupOFiles(gradient_fnames,gradientOFiles_);
+    parse("GRADIENT_FMT",gradient_output_fmt_);
+    if(gradient_output_fmt_.size()>0){
+      for(unsigned int i=0; i<ncoeffssets_; i++){
+        gradient_pntrs_[i]->setOutputFmt(gradient_output_fmt_);
+      }
+    }
 
     if(gradient_fnames.size()>0){
       if(ncoeffssets_==1){
@@ -418,6 +433,8 @@ isFirstStep(true)
       }
     }
     setupOFiles(hessian_fnames,hessianOFiles_);
+    std::string hessian_fmt;
+    parse("HESSIAN_FMT",hessian_output_fmt_);
 
     if(hessian_fnames.size()>0){
       if(ncoeffssets_==1){
@@ -714,12 +731,14 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
   keys.add("compulsory","COEFFS_FILE","coeffs.data","the name of output file for the coefficients");
   keys.add("compulsory","COEFFS_OUTPUT","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
+  keys.add("optional","COEFFS_FMT","specify format for coefficient file(s) (useful for decrease the number of digits in regtests)");
   keys.add("optional","COEFFS_SET_ID_PREFIX","suffix to add to the filename given in FILE to identfy the bias, should only be given if a single filename is given in FILE when optimizing multiple biases.");
   //
   keys.add("optional","INITIAL_COEFFS","the name(s) of file(s) with the initial coefficents");
   // Hidden keywords to output the gradient to a file.
   keys.add("hidden","GRADIENT_FILE","the name of output file for the gradient");
   keys.add("hidden","GRADIENT_OUTPUT","how often the gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if GRADIENT_FILE is specficed");
+  keys.add("hidden","GRADIENT_FMT","specify format for gradient file(s) (useful for decrease the number of digits in regtests)");
   // Either use a fixed stepsize (useFixedStepSizeKeywords) or changing stepsize (useDynamicsStepSizeKeywords)
   keys.reserve("compulsory","STEPSIZE","the step size used for the optimization");
   keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
@@ -727,6 +746,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.reserve("hidden","HESSIAN_OUTPUT","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
+  keys.reserve("hidden","HESSIAN_FMT","specify format for hessian file(s) (useful for decrease the number of digits in regtests)");
   // Keywords related to the multiple walkers, actived with the useMultipleWalkersKeywords function
   keys.reserveFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
   keys.reserveFlag("MWALKERS_SEPARATE_FILES",false,"DEBUG OPTION: if separate files should be outputted to file when using MPI multiple walkers");
@@ -765,6 +785,7 @@ void Optimizer::useHessianKeywords(Keywords& keys) {
   keys.use("FULL_HESSIAN");
   keys.use("HESSIAN_FILE");
   keys.use("HESSIAN_OUTPUT");
+  keys.use("HESSIAN_FMT");
 }
 
 
@@ -828,6 +849,12 @@ void Optimizer::turnOnHessian() {
     log.printf("  Optimization performed using full Hessian matrix\n");
   }
   //
+  if(hessian_output_fmt_.size()>0){
+    for(unsigned int i=0; i<ncoeffssets_; i++){
+      hessian_pntrs_[i]->setOutputFmt(hessian_output_fmt_);
+    }
+  }
+
 }
 
 
