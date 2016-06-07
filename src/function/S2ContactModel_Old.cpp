@@ -40,7 +40,7 @@ namespace function{
 //+ENDPLUMEDOC
 
 
-class S2ContactModel :
+class S2ContactModel_Old :
   public Function
 {
   bool serial_;
@@ -52,15 +52,15 @@ class S2ContactModel :
   double n_i_;
   double total_prefactor_;
 public:
-  explicit S2ContactModel(const ActionOptions&);
+  explicit S2ContactModel_Old(const ActionOptions&);
   void calculate();
   static void registerKeywords(Keywords& keys);
 };
 
 
-PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODEL_OLD")
+PLUMED_REGISTER_ACTION(S2ContactModel_Old,"S2_CONTACT_MODEL_OLD")
 
-void S2ContactModel::registerKeywords(Keywords& keys){
+void S2ContactModel_Old::registerKeywords(Keywords& keys){
   Function::registerKeywords(keys);
   keys.use("ARG");
   keys.addFlag("SERIAL",false,"Perform the calculation in serial - for debug purpose");
@@ -71,7 +71,7 @@ void S2ContactModel::registerKeywords(Keywords& keys){
   keys.add("compulsory","N_I"," n_i in the equation");
 }
 
-S2ContactModel::S2ContactModel(const ActionOptions&ao):
+S2ContactModel_Old::S2ContactModel_Old(const ActionOptions&ao):
 Action(ao),
 Function(ao),
 serial_(false),
@@ -101,7 +101,7 @@ total_prefactor_(0.0)
 
 }
 
-void S2ContactModel::calculate(){
+void S2ContactModel_Old::calculate(){
 
   unsigned int stride=comm.Get_size();
   unsigned int rank=comm.Get_rank();
