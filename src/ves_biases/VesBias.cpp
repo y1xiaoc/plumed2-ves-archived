@@ -402,7 +402,8 @@ void VesBias::updateGradientAndHessian() {
 
 void VesBias::addToSampledAverages(const std::vector<double>& values, const unsigned c_id) {
   /*
-  use the following online equation to calculate the average and covariance (see wikipedia)
+  use the following online equation to calculate the average and covariance
+  (see https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance)
       xm[n+1] = xm[n] + (x[n+1]-xm[n])/(n+1)
       cov(x,y)[n+1] = ( cov(x,y)[n]*n + (n/(n+1))*(x[n+1]-xm[n])*(y[n+1]-ym[n]) ) / (n+1)
                     = cov(x,y)[n]*(n/(n+1)) + ( n * (x[n+1]-xm[n])/(n+1) * (y[n+1]-ym[n])/(n+1) );
