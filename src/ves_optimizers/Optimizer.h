@@ -110,7 +110,7 @@ private:
 private:
   void updateOutputComponents();
   void writeOutputFiles(const unsigned int coeffs_id = 0);
-  void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&);
+  void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&, bool multi_sim_single_files=false);
   void readCoeffsFromFiles(const std::vector<std::string>&, const bool);
   void setAllCoeffsSetIterationCounters();
 protected:

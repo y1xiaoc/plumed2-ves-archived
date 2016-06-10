@@ -195,13 +195,12 @@ isFirstStep(true)
     diagonal_hessian_ = !full_hessian;
   }
   //
+  bool mw_single_files = false;
   if(keywords.exists("MULTIPLE_WALKERS")){
     parseFlag("MULTIPLE_WALKERS",use_mwalkers_mpi_);
-  }
-  if(keywords.exists("MWALKERS_SEPARATE_FILES")){
-    bool mw_separate_files = false;
-    parseFlag("MWALKERS_SEPARATE_FILES",mw_separate_files);
-    mwalkers_mpi_single_files_ = !mw_separate_files;
+    if(use_mwalkers_mpi_){
+      mw_single_files=true;
+    }
   }
 
   int numwalkers=1;
@@ -358,7 +357,7 @@ isFirstStep(true)
     if(coeffs_wstride_tmpstr=="OFF"){
       coeffs_fnames.clear();
     }
-    setupOFiles(coeffs_fnames,coeffsOFiles_);
+    setupOFiles(coeffs_fnames,coeffsOFiles_,mw_single_files);
     parse("COEFFS_FMT",coeffs_output_fmt_);
     if(coeffs_output_fmt_.size()>0){
       for(unsigned int i=0; i<ncoeffssets_; i++){
@@ -396,7 +395,7 @@ isFirstStep(true)
         plumed_massert(gradient_fnames[i]!=coeffs_fnames[i],"COEFFS_FILE and GRADIENT_FILE cannot be the same");
       }
     }
-    setupOFiles(gradient_fnames,gradientOFiles_);
+    setupOFiles(gradient_fnames,gradientOFiles_,mw_single_files);
     parse("GRADIENT_FMT",gradient_output_fmt_);
     if(gradient_output_fmt_.size()>0){
       for(unsigned int i=0; i<ncoeffssets_; i++){
@@ -432,7 +431,7 @@ isFirstStep(true)
         plumed_massert(hessian_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and HESSIAN_FILE cannot be the same");
       }
     }
-    setupOFiles(hessian_fnames,hessianOFiles_);
+    setupOFiles(hessian_fnames,hessianOFiles_,mw_single_files);
     std::string hessian_fmt;
     parse("HESSIAN_FMT",hessian_output_fmt_);
 
@@ -470,7 +469,7 @@ isFirstStep(true)
         plumed_massert(targetdist_averages_fnames[i]!=hessian_fnames[i],"HESSIAN_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
       }
     }
-    setupOFiles(targetdist_averages_fnames,targetdist_averagesOFiles_);
+    setupOFiles(targetdist_averages_fnames,targetdist_averagesOFiles_,mw_single_files);
 
     for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
       targetdist_averages_pntrs_[i]->writeToFile(*targetdist_averagesOFiles_[i]);
@@ -749,7 +748,6 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("hidden","HESSIAN_FMT","specify format for hessian file(s) (useful for decrease the number of digits in regtests)");
   // Keywords related to the multiple walkers, actived with the useMultipleWalkersKeywords function
   keys.reserveFlag("MULTIPLE_WALKERS",false,"if optimization is to be performed using multiple walkers connected via MPI");
-  keys.reserveFlag("MWALKERS_SEPARATE_FILES",false,"DEBUG OPTION: if separate files should be outputted to file when using MPI multiple walkers");
   // Keywords related to the mask file, actived with the useMaskKeywords function
   keys.reserve("optional","MASK_FILE","read in a mask file which allows one to employ different step sizes for different coefficents and/or deactive the optimization of certain coefficients (by putting values of 0.0). One can write out the resulting mask by using the OUTPUT_MASK_FILE keyword.");
   keys.reserve("optional","OUTPUT_MASK_FILE","Name of the file to write out the mask resulting from using the MASK_FILE keyword. Can also be used to generate a template mask file.");
@@ -791,7 +789,6 @@ void Optimizer::useHessianKeywords(Keywords& keys) {
 
 void Optimizer::useMultipleWalkersKeywords(Keywords& keys) {
   keys.use("MULTIPLE_WALKERS");
-  keys.use("MWALKERS_SEPARATE_FILES");
 }
 
 
@@ -1026,13 +1023,13 @@ void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
 }
 
 
-void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*>& OFiles) {
+void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*>& OFiles, bool multi_sim_single_files) {
   plumed_assert(ncoeffssets_>0);
   OFiles.resize(fnames.size(),NULL);
   for(unsigned int i=0; i<fnames.size();i++){
     OFiles[i] = new OFile();
     OFiles[i]->link(*this);
-    if(use_mwalkers_mpi_ && mwalkers_mpi_single_files_){
+    if(multi_sim_single_files){
       unsigned int r=0;
       if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
       comm.Bcast(r,0);
