@@ -1023,7 +1023,7 @@ void Optimizer::writeOutputFiles(const unsigned int coeffs_id) {
 }
 
 
-void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*>& OFiles, bool multi_sim_single_files) {
+void Optimizer::setupOFiles(std::vector<std::string>& fnames, std::vector<OFile*>& OFiles, const bool multi_sim_single_files) {
   plumed_assert(ncoeffssets_>0);
   OFiles.resize(fnames.size(),NULL);
   for(unsigned int i=0; i<fnames.size();i++){
