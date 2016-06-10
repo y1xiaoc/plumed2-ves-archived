@@ -186,6 +186,7 @@ public:
   //
   bool optimizeCoeffs() const {return optimize_coeffs_;}
   Optimizer* getOptimizerPntr() const {return optimizer_pntr_;}
+  bool useMultipleWalkers() const; 
   //
   unsigned int getIterationCounter() const;
   //
@@ -263,7 +264,7 @@ public:
   void applyBiasCutoff(double&, std::vector<double>&) const;
   void applyBiasCutoff(double&, std::vector<double>&, std::vector<double>&) const;
   //
-  OFile* getOFile(const std::string& filename, const bool enforce_backup=true);
+  OFile* getOFile(const std::string& filename, const bool multi_sim_single_file=false, const bool enforce_backup=true);
   //
   virtual void setupBiasFileOutput() {};
   virtual void writeBiasToFile() {};

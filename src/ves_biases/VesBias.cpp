@@ -531,12 +531,12 @@ std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsi
 }
 
 
-OFile* VesBias::getOFile(const std::string& filepath, const bool enforce_backup) {
+OFile* VesBias::getOFile(const std::string& filepath, const bool multi_sim_single_file, const bool enforce_backup) {
   OFile* ofile_pntr = new OFile();
   std::string fp = filepath;
   ofile_pntr->link(*static_cast<Action*>(this));
   if(enforce_backup){ofile_pntr->enforceBackup();}
-  if(optimizeCoeffs() && getOptimizerPntr()->useMultipleWalkers()){
+  if(multi_sim_single_file){
     unsigned int r=0;
     if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
     comm.Bcast(r,0);
@@ -647,6 +647,15 @@ double VesBias::getBiasCutoffSwitchingFunction(const double bias, double& deriv_
   // deriv *= arg;
   deriv_factor = value-bias*deriv;
   return value;
+}
+
+
+bool VesBias::useMultipleWalkers() const {
+  bool use_mwalkers_mpi=false;
+  if(optimizeCoeffs() && getOptimizerPntr()->useMultipleWalkers()){
+    use_mwalkers_mpi=true;
+  }
+  return use_mwalkers_mpi;
 }
 
 

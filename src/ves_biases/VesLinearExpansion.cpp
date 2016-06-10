@@ -195,12 +195,12 @@ void VesLinearExpansion::setupBiasFileOutput() {
 
 void VesLinearExpansion::writeBiasToFile() {
   bias_expansion_pntr_->updateBiasGrid();
-  OFile* ofile_pntr = getOFile(getCurrentBiasOutputFilename());
+  OFile* ofile_pntr = getOFile(getCurrentBiasOutputFilename(),useMultipleWalkers());
   bias_expansion_pntr_->writeBiasGridToFile(*ofile_pntr);
   ofile_pntr->close(); delete ofile_pntr;
   if(biasCutoffActive()){
     bias_expansion_pntr_->updateBiasWithoutCutoffGrid();
-    OFile* ofile_pntr2 = getOFile(getCurrentBiasOutputFilename("without-cutoff"));
+    OFile* ofile_pntr2 = getOFile(getCurrentBiasOutputFilename("without-cutoff"),useMultipleWalkers());
     bias_expansion_pntr_->writeBiasWithoutCutoffGridToFile(*ofile_pntr2);
     ofile_pntr2->close(); delete ofile_pntr2;
   }
@@ -218,7 +218,7 @@ void VesLinearExpansion::setupFesFileOutput() {
 
 void VesLinearExpansion::writeFesToFile() {
   bias_expansion_pntr_->updateFesGrid();
-  OFile* ofile_pntr = getOFile(getCurrentFesOutputFilename());
+  OFile* ofile_pntr = getOFile(getCurrentFesOutputFilename(),useMultipleWalkers());
   bias_expansion_pntr_->writeFesGridToFile(*ofile_pntr);
   ofile_pntr->close(); delete ofile_pntr;
 }
@@ -242,7 +242,7 @@ void VesLinearExpansion::writeFesProjToFile() {
     std::string suffix;
     Tools::convert(i+1,suffix);
     suffix = "proj-" + suffix;
-    OFile* ofile_pntr = getOFile(getCurrentFesOutputFilename(suffix));
+    OFile* ofile_pntr = getOFile(getCurrentFesOutputFilename(suffix),useMultipleWalkers());
     std::vector<std::string> args = getProjectionArgument(i);
     bias_expansion_pntr_->writeFesProjGridToFile(args,*ofile_pntr);
     ofile_pntr->close(); delete ofile_pntr;
@@ -251,7 +251,7 @@ void VesLinearExpansion::writeFesProjToFile() {
 
 
 void VesLinearExpansion::writeDynamicTargetDistToFile() {
-  OFile* ofile_pntr = getOFile(getCurrentTargetDistOutputFilename());
+  OFile* ofile_pntr = getOFile(getCurrentTargetDistOutputFilename(),useMultipleWalkers());
   bias_expansion_pntr_->writeDynamicTargetDistGridToFile(*ofile_pntr);
   ofile_pntr->close(); delete ofile_pntr;
 }
