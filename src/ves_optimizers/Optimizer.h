@@ -110,7 +110,6 @@ private:
 private:
   void updateOutputComponents();
   void writeOutputFiles(const unsigned int coeffs_id = 0);
-  void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&, const bool multi_sim_single_files=false);
   void readCoeffsFromFiles(const std::vector<std::string>&, const bool);
   void setAllCoeffsSetIterationCounters();
 protected:
@@ -140,6 +139,7 @@ protected:
   void parseFilenames(const std::string&, std::vector<std::string>&, const std::string&);
   void parseFilenames(const std::string&, std::vector<std::string>&);
   void addCoeffsSetIDsToFilenames(std::vector<std::string>&, std::string&);
+  void setupOFiles(std::vector<std::string>&, std::vector<OFile*>&, const bool multi_sim_single_files=false);
 public:
   static void registerKeywords(Keywords&);
   static void useMultipleWalkersKeywords(Keywords&);
