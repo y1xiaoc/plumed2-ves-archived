@@ -386,7 +386,7 @@ void VesBias::readCoeffsFromFiles() {
 }
 
 
-void VesBias::updateGradientAndHessian() {
+void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
   for(unsigned int i=0; i<ncoeffssets_; i++){
     comm.Sum(sampled_averages[i]);
     comm.Sum(sampled_covariance[i]);
@@ -395,6 +395,10 @@ void VesBias::updateGradientAndHessian() {
     Hessian(i) *= getBeta();
     std::fill(sampled_averages[i].begin(), sampled_averages[i].end(), 0.0);
     std::fill(sampled_covariance[i].begin(), sampled_covariance[i].end(), 0.0);
+    if(use_mwalkers_mpi){
+      gradient_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);
+      hessian_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);
+    }
   }
   aver_counter=0.0;
 }

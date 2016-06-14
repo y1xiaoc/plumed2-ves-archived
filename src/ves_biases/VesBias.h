@@ -190,7 +190,7 @@ public:
   //
   unsigned int getIterationCounter() const;
   //
-  void updateGradientAndHessian();
+  void updateGradientAndHessian(const bool use_mwalkers_mpi);
   void clearGradientAndHessian() {};
   //
   virtual void updateTargetDistributions() {};

@@ -907,19 +907,19 @@ std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in,
 void Optimizer::update() {
   if(onStep() && !isFirstStep){
     for(unsigned int i=0; i<nbiases_; i++){
-      bias_pntrs_[i]->updateGradientAndHessian();
+      bias_pntrs_[i]->updateGradientAndHessian(use_mwalkers_mpi_);
     }
     for(unsigned int i=0; i<ncoeffssets_; i++){
-      if(use_mwalkers_mpi_){
-        gradient_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);
+      //if(use_mwalkers_mpi_){
+        //gradient_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);
         // OV: June10-2016
         // here we just average over the Hessian directly but this assumes
         // that we have Bach-like gradient (and is correct in that case).
         // If we are interested in the "proper" Hessian where the covariance
         // term is proberly combined we would need to consider also cross terms
         // which are ignored if it is done in this way.
-        if(use_hessian_){hessian_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);}
-      }
+        //if(use_hessian_){hessian_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);}
+      //}
       coeffsUpdate(i);
       // +1 as this is done before increaseIterationCounter() is used
       unsigned int curr_iter = getIterationCounter()+1;
