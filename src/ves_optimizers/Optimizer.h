@@ -58,6 +58,7 @@ private:
   //
   bool use_hessian_;
   bool diagonal_hessian_;
+  bool hessian_covariance_from_averages_;
   //
   bool use_mwalkers_mpi_;
   bool mwalkers_mpi_single_files_;

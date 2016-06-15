@@ -65,7 +65,8 @@ private:
   std::vector<CoeffsVector*> gradient_pntrs_;
   std::vector<CoeffsMatrix*> hessian_pntrs_;
   std::vector<std::vector<double> > sampled_averages;
-  std::vector<std::vector<double> >sampled_covariance;
+  std::vector<std::vector<double> > sampled_covariance;
+  std::vector<std::vector<double> > sampled_cross_averages;
   bool use_multiple_coeffssets_;
   //
   std::vector<std::string> coeffs_fnames;
@@ -116,6 +117,7 @@ private:
   //
 private:
   void initializeCoeffs(CoeffsVector*);
+  std::vector<double> computeCovarianceFromAverages(const unsigned int) const;
 protected:
   //
   void checkThatTemperatureIsGiven();
@@ -186,11 +188,11 @@ public:
   //
   bool optimizeCoeffs() const {return optimize_coeffs_;}
   Optimizer* getOptimizerPntr() const {return optimizer_pntr_;}
-  bool useMultipleWalkers() const; 
+  bool useMultipleWalkers() const;
   //
   unsigned int getIterationCounter() const;
   //
-  void updateGradientAndHessian(const bool use_mwalkers_mpi);
+  void updateGradientAndHessian(const bool, const bool);
   void clearGradientAndHessian() {};
   //
   virtual void updateTargetDistributions() {};
@@ -344,6 +346,27 @@ void VesBias::applyBiasCutoff(double& bias, std::vector<double>& forces, std::ve
   for(unsigned int i=0; i<coeffsderivs_values.size(); i++){
     coeffsderivs_values[i] *= deriv_factor_sf;
   }
+}
+
+
+inline
+std::vector<double> VesBias::computeCovarianceFromAverages(const unsigned int c_id) const {
+  size_t ncoeffs = numberOfCoeffs(c_id);
+  std::vector<double> covariance(sampled_cross_averages[c_id].size(),0.0);
+  // diagonal part
+  for(size_t i=0; i<ncoeffs;i++){
+    size_t midx = getHessianIndex(i,i,c_id);
+    covariance[midx] = sampled_cross_averages[c_id][midx] - sampled_averages[c_id][i]*sampled_averages[c_id][i];
+  }
+  if(!diagonal_hessian_){
+    for(size_t i=0; i<ncoeffs;i++){
+      for(size_t j=(i+1); j<ncoeffs;j++){
+        size_t midx = getHessianIndex(i,j,c_id);
+        covariance[midx] = sampled_cross_averages[c_id][midx] - sampled_averages[c_id][i]*sampled_averages[c_id][j];
+      }
+    }
+  }
+  return covariance;
 }
 
 
