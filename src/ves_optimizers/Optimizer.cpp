@@ -436,7 +436,6 @@ isFirstStep(true)
       }
     }
     setupOFiles(hessian_fnames,hessianOFiles_,mw_single_files);
-    std::string hessian_fmt;
     parse("HESSIAN_FMT",hessian_output_fmt_);
 
     if(hessian_fnames.size()>0){
@@ -916,16 +915,6 @@ void Optimizer::update() {
       bias_pntrs_[i]->updateGradientAndHessian(use_mwalkers_mpi_,hessian_covariance_from_averages_);
     }
     for(unsigned int i=0; i<ncoeffssets_; i++){
-      //if(use_mwalkers_mpi_){
-        //gradient_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);
-        // OV: June10-2016
-        // here we just average over the Hessian directly but this assumes
-        // that we have Bach-like gradient (and is correct in that case).
-        // If we are interested in the "proper" Hessian where the covariance
-        // term is proberly combined we would need to consider also cross terms
-        // which are ignored if it is done in this way.
-        //if(use_hessian_){hessian_pntrs_[i]->sumMultiSimCommMPI(multi_sim_comm);}
-      //}
       coeffsUpdate(i);
       // +1 as this is done before increaseIterationCounter() is used
       unsigned int curr_iter = getIterationCounter()+1;
