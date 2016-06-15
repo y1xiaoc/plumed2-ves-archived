@@ -742,7 +742,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("compulsory","STEPSIZE","the step size used for the optimization");
   keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
   // Keywords related to the Hessian, actived with the useHessianKeywords function
-  keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal Hessian is used");
+  keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal part of the Hessian is used");
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.reserve("hidden","HESSIAN_OUTPUT","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
   keys.reserve("hidden","HESSIAN_FMT","specify format for hessian file(s) (useful for decrease the number of digits in regtests)");
