@@ -418,15 +418,19 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi, const bool c
     else{
       comm.Sum(sampled_cross_averages[k]);
       if(use_mwalkers_mpi){
-        multi_sim_comm.Sum(sampled_averages[k]);
-        multi_sim_comm.Sum(sampled_cross_averages[k]);
-        double nwalkers = static_cast<double>(multi_sim_comm.Get_size());
-        for(size_t i=0; i<sampled_averages[k].size(); i++){
-          sampled_averages[k][i] /= nwalkers;
+        if(comm.Get_rank()==0){
+          multi_sim_comm.Sum(sampled_averages[k]);
+          multi_sim_comm.Sum(sampled_cross_averages[k]);
+          double nwalkers = static_cast<double>(multi_sim_comm.Get_size());
+          for(size_t i=0; i<sampled_averages[k].size(); i++){
+            sampled_averages[k][i] /= nwalkers;
+          }
+          for(size_t i=0; i<sampled_cross_averages[k].size(); i++){
+            sampled_cross_averages[k][i] /= nwalkers;
+          }
         }
-        for(size_t i=0; i<sampled_cross_averages[k].size(); i++){
-          sampled_cross_averages[k][i] /= nwalkers;
-        }
+        comm.Bcast(sampled_averages[k],0);
+        comm.Bcast(sampled_cross_averages[k],0);
       }
       Hessian(k) = computeCovarianceFromAverages(k);
       Hessian(k) *= getBeta();
