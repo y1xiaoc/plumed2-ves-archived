@@ -219,7 +219,7 @@ void LinearBasisSetExpansion::setupFesProjGrid() {
 
 void LinearBasisSetExpansion::updateBiasGrid() {
   plumed_massert(bias_grid_pntr_!=NULL,"the bias grid is not defined");
-  if(getStepOfLastBiasGridUpdate() == action_pntr_->getStep()){
+  if(action_pntr_!=NULL &&  getStepOfLastBiasGridUpdate()==action_pntr_->getStep()){
     return;
   }
   for(Grid::index_t l=0; l<bias_grid_pntr_->getSize(); l++){
@@ -243,7 +243,9 @@ void LinearBasisSetExpansion::updateBiasGrid() {
   if(vesbias_pntr_!=NULL){
     vesbias_pntr_->setCurrentBiasMaxValue(bias_grid_pntr_->getMaxValue());
   }
-  setStepOfLastBiasGridUpdate(action_pntr_->getStep());
+  if(action_pntr_!=NULL){
+    setStepOfLastBiasGridUpdate(action_pntr_->getStep());
+  }
 }
 
 
@@ -289,14 +291,16 @@ void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
       bias_withoutcutoff_grid_pntr_->setValue(l,value);
     }
   }
-  vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
+  if(vesbias_pntr_!=NULL){
+    vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
+  }
 }
 
 
 void LinearBasisSetExpansion::updateFesGrid() {
   plumed_massert(fes_grid_pntr_!=NULL,"the FES grid is not defined");
   updateBiasGrid();
-  if(getStepOfLastFesGridUpdate() == action_pntr_->getStep()){
+  if(action_pntr_!=NULL && getStepOfLastFesGridUpdate() == action_pntr_->getStep()){
     return;
   }
   //
@@ -309,7 +313,9 @@ void LinearBasisSetExpansion::updateFesGrid() {
     fes_grid_pntr_->setValue(l,fes_value);
   }
   fes_grid_pntr_->setMinToZero();
-  setStepOfLastFesGridUpdate(action_pntr_->getStep());
+  if(action_pntr_!=NULL){
+    setStepOfLastFesGridUpdate(action_pntr_->getStep());
+  }
 }
 
 
