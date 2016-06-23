@@ -39,6 +39,9 @@ PLUMED_REGISTER_ACTION(MDRunner_Position,"MDRUNNER_POSITION")
 
 void MDRunner_Position::registerKeywords( Keywords& keys ){
   Colvar::registerKeywords( keys );
+  keys.addOutputComponent("x","default","x-postion of the walker");
+  keys.addOutputComponent("y","default","y-postion of the walker");
+  keys.addOutputComponent("z","default","z-postion of the walker");
 }
 
 MDRunner_Position::MDRunner_Position(const ActionOptions& ao):
