@@ -35,6 +35,7 @@
 
 !/ves_basisfunctions
 !/ves_biases
+!/ves_mdrunner
 !/ves_optimizers
 !/ves_targetdistributions
 !/ves_tools
