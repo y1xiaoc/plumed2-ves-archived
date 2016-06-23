@@ -797,6 +797,22 @@ void LinearBasisSetExpansion::writeTargetDistGridToFile(Grid* grid_pntr, const s
 }
 
 
+void LinearBasisSetExpansion::setBiasMinimumToZero(){
+  plumed_massert(bias_grid_pntr_!=NULL,"setBiasMinimumToZero can only be used if the bias grid is defined");
+  updateBiasGrid();
+  BiasCoeffs()[0]-=bias_grid_pntr_->getMinValue();
+}
+
+
+void LinearBasisSetExpansion::setBiasMaximumToZero(){
+  plumed_massert(bias_grid_pntr_!=NULL,"setBiasMaximumToZero can only be used if the bias grid is defined");
+  updateBiasGrid();
+  BiasCoeffs()[0]-=bias_grid_pntr_->getMaxValue();
+}
+
+
+
+
 
 
 }

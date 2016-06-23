@@ -138,6 +138,8 @@ public:
   void writeBiasGridToFile(OFile&, const bool append=false) const;
   void updateBiasWithoutCutoffGrid();
   void writeBiasWithoutCutoffGridToFile(OFile&, const bool append=false) const;
+  void setBiasMinimumToZero();
+  void setBiasMaximumToZero();
   //
   void setupFesGrid();
   void updateFesGrid();
