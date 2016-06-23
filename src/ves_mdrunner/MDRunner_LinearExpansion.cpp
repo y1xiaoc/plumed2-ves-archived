@@ -89,8 +89,10 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ){
     keys.add("compulsory","basis_functions_1","Basis functions for dimension 1.");
     keys.add("optional","basis_functions_2","Basis functions for dimension 2 if needed.");
     keys.add("optional","basis_functions_3","Basis functions for dimension 3 if needed.");
-    keys.add("compulsory","coeffs_file","Filename of the coefficent file.");
+    keys.add("compulsory","input_coeffs","potential-coeffs.in.data","Filename of the input coefficent file for the potential.");
+    keys.add("compulsory","output_coeffs","potential-coeffs.out.data","Filename of the output coefficent file for the potential.");
     keys.add("optional","coeffs_prefactor","prefactor for multiplying the coefficents with. ");
+    keys.add("optional","template_coeffs_file","only generate a template coefficent file with the filename given and exit.");
 }
 
 
@@ -222,28 +224,43 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   CoeffsVector* coeffs_pntr = new CoeffsVector("pot.coeffs",args,basisf_pntrs,comm_dummy,false);
   potential_expansion_pntr = new bias::LinearBasisSetExpansion("potential",1.0/temp,comm_dummy,args,basisf_pntrs,coeffs_pntr);
 
-  std::string coeffs_fname;
-  parse("coeffs_file",coeffs_fname);
-  if(coeffs_fname.size()==0){error("you need to give a coeffs file using the coeffs_file keyword.");}
-  coeffs_pntr->readFromFile(coeffs_fname,true,true);
+  std::string template_coeffs_fname="";
+  parse("template_coeffs_file",template_coeffs_fname);
+  if(template_coeffs_fname.size()>0){
+    OFile ofile_coeffstmpl;
+    ofile_coeffstmpl.link(pc);
+    ofile_coeffstmpl.open(template_coeffs_fname);
+    coeffs_pntr->writeToFile(ofile_coeffstmpl,true);
+    ofile_coeffstmpl.close();
+    error("Only generating a template coefficent file - Should stop now");
+  }
+
+  std::string input_coeffs_fname;
+  parse("input_coeffs",input_coeffs_fname);
+  std::string output_coeffs_fname;
+  parse("output_coeffs",output_coeffs_fname);
+  if(input_coeffs_fname.size()==0){error("you need to give a coeffs file using the coeffs_file keyword.");}
+  coeffs_pntr->readFromFile(input_coeffs_fname,true,true);
   double coeffs_prefactor = 1.0;
   parse("coeffs_prefactor",coeffs_prefactor);
   if(coeffs_prefactor!=1.0){coeffs_pntr->scaleAllValues(coeffs_prefactor);}
-  coeffs_pntr->readFromFile(coeffs_fname,true,true);
-
-  OFile ofile_coeffsout;
-  ofile_coeffsout.link(pc);
-  ofile_coeffsout.open("coeffs_out.data");
-  coeffs_pntr->writeToFile(ofile_coeffsout,true);
-  ofile_coeffsout.close();
 
   potential_expansion_pntr->setupBiasGrid(false);
   potential_expansion_pntr->updateBiasGrid();
+  potential_expansion_pntr->setBiasMinimumToZero();
+  potential_expansion_pntr->updateBiasGrid();
+
   OFile ofile_potential;
   ofile_potential.link(pc);
   ofile_potential.open("potential.data");
   potential_expansion_pntr->writeBiasGridToFile(ofile_potential);
   ofile_potential.close();
+
+  OFile ofile_coeffsout;
+  ofile_coeffsout.link(pc);
+  ofile_coeffsout.open(output_coeffs_fname);
+  coeffs_pntr->writeToFile(ofile_coeffsout,true);
+  ofile_coeffsout.close();
 
   if(pc.Get_rank() == 0) {
     fprintf(out,"Partitions                            %u\n",partitions);
