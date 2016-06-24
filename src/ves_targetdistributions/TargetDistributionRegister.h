@@ -35,7 +35,7 @@ namespace PLMD{
 
 class TargetDistributionRegister{
 private:
-/// Pointer to a function which, given the type for a ReferenceConfiguration, creates it
+/// Pointer to a function which, given the type for a TargetDistribution, creates it
   typedef TargetDistribution*(*creator_pointer)(const TargetDistributionOptions&);
 /// The set of possible target distribution we can use
   std::map<std::string,creator_pointer> m;
