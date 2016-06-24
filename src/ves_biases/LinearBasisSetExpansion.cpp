@@ -368,17 +368,15 @@ double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args
   std::vector<double> args_values_trsfrm(nargs);
   std::vector<bool>   inside_interval(nargs,true);
   //
-  std::vector< std::vector <double> > bf_values;
-  std::vector< std::vector <double> > bf_derivs;
+  std::vector< std::vector <double> > bf_values(nargs);
+  std::vector< std::vector <double> > bf_derivs(nargs);
   //
   for(unsigned int k=0;k<nargs;k++){
-    std::vector<double> tmp_val(basisf_pntrs_in[k]->getNumberOfBasisFunctions());
-    std::vector<double> tmp_der(tmp_val.size());
+    bf_values[k].assign(basisf_pntrs_in[k]->getNumberOfBasisFunctions(),0.0);
+    bf_derivs[k].assign(basisf_pntrs_in[k]->getNumberOfBasisFunctions(),0.0);
     bool inside=true;
-    basisf_pntrs_in[k]->getAllValues(args_values[k],args_values_trsfrm[k],inside,tmp_val,tmp_der);
+    basisf_pntrs_in[k]->getAllValues(args_values[k],args_values_trsfrm[k],inside,bf_values[k],bf_derivs[k]);
     inside_interval[k]=inside;
-    bf_values.push_back(tmp_val);
-    bf_derivs.push_back(tmp_der);
     forces[k]=0.0;
   }
   //
