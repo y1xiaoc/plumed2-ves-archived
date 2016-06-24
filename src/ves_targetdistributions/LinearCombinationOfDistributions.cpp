@@ -44,7 +44,7 @@ public:
 };
 
 
-VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(LinearCombinationOfDistributions,"LINEAR_COMBINATION")
+VES_REGISTER_TARGET_DISTRIBUTION(LinearCombinationOfDistributions,"LINEAR_COMBINATION")
 
 
 void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){

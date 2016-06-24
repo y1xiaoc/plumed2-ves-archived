@@ -54,7 +54,7 @@ public:
 
 TargetDistributionRegister& targetDistributionRegister();
 
-#define VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(classname,type) \
+#define VES_REGISTER_TARGET_DISTRIBUTION(classname,type) \
   static class classname##RegisterMe{ \
     static TargetDistribution * create(const TargetDistributionOptions&to){return new classname(to);} \
   public: \

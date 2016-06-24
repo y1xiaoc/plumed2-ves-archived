@@ -50,7 +50,7 @@ public:
 };
 
 
-VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(GaussianDistribution,"GAUSSIAN")
+VES_REGISTER_TARGET_DISTRIBUTION(GaussianDistribution,"GAUSSIAN")
 
 
 void GaussianDistribution::registerKeywords(Keywords& keys){

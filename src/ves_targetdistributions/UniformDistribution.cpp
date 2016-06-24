@@ -39,7 +39,7 @@ public:
 };
 
 
-VARIATIONAL_REGISTER_TARGET_DISTRIBUTION(UniformDistribution,"UNIFORM")
+VES_REGISTER_TARGET_DISTRIBUTION(UniformDistribution,"UNIFORM")
 
 
 void UniformDistribution::registerKeywords(Keywords& keys) {
