@@ -105,9 +105,11 @@ bf_pntrs(1)
   //
   OFile ofile_values;
   ofile_values.link(*this);
+  ofile_values.enforceBackup();
   ofile_values.open(fname_values);
   OFile ofile_derivs;
   ofile_derivs.link(*this);
+  ofile_derivs.enforceBackup();
   ofile_derivs.open(fname_derives);
   bf_pntrs[0]->writeBasisFunctionsToFile(ofile_values,ofile_derivs,grid_bins,ignore_periodicity);
   ofile_values.close();
@@ -125,13 +127,18 @@ bf_pntrs(1)
     args[0]->setNotPeriodic();
   }
 
+  OFile ofile_targetdist_aver;
+  ofile_targetdist_aver.link(*this);
+  ofile_targetdist_aver.enforceBackup();
+  ofile_targetdist_aver.open(fname_targetdist_aver);
+
   for(unsigned int i=0; i<targetdist_keywords.size(); i++){
     std::string is; Tools::convert(i+1,is);
     TargetDistribution* targetdist_pntr = setupTargetDistPntr(targetdist_keywords[i]);
     std::vector<double> bf_integrals = bf_pntrs[0]->getTargetDistributionIntegrals(targetdist_pntr);
     CoeffsVector targetdist_averages = CoeffsVector("aver.targetdist-"+is,args,bf_pntrs,comm,false);
     targetdist_averages.setValues(bf_integrals);
-    targetdist_averages.writeToFile(fname_targetdist_aver,true,true,this);
+    targetdist_averages.writeToFile(ofile_targetdist_aver,true);
     Grid ps_grid = Grid("targetdist-"+is,args,min,max,nbins,false,false);
     if(targetdist_pntr!=NULL){
       std::string fname = FileBase::appendSuffix(fname_targetdist,is);
@@ -145,6 +152,7 @@ bf_pntrs(1)
     }
     delete targetdist_pntr;
   }
+  ofile_targetdist_aver.close();
   delete args[0]; args.clear();
 
 
@@ -155,7 +163,7 @@ bf_pntrs(1)
 TargetDistribution* DumpBasisFunctions::setupTargetDistPntr(std::string keyword) const {
   std::vector<std::string> words = Tools::getWords(keyword);
   TargetDistribution* pntr = NULL;
-  if(words[0]=="UNIFORM"){
+  if(words[0]=="UNIFORM" && words.size()==1){
     pntr = NULL;
   }
   else{
