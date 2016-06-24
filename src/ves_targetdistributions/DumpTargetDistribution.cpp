@@ -62,7 +62,7 @@ void DumpTargetDistribution::registerKeywords(Keywords& keys){
   keys.add("compulsory","GRID_MIN","the lower bounds for the grid");
   keys.add("compulsory","GRID_MAX","the upper bounds for the grid");
   keys.add("compulsory","GRID_BINS","the number of bins used for the grid.");
-  keys.add("optional","GRID_PERIODICITY","specfiy if the individual arguments should be made periodic (YES) or not (NO). By default all arguments are not periodic.");
+  keys.add("optional","GRID_PERIODICITY","specfiy if the individual arguments should be made periodic (YES) or not (NO). By default all arguments are taken  be not periodic.");
   keys.add("compulsory","FILE","filename of the files on which the target distribution are written.");
   keys.add("compulsory","TARGET_DISTRIBUTION","the target distribution to be used.");
 }
@@ -98,6 +98,7 @@ Action(ao)
   std::vector<Value*> arguments(nargs);
   for(unsigned int i=0; i < nargs; i++) {
     std::string is; Tools::convert(i+1,is);
+    if(nargs==1){is="";}
     arguments[i]= new Value(NULL,"arg"+is,false);
     if(grid_periodicity[i]=="YES"){
       arguments[i]->setDomain(grid_min[i],grid_max[i]);
@@ -115,14 +116,10 @@ Action(ao)
 
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&ps_grid,"weights_grid.data");
   double sum_grid=0.0;
-  double sum_grid2=0.0;
   for(unsigned int i=0; i<ps_grid.getSize(); i++){
-    sum_grid  += ps_grid.getValue(i);
-    sum_grid2 += integration_weights[i]*ps_grid.getValue(i);
+    sum_grid += integration_weights[i]*ps_grid.getValue(i);
   }
-  sum_grid *= ps_grid.getBinVolume();
-  log.printf("  target distribtion summed over the grid: %16.12f (normal sum)\n",sum_grid);
-  log.printf("  target distribtion summed over the grid: %16.12f (with weights)\n",sum_grid2);
+  log.printf("  target distribution integrated over the grid: %16.12f (with weights)\n",sum_grid);
   //
   OFile ofile;
   ofile.link(*this);
