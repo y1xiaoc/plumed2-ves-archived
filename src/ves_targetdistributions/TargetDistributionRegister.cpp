@@ -61,7 +61,10 @@ TargetDistribution* TargetDistributionRegister::create( const TargetDistribution
   if( check(to.words[0]) ){
      lselect=m[to.words[0]](to);
      lselect->checkRead();
-  } else lselect=NULL;
+  }
+  else{
+    plumed_merror("problem with target distribution given in input, distribution of the type " + to.words[0] + " does not exist");
+  }
   return lselect;
 }
 
