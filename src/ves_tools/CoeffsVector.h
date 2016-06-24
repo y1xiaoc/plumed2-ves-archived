@@ -215,6 +215,20 @@ public:
   std::string getOutputFmt() const {return output_fmt_;}
   Communicator& getCommunicator() const {return mycomm;}
 };
+
+
+inline
+double CoeffsVector::getValue(const size_t index) const {
+  return data[index];
+}
+
+
+inline
+double CoeffsVector::getValue(const std::vector<unsigned int>& indices) const {
+  return data[getIndex(indices)];
+}
+
+
 }
 
 

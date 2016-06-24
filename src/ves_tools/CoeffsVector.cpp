@@ -171,17 +171,6 @@ void CoeffsVector::sumMultiSimCommMPI(Communicator& multi_sim_cc) {
 }
 
 
-double CoeffsVector::getValue(const size_t index) const {
-  plumed_dbg_assert(index<data.size());
-  return data[index];
-}
-
-
-double CoeffsVector::getValue(const std::vector<unsigned int>& indices) const {
-  return getValue(getIndex(indices));
-}
-
-
 double& CoeffsVector::operator[](const size_t index) {
   plumed_dbg_assert(index<data.size());
   return data[index];
