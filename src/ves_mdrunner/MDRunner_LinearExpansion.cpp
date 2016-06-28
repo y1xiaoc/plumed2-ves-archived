@@ -23,6 +23,7 @@
 #include "cltools/CLToolRegister.h"
 #include "tools/Vector.h"
 #include "tools/Random.h"
+#include "tools/Grid.h"
 #include "tools/Communicator.h"
 #include "tools/FileBase.h"
 #include "core/PlumedMain.h"
@@ -37,6 +38,7 @@
 #include "ves_basisfunctions/BasisFunctions.h"
 #include "ves_biases/LinearBasisSetExpansion.h"
 #include "ves_tools/CoeffsVector.h"
+#include "ves_tools/GridIntegrationWeights.h"
 
 #ifdef __PLUMED_HAS_MPI
 #include <mpi.h>
@@ -255,6 +257,21 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   ofile_potential.open("potential.data");
   potential_expansion_pntr->writeBiasGridToFile(ofile_potential);
   ofile_potential.close();
+
+  Grid histo_grid(*potential_expansion_pntr->getPntrToBiasGrid());
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&histo_grid);
+  double norm=0.0;
+  for(unsigned int i=0; i<histo_grid.getSize(); i++){
+    double value = integration_weights[i]*exp(-histo_grid.getValue(i)/temp);
+    norm += value;
+    histo_grid.setValue(i,value);
+  }
+  histo_grid.scaleAllValuesAndDerivatives(1.0/norm);
+  OFile ofile_histog;
+  ofile_histog.link(pc);
+  ofile_histog.open("histogram.data");
+  histo_grid.writeToFile(ofile_histog);
+  ofile_histog.close();
 
   OFile ofile_coeffsout;
   ofile_coeffsout.link(pc);
