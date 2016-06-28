@@ -73,7 +73,7 @@ private:
   double calc_temp( const std::vector<Vector>& );
 };
 
-PLUMED_REGISTER_CLTOOL(MDRunner_LinearExpansion,"mdrunner_linearexpansion")
+PLUMED_REGISTER_CLTOOL(MDRunner_LinearExpansion,"md_linearexpansion")
 
 void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ){
     CLTool::registerKeywords( keys );
