@@ -393,8 +393,8 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
           positions[0][k]=interval_max[k]*0.999;
           velocities[0][k]=-abs(velocities[0][k]);
         }
-        if(positions[0][k]<interval_min[k]*0.001){
-          positions[0][k]=interval_min[k]*0.001;
+        if(positions[0][k]<interval_min[k]*0.999){
+          positions[0][k]=interval_min[k]*0.999;
           velocities[0][k]=-abs(velocities[0][k]);
         }
       }
