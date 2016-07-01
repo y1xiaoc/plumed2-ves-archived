@@ -78,6 +78,7 @@ private:
   std::string targetdist_grid_label_;
   //
   long int step_of_last_biasgrid_update;
+  long int step_of_last_biaswithoutcutoffgrid_update;
   long int step_of_last_fesgrid_update;
   //
   Grid* bias_grid_pntr_;
@@ -137,6 +138,9 @@ public:
   long int getStepOfLastBiasGridUpdate() const {return step_of_last_biasgrid_update;}
   void writeBiasGridToFile(OFile&, const bool append=false) const;
   void updateBiasWithoutCutoffGrid();
+  void resetStepOfLastBiasWithoutCutoffGridUpdate() {step_of_last_biaswithoutcutoffgrid_update = -1000;}
+  void setStepOfLastBiasWithoutCutoffGridUpdate(long int step) {step_of_last_biaswithoutcutoffgrid_update = step;}
+  long int getStepOfLastBiasWithoutCutoffGridUpdate() const {return step_of_last_biaswithoutcutoffgrid_update;}
   void writeBiasWithoutCutoffGridToFile(OFile&, const bool append=false) const;
   void setBiasMinimumToZero();
   void setBiasMaximumToZero();

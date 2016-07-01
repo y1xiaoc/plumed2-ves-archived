@@ -79,6 +79,7 @@ bias_cutoff_active_(false),
 grid_bins_(nargs_,100),
 targetdist_grid_label_("targetdist"),
 step_of_last_biasgrid_update(-1000),
+step_of_last_biaswithoutcutoffgrid_update(-1000),
 step_of_last_fesgrid_update(-1000),
 bias_grid_pntr_(NULL),
 bias_withoutcutoff_grid_pntr_(NULL),
@@ -253,6 +254,9 @@ void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
   plumed_massert(bias_withoutcutoff_grid_pntr_!=NULL,"the bias without cutoff grid is not defined");
   plumed_massert(biasCutoffActive(),"the bias cutoff has to be active");
   plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
+  if(action_pntr_!=NULL &&  getStepOfLastBiasWithoutCutoffGridUpdate()==action_pntr_->getStep()){
+    return;
+  }
   //
   for(Grid::index_t l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
     std::vector<double> forces(nargs_);
@@ -293,6 +297,9 @@ void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
   }
   if(vesbias_pntr_!=NULL){
     vesbias_pntr_->setCurrentBiasMaxValue(bias_max);
+  }
+  if(action_pntr_!=NULL){
+    setStepOfLastBiasWithoutCutoffGridUpdate(action_pntr_->getStep());
   }
 }
 
