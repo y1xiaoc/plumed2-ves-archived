@@ -74,7 +74,9 @@ vesbias_pntr_(NULL),
 action_pntr_(NULL)
 {
   bf_keywords_.push_back(getName());
-  parse("ORDER",norder_); addKeywordToList("ORDER",norder_);
+  if(keywords.exist("ORDER"){
+    parse("ORDER",norder_); addKeywordToList("ORDER",norder_);
+  }
   nbasis_=norder_+1;
   //
   std::string str_imin; std::string str_imax;
