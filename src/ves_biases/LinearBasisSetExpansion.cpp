@@ -739,6 +739,7 @@ void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
   Grid::index_t stride=mycomm_.Get_size();
   Grid::index_t rank=mycomm_.Get_rank();
   double norm = 0.0;
+  dynamic_ps_grid_pntr_->clear();
   for(Grid::index_t l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
     double bias = bias_withoutcutoff_grid_pntr_->getValue(l);
     double deriv_factor_sf = 0.0;
