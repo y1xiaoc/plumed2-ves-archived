@@ -561,6 +561,14 @@ isFirstStep(true)
     }
   }
 
+  if(getRestart() && ustride_targetdist_>0){
+    for(unsigned int i=0; i<nbiases_; i++){
+      if(dynamic_targetdists_[i]){
+        bias_pntrs_[i]->updateTargetDistributions();
+      }
+    }
+  }
+
   if(keywords.exists("BIAS_OUTPUT")){
     parse("BIAS_OUTPUT",bias_output_stride_);
     if(bias_output_stride_>0){
@@ -674,18 +682,6 @@ isFirstStep(true)
       }
     }
   }
-
-  if(getRestart() && ustride_targetdist_>0){
-    for(unsigned int i=0; i<nbiases_; i++){
-      if(dynamic_targetdists_[i]){
-        bias_pntrs_[i]->updateTargetDistributions();
-        if(targetdist_output_active_){
-          bias_pntrs_[i]->writeDynamicTargetDistToFile();
-        }
-      }
-    }
-  }
-
 
 }
 

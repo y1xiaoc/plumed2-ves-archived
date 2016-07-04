@@ -132,7 +132,7 @@ protected:
   void setTargetDistAverages(const CoeffsVector&, const unsigned coeffs_id= 0);
   void setTargetDistAveragesToZero(const unsigned coeffs_id= 0);
 
-  void readCoeffsFromFiles();
+  bool readCoeffsFromFiles();
   //
   template<class T>
   bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int);

@@ -126,11 +126,14 @@ valueForce2_(NULL)
   }
   setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
 
+  bool read_coeffs = readCoeffsFromFiles();
+
   if(this->wellTemperdTargetDistribution()){
     bias_expansion_pntr_->setupWellTemperedTargetDistribution(this->getWellTemperedBiasFactor());
   }
   else if(this->biasCutoffActive()){
     bias_expansion_pntr_->setupBiasCutoffTargetDistribution();
+    if(read_coeffs){updateTargetDistributions();}
   }
 
   //

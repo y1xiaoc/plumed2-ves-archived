@@ -358,9 +358,10 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
 }
 
 
-void VesBias::readCoeffsFromFiles() {
+bool VesBias::readCoeffsFromFiles() {
   plumed_assert(ncoeffssets_>0);
   plumed_massert(keywords.exists("COEFFS"),"you are not allowed to use this function as the COEFFS keyword is not enabled");
+  bool read_coeffs = false;
   if(coeffs_fnames.size()>0){
     plumed_massert(coeffs_fnames.size()==ncoeffssets_,"COEFFS keyword is of the wrong size");
     if(ncoeffssets_==1){
@@ -387,7 +388,9 @@ void VesBias::readCoeffsFromFiles() {
       }
       ifile.close();
     }
+    read_coeffs = true;
   }
+  return read_coeffs;
 }
 
 
