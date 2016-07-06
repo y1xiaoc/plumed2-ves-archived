@@ -31,7 +31,7 @@ namespace ves_mdrunner{
 class MDRunner_Position : public Colvar {
 public:
   static void registerKeywords( Keywords& keys );
-  MDRunner_Position( const ActionOptions& );
+  explicit MDRunner_Position( const ActionOptions& );
   virtual void calculate();
 };
 

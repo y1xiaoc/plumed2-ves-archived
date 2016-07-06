@@ -65,7 +65,7 @@ class MDRunner_LinearExpansion : public PLMD::CLTool {
 public:
   string description() const {return "dynamics of one atom on energy landscape";}
   static void registerKeywords( Keywords& keys );
-  MDRunner_LinearExpansion( const CLToolOptions& co );
+  explicit MDRunner_LinearExpansion( const CLToolOptions& co );
   int main( FILE* in, FILE* out, PLMD::Communicator& pc);
 private:
   unsigned int dim;
@@ -98,7 +98,11 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ){
 }
 
 
-MDRunner_LinearExpansion::MDRunner_LinearExpansion( const CLToolOptions& co ) : CLTool(co) {
+MDRunner_LinearExpansion::MDRunner_LinearExpansion( const CLToolOptions& co ):
+CLTool(co),
+dim(0),
+potential_expansion_pntr(NULL)
+{
      inputdata=ifile; //commandline;
 }
 
@@ -301,7 +305,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   if(plumedon) plumed=new PLMD::PlumedMain;
 
   // Define inter and intra communicators
-  int me=(pc.Get_rank() % coresPerPart);
+  // int me=(pc.Get_rank() % coresPerPart);
   int iworld=(pc.Get_rank() / coresPerPart);
   //MPI_Comm multi;
   //MPI_Comm_split(pc.Get_comm(),iworld,0,&multi);
@@ -451,7 +455,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     ttt = calc_temp( velocities );
     conserved = potential+1.5*ttt+therm_eng;
     if( (intra.Get_rank()==0) && ((istep % stepWrite)==0) ){
-      fprintf(fp,"%d %f %f %f %f %f %f %f %f \n", istep, istep*tstep, positions[0][0], positions[0][1], positions[0][2], conserved, ttt, potential, therm_eng );
+      fprintf(fp,"%u %f %f %f %f %f %f %f %f \n", istep, istep*tstep, positions[0][0], positions[0][1], positions[0][2], conserved, ttt, potential, therm_eng );
     }
   }
 
