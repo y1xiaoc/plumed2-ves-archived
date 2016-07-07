@@ -95,7 +95,7 @@ ngaussians_(0)
   }
   plumed_massert(centers_.size()==sigmas_.size(),"there has to be an equal amount of CENTER and SIGMA keywords");
   if(centers_.size()==0){
-    plumed_merror("CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
+    plumed_merror("GAUSSIAN: CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
   }
   //
   setDimension(centers_[0].size());
@@ -107,22 +107,38 @@ ngaussians_(0)
   }
   //
   correlation_.resize(ngaussians_);
-  for(unsigned int i=0;i<ngaussians_; i++){
-    std::vector<double> corr;
-    if(parseNumberedVector("CORRELATION",(i+1),corr)){
-      plumed_massert(getDimension()==2,"CORRELATION is only defined for two-dimensional Gaussians for now.");
-      plumed_massert(corr.size()==1,"only one value should be given in CORRELATION");
-      for(unsigned int k=0;k<corr.size(); k++){
-        plumed_massert(corr[k] >= -1.0 && corr[k] <= 1.0,"values given in CORRELATION should be between -1.0 and 1.0" );
-      }
-      correlation_[i] = corr;
+
+  if(ngaussians_==1){
+    std::vector<double> corr(1,0.0);
+    if(parseVector("CORRELATION",corr,true)){
       diagonal_ = false;
     }
-    else {
-      corr.assign(1,0.0);
+    correlation_[0] = corr;
+  }
+  else {
+    for(unsigned int i=0;i<ngaussians_; i++){
+      std::vector<double> corr(1,0.0);
+      if(parseNumberedVector("CORRELATION",(i+1),corr)){
+        diagonal_ = false;
+      }
       correlation_[i] = corr;
     }
   }
+
+  if(!diagonal_ && getDimension()!=2){
+    plumed_merror("GAUSSIAN: CORRELATION is only defined for two-dimensional Gaussians for now.");
+  }
+  for(unsigned int i=0; i<correlation_.size(); i++){
+    if(correlation_[i].size()!=1){
+      plumed_merror("GAUSSIAN: only one value should be given in CORRELATION");
+    }
+    for(unsigned int k=0;k<correlation_[i].size(); k++){
+      if(correlation_[i][k] <= -1.0 ||  correlation_[i][k] >= 1.0){
+        plumed_merror("GAUSSIAN: values given in CORRELATION should be between -1.0 and 1.0" );
+      }
+    }
+  }
+
   //
   if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(centers_.size(),1.0);}
   plumed_massert(centers_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered CENTER keywords");

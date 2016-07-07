@@ -21,6 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
+#include "ves_tools/GridIntegrationWeights.h"
+
 
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
@@ -34,6 +36,7 @@ class DistributionFromGrid : public TargetDistribution {
   Grid* distGrid_;
   std::vector<double> minima_;
   std::vector<double> maxima_;
+  bool zero_outside_;
 public:
   static void registerKeywords( Keywords&);
   explicit DistributionFromGrid( const TargetDistributionOptions& to );
@@ -46,11 +49,12 @@ VES_REGISTER_TARGET_DISTRIBUTION(DistributionFromGrid,"GRID")
 
 void DistributionFromGrid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","FILE","the name of the file contaning the target distribtion");
+  keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
   keys.add("compulsory","ARGS","the arguments given in the grid file");
   keys.add("compulsory","LABEL","the label given in the grid file");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
-  keys.addFlag("NORMALIZE",false,"specifies that the target distribtion should be normalized by integrating over it. Otherwise it is assumed that it is normalized.");
+  keys.addFlag("NORMALIZE",false,"specifies that the target distribution should be normalized by integrating over it. Otherwise it is assumed that it is normalized.");
+  keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the given grid are the same as at the boundary. This can be changed by using this flag which will make values outside the grid to be taken as zero.");
 }
 
 
@@ -59,7 +63,8 @@ TargetDistribution(to),
 normalization_(0.0),
 distGrid_(NULL),
 minima_(0),
-maxima_(0)
+maxima_(0),
+zero_outside_(false)
 {
   std::string filename;
   parse("FILE",filename);
@@ -70,6 +75,7 @@ maxima_(0)
   setDimension(arglabels.size());
   bool normalize=false;
   parseFlag("NORMALIZE",normalize);
+  parseFlag("ZERO_OUTSIDE",zero_outside_);
   // bool nospline=false;
   // parseFlag("NOSPLINE",nospline);
   // bool spline=!nospline;
@@ -92,25 +98,36 @@ maxima_(0)
     Tools::convert(distGrid_->getMin()[i],minima_[i]);
     Tools::convert(distGrid_->getMax()[i],maxima_[i]);
   }
+
+  normalization_ = 0.0;
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(distGrid_);
+  for(unsigned int l=0; l<distGrid_->getSize(); l++){
+   normalization_ += integration_weights[l]*distGrid_->getValue(l);
+  }
+
   if(normalize){
-    normalization_ = 0.0;
-    for(unsigned int l=0; l<distGrid_->getSize(); l++)
-    {
-     normalization_ += distGrid_->getValue(l);
-    }
-    normalization_ *= distGrid_->getBinVolume();
     distGrid_->scaleAllValuesAndDerivatives(1.0/normalization_);
   }
-  setNormalized();
+
+   setNormalized();
 }
 
 
 double DistributionFromGrid::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
+  std::vector<double> arg = argument;
   for(unsigned int k=0; k<getDimension(); k++){
-    if(argument[k] < minima_[k] || argument[k] > maxima_[k]){return outside;}
+    if(zero_outside_ && (argument[k] < minima_[k] || argument[k] > maxima_[k])){
+      return outside;
+    }
+    else if(argument[k] < minima_[k]){
+      arg[k] = minima_[k];
+    }
+    else if(argument[k] > maxima_[k]){
+      arg[k] =maxima_[k];
+    }
   }
-  return distGrid_->getValue(argument);
+  return distGrid_->getValue(arg);
 }
 
 

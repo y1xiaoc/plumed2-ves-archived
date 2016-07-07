@@ -114,7 +114,8 @@ Action(ao)
   Grid ps_grid = Grid("targetdist",arguments,grid_min,grid_max,grid_bins,false,false);
   targetdist_pntr->calculateDistributionOnGrid(&ps_grid);
 
-  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&ps_grid,"weights_grid.data");
+  //std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&ps_grid,"weights_grid.data");
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&ps_grid);
   double sum_grid=0.0;
   for(unsigned int i=0; i<ps_grid.getSize(); i++){
     sum_grid += integration_weights[i]*ps_grid.getValue(i);
