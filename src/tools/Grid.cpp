@@ -127,6 +127,18 @@ void Grid::clear(){
  }
 }
 
+void Grid::enableSpline(){
+  der_.resize(maxsize_);
+  for(index_t i=0;i<maxsize_;++i){
+    der_[i].resize(dimension_);
+    for(unsigned int j=0;j<dimension_;++j){
+      der_[i][j]=0.0;
+    }
+  }
+  usederiv_=true;
+  dospline_=true;
+}
+
 vector<std::string> Grid::getMin() const {
  return str_min_;
 }

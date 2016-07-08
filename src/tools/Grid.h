@@ -111,6 +111,8 @@ public:
  void Init(const std::string & funcl, const std::vector<std::string> &names, const std::vector<std::string> & gmin,
       const std::vector<std::string> & gmax, const std::vector<unsigned> & nbin, bool dospline, bool usederiv,
       bool doclear, const std::vector<bool> &isperiodic, const std::vector<std::string> &pmin, const std::vector<std::string> &pmax);
+/// enable splines by creating empty deriv vector
+ void enableSpline();
 /// get lower boundary
  std::vector<std::string> getMin() const;
 /// get upper boundary
