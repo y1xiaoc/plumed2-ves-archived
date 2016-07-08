@@ -120,7 +120,7 @@ Action(ao)
   for(unsigned int i=0; i<ps_grid.getSize(); i++){
     sum_grid += integration_weights[i]*ps_grid.getValue(i);
   }
-  log.printf("  target distribution integrated over the grid: %16.12f (with weights)\n",sum_grid);
+  log.printf("  target distribution integrated over the grid: %16.12f\n",sum_grid);
   //
   OFile ofile;
   ofile.link(*this);
