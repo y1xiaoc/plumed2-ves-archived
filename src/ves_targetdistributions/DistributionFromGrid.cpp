@@ -91,6 +91,7 @@ zero_outside_(false)
   IFile gridfile; gridfile.open(filename);
   distGrid_=Grid::create(gridlabel,arguments,gridfile,sparsegrid,spline,false);
   plumed_massert(distGrid_->getDimension()==getDimension(),"mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
+  distGrid_->enableSpline();
 
   minima_.resize(getDimension());
   maxima_.resize(getDimension());
