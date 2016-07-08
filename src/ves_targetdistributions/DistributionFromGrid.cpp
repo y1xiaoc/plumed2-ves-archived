@@ -52,7 +52,7 @@ void DistributionFromGrid::registerKeywords(Keywords& keys) {
   keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
   keys.add("compulsory","ARGS","the arguments given in the grid file");
   keys.add("compulsory","LABEL","the label given in the grid file");
-  keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
+  // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
   keys.addFlag("NORMALIZE",false,"specifies that the target distribution should be normalized by integrating over it. Otherwise it is assumed that it is normalized.");
   keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the given grid are the same as at the boundary. This can be changed by using this flag which will make values outside the grid to be taken as zero.");
 }
@@ -77,7 +77,8 @@ zero_outside_(false)
   parseFlag("NORMALIZE",normalize);
   parseFlag("ZERO_OUTSIDE",zero_outside_);
   bool no_spline=false;
-  parseFlag("NOSPLINE",no_spline);
+  // parseFlag("NOSPLINE",no_spline);
+
   checkRead();
 
   std::vector<Value*> arguments(arglabels.size());
