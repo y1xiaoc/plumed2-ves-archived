@@ -50,8 +50,6 @@ VES_REGISTER_TARGET_DISTRIBUTION(DistributionFromGrid,"GRID")
 void DistributionFromGrid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
-  keys.add("compulsory","ARGS","the arguments given in the grid file");
-  keys.add("compulsory","LABEL","the label given in the grid file");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
   keys.addFlag("NORMALIZE",false,"specifies that the target distribution should be normalized by integrating over it. Otherwise it is assumed that it is normalized.");
   keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the given grid are the same as at the boundary. This can be changed by using this flag which will make values outside the grid to be taken as zero.");
@@ -68,11 +66,6 @@ zero_outside_(false)
 {
   std::string filename;
   parse("FILE",filename);
-  std::string gridlabel;
-  parse("LABEL",gridlabel);
-  std::vector<std::string> arglabels;
-  parseVector("ARGS",arglabels);
-  setDimension(arglabels.size());
   bool normalize=false;
   parseFlag("NORMALIZE",normalize);
   parseFlag("ZERO_OUTSIDE",zero_outside_);
@@ -81,14 +74,39 @@ zero_outside_(false)
 
   checkRead();
 
+  IFile gridfile_header; gridfile_header.open(filename);
+  std::vector<std::string> fields;
+  gridfile_header.scanFieldList(fields);
+  gridfile_header.allowIgnoredFields();
+  gridfile_header.scanField();
+  gridfile_header.close();
+  unsigned int nargs=0;
+  for(unsigned int i=0; i<fields.size(); i++){
+    if(fields[i]=="der_"+fields[0]){
+      plumed_merror("Target distribution of type GRID: the grid file should not contain derivatives");
+    }
+    if(fields[i]=="min_"+fields[0]){
+      nargs = i-1;
+      break;
+    }
+  }
+  std::string gridlabel = fields[nargs];
+  std::vector<std::string> arglabels(nargs);
+  for(unsigned int i=0; i<nargs; i++){
+    arglabels[i] = fields[i];
+  }
+
+  setDimension(arglabels.size());
   std::vector<Value*> arguments(arglabels.size());
   for (unsigned int i=0; i < arglabels.size(); i++) {
     arguments[i]= new Value(NULL,arglabels[i],false);
     arguments[i]->setNotPeriodic();
   }
+
+
   IFile gridfile; gridfile.open(filename);
   distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);
-  plumed_massert(distGrid_->getDimension()==getDimension(),"mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
+  plumed_massert(distGrid_->getDimension()==getDimension(),"Target distribution of type GRID: mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
   if(!no_spline){distGrid_->enableSpline();}
 
   minima_.resize(getDimension());
