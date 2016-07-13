@@ -22,6 +22,7 @@
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
 #include "ves_tools/GridIntegrationWeights.h"
+#include "ves_tools/VesTools.h"
 
 
 #include "tools/Keywords.h"
@@ -71,43 +72,44 @@ zero_outside_(false)
   parseFlag("ZERO_OUTSIDE",zero_outside_);
   bool no_spline=false;
   // parseFlag("NOSPLINE",no_spline);
+  bool use_spline = !no_spline;
 
   checkRead();
 
-  IFile gridfile_header; gridfile_header.open(filename);
-  std::vector<std::string> fields;
-  gridfile_header.scanFieldList(fields);
-  gridfile_header.allowIgnoredFields();
-  gridfile_header.scanField();
-  gridfile_header.close();
-  unsigned int nargs=0;
-  for(unsigned int i=0; i<fields.size(); i++){
-    if(fields[i]=="der_"+fields[0]){
-      plumed_merror("Target distribution of type GRID: the grid file should not contain derivatives");
-    }
-    if(fields[i]=="min_"+fields[0]){
-      nargs = i-1;
-      break;
-    }
-  }
-  std::string gridlabel = fields[nargs];
-  std::vector<std::string> arglabels(nargs);
-  for(unsigned int i=0; i<nargs; i++){
-    arglabels[i] = fields[i];
+  std::string gridlabel;
+  std::vector<std::string> arglabels;
+  std::vector<std::string> argmin;
+  std::vector<std::string> argmax;
+  std::vector<bool> argperiodic;
+  std::vector<unsigned int> argnbins;
+  bool has_deriv = false;
+  unsigned int nargs = VesTools::getGridFileInfo(filename,gridlabel,arglabels,argmin,argmax,argperiodic,argnbins,has_deriv);
+  if(nargs==0){
+    plumed_merror("Target distribution of type GRID: problem in parsing information from grid file");
   }
 
   setDimension(arglabels.size());
   std::vector<Value*> arguments(arglabels.size());
-  for (unsigned int i=0; i < arglabels.size(); i++) {
+  for(unsigned int i=0; i < arglabels.size(); i++) {
     arguments[i]= new Value(NULL,arglabels[i],false);
-    arguments[i]->setNotPeriodic();
+    if(argperiodic[i]){
+      arguments[i]->setDomain(argmin[i],argmax[i]);
+    }
+    else {
+      arguments[i]->setNotPeriodic();
+    }
   }
 
-
   IFile gridfile; gridfile.open(filename);
-  distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);
+  if(has_deriv){
+    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,use_spline,true);
+  }
+  else {
+    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);
+    if(use_spline){distGrid_->enableSpline();}
+  }
+
   plumed_massert(distGrid_->getDimension()==getDimension(),"Target distribution of type GRID: mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
-  if(!no_spline){distGrid_->enableSpline();}
 
   minima_.resize(getDimension());
   maxima_.resize(getDimension());
@@ -125,7 +127,6 @@ zero_outside_(false)
   if(normalize){
     distGrid_->scaleAllValuesAndDerivatives(1.0/normalization_);
   }
-
    setNormalized();
 }
 
