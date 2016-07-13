@@ -27,6 +27,7 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+#include <vector>
 
 namespace PLMD{
 
@@ -43,6 +44,7 @@ public:
   static void convertDbl2Str(const double value,std::string& str);
   // copy grid values
   static void copyGridValues(Grid* grid_pntr_orig, Grid* grid_pntr_copy);
+  static unsigned int getGridFileInfo(const std::string&, std::string&, std::vector<std::string>&, std::vector<std::string>&, std::vector<std::string>&, std::vector<bool>&, std::vector<unsigned int>&, bool&);
 };
 
 inline
