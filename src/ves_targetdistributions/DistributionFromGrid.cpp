@@ -37,6 +37,7 @@ class DistributionFromGrid : public TargetDistribution {
   Grid* distGrid_;
   std::vector<double> minima_;
   std::vector<double> maxima_;
+  std::vector<bool> periodic_;
   bool zero_outside_;
 public:
   static void registerKeywords( Keywords&);
@@ -113,9 +114,12 @@ zero_outside_(false)
 
   minima_.resize(getDimension());
   maxima_.resize(getDimension());
+  periodic_.resize(getDimension());
   for (unsigned int i=0; i < getDimension(); i++) {
     Tools::convert(distGrid_->getMin()[i],minima_[i]);
     Tools::convert(distGrid_->getMax()[i],maxima_[i]);
+    periodic_[i] = argperiodic[i];
+    if(periodic_[i]){maxima_[i]-=distGrid_->getDx()[i];}
   }
 
   normalization_ = 0.0;
