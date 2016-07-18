@@ -80,8 +80,14 @@ action_pntr_(NULL)
   nbasis_=norder_+1;
   //
   std::string str_imin; std::string str_imax;
-  parse("INTERVAL_MIN",str_imin); addKeywordToList("INTERVAL_MIN",str_imin);
-  parse("INTERVAL_MAX",str_imax); addKeywordToList("INTERVAL_MAX",str_imax);
+  if(keywords.exists("INTERVAL_MIN") && keywords.exists("INTERVAL_MAX")){
+    parse("INTERVAL_MIN",str_imin); addKeywordToList("INTERVAL_MIN",str_imin);
+    parse("INTERVAL_MAX",str_imax); addKeywordToList("INTERVAL_MAX",str_imax);
+  }
+  else {
+    str_imin = "-1.0";
+    str_imax = "1.0";
+  }
   interval_min_str_ = str_imin;
   interval_max_str_ = str_imax;
   if(!Tools::convert(str_imin,interval_min_)){
@@ -93,8 +99,12 @@ action_pntr_(NULL)
   if(interval_min_>interval_max_){plumed_merror("INTERVAL_MIN and INTERVAL_MAX are not correctly defined");}
   //
   parseFlag("DEBUG_INFO",print_debug_info_);
-  parseFlag("NUMERICAL_INTEGRALS",numerical_uniform_integrals_);
-  parse("NGRID_POINTS",nbins_);
+  if(keywords.exists("NUMERICAL_INTEGRALS")){
+    parseFlag("NUMERICAL_INTEGRALS",numerical_uniform_integrals_);
+  }
+  if(keywords.exists("NGRID_POINTS")){
+    parse("NGRID_POINTS",nbins_);
+  }
   // log.printf(" %s \n",getKeywordString().c_str());
 
 }
