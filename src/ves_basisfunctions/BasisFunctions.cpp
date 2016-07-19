@@ -115,7 +115,7 @@ void BasisFunctions::setIntrinsicInterval(const double interval_intrinsic_min_in
   interval_intrinsic_max_ = interval_intrinsic_max_in;
   VesTools::convertDbl2Str(interval_intrinsic_min_,interval_intrinsic_min_str_);
   VesTools::convertDbl2Str(interval_intrinsic_max_,interval_intrinsic_max_str_);
-  plumed_massert(interval_intrinsic_min_<interval_intrinsic_max_,"intrinsic intervals are not defined correctly");
+  plumed_massert(interval_intrinsic_min_<interval_intrinsic_max_,"setIntrinsicInterval: intrinsic intervals are not defined correctly");
 }
 
 
@@ -123,20 +123,34 @@ void BasisFunctions::setIntrinsicInterval(const std::string& interval_intrinsic_
   interval_intrinsic_min_str_ = interval_intrinsic_min_str_in;
   interval_intrinsic_max_str_ = interval_intrinsic_max_str_in;
   if(!Tools::convert(interval_intrinsic_min_str_,interval_intrinsic_min_)){
-    plumed_merror("setIntrinsicInterval: cannot convert value given for the minimum of the intrinsic interval to a double");
+    plumed_merror("setIntrinsicInterval: cannot convert string value given for the minimum of the intrinsic interval to a double");
   }
   if(!Tools::convert(interval_intrinsic_max_str_,interval_intrinsic_max_)){
-    plumed_merror("setIntrinsicInterval: cannot convert value given for the maximum of the intrinsic interval to a double");
+    plumed_merror("setIntrinsicInterval: cannot convert string value given for the maximum of the intrinsic interval to a double");
   }
-  plumed_massert(interval_intrinsic_min_<interval_intrinsic_max_,"intrinsic intervals are not defined correctly");
+  plumed_massert(interval_intrinsic_min_<interval_intrinsic_max_,"setIntrinsicInterval: intrinsic intervals are not defined correctly");
 }
 
 
+void BasisFunctions::setInterval(const double interval_min_in, const double interval_max_in) {
+  interval_min_ = interval_min_in;
+  interval_max_ = interval_max_in;
+  VesTools::convertDbl2Str(interval_min_,interval_min_str_);
+  VesTools::convertDbl2Str(interval_max_,interval_max_str_);
+  plumed_massert(interval_min_<interval_max_,"setInterval: intervals are not defined correctly");
+}
 
-void BasisFunctions::setNumberOfBasisFunctions(const unsigned int nbasis_in) {
-  nbasis_=nbasis_in;
-  bf_labels_.assign(nbasis_,"");
-  uniform_integrals_.assign(nbasis_,0.0);
+
+void BasisFunctions::setInterval(const std::string& interval_min_str_in, const std::string& interval_max_str_in) {
+  interval_min_str_ = interval_min_str_in;
+  interval_max_str_ = interval_max_str_in;
+  if(!Tools::convert(interval_min_str_,interval_min_)){
+    plumed_merror("setInterval: cannot convert string value given for the minimum of the interval to a double");
+  }
+  if(!Tools::convert(interval_max_str_,interval_max_)){
+    plumed_merror("setInterval: cannot convert string value given for the maximum of the interval to a double");
+  }
+  plumed_massert(interval_min_<interval_max_,"setInterval: intervals are not defined correctly");
 }
 
 
@@ -196,8 +210,8 @@ void BasisFunctions::printInfo() const {
   if(print_debug_info_){
     log.printf("  Debug information:\n");
     // log.printf("   Default interval of basis set: [%f,%f]\n",interval_intrinsic_min_,interval_intrinsic_max_);
-    log.printf("   Default interval of basis set: [%s,%s]\n",interval_intrinsic_min_str_.c_str(),interval_intrinsic_max_str_.c_str());
-    log.printf("   Default interval of basis set: range=%f,  mean=%f\n",interval_intrinsic_range_,interval_intrinsic_mean_);
+    log.printf("   Intrinsic interval of basis set: [%s,%s]\n",interval_intrinsic_min_str_.c_str(),interval_intrinsic_max_str_.c_str());
+    log.printf("   Intrinsic interval of basis set: range=%f,  mean=%f\n",interval_intrinsic_range_,interval_intrinsic_mean_);
     // log.printf("   Defined interval of basis set: [%f,%f]\n",interval_min_,interval_max_);
     log.printf("   Defined interval of basis set: [%s,%s]\n",interval_min_str_.c_str(),interval_max_str_.c_str());
     log.printf("   Defined interval of basis set: range=%f,  mean=%f\n",interval_range_,interval_mean_);

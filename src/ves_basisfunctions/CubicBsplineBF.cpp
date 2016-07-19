@@ -51,7 +51,6 @@ void CubicBsplineBF::registerKeywords(Keywords& keys){
 CubicBsplineBF::CubicBsplineBF(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
-  // plumed_merror("BF_CUBIC_B_SPLINES are not yet implented");
   setNumberOfBasisFunctions((getOrder()+3)+1);
   setIntrinsicInterval(intervalMin(),intervalMax());
   spacing_=(intervalMax()-intervalMin())/static_cast<double>(getOrder());

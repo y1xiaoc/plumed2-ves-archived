@@ -46,7 +46,7 @@ ChebyshevBF::ChebyshevBF(const ActionOptions&ao):
  PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
-  setIntrinsicInterval(-1.0,+1.0);
+  setIntrinsicInterval("-1.0","+1.0");
   setNonPeriodic();
   setIntervalBounded();
   setType("chebyshev-1st-kind");

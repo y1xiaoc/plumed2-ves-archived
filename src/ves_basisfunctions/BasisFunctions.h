@@ -115,10 +115,16 @@ protected:
   void setDescription(const std::string& description_in) {description_=description_in;}
   //
   void setNumberOfBasisFunctions(const unsigned int);
+  void setOrder(const unsigned int norder_in){norder_=norder_in;}
   void setIntrinsicInterval(const double, const double);
   void setIntrinsicInterval(const std::string&, const std::string&);
+  void setInterval(const double, const double);
+  void setInterval(const std::string&, const std::string&);  
+  //
   double intrinsicIntervalMin() const {return interval_intrinsic_min_;}
   double intrinsicIntervalMax() const {return interval_intrinsic_max_;}
+  std::string intrinsicIntervalMinStr() const {return interval_intrinsic_min_str_;}
+  std::string intrinsicIntervalMaxStr() const {return interval_intrinsic_max_str_;}
   //
   void setUniformIntegral(const unsigned int, const double);
   void setUniformIntegrals(const std::vector<double>&);
@@ -178,6 +184,14 @@ public:
   void getMultipleValue(const std::vector<double>&, std::vector<double>&, std::vector<std::vector<double> >&, std::vector<std::vector<double> >&) const;
   void writeBasisFunctionsToFile(OFile&, OFile&, unsigned int nbins=1000, const bool ignore_periodicity=false) const;
 };
+
+
+inline
+void BasisFunctions::setNumberOfBasisFunctions(const unsigned int nbasis_in) {
+  nbasis_=nbasis_in;
+  bf_labels_.assign(nbasis_,"");
+  uniform_integrals_.assign(nbasis_,0.0);
+}
 
 
 inline
