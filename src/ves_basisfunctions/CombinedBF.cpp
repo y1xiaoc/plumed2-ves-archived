@@ -73,7 +73,7 @@ basisf_pntrs_(0)
   bool periodic = true;
   for(unsigned int i=0; i<basisf_pntrs_.size(); i++){
     nbasisf_total_ += basisf_pntrs_[i]->getNumberOfBasisFunctions() - 1;
-    if(basisf_pntrs_[i]->intervalMinStr()!=basisf_pntrs_[0]->intervalMinStr() && basisf_pntrs_[i]->intervalMaxStr()!=basisf_pntrs_[0]->intervalMaxStr()){
+    if(basisf_pntrs_[i]->intervalMinStr()!=basisf_pntrs_[0]->intervalMinStr() || basisf_pntrs_[i]->intervalMaxStr()!=basisf_pntrs_[0]->intervalMaxStr()){
       plumed_merror("all the basis functions to be combined should have same INTERVAL_MIN and INTERVAL_MAX");
     }
     if(!basisf_pntrs_[i]->arePeriodic()){periodic=false;}
