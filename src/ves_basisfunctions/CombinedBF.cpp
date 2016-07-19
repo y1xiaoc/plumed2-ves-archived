@@ -57,7 +57,7 @@ PLUMED_BASISFUNCTIONS_INIT(ao),
 basisf_pntrs_(0)
 {
   std::vector<std::string> basisf_labels;
-  parseVector("BASIS_FUNCTIONS",basisf_labels);
+  parseVector("BASIS_FUNCTIONS",basisf_labels); addKeywordToList("BASIS_FUNCTIONS",basisf_labels);
   if(basisf_labels.size()==1){
     plumed_merror("using only one basis function in BF_COMBINED does not make sense");
   }

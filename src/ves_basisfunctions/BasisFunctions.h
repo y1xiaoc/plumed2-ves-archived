@@ -105,6 +105,8 @@ protected:
   virtual void setupUniformIntegrals();
   template<typename T>
   void addKeywordToList(const std::string&, const T);
+  template<typename T>
+  void addKeywordToList(const std::string&, const std::vector<T>&);
   void addKeywordToList(const std::string&, const bool);
   //
   void setPeriodic() {periodic_=true;}
@@ -119,7 +121,7 @@ protected:
   void setIntrinsicInterval(const double, const double);
   void setIntrinsicInterval(const std::string&, const std::string&);
   void setInterval(const double, const double);
-  void setInterval(const std::string&, const std::string&);  
+  void setInterval(const std::string&, const std::string&);
   //
   double intrinsicIntervalMin() const {return interval_intrinsic_min_;}
   double intrinsicIntervalMax() const {return interval_intrinsic_max_;}
@@ -290,6 +292,21 @@ void BasisFunctions::addKeywordToList(const std::string& keyword, const T value)
   Tools::convert(value,str_value);
   bf_keywords_.push_back(keyword+"="+str_value);
 }
+
+
+template<typename T>
+void BasisFunctions::addKeywordToList(const std::string& keyword, const std::vector<T>& values){
+  std::string str_value;
+  std::string str_keywordvalues;
+  Tools::convert(values[0],str_value);
+  str_keywordvalues = keyword + "=" + str_value;
+  for(unsigned int i=1; i<values.size(); i++){
+    Tools::convert(values[i],str_value);
+    str_keywordvalues += "," + str_value;
+  }
+  bf_keywords_.push_back(str_keywordvalues);
+}
+
 
 inline
 void BasisFunctions::addKeywordToList(const std::string& keyword, const bool value){
