@@ -129,8 +129,8 @@ protected:
   void clearCoeffsPntrsVector() {coeffs_pntrs_.clear();}
   void addToSampledAverages(const std::vector<double>&, const unsigned int c_id = 0);
   void setTargetDistAverages(const std::vector<double>&, const unsigned int coeffs_id = 0);
-  void setTargetDistAverages(const CoeffsVector&, const unsigned coeffs_id= 0);
-  void setTargetDistAveragesToZero(const unsigned coeffs_id= 0);
+  void setTargetDistAverages(const CoeffsVector&, const unsigned int coeffs_id= 0);
+  void setTargetDistAveragesToZero(const unsigned int coeffs_id= 0);
 
   bool readCoeffsFromFiles();
   //

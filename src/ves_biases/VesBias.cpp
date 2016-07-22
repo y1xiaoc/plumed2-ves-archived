@@ -417,7 +417,7 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     // Calculate the covariance using the online formula.
     // For multiple walkers the total Hessian (covariance)
     // matrix is combined. This is really incorrect.
-    else{ 
+    else{
       comm.Sum(sampled_covariance[k]);
       Hessian(k) = sampled_covariance[k];
       Hessian(k) *= getBeta();
@@ -488,19 +488,19 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
 }
 
 
-void VesBias::setTargetDistAverages(const std::vector<double>& coeffderivs_aver_ps, const unsigned coeffs_id) {
+void VesBias::setTargetDistAverages(const std::vector<double>& coeffderivs_aver_ps, const unsigned int coeffs_id) {
   TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
   TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
 }
 
 
-void VesBias::setTargetDistAverages(const CoeffsVector& coeffderivs_aver_ps, const unsigned coeffs_id) {
+void VesBias::setTargetDistAverages(const CoeffsVector& coeffderivs_aver_ps, const unsigned int coeffs_id) {
   TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
   TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
 }
 
 
-void VesBias::setTargetDistAveragesToZero(const unsigned coeffs_id) {
+void VesBias::setTargetDistAveragesToZero(const unsigned int coeffs_id) {
   TargetDistAverages(coeffs_id).setAllValuesToZero();
   TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
 }
