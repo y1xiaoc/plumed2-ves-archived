@@ -403,41 +403,27 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     if(use_mwalkers_mpi){
       gradient_pntrs_[k]->sumMultiSimCommMPI(multi_sim_comm);
     }
-    // Hessian - Option 1:
+    // Hessian - Option 1 (like done in the old code):
+    // Calculate the covariance from averages of f and f^2.
+    // For multiple walkers the averages f and f^2 are combined
+    // before calculating the Hessian (covariance) matrix.
+    if(covariance_from_averages){
+      comm.Sum(sampled_cross_averages[k]);
+      if(use_mwalkers_mpi){multiSimSumAverages(k);}
+      Hessian(k) = computeCovarianceFromAverages(k);
+      Hessian(k) *= getBeta();
+    }
+    // Hessian - Option 2:
     // Calculate the covariance using the online formula.
     // For multiple walkers the total Hessian (covariance)
-    // matrix is combined.
-    if(!covariance_from_averages){
+    // matrix is combined. This is really incorrect.
+    else{ 
       comm.Sum(sampled_covariance[k]);
       Hessian(k) = sampled_covariance[k];
       Hessian(k) *= getBeta();
       if(use_mwalkers_mpi){
         hessian_pntrs_[k]->sumMultiSimCommMPI(multi_sim_comm);
       }
-    }
-    // Hessian - Option 2:
-    // Calculate the covariance from averages of f and f^2.
-    // For multiple walkers the averages f and f^2 are combined
-    // before calculating the Hessian (covariance) matrix.
-    else{
-      comm.Sum(sampled_cross_averages[k]);
-      if(use_mwalkers_mpi){
-        if(comm.Get_rank()==0){
-          multi_sim_comm.Sum(sampled_averages[k]);
-          multi_sim_comm.Sum(sampled_cross_averages[k]);
-          double nwalkers = static_cast<double>(multi_sim_comm.Get_size());
-          for(size_t i=0; i<sampled_averages[k].size(); i++){
-            sampled_averages[k][i] /= nwalkers;
-          }
-          for(size_t i=0; i<sampled_cross_averages[k].size(); i++){
-            sampled_cross_averages[k][i] /= nwalkers;
-          }
-        }
-        comm.Bcast(sampled_averages[k],0);
-        comm.Bcast(sampled_cross_averages[k],0);
-      }
-      Hessian(k) = computeCovarianceFromAverages(k);
-      Hessian(k) *= getBeta();
     }
     //
     std::fill(sampled_averages[k].begin(), sampled_averages[k].end(), 0.0);
@@ -448,7 +434,24 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
 }
 
 
-void VesBias::addToSampledAverages(const std::vector<double>& values, const unsigned c_id) {
+void VesBias::multiSimSumAverages(const unsigned int c_id) {
+  if(comm.Get_rank()==0){
+    multi_sim_comm.Sum(sampled_averages[c_id]);
+    multi_sim_comm.Sum(sampled_cross_averages[c_id]);
+    double nwalkers = static_cast<double>(multi_sim_comm.Get_size());
+    for(size_t i=0; i<sampled_averages[c_id].size(); i++){
+      sampled_averages[c_id][i] /= nwalkers;
+    }
+    for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++){
+      sampled_cross_averages[c_id][i] /= nwalkers;
+    }
+  }
+  comm.Bcast(sampled_averages[c_id],0);
+  comm.Bcast(sampled_cross_averages[c_id],0);
+}
+
+
+void VesBias::addToSampledAverages(const std::vector<double>& values, const unsigned int c_id) {
   /*
   use the following online equation to calculate the average and covariance
   (see https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance)

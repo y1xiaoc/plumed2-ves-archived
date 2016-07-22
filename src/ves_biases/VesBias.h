@@ -194,6 +194,7 @@ public:
   //
   void updateGradientAndHessian(const bool);
   void clearGradientAndHessian() {};
+  void multiSimSumAverages(const unsigned int);
   //
   virtual void updateTargetDistributions() {};
   //
