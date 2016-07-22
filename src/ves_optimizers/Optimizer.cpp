@@ -47,7 +47,6 @@ fixed_stepsize_(true),
 iter_counter(0),
 use_hessian_(false),
 diagonal_hessian_(true),
-hessian_covariance_from_averages_(false),
 use_mwalkers_mpi_(false),
 mwalkers_mpi_single_files_(true),
 dynamic_targetdists_(0),
@@ -194,9 +193,6 @@ isFirstStep(true)
     bool full_hessian=false;
     parseFlag("FULL_HESSIAN",full_hessian);
     diagonal_hessian_ = !full_hessian;
-  }
-  if(keywords.exists("HESSIAN_COVARIANCE_FROM_AVERAGES")){
-    parseFlag("HESSIAN_COVARIANCE_FROM_AVERAGES",hessian_covariance_from_averages_);
   }
   //
   bool mw_single_files = false;
@@ -742,7 +738,6 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.reserve("compulsory","INITIAL_STEPSIZE","the initial step size used for the optimization");
   // Keywords related to the Hessian, actived with the useHessianKeywords function
   keys.reserveFlag("FULL_HESSIAN",false,"if the full Hessian matrix should be used for the optimization, otherwise only the diagonal part of the Hessian is used");
-  keys.reserveFlag("HESSIAN_COVARIANCE_FROM_AVERAGES",false,"if the covariance part in the Hessian should be calculated from averages and not using a direct online formula. This should only have an effect if using multiple walkers.");
   keys.reserve("hidden","HESSIAN_FILE","the name of output file for the Hessian");
   keys.reserve("hidden","HESSIAN_OUTPUT","how often the Hessian should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if HESSIAN_FILE is specficed");
   keys.reserve("hidden","HESSIAN_FMT","specify format for hessian file(s) (useful for decrease the number of digits in regtests)");
@@ -781,7 +776,6 @@ void Optimizer::registerKeywords( Keywords& keys ) {
 
 void Optimizer::useHessianKeywords(Keywords& keys) {
   keys.use("FULL_HESSIAN");
-  keys.use("HESSIAN_COVARIANCE_FROM_AVERAGES");
   keys.use("HESSIAN_FILE");
   keys.use("HESSIAN_OUTPUT");
   keys.use("HESSIAN_FMT");
@@ -908,7 +902,7 @@ std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in,
 void Optimizer::update() {
   if(onStep() && !isFirstStep){
     for(unsigned int i=0; i<nbiases_; i++){
-      bias_pntrs_[i]->updateGradientAndHessian(use_mwalkers_mpi_,hessian_covariance_from_averages_);
+      bias_pntrs_[i]->updateGradientAndHessian(use_mwalkers_mpi_);
     }
     for(unsigned int i=0; i<ncoeffssets_; i++){
       coeffsUpdate(i);

@@ -394,7 +394,8 @@ bool VesBias::readCoeffsFromFiles() {
 }
 
 
-void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi, const bool covariance_from_averages) {
+void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
+  bool covariance_from_averages = true;
   for(unsigned int k=0; k<ncoeffssets_; k++){
     // Gradient
     comm.Sum(sampled_averages[k]);

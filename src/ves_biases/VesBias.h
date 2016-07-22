@@ -192,7 +192,7 @@ public:
   //
   unsigned int getIterationCounter() const;
   //
-  void updateGradientAndHessian(const bool, const bool);
+  void updateGradientAndHessian(const bool);
   void clearGradientAndHessian() {};
   //
   virtual void updateTargetDistributions() {};
