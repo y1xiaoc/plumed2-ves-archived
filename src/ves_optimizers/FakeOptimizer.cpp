@@ -42,6 +42,7 @@ PLUMED_REGISTER_ACTION(FakeOptimizer,"FAKE_OPTIMIZER")
 void FakeOptimizer::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   //
+  Optimizer::useMultipleWalkersKeywords(keys);
   Optimizer::useHessianKeywords(keys);
   keys.addFlag("MONITOR_HESSIAN",false,"also monitor the Hessian");
 }
