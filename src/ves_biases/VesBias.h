@@ -118,6 +118,7 @@ private:
 private:
   void initializeCoeffs(CoeffsVector*);
   std::vector<double> computeCovarianceFromAverages(const unsigned int) const;
+  void multiSimSumAverages(const unsigned int);
 protected:
   //
   void checkThatTemperatureIsGiven();
@@ -194,7 +195,6 @@ public:
   //
   void updateGradientAndHessian(const bool);
   void clearGradientAndHessian() {};
-  void multiSimSumAverages(const unsigned int);
   //
   virtual void updateTargetDistributions() {};
   //
