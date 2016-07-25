@@ -59,7 +59,7 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
   keys.add("numbered","SIGMA","The sigmas of the Gaussians.");
   keys.add("numbered","CORRELATION","The correlation between the arguments, currently only works for two-dimensional Gaussians ");
   keys.add("optional","WEIGHTS","The weights of the Gaussians.");
-  keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized.");
+  keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized. Be warned that this will most likely lead to stange results");
 }
 
 
