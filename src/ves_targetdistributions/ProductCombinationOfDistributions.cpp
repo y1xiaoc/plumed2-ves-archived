@@ -48,7 +48,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(ProductCombinationOfDistributions,"PRODUCT_COMB
 
 void ProductCombinationOfDistributions::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","ARG","The one dimensional target distributions to be used in the product combination for each argument");
+  keys.add("numbered","DIST_ARG","The one dimensional target distributions to be used in the product combination for each argument");
   keys.addFlag("IGNORE_NORMALIZATION",false,"If the check on the normalization of the distributions should be ignored. Be warned that this can lead to non-normalized distributions and most likely stange results.");
 }
 
@@ -61,7 +61,7 @@ ndist_(0)
   bool normalized = true;
   for(unsigned int i=1;; i++) {
     std::string keywords;
-    if(!parseNumbered("ARG",i,keywords) ){break;}
+    if(!parseNumbered("DIST_ARG",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);
     TargetDistribution* dist_tmp = targetDistributionRegister().create( (words) );
     if(dist_tmp->getDimension()!=1){
