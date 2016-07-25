@@ -76,7 +76,7 @@ protected:
   void setNormalized(){normalized_=true;};
   void setNotNormalized(){normalized_=false;};
   //
-  void setDimension(const unsigned int);
+  void setDimension(const unsigned int dimension){dimension_=dimension;}
 public:
   // keywords
   static void registerKeywords( Keywords&);
