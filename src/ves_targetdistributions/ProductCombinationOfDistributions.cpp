@@ -48,7 +48,8 @@ VES_REGISTER_TARGET_DISTRIBUTION(ProductCombinationOfDistributions,"PRODUCT_COMB
 
 void ProductCombinationOfDistributions::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","ARG","The target distributions to be used in the product combination for each argument");
+  keys.add("numbered","ARG","The one dimensional target distributions to be used in the product combination for each argument");
+  keys.addFlag("IGNORE_NORMALIZATION",false,"If the check on the normalization of the distributions should be ignored. Be warned that this can lead to non-normalized distributions and stange results.");
 }
 
 
@@ -57,6 +58,7 @@ TargetDistribution(to),
 distributions_(0),
 ndist_(0)
 {
+  bool normalized = true;
   for(unsigned int i=1;; i++) {
     std::string keywords;
     if(!parseNumbered("ARG",i,keywords) ){break;}
@@ -65,11 +67,28 @@ ndist_(0)
     if(dist_tmp->getDimension()!=1){
       plumed_merror("PRODUCT_COMBINATION: all the target distributions should be one dimensional");
     }
+    if(!dist_tmp->isNormalized()){
+      normalized = false;
+    }
     distributions_.push_back(dist_tmp);
   }
   ndist_ = distributions_.size();
   setDimension(ndist_);
-  setNormalized();
+
+  bool ignore_normalization_check = false;
+  parseFlag("IGNORE_NORMALIZATION",ignore_normalization_check);
+  if(normalized){
+    setNormalized();
+  }
+  else{
+    if(!ignore_normalization_check){
+      plumed_merror("PRODUCT_COMBINATION: one of the one dimensional target distribution is not normalized so the product combination will not be normalized. Use the keyword IGNORE_NORMALIZATION to ignore this check and run regardless.")
+    }
+    setNotNormalized();
+  }
+
+
+
   checkRead();
 }
 
