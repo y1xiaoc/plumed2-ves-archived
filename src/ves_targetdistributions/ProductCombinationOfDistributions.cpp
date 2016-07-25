@@ -82,7 +82,7 @@ ndist_(0)
   }
   else{
     if(!ignore_normalization_check){
-      plumed_merror("PRODUCT_COMBINATION: one of the one dimensional target distribution is not normalized so the product combination will not be normalized. Use the keyword IGNORE_NORMALIZATION to ignore this check and run regardless.")
+      plumed_merror("PRODUCT_COMBINATION: one of the one dimensional target distribution is not normalized so the product combination will not be normalized. Use the keyword IGNORE_NORMALIZATION to ignore this check and run regardless.");
     }
     setNotNormalized();
   }
