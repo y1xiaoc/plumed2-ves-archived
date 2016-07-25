@@ -87,8 +87,6 @@ ndist_(0)
     setNotNormalized();
   }
 
-
-
   checkRead();
 }
 
