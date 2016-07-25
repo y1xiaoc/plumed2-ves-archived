@@ -51,7 +51,7 @@ void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination.");
   keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally.");
-  keys.addFlag("DO_NOT_NORMALIZE",false,"If the weight should not be normalized.");
+  keys.addFlag("DO_NOT_NORMALIZE",false,"If the weight should not be normalized. Be warned that this will lead to non-normalized distributions and most likely stange results.");
 }
 
 

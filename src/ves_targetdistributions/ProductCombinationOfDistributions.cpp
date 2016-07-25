@@ -49,7 +49,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(ProductCombinationOfDistributions,"PRODUCT_COMB
 void ProductCombinationOfDistributions::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","ARG","The one dimensional target distributions to be used in the product combination for each argument");
-  keys.addFlag("IGNORE_NORMALIZATION",false,"If the check on the normalization of the distributions should be ignored. Be warned that this can lead to non-normalized distributions and stange results.");
+  keys.addFlag("IGNORE_NORMALIZATION",false,"If the check on the normalization of the distributions should be ignored. Be warned that this can lead to non-normalized distributions and most likely stange results.");
 }
 
 
