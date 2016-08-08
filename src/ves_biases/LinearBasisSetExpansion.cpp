@@ -52,8 +52,8 @@ LinearBasisSetExpansion::LinearBasisSetExpansion(
   const std::string& label,
   const double beta_in,
   Communicator& cc,
-  std::vector<Value*> args_pntrs_in,
-  std::vector<BasisFunctions*> basisf_pntrs_in,
+  std::vector<Value*>& args_pntrs_in,
+  std::vector<BasisFunctions*>& basisf_pntrs_in,
   CoeffsVector* bias_coeffs_pntr_in):
 label_(label),
 action_pntr_(NULL),

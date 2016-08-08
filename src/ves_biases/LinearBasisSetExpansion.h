@@ -93,8 +93,8 @@ public:
     const std::string&,
     const double,
     Communicator&,
-    std::vector<Value*>,
-    std::vector<BasisFunctions*>,
+    std::vector<Value*>&,
+    std::vector<BasisFunctions*>&,
     CoeffsVector* bias_coeffs_pntr_in=NULL);
   //
 private:
