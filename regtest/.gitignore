@@ -16,7 +16,9 @@
 !/manyrestraints
 !/molfile_plugin
 !/has-almost
-!/ves
 # These files we just want to ignore completely
 tmp
 report.txt
+
+# VES related regtests
+!/ves
