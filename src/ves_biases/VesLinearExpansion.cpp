@@ -51,7 +51,6 @@ private:
   std::vector<BasisFunctions*> basisf_pntrs_;
   LinearBasisSetExpansion* bias_expansion_pntr_;
   size_t ncoeffs_;
-  Value* valueBias_;
   Value* valueForce2_;
 public:
   explicit VesLinearExpansion(const ActionOptions&);
@@ -78,14 +77,17 @@ PLUMED_REGISTER_ACTION(VesLinearExpansion,"VES_LINEAR_EXPANSION")
 
 void VesLinearExpansion::registerKeywords( Keywords& keys ){
   VesBias::registerKeywords(keys);
-  keys.use("ARG");
-  keys.add("compulsory","BASIS_FUNCTIONS","the label of the basis sets that you want to use");
+  //
   VesBias::useInitialCoeffsKeywords(keys);
   VesBias::useTargetDistributionKeywords(keys);
   VesBias::useWellTemperdKeywords(keys);
   VesBias::useBiasCutoffKeywords(keys);
   VesBias::useGridBinKeywords(keys);
   VesBias::useProjectionArgKeywords(keys);
+  //
+  keys.use("ARG");
+  keys.add("compulsory","BASIS_FUNCTIONS","the label of the basis sets that you want to use");
+  keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential.");
 }
 
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
@@ -93,7 +95,6 @@ PLUMED_VESBIAS_INIT(ao),
 nargs_(getNumberOfArguments()),
 basisf_pntrs_(getNumberOfArguments(),NULL),
 bias_expansion_pntr_(NULL),
-valueBias_(NULL),
 valueForce2_(NULL)
 {
   std::vector<std::string> basisf_labels;
@@ -139,8 +140,6 @@ valueForce2_(NULL)
   //
   readCoeffsFromFiles();
   //
-  addComponent("bias"); componentIsNotPeriodic("bias");
-  valueBias_=getPntrToComponent("bias");
   addComponent("force2"); componentIsNotPeriodic("force2");
   valueForce2_=getPntrToComponent("force2");
 }
@@ -174,7 +173,7 @@ void VesLinearExpansion::calculate() {
     totalForce2 += forces[k]*forces[k];
   }
 
-  valueBias_->set(bias);
+  setBias(bias);
   valueForce2_->set(totalForce2);
   addToSampledAverages(coeffsderivs_values);
 }

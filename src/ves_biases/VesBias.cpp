@@ -236,9 +236,6 @@ void VesBias::registerKeywords( Keywords& keys ) {
   Bias::registerKeywords(keys);
   keys.add("optional","TEMP","the system temperature - this is needed if the MD code does not pass the temperature to PLUMED.");
   //
-  keys.addOutputComponent("bias","default","the instantaneous value of the bias potential.");
-  keys.addOutputComponent("force2","default","the instantaneous value of the squared force due to this bias potential.");
-  //
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   //
   keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
