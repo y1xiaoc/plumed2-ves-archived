@@ -19,12 +19,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include <vector>
-#include <cmath>
-#include <iostream>
-#include <sstream>
-#include <cstdio>
-#include <cfloat>
 
 #include "Grid.h"
 #include "Tools.h"
@@ -34,6 +28,13 @@
 #include "KernelFunctions.h"
 #include "RootFindingBase.h"
 #include "Communicator.h"
+
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include <sstream>
+#include <cstdio>
+#include <cfloat>
 
 using namespace std;
 namespace PLMD{
@@ -694,7 +695,7 @@ Grid::index_t SparseGrid::getMaxSize() const {
  return maxsize_; 
 }
 
-double Grid::getDifferenceFromContour( const std::vector<double>& x, std::vector<double>& der ){
+double Grid::getDifferenceFromContour( const std::vector<double>& x, std::vector<double>& der ) const {
  return getValueAndDerivatives( x, der ) - contour_location; 
 }
 

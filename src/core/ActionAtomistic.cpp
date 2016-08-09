@@ -34,7 +34,8 @@
 #include "tools/PDB.h"
 
 using namespace std;
-using namespace PLMD;
+
+namespace PLMD {
 
 ActionAtomistic::~ActionAtomistic(){
 // forget the pending request
@@ -136,7 +137,7 @@ void ActionAtomistic::calculateAtomicNumericalDerivatives( ActionWithValue* a, c
   for(int j=0;j<nval;j++){
     Value* v=a->copyOutput(j);
     double ref=v->get();
-    if(v->hasDerivatives()>0){
+    if(v->hasDerivatives()){
       for(int i=0;i<natoms;i++) for(int k=0;k<3;k++) {
         double d=(value[j*natoms+i][k]-ref)/delta;
         v->addDerivative(startnum+3*i+k,d);
@@ -279,4 +280,6 @@ void ActionAtomistic::makeWhole(){
     Vector & second (positions[j+1]);
     second=first+pbcDistance(first,second);
   }
+}
+
 }

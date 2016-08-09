@@ -350,6 +350,7 @@ private:
   int mw_id_;
   int mw_rstride_;
   bool walkers_mpi;
+  unsigned mpi_nw_;
   bool acceleration;
   double acc;
   vector<IFile*> ifiles;
@@ -391,8 +392,6 @@ PLUMED_REGISTER_ACTION(MetaD,"METAD")
 
 void MetaD::registerKeywords(Keywords& keys){
   Bias::registerKeywords(keys);
-  componentsAreNotOptional(keys);
-  keys.addOutputComponent("bias","default","the instantaneous value of the bias potential");
   keys.addOutputComponent("rbias","REWEIGHTING_NGRID","the instantaneous value of the bias normalized using the \\f$c(t)\\f$ reweighting factor [rbias=bias-c(t)]."
                                                       "This component can be used to obtain a reweighted histogram.");
   keys.addOutputComponent("rct","REWEIGHTING_NGRID","the reweighting factor \\f$c(t)\\f$.");
@@ -467,7 +466,7 @@ dp_(NULL), adaptive_(FlexibleBin::none),
 flexbin(NULL),
 // Multiple walkers initialization
 mw_n_(1), mw_dir_("./"), mw_id_(0), mw_rstride_(1),
-walkers_mpi(false),
+walkers_mpi(false), mpi_nw_(0),
 acceleration(false), acc(0.0),
 // Interval initialization
 uppI_(-1), lowI_(-1), doInt_(false),
@@ -715,10 +714,18 @@ last_step_warn_grid(0)
     log.printf("  reading stride %d\n",mw_rstride_);
     log.printf("  directory with hills files %s\n",mw_dir_.c_str());
   } else {
-    if(walkers_mpi) log.printf("  Multiple walkers active using MPI communnication\n"); 
+    if(walkers_mpi) {
+      log.printf("  Multiple walkers active using MPI communnication\n"); 
+      if(comm.Get_rank()==0){
+        // Only root of group can communicate with other walkers
+        mpi_nw_=multi_sim_comm.Get_size();
+      }
+      // Communicate to the other members of the same group
+      // info abount number of walkers and walker index
+      comm.Bcast(mpi_nw_,0);
+    }
   }
 
-  addComponent("bias"); componentIsNotPeriodic("bias");
   if( rewf_grid_.size()>0 ){ 
     addComponent("rbias"); componentIsNotPeriodic("rbias");
     addComponent("rct"); componentIsNotPeriodic("rct"); 
@@ -735,6 +742,29 @@ last_step_warn_grid(0)
 
   // for performance
   dp_ = new double[getNumberOfArguments()];
+
+  // initializing and checking grid
+  if(grid_){
+    // check for adaptive and sigma_min
+    if(sigma0min_.size()==0&&adaptive_!=FlexibleBin::none) error("When using Adaptive Gaussians on a grid SIGMA_MIN must be specified");
+    // check for mesh and sigma size
+    for(unsigned i=0;i<getNumberOfArguments();i++) {
+      double a,b;
+      Tools::convert(gmin[i],a);
+      Tools::convert(gmax[i],b);
+      double mesh=(b-a)/((double)gbin[i]);
+      if(mesh>0.5*sigma0_[i]) log<<"  WARNING: Using a METAD with a Grid Spacing larger than half of the Gaussians width can produce artifacts\n";
+    }
+    std::string funcl=getLabel() + ".bias";
+    if(!sparsegrid){BiasGrid_=new Grid(funcl,getArguments(),gmin,gmax,gbin,spline,true);}
+    else{BiasGrid_=new SparseGrid(funcl,getArguments(),gmin,gmax,gbin,spline,true);}
+    std::vector<std::string> actualmin=BiasGrid_->getMin();
+    std::vector<std::string> actualmax=BiasGrid_->getMax();
+    for(unsigned i=0;i<getNumberOfArguments();i++){
+      if(gmin[i]!=actualmin[i]) log<<"  WARNING: GRID_MIN["<<i<<"] has been adjusted to "<<actualmin[i]<<" to fit periodicity\n";
+      if(gmax[i]!=actualmax[i]) log<<"  WARNING: GRID_MAX["<<i<<"] has been adjusted to "<<actualmax[i]<<" to fit periodicity\n";
+    }
+  }
 
   // restart from external grid
   bool restartedFromGrid=false;
@@ -894,7 +924,6 @@ last_step_warn_grid(0)
     log<<plumed.cite("Gil-Ley, Bottaro, and Bussi, submitted (2016)");
   }
   log<<"\n";
-
 }
 
 void MetaD::readGaussians(IFile *ifile)
@@ -1243,7 +1272,7 @@ void MetaD::calculate()
     der[i]=0.;
   }
   const double ene = getBiasAndDerivatives(cv,der);
-  getPntrToComponent("bias")->set(ene);
+  setBias(ene);
   if( rewf_grid_.size()>0 ) getPntrToComponent("rbias")->set(ene - reweight_factor);
   // calculate the acceleration factor
   if(acceleration&&!isFirstStep) {
@@ -1254,8 +1283,7 @@ void MetaD::calculate()
   getPntrToComponent("work")->set(work_);
   // set Forces 
   for(unsigned i=0;i<ncv;++i){
-    const double f=-der[i];
-    setOutputForce(i,f);
+    setOutputForce(i,-der[i]);
   }
   delete [] der;
 }
@@ -1295,22 +1323,11 @@ void MetaD::update(){
 
     // In case we use walkers_mpi, it is now necessary to communicate with other replicas.
     if(walkers_mpi){
-      int nw=0;
-      int mw=0;
-      if(comm.Get_rank()==0){
-        // Only root of group can communicate with other walkers
-        nw=multi_sim_comm.Get_size();
-        mw=multi_sim_comm.Get_rank();
-      }
-      // Communicate to the other members of the same group
-      // info abount number of walkers and walker index
-      comm.Bcast(nw,0);
-      comm.Bcast(mw,0);
       // Allocate arrays to store all walkers hills
-      std::vector<double> all_cv(nw*cv.size(),0.0);
-      std::vector<double> all_sigma(nw*thissigma.size(),0.0);
-      std::vector<double> all_height(nw,0.0);
-      std::vector<int>    all_multivariate(nw,0);
+      std::vector<double> all_cv(mpi_nw_*cv.size(),0.0);
+      std::vector<double> all_sigma(mpi_nw_*thissigma.size(),0.0);
+      std::vector<double> all_height(mpi_nw_,0.0);
+      std::vector<int>    all_multivariate(mpi_nw_,0);
       if(comm.Get_rank()==0){
         // Communicate (only root)
         multi_sim_comm.Allgather(cv,all_cv);
@@ -1323,7 +1340,7 @@ void MetaD::update(){
       comm.Bcast(all_sigma,0);
       comm.Bcast(all_height,0);
       comm.Bcast(all_multivariate,0);
-      for(int i=0;i<nw;i++){
+      for(unsigned i=0;i<mpi_nw_;i++){
         // actually add hills one by one
         std::vector<double> cv_now(cv.size());
         std::vector<double> sigma_now(thissigma.size());
@@ -1345,13 +1362,20 @@ void MetaD::update(){
   work_+=vbias1-vbias;
 
   // dump grid on file
-  if(wgridstride_>0&&getStep()%wgridstride_==0){
+  if(wgridstride_>0&&(getStep()%wgridstride_==0||getCPT())){
     // in case old grids are stored, a sequence of grids should appear
     // this call results in a repetition of the header:
     if(storeOldGrids_) gridfile_.clearFields();
     // in case only latest grid is stored, file should be rewound
     // this will overwrite previously written grids
-    else gridfile_.rewind();
+    else {
+      int r = 0;
+      if(walkers_mpi) {
+        if(comm.Get_rank()==0) r=multi_sim_comm.Get_rank();
+        comm.Bcast(r,0);
+      } 
+      if(r==0) gridfile_.rewind();
+    }
     BiasGrid_->writeToFile(gridfile_); 
     // if a single grid is stored, it is necessary to flush it, otherwise
     // the file might stay empty forever (when a single grid is not large enough to

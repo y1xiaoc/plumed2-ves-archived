@@ -133,6 +133,9 @@ private:
 /// Flag for restart
   bool restart;
 
+/// Flag for checkpointig
+  bool doCheckPoint;
+
   std::set<FileBase*> files;
   typedef std::set<FileBase*>::iterator files_iterator;
 
@@ -304,6 +307,8 @@ public:
   bool getRestart()const;
 /// Set restart flag
   void setRestart(bool f){restart=f;}
+/// Check if checkpointing 
+  bool getCPT()const;
 /// Set exchangeStep flag
   void setExchangeStep(bool f);
 /// Get exchangeStep flag
@@ -354,6 +359,11 @@ void PlumedMain::setSuffix(const std::string&s){
 inline
 bool PlumedMain::getRestart()const{
   return restart;
+}
+
+inline
+bool PlumedMain::getCPT()const{
+  return doCheckPoint;
 }
 
 inline

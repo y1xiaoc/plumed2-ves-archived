@@ -19,7 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "File.h"
+#include "IFile.h"
 #include "Exception.h"
 #include "core/Action.h"
 #include "core/PlumedMain.h"
@@ -93,7 +93,7 @@ IFile& IFile::advanceField(){
           }
           done=true;
       } else if( !words.empty() ) {
-          plumed_merror("mismatch between number of fields in file and expected number");
+          plumed_merror(getPath() + " mismatch between number of fields in file and expected number");
       }
     }
   }

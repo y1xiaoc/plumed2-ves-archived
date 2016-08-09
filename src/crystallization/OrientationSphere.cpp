@@ -19,8 +19,8 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "VectorMultiColvar.h"
 #include "OrientationSphere.h"
+#include "VectorMultiColvar.h"
 
 using namespace std;
 
@@ -67,7 +67,7 @@ MultiColvarFunction(ao)
 }
 
 double OrientationSphere::compute( const unsigned& tindex, multicolvar::AtomValuePack& myatoms ) const {
-   double d2, sw, value=0, denom=0, dot, f_dot, dot_df, dfunc; Vector ddistance;
+   double d2, sw, value=0, denom=0, dfunc; Vector ddistance;
    unsigned ncomponents=getBaseMultiColvar(0)->getNumberOfQuantities();
    std::vector<double> catom_orient( ncomponents ), this_orient( ncomponents );
    std::vector<double> this_der( ncomponents ), catom_der( ncomponents ); 
