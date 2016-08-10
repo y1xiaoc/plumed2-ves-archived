@@ -26,15 +26,14 @@
 #include "core/Value.h"
 #include "tools/Grid.h"
 #include "ves_tools/GridProjWeights.h"
+#include "ves_tools/GridIntegrationWeights.h"
 #include "tools/File.h"
 #include "tools/Keywords.h"
 
 namespace PLMD {
 
 TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
-words(input)
-{
-}
+words(input){}
 
 
 void TargetDistribution::registerKeywords( Keywords& keys ){
@@ -42,18 +41,31 @@ void TargetDistribution::registerKeywords( Keywords& keys ){
 
 
 TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
-type_(to.words[0]),
+name_(to.words[0]),
 input(to.words),
+type_(static_targetdist),
 normalized_(false),
-dimension_(1),
+dimension_(0),
+targetdist_grid_pntr_(NULL),
+log_targetdist_grid_pntr_(NULL),
 action_pntr_(NULL),
 vesbias_pntr_(NULL)
 {
   input.erase( input.begin() );
+  // unsigned int dimension = 0;
+  //parse("DIMENSION",dimension,true);
+  //plumed_massert(dimension>0,"Programming error in usage of TargetDistribution class, the dimension should always be passed by using the DIMENSION keyword");
+  //setDimension(dimension);
 }
 
 
 TargetDistribution::~TargetDistribution() {
+  if(targetdist_grid_pntr_!=NULL){
+    delete targetdist_grid_pntr_;
+  }
+  if(log_targetdist_grid_pntr_!=NULL){
+    delete log_targetdist_grid_pntr_;
+  }
 }
 
 
@@ -83,121 +95,99 @@ void TargetDistribution::checkRead() const {
 
 
 std::string TargetDistribution::description() {
-  std::string str="Type: " + type_;
+  std::string str="Type: " + name_;
   return str;
 }
 
 
-void TargetDistribution::writeDistributionToFile(const std::string& filepath, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+void TargetDistribution::setupGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  if(getDimension()==0){
+    setDimension(arguments.size());
+  }
   unsigned int dimension = getDimension();
-  plumed_assert(min.size()==dimension);
-  plumed_assert(max.size()==dimension);
-  plumed_assert(nbins.size()==dimension);
-  std::vector<Value*> arguments(dimension);
-  for (unsigned int i=0; i < dimension; i++) {
-    std::string is; Tools::convert(i+1,is);
-    arguments[i]= new Value(NULL,"arg"+is,false);
-    arguments[i]->setNotPeriodic();
-  }
-  Grid* grid_pntr = new Grid(getType(),arguments,min,max,nbins,false,false);
-  //
-  calculateDistributionOnGrid(grid_pntr);
-  TargetDistribution::writeProbGridToFile(filepath,grid_pntr);
-
-  // delete stuff
-  delete grid_pntr;
-  for (unsigned int i=0; i < dimension; i++) {delete arguments[i];}
+  plumed_massert(arguments.size()==dimension,"TargetDistribution::setupGrids: mismatch between number of values given for grid parameters");
+  plumed_massert(min.size()==dimension,"TargetDistribution::setupGrids: mismatch between number of values given for grid parameters");
+  plumed_massert(max.size()==dimension,"TargetDistribution::setupGrids: mismatch between number of values given for grid parameters");
+  plumed_massert(nbins.size()==dimension,"TargetDistribution::setupGrids: mismatch between number of values given for grid parameters");
+  targetdist_grid_pntr_ =     new Grid("targetdist",arguments,min,max,nbins,false,false);
+  log_targetdist_grid_pntr_ = new Grid("log_targetdist",arguments,min,max,nbins,false,false);
+  setupAdditionalGrids(arguments,min,max,nbins);
 }
 
 
-void TargetDistribution::writeDistributionToFile(const std::string& filepath, const std::string& keywords, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
-  // create distribtion
-  std::vector<std::string> words = Tools::getWords(keywords);
-  TargetDistribution* targetdist_pntr=targetDistributionRegister().create( (words) );
-  targetdist_pntr->writeDistributionToFile(filepath,min,max,nbins);
-  delete targetdist_pntr;
-}
-
-
-void TargetDistribution::calculateDistributionOnGrid(Grid* grid_pntr) const {
-  plumed_massert(grid_pntr->getDimension()==dimension_,"Grid is of the wrong dimension");
-  for(unsigned int l=0; l<grid_pntr->getSize(); l++)
+void TargetDistribution::calculateStaticDistributionGrid(){
+  plumed_massert(isStatic(),"this should only be used for static distributions");
+  plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids!!");
+  plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids!!!!");
+  for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
   {
-   std::vector<double> argument=grid_pntr->getPoint(l);
-   double value=getValue(argument);
-   grid_pntr->setValue(l,value);
+   std::vector<double> argument = targetdist_grid_pntr_->getPoint(l);
+   double value = getValue(argument);
+   targetdist_grid_pntr_->setValue(l,value);
+   log_targetdist_grid_pntr_->setValue(l,std::log(value));
   }
 }
 
 
-void TargetDistribution::writeProbGridToFile(const std::string& filepath, Grid* grid_pntr, const bool do_projections) {
-  OFile file;
-  file.setBackupString("bck");
-  file.open(filepath);
-  grid_pntr->writeToFile(file);
-  file.close();
-  if(do_projections && grid_pntr->getDimension()>1){
-    std::vector<std::string> argnames = grid_pntr->getArgNames();
-    for(unsigned int i=0; i<argnames.size(); i++){
-      Grid proj_grid = getMarginalGrid(grid_pntr,argnames[i]);
-      OFile file2;
-      file2.setBackupString("bck");
-      std::string proj_fname = argnames[i];
-      proj_fname = FileBase::appendSuffix(filepath,".proj-"+proj_fname);
-      file2.open(proj_fname);
-      proj_grid.writeToFile(file2);
-      file2.close();
-    }
+double TargetDistribution::integrateGrid(const Grid* grid_pntr){
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(grid_pntr);
+  double sum = 0.0;
+  for(Grid::index_t l=0; l<grid_pntr->getSize(); l++){
+    sum += integration_weights[l]*grid_pntr->getValue(l);
+  }
+  return sum;
+}
+
+
+double TargetDistribution::normalizeGrid(Grid* grid_pntr){
+  double normalization = TargetDistribution::integrateGrid(grid_pntr);
+  grid_pntr->scaleAllValuesAndDerivatives(1.0/normalization);
+  return normalization;
+}
+
+
+void TargetDistribution::normalizeTargetDistGrid(){
+  double shift = normalizeGrid(targetdist_grid_pntr_);
+  shift = -std::log(shift);
+  for(Grid::index_t l=0; l<log_targetdist_grid_pntr_->getSize(); l++){
+    double value = log_targetdist_grid_pntr_->getValue(l);
+    log_targetdist_grid_pntr_->setValue(l,value+shift);
   }
 }
 
 
-Grid TargetDistribution::getMarginalGrid(Grid* grid_pntr, const std::string& arg) {
-  plumed_massert(grid_pntr->getDimension()>1,"doesn't make sense calculating the marginal for a one-dimensional grid");
-  MarginalWeight* Pw = new MarginalWeight();
+Grid TargetDistribution::getMarginalDistributionGrid(Grid* grid_pntr, const std::vector<std::string>& args) {
+
+  plumed_massert(grid_pntr->getDimension()>1,"doesn't make sense calculating the marginal distribution for a one-dimensional distribution");
+  plumed_massert(args.size()<grid_pntr->getDimension(),"the number of arguments for the marginal distribution should be less than the dimension of the full distribution");
+  //
   std::vector<std::string> argnames = grid_pntr->getArgNames();
-  std::vector<double> binDeltas = grid_pntr->getDx();
-  bool arg_found = false;
-  unsigned int arg_index = 0;
+  std::vector<unsigned int> args_index(0);
   for(unsigned int i=0; i<argnames.size(); i++){
-    if(argnames[i]==arg){
-      arg_found=true;
-      arg_index=i;
+    for(unsigned int l=0; l<args.size(); l++){
+      if(argnames[i]==args[l]){args_index.push_back(i);}
     }
   }
-  plumed_massert(arg_found,"getMarginalGrid: the argument given is not one of grid arguments");
-  std::vector<std::string> argv(1,arg);
-  Grid proj_grid = grid_pntr->project(argv,Pw);
+  plumed_massert(args.size()==args_index.size(),"getMarginalDistributionGrid: problem with the arguments of the marginal");
+  //
+  MarginalWeight* Pw = new MarginalWeight();
+  Grid proj_grid = grid_pntr->project(args,Pw);
+  delete Pw;
+  //
   // scale with the bin volume used for the integral such that the
-  // marginals are proberly normalized
-  double intVol = 1.0;
-  for(unsigned int l=0; l<binDeltas.size(); l++){
-    if(l!=arg_index){intVol*=binDeltas[l];}
+  // marginals are proberly normalized to 1.0
+  double intVol = grid_pntr->getBinVolume();
+  for(unsigned int l=0; l<args_index.size(); l++){
+    intVol/=grid_pntr->getDx()[args_index[l]];
   }
   proj_grid.scaleAllValuesAndDerivatives(intVol);
-  delete Pw;
+  //
   return proj_grid;
 }
 
 
-void TargetDistribution::calculateSeperableDistributionOnGrid(Grid* grid_pntr, std::vector<TargetDistribution*> targetdist_pntrs) {
-  unsigned int ntargetdist = targetdist_pntrs.size();
-  plumed_massert(grid_pntr->getDimension()==ntargetdist,"dimension of Grid doesn't match the number of seperable one-dimensional target distribtions");
-  for(unsigned int k=0; k<ntargetdist; k++){
-    plumed_massert(targetdist_pntrs[k]!=NULL,"all the target distribtions must be defined");
-    plumed_massert(targetdist_pntrs[k]->getDimension()==1,"all the target distribtions must be one-dimensional");
-  }
-  for(unsigned int l=0; l<grid_pntr->getSize(); l++)
-  {
-   std::vector<double> argument=grid_pntr->getPoint(l);
-   double value=1;
-   std::vector<double> arg1d(1);
-   for(unsigned int k=0; k<ntargetdist; k++){
-     arg1d[0] = argument[k];
-     value*=targetdist_pntrs[k]->getValue(arg1d);
-   }
-   grid_pntr->setValue(l,value);
-  }
+Grid TargetDistribution::getMarginal(const std::vector<std::string>& args){
+  return TargetDistribution::getMarginalDistributionGrid(targetdist_grid_pntr_,args);
 }
 
 
