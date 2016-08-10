@@ -52,10 +52,6 @@ action_pntr_(NULL),
 vesbias_pntr_(NULL)
 {
   input.erase( input.begin() );
-  // unsigned int dimension = 0;
-  //parse("DIMENSION",dimension,true);
-  //plumed_massert(dimension>0,"Programming error in usage of TargetDistribution class, the dimension should always be passed by using the DIMENSION keyword");
-  //setDimension(dimension);
 }
 
 
@@ -69,7 +65,7 @@ TargetDistribution::~TargetDistribution() {
 }
 
 
-void setDimension(const unsigned int dimension){
+void TargetDistribution::setDimension(const unsigned int dimension){
   plumed_massert(dimension_==0,"setDimension: the dimension of the target distribution has already been set!");
   dimension_=dimension;
 }
