@@ -80,8 +80,8 @@ bf_pntrs(1)
   bf_pntrs[0]=plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_label);
   plumed_massert(bf_pntrs[0]!=NULL,"basis function "+basisset_label+" does not exist. NOTE: the basis functions should always be defined BEFORE the DUMP_BASISFUNCTIONS action.");
 
-  unsigned int grid_bins = 1000;
-  parse("GRID_BINS",grid_bins);
+  unsigned int nbins = 1000;
+  parse("GRID_BINS",nbins);
 
   std::string fname_values = bf_pntrs[0]->getLabel()+".values.data";
   parse("FILE_VALUES",fname_values);
@@ -111,20 +111,20 @@ bf_pntrs(1)
   ofile_derivs.link(*this);
   ofile_derivs.enforceBackup();
   ofile_derivs.open(fname_derives);
-  bf_pntrs[0]->writeBasisFunctionsToFile(ofile_values,ofile_derivs,grid_bins,ignore_periodicity);
+  bf_pntrs[0]->writeBasisFunctionsToFile(ofile_values,ofile_derivs,nbins,ignore_periodicity);
   ofile_values.close();
   ofile_derivs.close();
   //
-  std::vector<std::string> min(1); min[0]=bf_pntrs[0]->intervalMinStr();
-  std::vector<std::string> max(1); max[0]=bf_pntrs[0]->intervalMaxStr();
-  std::vector<unsigned int> nbins(1); nbins[0]=grid_bins;
-  std::vector<Value*> args(1);
-  args[0]= new Value(NULL,"arg",false);
+  std::vector<std::string> grid_min(1); grid_min[0]=bf_pntrs[0]->intervalMinStr();
+  std::vector<std::string> grid_max(1); grid_max[0]=bf_pntrs[0]->intervalMaxStr();
+  std::vector<unsigned int> grid_bins(1); grid_bins[0]=nbins;
+  std::vector<Value*> arguments(1);
+  arguments[0]= new Value(NULL,"arg",false);
   if(bf_pntrs[0]->arePeriodic() && !ignore_periodicity){
-    args[0]->setDomain(bf_pntrs[0]->intervalMinStr(),bf_pntrs[0]->intervalMaxStr());
+    arguments[0]->setDomain(bf_pntrs[0]->intervalMinStr(),bf_pntrs[0]->intervalMaxStr());
   }
   else {
-    args[0]->setNotPeriodic();
+    arguments[0]->setNotPeriodic();
   }
 
   OFile ofile_targetdist_aver;
@@ -136,24 +136,25 @@ bf_pntrs(1)
     std::string is; Tools::convert(i+1,is);
     TargetDistribution* targetdist_pntr = setupTargetDistPntr(targetdist_keywords[i]);
     std::vector<double> bf_integrals = bf_pntrs[0]->getTargetDistributionIntegrals(targetdist_pntr);
-    CoeffsVector targetdist_averages = CoeffsVector("aver.targetdist-"+is,args,bf_pntrs,comm,false);
+    CoeffsVector targetdist_averages = CoeffsVector("aver.targetdist-"+is,arguments,bf_pntrs,comm,false);
     targetdist_averages.setValues(bf_integrals);
     targetdist_averages.writeToFile(ofile_targetdist_aver,true);
-    Grid ps_grid = Grid("targetdist-"+is,args,min,max,nbins,false,false);
     if(targetdist_pntr!=NULL){
+      targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
+      targetdist_pntr->updateGrid();
+      Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
       std::string fname = FileBase::appendSuffix(fname_targetdist,is);
-      targetdist_pntr->calculateDistributionOnGrid(&ps_grid);
       OFile ofile;
       ofile.link(*this);
       ofile.enforceBackup();
       ofile.open(fname);
-      ps_grid.writeToFile(ofile);
+      targetdist_grid_pntr->writeToFile(ofile);
       ofile.close();
     }
     delete targetdist_pntr;
   }
   ofile_targetdist_aver.close();
-  delete args[0]; args.clear();
+  delete arguments[0]; arguments.clear();
 
 
 
