@@ -89,8 +89,6 @@ protected:
   void setNormalized(){normalized_=true;};
   void setNotNormalized(){normalized_=false;};
   //
-  void setDimension(const unsigned int dimension){dimension_=dimension;}
-  //
   bias::VesBias* getPntrToVesBias() const;
   Action* getPntrToAction() const;
   //
@@ -114,6 +112,7 @@ public:
   // is the target distribution normalize or not
   bool isNormalized() const {return normalized_;};
   //
+  void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}
   // get type of distribution
   std::string getName()const{return name_;};

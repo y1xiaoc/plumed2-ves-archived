@@ -69,6 +69,12 @@ TargetDistribution::~TargetDistribution() {
 }
 
 
+void setDimension(const unsigned int dimension){
+  plumed_massert(dimension_==0,"setDimension: the dimension of the target distribution has already been set!");
+  dimension_=dimension;
+}
+
+
 void TargetDistribution::linkVesBias(bias::VesBias* vesbias_pntr_in){
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
