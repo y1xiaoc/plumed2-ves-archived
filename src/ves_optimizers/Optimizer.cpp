@@ -628,8 +628,8 @@ isFirstStep(true)
       for(unsigned int i=0; i<nbiases_; i++){
         if(dynamic_targetdists_[i]){
           bias_pntrs_[i]->enableDynamicTargetDistFileOutput();
-          bias_pntrs_[i]->setupDynamicTargetDistFileOutput();
-          bias_pntrs_[i]->writeDynamicTargetDistToFile();
+          bias_pntrs_[i]->setupTargetDistFileOutput();
+          bias_pntrs_[i]->writeTargetDistToFile();
         }
       }
     }
@@ -1129,7 +1129,7 @@ void Optimizer::writeFesProjOutputFiles() const {
 void Optimizer::writeTargetDistOutputFiles() const {
   for(unsigned int i=0; i<nbiases_; i++){
     if(dynamic_targetdists_[i]){
-      bias_pntrs_[i]->writeDynamicTargetDistToFile();
+      bias_pntrs_[i]->writeTargetDistToFile();
     }
   }
 }

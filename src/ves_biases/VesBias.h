@@ -281,9 +281,13 @@ public:
   virtual void writeFesProjToFile() {};
   virtual void resetFesProjFileOutput() {};
   //
-  virtual void setupDynamicTargetDistFileOutput() {};
-  virtual void writeDynamicTargetDistToFile() {};
-  virtual void resetDynamicTargetDistFileOutput() {};
+  virtual void setupTargetDistFileOutput() {};
+  virtual void writeTargetDistToFile() {};
+  virtual void resetTargetDistFileOutput() {};
+  //
+  virtual void setupTargetDistProjFileOutput() {};
+  virtual void writeTargetDistProjToFile() {};
+  virtual void resetTargetDistProjFileOutput() {};
 };
 
 

@@ -19,6 +19,10 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#include "tools/Keywords.h"
+#include "tools/Grid.h"
+#include "tools/Communicator.h"
+
 #include "LinearBasisSetExpansion.h"
 #include "VesBias.h"
 #include "ves_tools/CoeffsVector.h"
@@ -27,12 +31,8 @@
 #include "ves_basisfunctions/BasisFunctions.h"
 #include "ves_targetdistributions/TargetDistribution.h"
 #include "ves_targetdistributions/TargetDistributionRegister.h"
-
-
-#include "tools/Keywords.h"
-#include "tools/Grid.h"
 #include "ves_tools/GridProjWeights.h"
-#include "tools/Communicator.h"
+
 
 
 
@@ -69,13 +69,8 @@ nbasisf_(basisf_pntrs_.size()),
 bias_coeffs_pntr_(bias_coeffs_pntr_in),
 ncoeffs_(0),
 targetdist_averages_pntr_(NULL),
-fes_wt_coeffs_pntr_(NULL),
-bias_fes_scalingf_(-1.0),
-log_ps_fes_contribution_(false),
-welltemp_biasf_(-1.0),
-inv_welltemp_biasf_(-1.0),
-welltemp_beta_prime_(0.0),
-bias_cutoff_active_(false),
+grid_min_(nargs_),
+grid_max_(nargs_),
 grid_bins_(nargs_,100),
 targetdist_grid_label_("targetdist"),
 step_of_last_biasgrid_update(-1000),
@@ -84,8 +79,8 @@ step_of_last_fesgrid_update(-1000),
 bias_grid_pntr_(NULL),
 bias_withoutcutoff_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
-log_ps_grid_pntr_(NULL),
-dynamic_ps_grid_pntr_(NULL)
+log_targetdist_grid_pntr_(NULL),
+targetdist_grid_pntr_(NULL)
 {
   plumed_massert(args_pntrs_.size()==basisf_pntrs_.size(),"number of arguments and basis functions do not match");
   for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs_[k]->getNumberOfBasisFunctions();}
@@ -107,14 +102,15 @@ dynamic_ps_grid_pntr_(NULL)
   }
   targetdist_averages_pntr_->setLabels(targetdist_averages_label);
   //
+  for(unsigned int k=0;k<nargs_;k++){
+    grid_min_[k] = basisf_pntrs_[k]->intervalMinStr();
+    grid_max_[k] = basisf_pntrs_[k]->intervalMaxStr();
+  }
 }
 
 LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   if(targetdist_averages_pntr_!=NULL){
     delete targetdist_averages_pntr_;
-  }
-  if(fes_wt_coeffs_pntr_!=NULL){
-    delete fes_wt_coeffs_pntr_;
   }
   if(bias_grid_pntr_!=NULL){
     delete bias_grid_pntr_;
@@ -125,11 +121,8 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   if(fes_grid_pntr_!=NULL){
     delete fes_grid_pntr_;
   }
-  if(log_ps_grid_pntr_!=NULL){
-    delete log_ps_grid_pntr_;
-  }
-  if(dynamic_ps_grid_pntr_!=NULL){
-    delete dynamic_ps_grid_pntr_;
+  if(targetdist_pntr_!=NULL){
+    delete targetdist_pntr_;
   }
 }
 
@@ -157,48 +150,28 @@ void LinearBasisSetExpansion::linkAction(Action* action_pntr_in) {
 
 void LinearBasisSetExpansion::setGridBins(const std::vector<unsigned int>& grid_bins_in) {
   plumed_massert(grid_bins_in.size()==nargs_,"the number of grid bins given doesn't match the number of arguments");
+  plumed_massert(bias_grid_pntr_==NULL,"setGridBins should be used before setting up the grids, otherwise it doesn't work");
+  plumed_massert(fes_grid_pntr_==NULL,"setGridBins should be used before setting up the grids, otherwise it doesn't work");
   grid_bins_=grid_bins_in;
 }
 
 
 void LinearBasisSetExpansion::setGridBins(const unsigned int nbins) {
   std::vector<unsigned int> grid_bins_in(nargs_,nbins);
-  grid_bins_=grid_bins_in;
+  setGridBins(grid_bins_in);
 }
 
 
-Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string& label_suffix, const std::vector<unsigned int>& nbins, const bool usederiv) {
-  plumed_assert(nbins.size()==nargs_);
-  std::vector<std::string> min(nargs_);
-  std::vector<std::string> max(nargs_);
-  for(unsigned int k=0;k<nargs_;k++){
-    Tools::convert(basisf_pntrs_[k]->intervalMin(),min[k]);
-    Tools::convert(basisf_pntrs_[k]->intervalMax(),max[k]);
-  }
-  Grid* grid_pntr = new Grid(label_+"."+label_suffix,args_pntrs_,min,max,nbins,false,usederiv);
-  return grid_pntr;
-}
-
-
-Grid* LinearBasisSetExpansion::setupOneDimensionalMarginalGrid(const std::string& label_suffix, const unsigned int nbins, const unsigned int dim) {
-  plumed_assert(dim<nargs_);
-  std::vector<Value*> arg(1);
-  arg[0]=args_pntrs_[dim];
-  std::vector<std::string> min(1);
-  std::vector<std::string> max(1);
-  Tools::convert(basisf_pntrs_[dim]->intervalMin(),min[0]);
-  Tools::convert(basisf_pntrs_[dim]->intervalMax(),max[0]);
-  std::vector<unsigned int> nbinsv(1);
-  nbinsv[0]=nbins;
-  //
-  Grid* grid_pntr = new Grid(label_+"."+label_suffix,arg,min,max,nbinsv,false,false);
+Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string& label_suffix, const bool usederiv) {
+  bool use_spline = false;
+  Grid* grid_pntr = new Grid(label_+"."+label_suffix,args_pntrs_,grid_min_,grid_max_,grid_bins_,use_spline,usederiv);
   return grid_pntr;
 }
 
 
 void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
   plumed_massert(bias_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias grid has already been defined.");
-  bias_grid_pntr_ = setupGeneralGrid("bias",grid_bins_,usederiv);
+  bias_grid_pntr_ = setupGeneralGrid("bias",usederiv);
 }
 
 
@@ -207,7 +180,7 @@ void LinearBasisSetExpansion::setupFesGrid() {
   if(bias_grid_pntr_==NULL){
     setupBiasGrid(false);
   }
-  fes_grid_pntr_ = setupGeneralGrid("fes",grid_bins_,false);
+  fes_grid_pntr_ = setupGeneralGrid("fes",false);
 }
 
 
@@ -311,11 +284,11 @@ void LinearBasisSetExpansion::updateFesGrid() {
     return;
   }
   //
-  double fes_scalingf = getBiasToFesScalingFactor();
+  double bias2fes_scalingf = -1.0;
   for(Grid::index_t l=0; l<fes_grid_pntr_->getSize(); l++){
-    double fes_value = fes_scalingf*bias_grid_pntr_->getValue(l);
-    if(log_ps_fes_contribution_){
-      fes_value += log_ps_grid_pntr_->getValue(l);
+    double fes_value = bias2fes_scalingf*bias_grid_pntr_->getValue(l);
+    if(log_targetdist_grid_pntr_!=NULL){
+      fes_value += kBT()*log_targetdist_grid_pntr_->getValue(l);
     }
     fes_grid_pntr_->setValue(l,fes_value);
   }
@@ -358,11 +331,42 @@ void LinearBasisSetExpansion::writeFesProjGridToFile(const std::vector<std::stri
 }
 
 
-void LinearBasisSetExpansion::writeDynamicTargetDistGridToFile(OFile& ofile, const bool append_file) const {
-    plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the FES grid is not defined");
-    if(append_file){ofile.enforceRestart();}
-    dynamic_ps_grid_pntr_->writeToFile(ofile);
+void LinearBasisSetExpansion::writeTargetDistGridToFile(OFile& ofile, const bool append_file) const {
+  if(targetdist_grid_pntr_==NULL){return;}
+  if(append_file){ofile.enforceRestart();}
+  targetdist_grid_pntr_->writeToFile(ofile);
 }
+
+
+void LinearBasisSetExpansion::writeLogTargetDistGridToFile(OFile& ofile, const bool append_file) const {
+  if(log_targetdist_grid_pntr_==NULL){return;}
+  if(append_file){ofile.enforceRestart();}
+  log_targetdist_grid_pntr_->writeToFile(ofile);
+}
+
+
+void LinearBasisSetExpansion::writeTargetDistProjGridToFile(const std::vector<std::string>& proj_arg, OFile& ofile, const bool append_file) const {
+  if(targetdist_grid_pntr_==NULL){return;}
+  if(append_file){ofile.enforceRestart();}
+  Grid proj_grid = TargetDistribution::getMarginalDistributionGrid(targetdist_grid_pntr_,proj_arg);
+  proj_grid.writeToFile(ofile);
+}
+
+
+void LinearBasisSetExpansion::writeTargetDistributionToFile(const std::string& filename) const {
+  OFile of1; OFile of2;
+  if(action_pntr_!=NULL){
+    of1.link(*action_pntr_); of2.link(*action_pntr_);
+  }
+  of1.enforceBackup(); of2.enforceBackup();
+  of1.open(filename);
+  of2.open(FileBase::appendSuffix(filename,".log"));
+  writeTargetDistGridToFile(of1);
+  writeLogTargetDistGridToFile(of2);
+  of1.close(); of2.close();
+}
+
+
 
 
 double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values, std::vector<BasisFunctions*>& basisf_pntrs_in, CoeffsVector* coeffs_pntr_in, Communicator* comm_in) {
@@ -465,62 +469,10 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
 
 
 void LinearBasisSetExpansion::setupUniformTargetDistribution() {
-  std::vector<TargetDistribution*> targetdist_dummy(nargs_,NULL);
-  setupTargetDistribution(targetdist_dummy);
-}
-
-
-void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<std::string>& targetdist_keywords) {
-  if(targetdist_keywords.size()!=1 && targetdist_keywords.size()!=nargs_){
-    plumed_merror("the number of target distribution keywords needs to be either 1 or equal to the number of arguments");
-  }
-  std::vector<TargetDistribution*> targetdist_pntrs(targetdist_keywords.size(),NULL);
-  for(unsigned int k=0;k<targetdist_keywords.size();k++){
-    std::vector<std::string> words = Tools::getWords(targetdist_keywords[k]);
-    if(words[0]=="UNIFORM"){
-      targetdist_pntrs[k] = NULL;
-    }
-    else{
-      targetdist_pntrs[k] = targetDistributionRegister().create(words);
-    }
-  }
-  setupTargetDistribution(targetdist_pntrs);
-  for(unsigned int k=0;k<targetdist_pntrs.size();k++){
-    if(targetdist_pntrs[k]!=NULL){
-      delete targetdist_pntrs[k];
-    }
-  }
-}
-
-
-void LinearBasisSetExpansion::setupTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
-  if(targetdist_pntrs.size()!=1 && targetdist_pntrs.size()!=nargs_){
-    plumed_merror("the number of target distribution pointers needs to be either 1 or equal to the number of arguments");
-  }
-  if(nargs_==1){
-    setupOneDimensionalTargetDistribution(targetdist_pntrs);
-  }
-  else if(nargs_>1 && targetdist_pntrs.size()==1){
-    setupNonSeperableTargetDistribution(targetdist_pntrs[0]);
-  }
-  else{
-    setupSeperableTargetDistribution(targetdist_pntrs);
-  }
-}
-
-
-void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
-  plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
-  plumed_massert(nargs_>1,"setupSeperableTargetDistribution should not be used for one-dimensional cases");
-  //
   std::vector< std::vector <double> > bf_integrals(0);
+  //
   for(unsigned int k=0;k<nargs_;k++){
-    if(targetdist_pntrs[k]!=NULL){
-      bf_integrals.push_back(basisf_pntrs_[k]->getTargetDistributionIntegrals(targetdist_pntrs[k]));
-    }
-    else{
-      bf_integrals.push_back(basisf_pntrs_[k]->getUniformIntegrals());
-    }
+    bf_integrals.push_back(basisf_pntrs_[k]->getUniformIntegrals());
   }
   //
   for(size_t i=0;i<ncoeffs_;i++){
@@ -531,195 +483,45 @@ void LinearBasisSetExpansion::setupSeperableTargetDistribution(const std::vector
     }
     targetdist_averages_pntr_->setValue(i,value);
   }
-  //
-  bool all_targetdist_uniform = true;
-  for(unsigned int k=0;k<nargs_;k++){
-    if(targetdist_pntrs[k]!=NULL){
-      all_targetdist_uniform = false;
-      if(isStaticTargetDistFileOutputActive()){
-        Grid* grid1d_pntr_tmp = setupOneDimensionalMarginalGrid(targetdist_grid_label_+"_proj",grid_bins_[k],k);
-        targetdist_pntrs[k]->calculateDistributionOnGrid(grid1d_pntr_tmp);
-        writeTargetDistGridToFile(grid1d_pntr_tmp,"proj-" + args_pntrs_[k]->getName());
-        delete grid1d_pntr_tmp;
-      }
-    }
-  }
-  //
-  if(!all_targetdist_uniform){
-    std::vector<TargetDistribution*> targetdist_pntrs_modifed(nargs_);
-    for(unsigned int k=0;k<nargs_;k++){
-      targetdist_pntrs_modifed[k]=targetdist_pntrs[k];
-      if(targetdist_pntrs[k]==NULL){
-        std::vector<std::string> words;
-        std::string tmp1;
-        words.push_back("UNIFORM");
-        VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMin(),tmp1);
-        words.push_back("MINIMA=" + tmp1);
-        VesTools::convertDbl2Str(basisf_pntrs_[k]->intervalMax(),tmp1);
-        words.push_back("MAXIMA=" + tmp1);
-        targetdist_pntrs_modifed[k] = targetDistributionRegister().create(words);
-      }
-    }
-    Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
-    TargetDistribution::calculateSeperableDistributionOnGrid(ps_grid_pntr,targetdist_pntrs_modifed);
-    if(isStaticTargetDistFileOutputActive()){
-      writeTargetDistGridToFile(ps_grid_pntr);
-    }
-    //
-    log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
-    VesTools::copyGridValues(ps_grid_pntr,log_ps_grid_pntr_);
-    delete ps_grid_pntr;
-    log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
-    log_ps_fes_contribution_ = true;
-    if(isStaticTargetDistFileOutputActive()){
-      writeTargetDistGridToFile(log_ps_grid_pntr_,"log-beta");
-    }
-    //
-    for(unsigned int k=0;k<nargs_;k++){
-      if(targetdist_pntrs[k]==NULL && targetdist_pntrs_modifed[k]!=NULL){
-        delete targetdist_pntrs_modifed[k];
-      }
-    }
-  }
 }
 
 
-void LinearBasisSetExpansion::setupOneDimensionalTargetDistribution(const std::vector<TargetDistribution*>& targetdist_pntrs) {
-  plumed_massert(nargs_==1,"setupOneDimensionalTargetDistribution should only be used for one-dimensional cases");
-  plumed_massert(targetdist_pntrs.size()==nargs_,"number of target distribution does not match the number of basis functions");
-  //
-  std::vector<double> bf_integrals;
-  if(targetdist_pntrs[0]!=NULL){
-    bf_integrals = basisf_pntrs_[0]->getTargetDistributionIntegrals(targetdist_pntrs[0]);
-  }
-  else{
-    bf_integrals = basisf_pntrs_[0]->getUniformIntegrals();
-  }
-  plumed_massert(bf_integrals.size()==ncoeffs_,"something wrong in setupOneDimensionalTargetDistribution");
-  targetdist_averages_pntr_->setValues(bf_integrals);
-  //
-  if(targetdist_pntrs[0]!=NULL){
-    Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
-    targetdist_pntrs[0]->calculateDistributionOnGrid(ps_grid_pntr);
-    if(isStaticTargetDistFileOutputActive()){
-      writeTargetDistGridToFile(ps_grid_pntr);
-    }
-    //
-    log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"log-beta",grid_bins_,false);
-    VesTools::copyGridValues(ps_grid_pntr,log_ps_grid_pntr_);
-    delete ps_grid_pntr;
-    log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
-    log_ps_fes_contribution_ = true;
-    if(isStaticTargetDistFileOutputActive()){
-      writeTargetDistGridToFile(log_ps_grid_pntr_,"log-beta");
-    }
-  }
+void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_keyword) {
+  std::vector<std::string> words = Tools::getWords(targetdist_keyword);
+  targetdist_pntr_ = targetDistributionRegister().create(words);
+  targetdist_pntr_->setupGrids(args_pntrs_,grid_min_,grid_max_,grid_bins_);
+  targetdist_pntr_->linkVesBias(vesbias_pntr_);
+  if(targetdist_pntr_->isDynamic()){vesbias_pntr_->enableDynamicTargetDistribution();}
+  targetdist_pntr_->updateGrid();
+  targetdist_grid_pntr_      = targetdist_pntr_->getTargetDistGridPntr();
+  log_targetdist_grid_pntr_  = targetdist_pntr_->getLogTargetDistGridPntr();
+  calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
 
 
-void LinearBasisSetExpansion::setupNonSeperableTargetDistribution(const TargetDistribution* targetdist_pntr) {
-  if(targetdist_pntr==NULL){
-    setupUniformTargetDistribution();
-    return;
-  }
-  plumed_massert(nargs_>1,"setupNonSeperableTargetDistribution should not be used for one-dimensional cases");
-  Grid* ps_grid_pntr = setupGeneralGrid(targetdist_grid_label_,grid_bins_,false);
-  targetdist_pntr->calculateDistributionOnGrid(ps_grid_pntr);
-  calculateTargetDistAveragesFromGrid(ps_grid_pntr);
-  if(isStaticTargetDistFileOutputActive()){
-    writeTargetDistGridToFile(ps_grid_pntr);
-  }
-  log_ps_grid_pntr_ = setupGeneralGrid(targetdist_grid_label_+"_log-beta",grid_bins_,false);
-  VesTools::copyGridValues(ps_grid_pntr,log_ps_grid_pntr_);
-  log_ps_grid_pntr_->logAllValuesAndDerivatives( (-1.0/beta_) );
-  log_ps_fes_contribution_ = true;
-  if(isStaticTargetDistFileOutputActive()){
-    writeTargetDistGridToFile(log_ps_grid_pntr_,"log-beta");
-    for(unsigned int k=0; k<args_pntrs_.size(); k++){
-      Grid proj_grid = TargetDistribution::getMarginalGrid(ps_grid_pntr,args_pntrs_[k]->getName());
-      writeTargetDistGridToFile(&proj_grid,"proj-"+args_pntrs_[k]->getName());
-    }
-  }
-  delete ps_grid_pntr;
+void LinearBasisSetExpansion::updateTargetDistribution() {
+  plumed_massert(targetdist_pntr_!=NULL,"the target distribution hasn't been setup!");
+  plumed_massert(targetdist_pntr_->isStatic(),"this should only be used for dynamically updated target distributions!");
+  updateBiasGrid();
+  updateBiasWithoutCutoffGrid();
+  updateFesGrid();
+  targetdist_pntr_->updateGrid();
+  calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
 
 
-void LinearBasisSetExpansion::setupWellTemperedTargetDistribution(const double biasf) {
-  plumed_massert(welltemp_biasf_<0.0,"setupWellTemperedTargetDistribution should only be run once.");
-  plumed_massert(biasf>1.0,"setupWellTemperedTargetDistribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
-  plumed_massert(fes_wt_coeffs_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the CoeffsVector for the well-tempered FES has already been defined");
-  plumed_massert(dynamic_ps_grid_pntr_==NULL,"setupWellTemperedTargetDistribution should only be called once: the grid for the well-tempered p(s) has already been defined");
-  //
-  welltemp_biasf_=biasf;
-  inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
-  welltemp_beta_prime_ = beta_/welltemp_biasf_;
-  bias_fes_scalingf_ = -(welltemp_biasf_)/(welltemp_biasf_-1.0);
-  //
-  fes_wt_coeffs_pntr_ = new CoeffsVector(*bias_coeffs_pntr_);
-  std::string fes_wt_label = bias_coeffs_pntr_->getLabel();
-  if(fes_wt_label.find("coeffs")!=std::string::npos){
-    fes_wt_label.replace(fes_wt_label.find("coeffs"), std::string("coeffs").length(), "fes_wt_coeffs");
-  }
-  else {
-    fes_wt_label += "_fes_wt";
-  }
-  fes_wt_coeffs_pntr_->setLabels(fes_wt_label);
-  //
-  dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_wt",grid_bins_,false);
-}
-
-void LinearBasisSetExpansion::setWellTemperedBiasFactor(const double biasf) {
-  plumed_massert(welltemp_biasf_>1.0,"setupWellTemperedTargetDistribution has to be run before changing the bias factor using setWellTemperedBiasFactor.");
-  plumed_massert(biasf>1.0,"setWellTemperedBiasFactor: the value of the bias factor doesn't make sense, it should be larger than 1.0");
-  welltemp_biasf_=biasf;
-  inv_welltemp_biasf_ = 1.0/welltemp_biasf_;
-  welltemp_beta_prime_ = beta_/welltemp_biasf_;
-  bias_fes_scalingf_ = -(welltemp_biasf_)/(welltemp_biasf_-1.0);
-}
-
-
-void LinearBasisSetExpansion::updateWellTemperedPsGrid() {
-  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(dynamic_ps_grid_pntr_);
-  Grid::index_t stride=mycomm_.Get_size();
-  Grid::index_t rank=mycomm_.Get_rank();
-  double norm = 0.0;
-  for(Grid::index_t l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
-    std::vector<double> args = dynamic_ps_grid_pntr_->getPoint(l);
-    double value = -welltemp_beta_prime_ * getFES_WellTempered(args,false);
-    value = exp(value);
-    norm += integration_weights[l]*value;
-    dynamic_ps_grid_pntr_->setValue(l,value);
-  }
-  mycomm_.Sum(norm);
-  norm = 1.0/norm;
-  dynamic_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
-  dynamic_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
-}
-
-
-void LinearBasisSetExpansion::updateWellTemperedTargetDistribution() {
-  plumed_assert(welltemp_biasf_>1.0);
-  // Update FES WT coeffs
-  FesWTCoeffs() = -BiasCoeffs() + inv_welltemp_biasf_*FesWTCoeffs();
-  // Update p(s) grid
-  updateWellTemperedPsGrid();
-  // calcuate coeffs derivs from grid
-  calculateTargetDistAveragesFromGrid(dynamic_ps_grid_pntr_);
-}
-
-
-void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* ps_grid_pntr, const bool normalize_dist) {
-  plumed_assert(ps_grid_pntr!=NULL);
+void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* targetdist_grid_pntr, const bool normalize_dist) {
+  plumed_assert(targetdist_grid_pntr!=NULL);
   std::vector<double> targetdist_averages(ncoeffs_,0.0);
-  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(ps_grid_pntr);
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(targetdist_grid_pntr);
   Grid::index_t stride=mycomm_.Get_size();
   Grid::index_t rank=mycomm_.Get_rank();
   double sum_grid = 0.0;
-  for(Grid::index_t l=rank; l<ps_grid_pntr->getSize(); l+=stride){
-    std::vector<double> args_values = ps_grid_pntr->getPoint(l);
+  for(Grid::index_t l=rank; l<targetdist_grid_pntr->getSize(); l+=stride){
+    std::vector<double> args_values = targetdist_grid_pntr->getPoint(l);
     std::vector<double> basisset_values(ncoeffs_);
     getBasisSetValues(args_values,basisset_values,false);
-    double weight = integration_weights[l]*ps_grid_pntr->getValue(l);
+    double weight = integration_weights[l]*targetdist_grid_pntr->getValue(l);
     sum_grid += weight;
     for(unsigned int i=0; i<ncoeffs_; i++){
       targetdist_averages[i] += weight*basisset_values[i];
@@ -738,71 +540,6 @@ void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* ps
 }
 
 
-void LinearBasisSetExpansion::updateBiasCutoffPsGrid() {
-  plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
-  plumed_massert(bias_withoutcutoff_grid_pntr_!=NULL,"the bias grid has to be defined");
-  plumed_massert(dynamic_ps_grid_pntr_!=NULL,"the p(s) grid has to be defined");
-  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(dynamic_ps_grid_pntr_);
-  Grid::index_t stride=mycomm_.Get_size();
-  Grid::index_t rank=mycomm_.Get_rank();
-  double norm = 0.0;
-  dynamic_ps_grid_pntr_->clear();
-  for(Grid::index_t l=rank; l<dynamic_ps_grid_pntr_->getSize(); l+=stride){
-    double bias = bias_withoutcutoff_grid_pntr_->getValue(l);
-    double deriv_factor_sf = 0.0;
-    // this comes from the p(s)
-    double value = vesbias_pntr_->getBiasCutoffSwitchingFunction(bias,deriv_factor_sf);
-    norm += integration_weights[l]*value;
-    // this comes from the derivative of V(s)
-    value *= deriv_factor_sf;
-    dynamic_ps_grid_pntr_->setValue(l,value);
-  }
-  mycomm_.Sum(norm);
-  norm = 1.0/norm;
-  dynamic_ps_grid_pntr_->scaleAllValuesAndDerivatives(norm);
-  dynamic_ps_grid_pntr_->mpiSumValuesAndDerivatives(mycomm_);
-}
-
-
-void LinearBasisSetExpansion::updateBiasCutoffTargetDistribution() {
-  plumed_massert(biasCutoffActive(),"the bias cutoff is not active");
-  updateBiasWithoutCutoffGrid();
-  updateBiasCutoffPsGrid();
-  calculateTargetDistAveragesFromGrid(dynamic_ps_grid_pntr_);
-}
-
-
-void LinearBasisSetExpansion::setupBiasCutoffTargetDistribution() {
-  plumed_massert(dynamic_ps_grid_pntr_==NULL,"setupBiasCutoffTargetDistribution should only be called once: the grid for the p(s) has already been defined");
-  plumed_massert(bias_withoutcutoff_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias with cutoff grid has already been defined.");
-  plumed_massert(vesbias_pntr_!=NULL,"has to be linked to a VesBias to work");
-  plumed_massert(!bias_cutoff_active_,"setupBiasCutoffTargetDistribution should only be called once");
-  //
-  bias_cutoff_active_=true;
-  dynamic_ps_grid_pntr_ = setupGeneralGrid("ps_cutoff",grid_bins_,false);
-  bias_withoutcutoff_grid_pntr_ = setupGeneralGrid("bias_withoutcutoff",grid_bins_,true);
-}
-
-
-void LinearBasisSetExpansion::writeTargetDistGridToFile(Grid* grid_pntr, const std::string& suffix) const {
-  plumed_massert(grid_pntr!=NULL,"the grid is not defined");
-  //
-  std::string filepath = "targetdist.data";
-  if(suffix.size()>0){
-    filepath = FileBase::appendSuffix(filepath,"."+suffix);
-  }
-  if(vesbias_pntr_!=NULL){
-    filepath = vesbias_pntr_->getCurrentTargetDistOutputFilename(suffix);
-  }
-  OFile file;
-  file.link(*action_pntr_);
-  // file.setBackupString("bck");
-  file.open(filepath);
-  grid_pntr->writeToFile(file);
-  file.close();
-}
-
-
 void LinearBasisSetExpansion::setBiasMinimumToZero(){
   plumed_massert(bias_grid_pntr_!=NULL,"setBiasMinimumToZero can only be used if the bias grid is defined");
   updateBiasGrid();
@@ -817,6 +554,10 @@ void LinearBasisSetExpansion::setBiasMaximumToZero(){
 }
 
 
+bool LinearBasisSetExpansion::biasCutoffActive() const {
+  if(vesbias_pntr_!=NULL){return vesbias_pntr_->biasCutoffActive();}
+  else{return false;}
+}
 
 
 

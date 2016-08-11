@@ -68,8 +68,9 @@ public:
   //
   void setupFesProjFileOutput();
   void writeFesProjToFile();
-  void setupTargetDistFileOutput() {};
-  void writeDynamicTargetDistToFile();
+  //
+  void writeTargetDistToFile();
+  void writeTargetDistProjToFile();
   static void registerKeywords( Keywords& keys );
 };
 
@@ -117,10 +118,10 @@ valueForce2_(NULL)
   bias_expansion_pntr_->setGridBins(this->getGridBins());
   //
   if(getNumberOfTargetDistributionKeywords()>0){
-    if(getNumberOfTargetDistributionKeywords()!=1 && getNumberOfTargetDistributionKeywords()!=nargs_){
-      plumed_merror("the number of target distribution keywords given by the TARGET_DISTRIBUTION keywords needs to be either 1 or equal to the number of arguments");
+    if(getNumberOfTargetDistributionKeywords()!=1){
+      plumed_merror("the number of target distribution keywords given by the TARGET_DISTRIBUTION keywords should be 1");
     }
-    bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords());
+    bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords()[0]);
   }
   else{
     bias_expansion_pntr_->setupUniformTargetDistribution();
@@ -130,10 +131,8 @@ valueForce2_(NULL)
   bool read_coeffs = readCoeffsFromFiles();
 
   if(this->wellTemperdTargetDistribution()){
-    bias_expansion_pntr_->setupWellTemperedTargetDistribution(this->getWellTemperedBiasFactor());
   }
   else if(this->biasCutoffActive()){
-    bias_expansion_pntr_->setupBiasCutoffTargetDistribution();
     if(read_coeffs){updateTargetDistributions();}
   }
 
@@ -180,12 +179,7 @@ void VesLinearExpansion::calculate() {
 
 
 void VesLinearExpansion::updateTargetDistributions() {
-  if(wellTemperdTargetDistribution()){
-    bias_expansion_pntr_->updateWellTemperedTargetDistribution();
-  }
-  else if(biasCutoffActive()){
-    bias_expansion_pntr_->updateBiasCutoffTargetDistribution();
-  }
+  bias_expansion_pntr_->updateTargetDistribution();
   setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
 }
 
@@ -252,10 +246,26 @@ void VesLinearExpansion::writeFesProjToFile() {
 }
 
 
-void VesLinearExpansion::writeDynamicTargetDistToFile() {
-  OFile* ofile_pntr = getOFile(getCurrentTargetDistOutputFilename(),useMultipleWalkers());
-  bias_expansion_pntr_->writeDynamicTargetDistGridToFile(*ofile_pntr);
-  ofile_pntr->close(); delete ofile_pntr;
+void VesLinearExpansion::writeTargetDistToFile() {
+  OFile* ofile1_pntr = getOFile(getCurrentTargetDistOutputFilename(),useMultipleWalkers());
+  OFile* ofile2_pntr = getOFile(getCurrentTargetDistOutputFilename("log"),useMultipleWalkers());
+  bias_expansion_pntr_->writeTargetDistGridToFile(*ofile1_pntr);
+  bias_expansion_pntr_->writeLogTargetDistGridToFile(*ofile2_pntr);
+  ofile1_pntr->close(); delete ofile1_pntr;
+  ofile2_pntr->close(); delete ofile2_pntr;
+}
+
+
+void VesLinearExpansion::writeTargetDistProjToFile() {
+  for(unsigned int i=0; i<getNumberOfProjectionArguments(); i++){
+    std::string suffix;
+    Tools::convert(i+1,suffix);
+    suffix = "proj-" + suffix;
+    OFile* ofile_pntr = getOFile(getCurrentFesOutputFilename(suffix),useMultipleWalkers());
+    std::vector<std::string> args = getProjectionArgument(i);
+    bias_expansion_pntr_->writeTargetDistProjGridToFile(args,*ofile_pntr);
+    ofile_pntr->close(); delete ofile_pntr;
+  }
 }
 
 
