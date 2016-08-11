@@ -129,6 +129,15 @@ Action(ao)
   ps_grid.writeToFile(ofile);
   ofile.close();
   //
+  ps_grid.logAllValuesAndDerivatives(-1.0);
+  ps_grid.setMinToZero();
+  OFile ofile2;
+  ofile2.link(*this);
+  ofile2.enforceBackup();
+  ofile2.open(FileBase::appendSuffix(fname,".log"));
+  ps_grid.writeToFile(ofile2);
+  ofile2.close();
+  //
   delete targetdist_pntr;
   for(unsigned int i=0; i < nargs; i++) {
     delete arguments[i];
