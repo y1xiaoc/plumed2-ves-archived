@@ -59,6 +59,8 @@ private:
   //
   Action* action_pntr_;
   bias::VesBias* vesbias_pntr_;
+  //
+  bool force_normalized_grid_;
 protected:
   // Read a keywords from the input
   template <class T>

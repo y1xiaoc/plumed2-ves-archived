@@ -26,6 +26,7 @@
 #include "core/Value.h"
 #include "tools/Grid.h"
 #include "ves_tools/GridProjWeights.h"
+#include "ves_tools/GridIntegrationWeights.h"
 #include "tools/File.h"
 #include "tools/Keywords.h"
 
@@ -38,6 +39,7 @@ words(input)
 
 
 void TargetDistribution::registerKeywords( Keywords& keys ){
+  keys.addFlag("FORCE_NORMALIZED_GRID",false,"bla");
 }
 
 
@@ -47,9 +49,11 @@ input(to.words),
 normalized_(false),
 dimension_(1),
 action_pntr_(NULL),
-vesbias_pntr_(NULL)
+vesbias_pntr_(NULL),
+force_normalized_grid_(false)
 {
   input.erase( input.begin() );
+  parseFlag("FORCE_NORMALIZED_GRID",force_normalized_grid_);
 }
 
 
@@ -121,12 +125,16 @@ void TargetDistribution::writeDistributionToFile(const std::string& filepath, co
 
 void TargetDistribution::calculateDistributionOnGrid(Grid* grid_pntr) const {
   plumed_massert(grid_pntr->getDimension()==dimension_,"Grid is of the wrong dimension");
+  double sum = 0.0;
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(grid_pntr);
   for(unsigned int l=0; l<grid_pntr->getSize(); l++)
   {
    std::vector<double> argument=grid_pntr->getPoint(l);
    double value=getValue(argument);
+   sum += integration_weights[l]*value;
    grid_pntr->setValue(l,value);
   }
+  if(force_normalized_grid_){grid_pntr->scaleAllValuesAndDerivatives(1.0/sum);}
 }
 
 
@@ -187,16 +195,15 @@ void TargetDistribution::calculateSeperableDistributionOnGrid(Grid* grid_pntr, s
     plumed_massert(targetdist_pntrs[k]!=NULL,"all the target distribtions must be defined");
     plumed_massert(targetdist_pntrs[k]->getDimension()==1,"all the target distribtions must be one-dimensional");
   }
-  for(unsigned int l=0; l<grid_pntr->getSize(); l++)
-  {
-   std::vector<double> argument=grid_pntr->getPoint(l);
-   double value=1;
-   std::vector<double> arg1d(1);
-   for(unsigned int k=0; k<ntargetdist; k++){
-     arg1d[0] = argument[k];
-     value*=targetdist_pntrs[k]->getValue(arg1d);
-   }
-   grid_pntr->setValue(l,value);
+  for(unsigned int l=0; l<grid_pntr->getSize(); l++){
+    std::vector<double> argument=grid_pntr->getPoint(l);
+    double value=1;
+    std::vector<double> arg1d(1);
+    for(unsigned int k=0; k<ntargetdist; k++){
+      arg1d[0] = argument[k];
+      value*=targetdist_pntrs[k]->getValue(arg1d);
+    }
+    grid_pntr->setValue(l,value);
   }
 }
 
