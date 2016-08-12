@@ -613,6 +613,12 @@ isFirstStep(true)
     }
   }
 
+  for(unsigned int i=0; i<nbiases_; i++){
+    if(!dynamic_targetdists_[i] && bias_pntrs_[i]->isStaticTargetDistFileOutputActive()){
+      bias_pntrs_[i]->setupTargetDistFileOutput();
+      bias_pntrs_[i]->writeTargetDistToFile();
+    }
+  }
 
   if(keywords.exists("TARGETDIST_OUTPUT")){
     parse("TARGETDIST_OUTPUT",targetdist_output_stride_);
