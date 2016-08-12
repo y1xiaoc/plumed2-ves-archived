@@ -128,6 +128,7 @@ void TargetDistribution::calculateStaticDistributionGrid(){
    targetdist_grid_pntr_->setValue(l,value);
    log_targetdist_grid_pntr_->setValue(l,-std::log(value));
   }
+  log_targetdist_grid_pntr_->setMinToZero();
 }
 
 
