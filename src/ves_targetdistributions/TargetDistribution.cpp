@@ -126,7 +126,7 @@ void TargetDistribution::calculateStaticDistributionGrid(){
    std::vector<double> argument = targetdist_grid_pntr_->getPoint(l);
    double value = getValue(argument);
    targetdist_grid_pntr_->setValue(l,value);
-   log_targetdist_grid_pntr_->setValue(l,std::log(value));
+   log_targetdist_grid_pntr_->setValue(l,-std::log(value));
   }
 }
 
