@@ -261,7 +261,7 @@ void VesLinearExpansion::writeTargetDistProjToFile() {
     std::string suffix;
     Tools::convert(i+1,suffix);
     suffix = "proj-" + suffix;
-    OFile* ofile_pntr = getOFile(getCurrentFesOutputFilename(suffix),useMultipleWalkers());
+    OFile* ofile_pntr = getOFile(getCurrentTargetDistOutputFilename(suffix),useMultipleWalkers());
     std::vector<std::string> args = getProjectionArgument(i);
     bias_expansion_pntr_->writeTargetDistProjGridToFile(args,*ofile_pntr);
     ofile_pntr->close(); delete ofile_pntr;
