@@ -617,6 +617,8 @@ isFirstStep(true)
     if(!dynamic_targetdists_[i] && bias_pntrs_[i]->isStaticTargetDistFileOutputActive()){
       bias_pntrs_[i]->setupTargetDistFileOutput();
       bias_pntrs_[i]->writeTargetDistToFile();
+      bias_pntrs_[i]->setupTargetDistProjFileOutput();
+      bias_pntrs_[i]->writeTargetDistProjToFile();
     }
   }
 
