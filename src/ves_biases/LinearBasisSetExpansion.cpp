@@ -503,7 +503,7 @@ void LinearBasisSetExpansion::updateTargetDistribution() {
   plumed_massert(targetdist_pntr_!=NULL,"the target distribution hasn't been setup!");
   plumed_massert(targetdist_pntr_->isStatic(),"this should only be used for dynamically updated target distributions!");
   updateBiasGrid();
-  updateBiasWithoutCutoffGrid();
+  if(biasCutoffActive()){updateBiasWithoutCutoffGrid();}
   updateFesGrid();
   targetdist_pntr_->updateGrid();
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
