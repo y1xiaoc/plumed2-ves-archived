@@ -149,16 +149,6 @@ double TargetDistribution::normalizeGrid(Grid* grid_pntr){
 }
 
 
-void TargetDistribution::normalizeTargetDistGrid(){
-  double shift = normalizeGrid(targetdist_grid_pntr_);
-  shift = -std::log(shift);
-  for(Grid::index_t l=0; l<log_targetdist_grid_pntr_->getSize(); l++){
-    double value = log_targetdist_grid_pntr_->getValue(l);
-    log_targetdist_grid_pntr_->setValue(l,value+shift);
-  }
-}
-
-
 Grid TargetDistribution::getMarginalDistributionGrid(Grid* grid_pntr, const std::vector<std::string>& args) {
 
   plumed_massert(grid_pntr->getDimension()>1,"doesn't make sense calculating the marginal distribution for a one-dimensional distribution");

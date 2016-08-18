@@ -154,6 +154,12 @@ Action* TargetDistribution::getPntrToAction() const {
 }
 
 
+inline
+void TargetDistribution::normalizeTargetDistGrid(){
+  normalizeGrid(targetdist_grid_pntr_);
+}
+
+
 template <class T>
 bool TargetDistribution::parse( const std::string& key, T& t, bool optional){
   bool found=Tools::parse(input,key,t);
