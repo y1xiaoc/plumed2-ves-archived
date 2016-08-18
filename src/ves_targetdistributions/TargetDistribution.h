@@ -95,6 +95,9 @@ protected:
   virtual void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&) {}
   //
   void normalizeTargetDistGrid();
+  //
+  Grid& targetDistGrid() const {return *targetdist_grid_pntr_;}
+  Grid& logTargetDistGrid() const {return *log_targetdist_grid_pntr_;}
 public:
   // keywords
   static void registerKeywords( Keywords&);
