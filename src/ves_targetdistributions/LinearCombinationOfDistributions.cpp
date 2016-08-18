@@ -72,9 +72,7 @@ ndist_(0)
     if(!parseNumbered("DISTRIBUTION",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);
     TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
-    if(dist_pntr_tmp->isDynamic()){
-      setDynamic();
-    }
+    if(dist_pntr_tmp->isDynamic()){setDynamic();}
     distribution_pntrs_.push_back(dist_pntr_tmp);
   }
   ndist_ = distribution_pntrs_.size();
