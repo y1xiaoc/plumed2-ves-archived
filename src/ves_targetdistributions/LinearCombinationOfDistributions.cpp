@@ -130,7 +130,9 @@ void LinearCombinationOfDistributions::updateGrid(){
       value += weights_[i]*grid_pntrs_[i]->getValue(l);
     }
     targetDistGrid().setValue(l,value);
+    logTargetDistGrid().setValue(l,-std::log(value));
   }
+  logTargetDistGrid().setMinToZero();
 }
 
 

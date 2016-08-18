@@ -137,7 +137,9 @@ void ProductCombinationOfDistributions::updateGrid(){
       value *= grid_pntrs_[i]->getValue(indices[i]);
     }
     targetDistGrid().setValue(l,value);
+    logTargetDistGrid().setValue(l,-std::log(value));
   }
+  logTargetDistGrid().setMinToZero();
 }
 
 
