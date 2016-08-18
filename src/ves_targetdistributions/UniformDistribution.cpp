@@ -56,12 +56,24 @@ inverse_normalization_(1.0),
 minima_(0),
 maxima_(0)
 {
-  parseVector("MINIMA",minima_);
-  parseVector("MAXIMA",maxima_);
-  plumed_massert(minima_.size()==maxima_.size(),"MINIMA and MAXIMA for the uniform distribution do not have the same size");
-  setDimension(minima_.size());
+  std::vector<std::string> min_str_;
+  std::vector<std::string> max_str_;
+  parseVector("MINIMA",min_str_);
+  parseVector("MAXIMA",max_str_);
+  plumed_massert(min_str_.size()==max_str_.size(),"MINIMA and MAXIMA for the uniform distribution do not have the same size");
+  //
+  setDimension(min_str_.size());
+  minima_.assign(getDimension(),0.0);
+  maxima_.assign(getDimension(),0.0);
+  //
   normalization_ = 1.0;
   for(unsigned int k=0; k<getDimension(); k++){
+    if(!Tools::convert(min_str_[k],minima_[k])){
+      plumed_merror("cannot convert one of the values given in MINIMA to a double");
+    }
+    if(!Tools::convert(max_str_[k],maxima_[k])){
+      plumed_merror("cannot convert one of the values given in MAXIMA to a double");
+    }
     plumed_massert(maxima_[k]>minima_[k],"Check MINIMA and MAXIMA keywords");
     normalization_ *= maxima_[k]-minima_[k];
   }
