@@ -150,7 +150,6 @@ double TargetDistribution::normalizeGrid(Grid* grid_pntr){
 
 
 Grid TargetDistribution::getMarginalDistributionGrid(Grid* grid_pntr, const std::vector<std::string>& args) {
-
   plumed_massert(grid_pntr->getDimension()>1,"doesn't make sense calculating the marginal distribution for a one-dimensional distribution");
   plumed_massert(args.size()<grid_pntr->getDimension(),"the number of arguments for the marginal distribution should be less than the dimension of the full distribution");
   //
