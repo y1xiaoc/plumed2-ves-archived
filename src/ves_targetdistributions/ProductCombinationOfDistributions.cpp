@@ -23,6 +23,7 @@
 #include "TargetDistributionRegister.h"
 
 #include "tools/Keywords.h"
+#include "tools/Grid.h"
 
 namespace PLMD {
 
@@ -33,13 +34,17 @@ namespace PLMD {
 //+ENDPLUMEDOC
 
 class ProductCombinationOfDistributions: public TargetDistribution {
-  std::vector<TargetDistribution*> distributions_;
+private:
+  std::vector<TargetDistribution*> distribution_pntrs_;
+  std::vector<Grid*> grid_pntrs_;
   unsigned int ndist_;
+  void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
   explicit ProductCombinationOfDistributions(const TargetDistributionOptions& to);
-  ~ProductCombinationOfDistributions();
+  void updateGrid();
   double getValue(const std::vector<double>&) const;
+  ~ProductCombinationOfDistributions();
 };
 
 
@@ -55,7 +60,8 @@ void ProductCombinationOfDistributions::registerKeywords(Keywords& keys){
 
 ProductCombinationOfDistributions::ProductCombinationOfDistributions( const TargetDistributionOptions& to ):
 TargetDistribution(to),
-distributions_(0),
+distribution_pntrs_(0),
+grid_pntrs_(0),
 ndist_(0)
 {
   bool normalized = true;
@@ -63,16 +69,13 @@ ndist_(0)
     std::string keywords;
     if(!parseNumbered("DIST_ARG",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);
-    TargetDistribution* dist_tmp = targetDistributionRegister().create( (words) );
-    if(dist_tmp->getDimension()!=1){
-      plumed_merror("PRODUCT_COMBINATION: all the target distributions should be one dimensional");
-    }
-    if(!dist_tmp->isNormalized()){
-      normalized = false;
-    }
-    distributions_.push_back(dist_tmp);
+    TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
+    if(dist_pntr_tmp->isDynamic()){setDynamic();}
+    if(!dist_pntr_tmp->isNormalized()){normalized = false;}
+    distribution_pntrs_.push_back(dist_pntr_tmp);
   }
-  ndist_ = distributions_.size();
+  ndist_ = distribution_pntrs_.size();
+  grid_pntrs_.assign(ndist_,NULL);
   setDimension(ndist_);
 
   bool ignore_normalization_check = false;
@@ -93,21 +96,49 @@ ndist_(0)
 
 ProductCombinationOfDistributions::~ProductCombinationOfDistributions(){
   for(unsigned int i=0; i<ndist_; i++){
-    delete distributions_[i];
+    delete distribution_pntrs_[i];
   }
 }
 
 
 double ProductCombinationOfDistributions::getValue(const std::vector<double>& argument) const {
-  double value=1.0;
-  for(unsigned int i=0; i<ndist_; i++){
-    std::vector<double> arg_tmp(1);
-    arg_tmp[0]=argument[i];
-    value *= distributions_[i]->getValue(arg_tmp);
-  }
-  return value;
+  plumed_merror("getValue not implemented for ProductCombinationOfDistributions");
+  return 0.0;
 }
 
+
+void ProductCombinationOfDistributions::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  for(unsigned int i=0; i<ndist_; i++){
+    std::vector<Value*> arg1d(1);
+    std::vector<std::string> min1d(1);
+    std::vector<std::string> max1d(1);
+    std::vector<unsigned int> nbins1d(1);
+    arg1d[0]=arguments[i];
+    min1d[0]=min[i];
+    max1d[0]=max[i];
+    nbins1d[0]=nbins[i];
+    distribution_pntrs_[i]->setupGrids(arg1d,min1d,max1d,nbins1d);
+    grid_pntrs_[i]=distribution_pntrs_[i]->getTargetDistGridPntr();
+    if(distribution_pntrs_[i]->getDimension()!=1 || grid_pntrs_[i]->getDimension()!=1){
+      plumed_merror("Error in PRODUCT_COMBINATION: all target distribution need to be one dimensional");
+    }
+  }
+}
+
+
+void ProductCombinationOfDistributions::updateGrid(){
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->updateGrid();
+  }
+  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
+    std::vector<unsigned int> indices = targetDistGrid().getIndices(l);
+    double value = 1.0;
+    for(unsigned int i=0; i<ndist_; i++){
+      value *= grid_pntrs_[i]->getValue(indices[i]);
+    }
+    targetDistGrid().setValue(l,value);
+  }
+}
 
 
 }
