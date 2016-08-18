@@ -23,6 +23,7 @@
 #include "TargetDistributionRegister.h"
 
 #include "tools/Keywords.h"
+#include "tools/Grid.h"
 
 namespace PLMD {
 
@@ -33,14 +34,18 @@ namespace PLMD {
 //+ENDPLUMEDOC
 
 class LinearCombinationOfDistributions: public TargetDistribution {
-  std::vector<TargetDistribution*> distributions_;
+private:
+  std::vector<TargetDistribution*> distribution_pntrs_;
+  std::vector<Grid*> grid_pntrs_;
   std::vector<double> weights_;
   unsigned int ndist_;
+  void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
   explicit LinearCombinationOfDistributions(const TargetDistributionOptions& to);
-  ~LinearCombinationOfDistributions();
+  void updateGrid();
   double getValue(const std::vector<double>&) const;
+  ~LinearCombinationOfDistributions();
 };
 
 
@@ -57,7 +62,8 @@ void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
 
 LinearCombinationOfDistributions::LinearCombinationOfDistributions( const TargetDistributionOptions& to ):
 TargetDistribution(to),
-distributions_(0),
+distribution_pntrs_(0),
+grid_pntrs_(0),
 weights_(0),
 ndist_(0)
 {
@@ -65,18 +71,17 @@ ndist_(0)
     std::string keywords;
     if(!parseNumbered("DISTRIBUTION",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);
-    TargetDistribution* dist_tmp = targetDistributionRegister().create( (words) );
-    distributions_.push_back(dist_tmp);
+    TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
+    if(dist_pntr_tmp->isDynamic()){
+      setDynamic();
+    }
+    distribution_pntrs_.push_back(dist_pntr_tmp);
   }
-  setDimension(distributions_[0]->getDimension());
-  ndist_ = distributions_.size();
-
-  for(unsigned int i=0; i<ndist_; i++){
-    plumed_massert(getDimension()==distributions_[0]->getDimension(),"all distributions have to have the same dimension");
-  }
+  ndist_ = distribution_pntrs_.size();
+  grid_pntrs_.assign(ndist_,NULL);
   //
-  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(distributions_.size(),1.0);}
-  plumed_massert(distributions_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
+  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(distribution_pntrs_.size(),1.0);}
+  plumed_massert(distribution_pntrs_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
   //
   bool do_not_normalize=false;
   parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
@@ -95,19 +100,40 @@ ndist_(0)
 
 LinearCombinationOfDistributions::~LinearCombinationOfDistributions(){
   for(unsigned int i=0; i<ndist_; i++){
-    delete distributions_[i];
+    delete distribution_pntrs_[i];
   }
 }
 
 
 double LinearCombinationOfDistributions::getValue(const std::vector<double>& argument) const {
-  double value=0.0;
-  for(unsigned int i=0; i<ndist_; i++){
-    value += weights_[i] * distributions_[i]->getValue(argument);
-  }
-  return value;
+  plumed_merror("getValue not implemented for LinearCombinationOfDistributions");
+  return 0.0;
 }
 
+
+void LinearCombinationOfDistributions::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->setupGrids(arguments,min,max,nbins);
+    if(distribution_pntrs_[i]->getDimension()!=this->getDimension()){
+      plumed_merror("Error in LINEAR_COMBINATION: all target distribution need to have the same dimension");
+    }
+    grid_pntrs_[i]=distribution_pntrs_[i]->getTargetDistGridPntr();
+  }
+}
+
+
+void LinearCombinationOfDistributions::updateGrid(){
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->updateGrid();
+  }
+  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
+    double value = 0.0;
+    for(unsigned int i=0; i<ndist_; i++){
+      value += weights_[i]*grid_pntrs_[i]->getValue(l);
+    }
+    targetDistGrid().setValue(l,value);
+  }
+}
 
 
 }
