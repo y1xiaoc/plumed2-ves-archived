@@ -49,7 +49,9 @@ dimension_(0),
 targetdist_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
 action_pntr_(NULL),
-vesbias_pntr_(NULL)
+vesbias_pntr_(NULL),
+fes_grid_pntr_(NULL),
+bias_grid_pntr_(NULL)
 {
   input.erase( input.begin() );
 }
@@ -79,6 +81,16 @@ void TargetDistribution::linkVesBias(bias::VesBias* vesbias_pntr_in){
 
 void TargetDistribution::linkAction(Action* action_pntr_in){
   action_pntr_ = action_pntr_in;
+}
+
+
+void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in){
+  fes_grid_pntr_=fes_grid_pntr_in;
+}
+
+
+void TargetDistribution::linkBiasGrid(Grid* bias_grid_pntr_in){
+  bias_grid_pntr_=bias_grid_pntr_in;
 }
 
 

@@ -68,6 +68,9 @@ private:
   Action* action_pntr_;
   bias::VesBias* vesbias_pntr_;
   //
+  Grid* fes_grid_pntr_;
+  Grid* bias_grid_pntr_;
+  //
   void calculateStaticDistributionGrid();
 protected:
   // Read a keywords from the input
@@ -98,6 +101,9 @@ protected:
   //
   Grid& targetDistGrid() const {return *targetdist_grid_pntr_;}
   Grid& logTargetDistGrid() const {return *log_targetdist_grid_pntr_;}
+  //
+  Grid* getFesGridPntr() const {return fes_grid_pntr_;}
+  Grid* getBiasGridPntr() const {return bias_grid_pntr_;}
 public:
   // keywords
   static void registerKeywords( Keywords&);
@@ -122,6 +128,9 @@ public:
   //
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
+  //
+  void linkFesGrid(Grid*);
+  void linkBiasGrid(Grid*);
   //
   Grid* getTargetDistGridPntr() const {return targetdist_grid_pntr_;}
   Grid* getLogTargetDistGridPntr() const {return log_targetdist_grid_pntr_;}
