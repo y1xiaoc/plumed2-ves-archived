@@ -67,6 +67,12 @@ TargetDistribution::~TargetDistribution() {
 }
 
 
+double TargetDistribution::getBeta() const {
+  plumed_massert(vesbias_pntr_!=NULL,"The VesBias has to be linked to use TargetDistribution::getBeta");
+  return vesbias_pntr_->getBeta();
+}
+
+
 void TargetDistribution::setDimension(const unsigned int dimension){
   plumed_massert(dimension_==0,"setDimension: the dimension of the target distribution has already been set!");
   dimension_=dimension;

@@ -104,6 +104,8 @@ protected:
   //
   Grid* getFesGridPntr() const {return fes_grid_pntr_;}
   Grid* getBiasGridPntr() const {return bias_grid_pntr_;}
+  //
+  double getBeta() const;
 public:
   // keywords
   static void registerKeywords( Keywords&);
