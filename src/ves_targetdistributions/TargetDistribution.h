@@ -68,6 +68,9 @@ private:
   Action* action_pntr_;
   bias::VesBias* vesbias_pntr_;
   //
+  bool needs_bias_grid_;
+  bool needs_fes_grid_;
+  //
   Grid* fes_grid_pntr_;
   Grid* bias_grid_pntr_;
   //
@@ -91,6 +94,9 @@ protected:
   // set the that target distribution is normalized
   void setNormalized(){normalized_=true;};
   void setNotNormalized(){normalized_=false;};
+  //
+  void setBiasGridNeeded(){needs_bias_grid_=true;}
+  void setFesGridNeeded(){needs_fes_grid_=true;}
   //
   bias::VesBias* getPntrToVesBias() const;
   Action* getPntrToAction() const;
@@ -122,6 +128,9 @@ public:
   bool isDynamic() const {return type_==dynamic_targetdist;}
   // is the target distribution normalize or not
   bool isNormalized() const {return normalized_;};
+  //
+  bool biasGridNeeded() const {return needs_bias_grid_;}
+  bool fesGridNeeded()  const {return needs_fes_grid_;}
   //
   void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}

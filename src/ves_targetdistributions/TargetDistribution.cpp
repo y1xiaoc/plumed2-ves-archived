@@ -50,6 +50,8 @@ targetdist_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
 action_pntr_(NULL),
 vesbias_pntr_(NULL),
+needs_bias_grid_(false),
+needs_fes_grid_(false),
 fes_grid_pntr_(NULL),
 bias_grid_pntr_(NULL)
 {

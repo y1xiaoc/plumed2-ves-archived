@@ -69,6 +69,7 @@ beta_prime_(0.0)
   }
   setDynamic();
   setNormalized();
+  setFesGridNeeded();
   checkRead();
 }
 
