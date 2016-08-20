@@ -509,7 +509,7 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetd
 
 void LinearBasisSetExpansion::updateTargetDistribution() {
   plumed_massert(targetdist_pntr_!=NULL,"the target distribution hasn't been setup!");
-  plumed_massert(targetdist_pntr_->isStatic(),"this should only be used for dynamically updated target distributions!");
+  plumed_massert(targetdist_pntr_->isDynamic(),"this should only be used for dynamically updated target distributions!");
   updateBiasGrid();
   if(biasCutoffActive()){updateBiasWithoutCutoffGrid();}
   updateFesGrid();
