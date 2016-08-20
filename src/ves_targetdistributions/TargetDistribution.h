@@ -74,6 +74,8 @@ private:
   Grid* fes_grid_pntr_;
   Grid* bias_grid_pntr_;
   //
+  bool static_grid_calculated;
+  //
   void calculateStaticDistributionGrid();
 protected:
   // Read a keywords from the input

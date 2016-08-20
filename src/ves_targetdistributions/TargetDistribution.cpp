@@ -53,7 +53,8 @@ vesbias_pntr_(NULL),
 needs_bias_grid_(false),
 needs_fes_grid_(false),
 fes_grid_pntr_(NULL),
-bias_grid_pntr_(NULL)
+bias_grid_pntr_(NULL),
+static_grid_calculated(false)
 {
   input.erase( input.begin() );
 }
@@ -138,6 +139,7 @@ void TargetDistribution::setupGrids(const std::vector<Value*>& arguments, const 
 
 
 void TargetDistribution::calculateStaticDistributionGrid(){
+  if(static_grid_calculated){return;}
   plumed_massert(isStatic(),"this should only be used for static distributions");
   plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids!!");
   plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids!!!!");
@@ -149,6 +151,7 @@ void TargetDistribution::calculateStaticDistributionGrid(){
    log_targetdist_grid_pntr_->setValue(l,-std::log(value));
   }
   log_targetdist_grid_pntr_->setMinToZero();
+  static_grid_calculated = true;
 }
 
 
