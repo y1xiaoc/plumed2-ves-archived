@@ -170,15 +170,15 @@ Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string& label_suffix,
 
 
 void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
-  plumed_massert(bias_grid_pntr_==NULL,"setupBiasGrid should only be called once: the bias grid has already been defined.");
+  if(bias_grid_pntr_!=NULL){return;}
   bias_grid_pntr_ = setupGeneralGrid("bias",usederiv);
 }
 
 
 void LinearBasisSetExpansion::setupFesGrid() {
-  plumed_massert(fes_grid_pntr_==NULL,"setupFesGrid should only be called once: the fes grid has already been defined.");
+  if(fes_grid_pntr_!=NULL){return;}
   if(bias_grid_pntr_==NULL){
-    setupBiasGrid(false);
+    setupBiasGrid(true);
   }
   fes_grid_pntr_ = setupGeneralGrid("fes",false);
 }
