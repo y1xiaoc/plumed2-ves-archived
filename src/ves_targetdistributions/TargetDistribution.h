@@ -108,8 +108,8 @@ protected:
   Grid& targetDistGrid() const {return *targetdist_grid_pntr_;}
   Grid& logTargetDistGrid() const {return *log_targetdist_grid_pntr_;}
   //
-  Grid* getFesGridPntr() const {return fes_grid_pntr_;}
   Grid* getBiasGridPntr() const {return bias_grid_pntr_;}
+  Grid* getFesGridPntr() const {return fes_grid_pntr_;}
   //
   double getBeta() const;
 public:
@@ -137,11 +137,11 @@ public:
   // get type of distribution
   std::string getName()const{return name_;};
   //
-  void linkVesBias(bias::VesBias*);
-  void linkAction(Action*);
+  virtual void linkVesBias(bias::VesBias*);
+  virtual void linkAction(Action*);
   //
-  void linkFesGrid(Grid*);
-  void linkBiasGrid(Grid*);
+  virtual void linkBiasGrid(Grid*);
+  virtual void linkFesGrid(Grid*);
   //
   Grid* getTargetDistGridPntr() const {return targetdist_grid_pntr_;}
   Grid* getLogTargetDistGridPntr() const {return log_targetdist_grid_pntr_;}

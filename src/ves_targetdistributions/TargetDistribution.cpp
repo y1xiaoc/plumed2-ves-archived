@@ -92,13 +92,13 @@ void TargetDistribution::linkAction(Action* action_pntr_in){
 }
 
 
-void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in){
-  fes_grid_pntr_=fes_grid_pntr_in;
+void TargetDistribution::linkBiasGrid(Grid* bias_grid_pntr_in){
+  bias_grid_pntr_=bias_grid_pntr_in;
 }
 
 
-void TargetDistribution::linkBiasGrid(Grid* bias_grid_pntr_in){
-  bias_grid_pntr_=bias_grid_pntr_in;
+void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in){
+  fes_grid_pntr_=fes_grid_pntr_in;
 }
 
 
