@@ -492,6 +492,14 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetd
   targetdist_pntr_->setupGrids(args_pntrs_,grid_min_,grid_max_,grid_bins_);
   targetdist_pntr_->linkVesBias(vesbias_pntr_);
   if(targetdist_pntr_->isDynamic()){vesbias_pntr_->enableDynamicTargetDistribution();}
+  if(targetdist_pntr_->biasGridNeeded()){
+    setupBiasGrid(true);
+    targetdist_pntr_->linkBiasGrid(bias_grid_pntr_);
+  }
+  if(targetdist_pntr_->fesGridNeeded()){
+    setupFesGrid();
+    targetdist_pntr_->linkFesGrid(fes_grid_pntr_);
+  }
   targetdist_pntr_->updateGrid();
   targetdist_grid_pntr_      = targetdist_pntr_->getTargetDistGridPntr();
   log_targetdist_grid_pntr_  = targetdist_pntr_->getLogTargetDistGridPntr();
