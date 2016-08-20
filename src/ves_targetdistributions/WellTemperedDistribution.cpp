@@ -92,7 +92,7 @@ void WellTemperedDistribution::updateGrid(){
     norm += integration_weights[l]*value;
     targetDistGrid().setValue(l,value);
   }
-  targetDistGrid().scaleAllValuesAndDerivatives(norm);
+  targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
   logTargetDistGrid().setMinToZero();
 }
 
