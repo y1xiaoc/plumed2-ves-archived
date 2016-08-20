@@ -33,6 +33,13 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
+class Grid;
+class Action;
+
+namespace bias{
+  class VesBias;
+}
+
 class LinearCombinationOfDistributions: public TargetDistribution {
 private:
   std::vector<TargetDistribution*> distribution_pntrs_;
@@ -46,6 +53,12 @@ public:
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~LinearCombinationOfDistributions();
+  //
+  void linkVesBias(bias::VesBias*);
+  void linkAction(Action*);
+  void linkFesGrid(Grid*);
+  void linkBiasGrid(Grid*);
+  //
 };
 
 
@@ -73,6 +86,8 @@ ndist_(0)
     std::vector<std::string> words = Tools::getWords(keywords);
     TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
     if(dist_pntr_tmp->isDynamic()){setDynamic();}
+    if(dist_pntr_tmp->fesGridNeeded()){setFesGridNeeded();}
+    if(dist_pntr_tmp->biasGridNeeded()){setBiasGridNeeded();}
     distribution_pntrs_.push_back(dist_pntr_tmp);
   }
   ndist_ = distribution_pntrs_.size();
@@ -133,6 +148,38 @@ void LinearCombinationOfDistributions::updateGrid(){
     logTargetDistGrid().setValue(l,-std::log(value));
   }
   logTargetDistGrid().setMinToZero();
+}
+
+
+void LinearCombinationOfDistributions::linkVesBias(bias::VesBias* vesbias_pntr_in){
+  TargetDistribution::linkVesBias(vesbias_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
+  }
+}
+
+
+void LinearCombinationOfDistributions::linkAction(Action* action_pntr_in){
+  TargetDistribution::linkAction(action_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkAction(action_pntr_in);
+  }
+}
+
+
+void LinearCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
+  TargetDistribution::linkBiasGrid(bias_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkBiasGrid(bias_grid_pntr_in);
+  }
+}
+
+
+void LinearCombinationOfDistributions::linkFesGrid(Grid* fes_grid_pntr_in){
+  TargetDistribution::linkFesGrid(fes_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkFesGrid(fes_grid_pntr_in);
+  }
 }
 
 

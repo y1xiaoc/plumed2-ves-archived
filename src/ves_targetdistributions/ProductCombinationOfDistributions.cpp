@@ -45,6 +45,11 @@ public:
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~ProductCombinationOfDistributions();
+  //
+  void linkVesBias(bias::VesBias*);
+  void linkAction(Action*);
+  void linkFesGrid(Grid*);
+  void linkBiasGrid(Grid*);
 };
 
 
@@ -71,6 +76,8 @@ ndist_(0)
     std::vector<std::string> words = Tools::getWords(keywords);
     TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
     if(dist_pntr_tmp->isDynamic()){setDynamic();}
+    if(dist_pntr_tmp->fesGridNeeded()){setFesGridNeeded();}
+    if(dist_pntr_tmp->biasGridNeeded()){setBiasGridNeeded();}
     if(!dist_pntr_tmp->isNormalized()){normalized = false;}
     distribution_pntrs_.push_back(dist_pntr_tmp);
   }
@@ -140,6 +147,38 @@ void ProductCombinationOfDistributions::updateGrid(){
     logTargetDistGrid().setValue(l,-std::log(value));
   }
   logTargetDistGrid().setMinToZero();
+}
+
+
+void ProductCombinationOfDistributions::linkVesBias(bias::VesBias* vesbias_pntr_in){
+  TargetDistribution::linkVesBias(vesbias_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
+  }
+}
+
+
+void ProductCombinationOfDistributions::linkAction(Action* action_pntr_in){
+  TargetDistribution::linkAction(action_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkAction(action_pntr_in);
+  }
+}
+
+
+void ProductCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
+  TargetDistribution::linkBiasGrid(bias_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkBiasGrid(bias_grid_pntr_in);
+  }
+}
+
+
+void ProductCombinationOfDistributions::linkFesGrid(Grid* fes_grid_pntr_in){
+  TargetDistribution::linkFesGrid(fes_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkFesGrid(fes_grid_pntr_in);
+  }
 }
 
 
