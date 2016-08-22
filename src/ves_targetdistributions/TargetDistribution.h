@@ -138,6 +138,8 @@ public:
   bool biasGridNeeded() const {return needs_bias_grid_;}
   bool fesGridNeeded()  const {return needs_fes_grid_;}
   //
+  bool biasCutoffActive() const {return bias_cutoff_active_;}
+  //
   void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}
   // get type of distribution
