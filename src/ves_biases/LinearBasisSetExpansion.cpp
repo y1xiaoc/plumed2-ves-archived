@@ -500,7 +500,7 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetd
     setupFesGrid();
     targetdist_pntr_->linkFesGrid(fes_grid_pntr_);
   }
-  targetdist_pntr_->updateGrid();
+  targetdist_pntr_->update();
   targetdist_grid_pntr_      = targetdist_pntr_->getTargetDistGridPntr();
   log_targetdist_grid_pntr_  = targetdist_pntr_->getLogTargetDistGridPntr();
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
@@ -513,7 +513,7 @@ void LinearBasisSetExpansion::updateTargetDistribution() {
   updateBiasGrid();
   if(biasCutoffActive()){updateBiasWithoutCutoffGrid();}
   updateFesGrid();
-  targetdist_pntr_->updateGrid();
+  targetdist_pntr_->update();
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
 

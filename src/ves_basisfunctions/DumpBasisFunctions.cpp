@@ -141,7 +141,7 @@ bf_pntrs(1)
     targetdist_averages.writeToFile(ofile_targetdist_aver,true);
     if(targetdist_pntr!=NULL){
       targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
-      targetdist_pntr->updateGrid();
+      targetdist_pntr->update();
       Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
       std::string fname = FileBase::appendSuffix(fname_targetdist,is);
       OFile ofile;

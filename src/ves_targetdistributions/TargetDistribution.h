@@ -116,6 +116,8 @@ protected:
   Grid* getFesGridPntr() const {return fes_grid_pntr_;}
   //
   double getBeta() const;
+  //
+  virtual void updateGrid(){calculateStaticDistributionGrid();}
 public:
   // keywords
   static void registerKeywords( Keywords&);
@@ -158,12 +160,19 @@ public:
   //
   Grid getMarginal(const std::vector<std::string>&);
   //
-  virtual void updateGrid() {calculateStaticDistributionGrid();};
+  void update();
   //
   static double integrateGrid(const Grid*);
   static double normalizeGrid(Grid*);
   static Grid getMarginalDistributionGrid(Grid*, const std::vector<std::string>&);
 };
+
+
+inline
+void TargetDistribution::update() {
+  updateGrid();
+  if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
+}
 
 
 inline

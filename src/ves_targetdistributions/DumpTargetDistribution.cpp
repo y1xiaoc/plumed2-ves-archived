@@ -123,7 +123,7 @@ Action(ao)
     plumed_merror("DUMP_TARGET_DISTRIBUTION only works for static target distributions");
   }
   targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
-  targetdist_pntr->updateGrid();
+  targetdist_pntr->update();
   Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
   Grid* log_targetdist_grid_pntr = targetdist_pntr->getLogTargetDistGridPntr();
 

@@ -137,7 +137,7 @@ void LinearCombinationOfDistributions::setupAdditionalGrids(const std::vector<Va
 
 void LinearCombinationOfDistributions::updateGrid(){
   for(unsigned int i=0; i<ndist_; i++){
-    distribution_pntrs_[i]->updateGrid();
+    distribution_pntrs_[i]->update();
   }
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
     double value = 0.0;
