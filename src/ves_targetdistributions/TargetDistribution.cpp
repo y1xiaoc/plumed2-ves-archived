@@ -147,8 +147,8 @@ void TargetDistribution::setupGrids(const std::vector<Value*>& arguments, const 
 
 
 void TargetDistribution::calculateStaticDistributionGrid(){
-  if(static_grid_calculated){return;}
-  plumed_massert(isStatic(),"this should only be used for static distributions");
+  if(static_grid_calculated && !bias_cutoff_active_){return;}
+  // plumed_massert(isStatic(),"this should only be used for static distributions");
   plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
   plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
   for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
