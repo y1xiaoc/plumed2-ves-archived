@@ -206,4 +206,31 @@ Grid TargetDistribution::getMarginal(const std::vector<std::string>& args){
 }
 
 
+void TargetDistribution::updateBiasCutoffForTargetDistGrid() {
+  plumed_massert(vesbias_pntr_!=NULL,"The VesBias has to be linked to use updateBiasCutoffForTargetDistGrid()");
+  plumed_massert(vesbias_pntr_->biasCutoffActive(),"updateBiasCutoffForTargetDistGrid() should only be used if the bias cutoff is active");
+  plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  //
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(targetdist_grid_pntr_);
+  double norm = 0.0;
+  for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
+  {
+   double value = targetdist_grid_pntr_->getValue(l);
+   double bias = getBiasGridPntr()->getValue(l);
+   double deriv_factor_swf = 0.0;
+   double swf = vesbias_pntr_->getBiasCutoffSwitchingFunction(bias,deriv_factor_swf);
+   // this comes from the p(s)
+   value *= swf;
+   norm += integration_weights[l]*value;
+   // this comes from the derivative of V(s)
+   value *= deriv_factor_swf;
+   targetdist_grid_pntr_->setValue(l,value);
+   double log_value = log_targetdist_grid_pntr_->getValue(l) - std::log(swf);
+   log_targetdist_grid_pntr_->setValue(l,log_value);
+  }
+  log_targetdist_grid_pntr_->setMinToZero();
+}
+
+
 }

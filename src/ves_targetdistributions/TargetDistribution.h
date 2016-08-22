@@ -77,6 +77,7 @@ private:
   bool static_grid_calculated;
   //
   void calculateStaticDistributionGrid();
+  void updateBiasCutoffForTargetDistGrid();
 protected:
   // Read a keywords from the input
   template <class T>
