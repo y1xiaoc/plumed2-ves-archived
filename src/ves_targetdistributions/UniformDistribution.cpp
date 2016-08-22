@@ -35,7 +35,6 @@ public:
   static void registerKeywords( Keywords&);
   explicit UniformDistribution( const TargetDistributionOptions& to );
   double getValue(const std::vector<double>&) const;
-  double getNormalization() const {return normalization_;}
 };
 
 
