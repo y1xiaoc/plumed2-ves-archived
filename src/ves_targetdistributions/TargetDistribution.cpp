@@ -71,13 +71,13 @@ TargetDistribution::~TargetDistribution() {
 
 
 double TargetDistribution::getBeta() const {
-  plumed_massert(vesbias_pntr_!=NULL,"The VesBias has to be linked to use TargetDistribution::getBeta");
+  plumed_massert(vesbias_pntr_!=NULL,"The VesBias has to be linked to use TargetDistribution::getBeta()");
   return vesbias_pntr_->getBeta();
 }
 
 
 void TargetDistribution::setDimension(const unsigned int dimension){
-  plumed_massert(dimension_==0,"setDimension: the dimension of the target distribution has already been set!");
+  plumed_massert(dimension_==0,"setDimension: the dimension of the target distribution has already been set");
   dimension_=dimension;
 }
 
@@ -141,8 +141,8 @@ void TargetDistribution::setupGrids(const std::vector<Value*>& arguments, const 
 void TargetDistribution::calculateStaticDistributionGrid(){
   if(static_grid_calculated){return;}
   plumed_massert(isStatic(),"this should only be used for static distributions");
-  plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids!!");
-  plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids!!!!");
+  plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
   for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
   {
    std::vector<double> argument = targetdist_grid_pntr_->getPoint(l);
