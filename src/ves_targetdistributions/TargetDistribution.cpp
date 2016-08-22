@@ -54,7 +54,8 @@ needs_bias_grid_(false),
 needs_fes_grid_(false),
 fes_grid_pntr_(NULL),
 bias_grid_pntr_(NULL),
-static_grid_calculated(false)
+static_grid_calculated(false),
+bias_cutoff_active_(false)
 {
   input.erase( input.begin() );
 }
@@ -100,6 +101,13 @@ void TargetDistribution::linkBiasGrid(Grid* bias_grid_pntr_in){
 
 void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in){
   fes_grid_pntr_=fes_grid_pntr_in;
+}
+
+
+void TargetDistribution::setupBiasCutoff() {
+  bias_cutoff_active_=true;
+  setBiasGridNeeded();
+  setDynamic();
 }
 
 

@@ -75,6 +75,7 @@ private:
   Grid* bias_grid_pntr_;
   //
   bool static_grid_calculated;
+  bool bias_cutoff_active_;
   //
   void calculateStaticDistributionGrid();
   void updateBiasCutoffForTargetDistGrid();
@@ -145,6 +146,8 @@ public:
   //
   virtual void linkBiasGrid(Grid*);
   virtual void linkFesGrid(Grid*);
+  //
+  void setupBiasCutoff();
   //
   Grid* getTargetDistGridPntr() const {return targetdist_grid_pntr_;}
   Grid* getLogTargetDistGridPntr() const {return log_targetdist_grid_pntr_;}
