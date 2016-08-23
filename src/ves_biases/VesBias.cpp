@@ -57,7 +57,7 @@ optimizer_pntr_(NULL),
 optimize_coeffs_(false),
 compute_hessian_(false),
 diagonal_hessian_(true),
-aver_counter(0.0),
+aver_counter(0),
 kbt_(0.0),
 targetdist_keywords_(0),
 targetdist_pntrs_(0),
@@ -427,7 +427,7 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     std::fill(sampled_covariance[k].begin(), sampled_covariance[k].end(), 0.0);
     std::fill(sampled_cross_averages[k].begin(), sampled_cross_averages[k].end(), 0.0);
   }
-  aver_counter=0.0;
+  aver_counter=0;
 }
 
 
@@ -457,6 +457,7 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
                     = cov(x,y)[n]*(n/(n+1)) + ( n * (x[n+1]-xm[n])/(n+1) * (y[n+1]-ym[n])/(n+1) );
       n starts at 0.
   */
+  double counter_dbl = static_cast<double>(aver_counter);
   size_t ncoeffs = numberOfCoeffs(c_id);
   std::vector<double> deltas(ncoeffs,0.0);
   size_t stride = comm.Get_size();
@@ -464,10 +465,10 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
   // update average and diagonal part of Hessian
   for(size_t i=rank; i<ncoeffs;i+=stride){
     size_t midx = getHessianIndex(i,i,c_id);
-    deltas[i] = (values[i]-sampled_averages[c_id][i])/(aver_counter+1); // (x[n+1]-xm[n])/(n+1)
+    deltas[i] = (values[i]-sampled_averages[c_id][i])/(counter_dbl+1); // (x[n+1]-xm[n])/(n+1)
     sampled_averages[c_id][i] += deltas[i];
-    sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[i];
-    sampled_cross_averages[c_id][midx] += (values[i]*values[i]-sampled_cross_averages[c_id][midx])/(aver_counter+1);
+    sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( counter_dbl / (counter_dbl+1) ) + counter_dbl*deltas[i]*deltas[i];
+    sampled_cross_averages[c_id][midx] += (values[i]*values[i]-sampled_cross_averages[c_id][midx])/(counter_dbl+1);
   }
   comm.Sum(deltas);
   // update off-diagonal part of the Hessian
@@ -475,13 +476,13 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
         size_t midx = getHessianIndex(i,j,c_id);
-        sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( aver_counter / (aver_counter+1) ) + aver_counter*deltas[i]*deltas[j];
-        sampled_cross_averages[c_id][midx] += (values[i]*values[j]-sampled_cross_averages[c_id][midx])/(aver_counter+1);
+        sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( counter_dbl / (counter_dbl+1) ) + counter_dbl*deltas[i]*deltas[j];
+        sampled_cross_averages[c_id][midx] += (values[i]*values[j]-sampled_cross_averages[c_id][midx])/(counter_dbl+1);
       }
     }
   }
   // NOTE: the MPI sum for sampled_averages and sampled_covariance is done later
-  //aver_counter += 1.0;
+  aver_counter += 1;
 }
 
 
@@ -578,7 +579,6 @@ void VesBias::disableHessian() {
 
 void VesBias::apply() {
   Bias::apply();
-  aver_counter += 1.0;
 }
 
 

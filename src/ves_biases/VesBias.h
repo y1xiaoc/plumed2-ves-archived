@@ -79,7 +79,8 @@ private:
   bool compute_hessian_;
   bool diagonal_hessian_;
   //
-  double aver_counter;
+  unsigned int aver_counter;  
+  //
   double kbt_;
   //
   std::vector<std::string> targetdist_keywords_;
