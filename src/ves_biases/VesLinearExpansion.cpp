@@ -111,33 +111,39 @@ valueForce2_(NULL)
   std::vector<Value*> args_pntrs = getArguments();
   addCoeffsSet(args_pntrs,basisf_pntrs_);
   ncoeffs_ = numberOfCoeffs();
+  readCoeffsFromFiles();
 
   checkThatTemperatureIsGiven();
   bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),getBeta(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
   bias_expansion_pntr_->linkVesBias(this);
   bias_expansion_pntr_->setGridBins(this->getGridBins());
   //
-  if(getNumberOfTargetDistributionKeywords()>0){
-    if(getNumberOfTargetDistributionKeywords()!=1){
-      plumed_merror("the number of target distribution keywords given by the TARGET_DISTRIBUTION keywords should be 1");
+
+  if(getNumberOfTargetDistributionKeywords()==0){
+    if(wellTemperdTargetDistribution()){
+      std::vector<std::string> keywords(1);
+      std::string s1; Tools::convert(getWellTemperedBiasFactor(),s1);
+      keywords[0]="WELL_TEMPERED BIAS_FACTOR="+s1;
+      setTargetDistributionKeywords(keywords);
     }
-    bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords()[0]);
+    else if(biasCutoffActive()){
+      std::vector<std::string> keywords(1);
+      std::string s1; Tools::convert(getBiasCutoffValue(),s1);
+      keywords[0]="UNIFORM_BIAS_CUTOFF CUTOFF="+s1;
+      setTargetDistributionKeywords(keywords);
+    }
   }
-  else{
+  //
+  if(getNumberOfTargetDistributionKeywords()!=0){
+    plumed_massert(getNumberOfTargetDistributionKeywords()==1,"the number of target distribution keywords given by the TARGET_DISTRIBUTION keywords should be 1");
+    bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords()[0]);
+    updateTargetDistributions();
+    log.printf("  using the following target distribution:\n   %s\n",getTargetDistributionKeywords()[0].c_str());
+  }
+  else {
+    log.printf("  using an uniform target distribution: \n");
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
-  setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
-
-  bool read_coeffs = readCoeffsFromFiles();
-
-  if(this->wellTemperdTargetDistribution()){
-  }
-  else if(this->biasCutoffActive()){
-    if(read_coeffs){updateTargetDistributions();}
-  }
-
-  //
-  readCoeffsFromFiles();
   //
   addComponent("force2"); componentIsNotPeriodic("force2");
   valueForce2_=getPntrToComponent("force2");
