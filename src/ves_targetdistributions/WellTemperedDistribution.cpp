@@ -37,8 +37,6 @@ namespace PLMD {
 class WellTemperedDistribution: public TargetDistribution {
 private:
   double bias_factor_;
-  double beta_;
-  double beta_prime_;
 public:
   static void registerKeywords(Keywords&);
   explicit WellTemperedDistribution(const TargetDistributionOptions& to);
@@ -59,9 +57,7 @@ void WellTemperedDistribution::registerKeywords(Keywords& keys){
 
 WellTemperedDistribution::WellTemperedDistribution( const TargetDistributionOptions& to ):
 TargetDistribution(to),
-bias_factor_(0.0),
-beta_(0.0),
-beta_prime_(0.0)
+bias_factor_(0.0)
 {
   parse("BIAS_FACTOR",bias_factor_);
   if(bias_factor_<=1.0){
