@@ -48,6 +48,7 @@ UniformBiasCutoffDistribution::UniformBiasCutoffDistribution(const TargetDistrib
 TargetDistribution(to)
 {
   setNormalized();
+  setupBiasCutoff();
   checkRead();
 }
 
