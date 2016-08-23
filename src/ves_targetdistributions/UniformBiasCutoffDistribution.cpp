@@ -28,6 +28,8 @@
 namespace PLMD {
 
 class UniformBiasCutoffDistribution : public TargetDistribution {
+private:
+  double bias_cutoff_;
 public:
   static void registerKeywords( Keywords&);
   explicit UniformBiasCutoffDistribution( const TargetDistributionOptions& to );
@@ -41,12 +43,15 @@ VES_REGISTER_TARGET_DISTRIBUTION(UniformBiasCutoffDistribution,"UNIFORM_BIAS_CUT
 
 void UniformBiasCutoffDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
+  keys.add("compulsory","CUTOFF","The cutoff used for the bias");
 }
 
 
 UniformBiasCutoffDistribution::UniformBiasCutoffDistribution(const TargetDistributionOptions& to):
-TargetDistribution(to)
+TargetDistribution(to),
+bias_cutoff_(0.0)
 {
+  parse("CUTOFF",bias_cutoff_);
   setNormalized();
   setupBiasCutoff();
   checkRead();
