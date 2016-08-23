@@ -77,12 +77,12 @@ double WellTemperedDistribution::getValue(const std::vector<double>& argument) c
 
 
 void WellTemperedDistribution::updateGrid(){
-  double beta_prime_ = getBeta()/bias_factor_;
+  double beta_prime = getBeta()/bias_factor_;
   plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to use WellTemperedDistribution!");
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(getTargetDistGridPntr());
   double norm = 0.0;
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
-    double value = beta_prime_ * getFesGridPntr()->getValue(l);
+    double value = beta_prime * getFesGridPntr()->getValue(l);
     logTargetDistGrid().setValue(l,value);
     value = exp(-value);
     norm += integration_weights[l]*value;
