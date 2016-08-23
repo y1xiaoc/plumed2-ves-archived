@@ -126,14 +126,17 @@ protected:
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
   void addCoeffsSet(CoeffsVector*);
+  //
   std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0) const;
   void clearCoeffsPntrsVector() {coeffs_pntrs_.clear();}
   void addToSampledAverages(const std::vector<double>&, const unsigned int c_id = 0);
   void setTargetDistAverages(const std::vector<double>&, const unsigned int coeffs_id = 0);
   void setTargetDistAverages(const CoeffsVector&, const unsigned int coeffs_id= 0);
   void setTargetDistAveragesToZero(const unsigned int coeffs_id= 0);
-
+  //
   bool readCoeffsFromFiles();
+  //
+  void setTargetDistributionKeywords(const std::vector<std::string>& keywords){targetdist_keywords_=keywords;}
   //
   template<class T>
   bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int);
@@ -167,8 +170,9 @@ public:
   CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs_[coeffs_id];}
   //
   std::vector<std::string> getTargetDistributionKeywords() const {return targetdist_keywords_;}
+  std::string getTargetDistributionKeyword(const unsigned int i) const {return targetdist_keywords_[i];}
   unsigned int getNumberOfTargetDistributionKeywords() const {return targetdist_keywords_.size();}
-  //
+    //
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id]->numberOfCoeffs();}
   size_t totalNumberOfCoeffs() const {return ncoeffs_total_;}
   unsigned int numberOfCoeffsSets() const {return ncoeffssets_;}
