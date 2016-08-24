@@ -113,7 +113,8 @@ double MDRunner_LinearExpansion::calc_energy( const std::vector<Vector>& pos, st
   for(unsigned int j=0;j<dim;++j){
     pos_tmp[j]=pos[0][j];
   }
-  double potential = potential_expansion_pntr->getBiasAndForces(pos_tmp,forces_tmp);
+  bool all_inside = true;
+  double potential = potential_expansion_pntr->getBiasAndForces(pos_tmp,all_inside,forces_tmp);
   for(unsigned int j=0;j<dim;++j){
     forces[0][j] = forces_tmp[j];
   }

@@ -162,7 +162,8 @@ void VesLinearExpansion::calculate() {
     cv_values[k]=getArgument(k);
   }
 
-  double bias = bias_expansion_pntr_->getBiasAndForces(cv_values,forces,coeffsderivs_values);
+  bool all_inside = true;
+  double bias = bias_expansion_pntr_->getBiasAndForces(cv_values,all_inside,forces,coeffsderivs_values);
   if(biasCutoffActive()){
     applyBiasCutoff(bias,forces,coeffsderivs_values);
     coeffsderivs_values[0]=1.0;
@@ -175,7 +176,9 @@ void VesLinearExpansion::calculate() {
 
   setBias(bias);
   valueForce2_->set(totalForce2);
-  addToSampledAverages(coeffsderivs_values);
+  if(all_inside){
+    addToSampledAverages(coeffsderivs_values);
+  }
 }
 
 

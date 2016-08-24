@@ -122,10 +122,10 @@ public:
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
   // calculate bias and derivatives
-  static double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
-  double getBiasAndForces(const std::vector<double>&, std::vector<double>&, std::vector<double>&);
-  double getBiasAndForces(const std::vector<double>&, std::vector<double>&);
-  double getBias(const std::vector<double>&, const bool parallel=true);
+  static double getBiasAndForces(const std::vector<double>&, bool&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
+  double getBiasAndForces(const std::vector<double>&, bool&, std::vector<double>&, std::vector<double>&);
+  double getBiasAndForces(const std::vector<double>&, bool&, std::vector<double>&);
+  double getBias(const std::vector<double>&, bool&, const bool parallel=true);
   double getFES_WellTempered(const std::vector<double>&, const bool parallel=true);
   //
   static void getBasisSetValues(const std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
@@ -220,27 +220,27 @@ void LinearBasisSetExpansion::setupTargetDistribution(TargetDistribution* target
 
 
 inline
-double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
-  return getBiasAndForces(args_values,forces,coeffsderivs_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, bool& all_inside, std::vector<double>& forces, std::vector<double>& coeffsderivs_values) {
+  return getBiasAndForces(args_values,all_inside,forces,coeffsderivs_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
 }
 
 
 inline
-double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, std::vector<double>& forces) {
+double LinearBasisSetExpansion::getBiasAndForces(const std::vector<double>& args_values, bool& all_inside, std::vector<double>& forces) {
   std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
-  return getBiasAndForces(args_values,forces,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+  return getBiasAndForces(args_values,all_inside,forces,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
 }
 
 
 inline
-double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values, const bool parallel) {
+double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values, bool& all_inside, const bool parallel) {
   std::vector<double> forces_dummy(nargs_);
   std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
   if(parallel){
-    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
+    return getBiasAndForces(args_values,all_inside,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
   }
   else{
-    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, NULL);
+    return getBiasAndForces(args_values,all_inside,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, NULL);
   }
 }
 
@@ -249,11 +249,12 @@ inline
 double LinearBasisSetExpansion::getFES_WellTempered(const std::vector<double>& args_values, const bool parallel) {
   std::vector<double> forces_dummy(nargs_);
   std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
+  bool all_inside_dummy=true;
   if(parallel){
-    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, &mycomm_);
+    return getBiasAndForces(args_values,all_inside_dummy,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, &mycomm_);
   }
   else{
-    return getBiasAndForces(args_values,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, NULL);
+    return getBiasAndForces(args_values,all_inside_dummy,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, NULL);
   }
 }
 
