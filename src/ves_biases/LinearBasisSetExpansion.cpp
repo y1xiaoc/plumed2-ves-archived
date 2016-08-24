@@ -501,9 +501,14 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetd
   if(vesbias_pntr_->biasCutoffActive()){
     targetdist_pntr_->setupBiasCutoff();
   }
+  //
   if(targetdist_pntr_->biasGridNeeded()){
     setupBiasGrid(true);
     targetdist_pntr_->linkBiasGrid(bias_grid_pntr_);
+  }
+  if(targetdist_pntr_->biasWithoutCutoffGridNeeded()){
+    setupBiasGrid(true);
+    targetdist_pntr_->linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_);
   }
   if(targetdist_pntr_->fesGridNeeded()){
     setupFesGrid();

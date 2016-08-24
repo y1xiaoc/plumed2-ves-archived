@@ -48,8 +48,9 @@ public:
   //
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
-  void linkFesGrid(Grid*);
   void linkBiasGrid(Grid*);
+  void linkBiasWithoutCutoffGrid(Grid*);
+  void linkFesGrid(Grid*);
 };
 
 
@@ -170,6 +171,14 @@ void ProductCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
   TargetDistribution::linkBiasGrid(bias_grid_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkBiasGrid(bias_grid_pntr_in);
+  }
+}
+
+
+void ProductCombinationOfDistributions::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
+  TargetDistribution::linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
   }
 }
 

@@ -51,9 +51,11 @@ log_targetdist_grid_pntr_(NULL),
 action_pntr_(NULL),
 vesbias_pntr_(NULL),
 needs_bias_grid_(false),
+needs_bias_withoutcutoff_grid_(false),
 needs_fes_grid_(false),
-fes_grid_pntr_(NULL),
 bias_grid_pntr_(NULL),
+bias_withoutcutoff_grid_pntr_(NULL),
+fes_grid_pntr_(NULL),
 static_grid_calculated(false),
 bias_cutoff_active_(false)
 {
@@ -95,18 +97,23 @@ void TargetDistribution::linkAction(Action* action_pntr_in){
 
 
 void TargetDistribution::linkBiasGrid(Grid* bias_grid_pntr_in){
-  bias_grid_pntr_=bias_grid_pntr_in;
+  bias_grid_pntr_ = bias_grid_pntr_in;
+}
+
+
+void TargetDistribution::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
+  bias_withoutcutoff_grid_pntr_ = bias_withoutcutoff_grid_pntr_in;
 }
 
 
 void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in){
-  fes_grid_pntr_=fes_grid_pntr_in;
+  fes_grid_pntr_ = fes_grid_pntr_in;
 }
 
 
 void TargetDistribution::setupBiasCutoff() {
   bias_cutoff_active_=true;
-  setBiasGridNeeded();
+  setBiasWithoutCutoffGridNeeded();
   setDynamic();
 }
 
@@ -217,15 +224,16 @@ Grid TargetDistribution::getMarginal(const std::vector<std::string>& args){
 void TargetDistribution::updateBiasCutoffForTargetDistGrid() {
   plumed_massert(vesbias_pntr_!=NULL,"The VesBias has to be linked to use updateBiasCutoffForTargetDistGrid()");
   plumed_massert(vesbias_pntr_->biasCutoffActive(),"updateBiasCutoffForTargetDistGrid() should only be used if the bias cutoff is active");
-  plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
-  plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  // plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  // plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  plumed_massert(getBiasWithoutCutoffGridPntr()!=NULL,"the bias without cutoff grid has to be linked");
   //
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(targetdist_grid_pntr_);
   double norm = 0.0;
   for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
   {
    double value = targetdist_grid_pntr_->getValue(l);
-   double bias = getBiasGridPntr()->getValue(l);
+   double bias = getBiasWithoutCutoffGridPntr()->getValue(l);
    double deriv_factor_swf = 0.0;
    double swf = vesbias_pntr_->getBiasCutoffSwitchingFunction(bias,deriv_factor_swf);
    // this comes from the p(s)

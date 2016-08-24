@@ -69,10 +69,12 @@ private:
   bias::VesBias* vesbias_pntr_;
   //
   bool needs_bias_grid_;
+  bool needs_bias_withoutcutoff_grid_;
   bool needs_fes_grid_;
   //
-  Grid* fes_grid_pntr_;
   Grid* bias_grid_pntr_;
+  Grid* bias_withoutcutoff_grid_pntr_;
+  Grid* fes_grid_pntr_;
   //
   bool static_grid_calculated;
   bool bias_cutoff_active_;
@@ -100,6 +102,7 @@ protected:
   void setNotNormalized(){normalized_=false;};
   //
   void setBiasGridNeeded(){needs_bias_grid_=true;}
+  void setBiasWithoutCutoffGridNeeded(){needs_bias_withoutcutoff_grid_=true;}
   void setFesGridNeeded(){needs_fes_grid_=true;}
   //
   bias::VesBias* getPntrToVesBias() const;
@@ -113,6 +116,7 @@ protected:
   Grid& logTargetDistGrid() const {return *log_targetdist_grid_pntr_;}
   //
   Grid* getBiasGridPntr() const {return bias_grid_pntr_;}
+  Grid* getBiasWithoutCutoffGridPntr() const {return bias_withoutcutoff_grid_pntr_;}
   Grid* getFesGridPntr() const {return fes_grid_pntr_;}
   //
   double getBeta() const;
@@ -136,6 +140,7 @@ public:
   bool isNormalized() const {return normalized_;};
   //
   bool biasGridNeeded() const {return needs_bias_grid_;}
+  bool biasWithoutCutoffGridNeeded() const {return needs_bias_withoutcutoff_grid_;}
   bool fesGridNeeded()  const {return needs_fes_grid_;}
   //
   bool biasCutoffActive() const {return bias_cutoff_active_;}
@@ -149,6 +154,7 @@ public:
   virtual void linkAction(Action*);
   //
   virtual void linkBiasGrid(Grid*);
+  virtual void linkBiasWithoutCutoffGrid(Grid*);
   virtual void linkFesGrid(Grid*);
   //
   void setupBiasCutoff();
