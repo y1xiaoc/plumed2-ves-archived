@@ -413,7 +413,9 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     }
     if(total_samples==0){
       Gradient(k).deactivate();
+      Gradient(k).clear();
       Hessian(k).deactivate();
+      Hessian(k).clear();
     }
     //
     std::fill(sampled_averages[k].begin(), sampled_averages[k].end(), 0.0);
@@ -424,6 +426,7 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
 
 
 void VesBias::multiSimSumAverages(const unsigned int c_id, const double walker_weight) {
+  plumed_massert(walker_weight>=0.0,"the weight of the walker cannot be negative!");
   if(walker_weight!=1.0){
     for(size_t i=0; i<sampled_averages[c_id].size(); i++){
       sampled_averages[c_id][i] *= walker_weight;
@@ -436,13 +439,14 @@ void VesBias::multiSimSumAverages(const unsigned int c_id, const double walker_w
   if(comm.Get_rank()==0){
     multi_sim_comm.Sum(sampled_averages[c_id]);
     multi_sim_comm.Sum(sampled_cross_averages[c_id]);
-    double sum_weight = walker_weight;
-    multi_sim_comm.Sum(sum_weight);
+    double norm_weights = walker_weight;
+    multi_sim_comm.Sum(norm_weights);
+    if(norm_weights>0.0){norm_weights=1.0/norm_weights;}
     for(size_t i=0; i<sampled_averages[c_id].size(); i++){
-      sampled_averages[c_id][i] /= sum_weight;
+      sampled_averages[c_id][i] *= norm_weights;
     }
     for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++){
-      sampled_cross_averages[c_id][i] /= sum_weight;
+      sampled_cross_averages[c_id][i] *= norm_weights;
     }
   }
   comm.Bcast(sampled_averages[c_id],0);
