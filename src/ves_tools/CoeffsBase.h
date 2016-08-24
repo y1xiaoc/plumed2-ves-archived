@@ -62,6 +62,8 @@ private:
   unsigned int iteration_opt;
   double time_md;
   //
+  bool active;
+  //
   Action* action_pntr_;
   bias::VesBias* vesbias_pntr_;
   //
@@ -136,6 +138,10 @@ public:
   unsigned int shapeOfIndices(const unsigned int dim_index) const {return indices_shape_[dim_index];}
   size_t numberOfCoeffs() const {return ncoeffs_;}
   unsigned int numberOfDimensions() const {return ndimensions_;}
+  //
+  bool isActive() const {return active;}
+  void activate() {active=true;}
+  void deactivate() {active=false;}
   //
   size_t getIndex(const std::vector<unsigned int>&) const;
   std::vector<unsigned int> getIndices(const size_t) const;
