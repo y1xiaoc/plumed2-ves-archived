@@ -172,6 +172,9 @@ Grid* LinearBasisSetExpansion::setupGeneralGrid(const std::string& label_suffix,
 void LinearBasisSetExpansion::setupBiasGrid(const bool usederiv) {
   if(bias_grid_pntr_!=NULL){return;}
   bias_grid_pntr_ = setupGeneralGrid("bias",usederiv);
+  if(biasCutoffActive()){
+    bias_withoutcutoff_grid_pntr_ = setupGeneralGrid("bias_withoutcutoff",usederiv);
+  }
 }
 
 
@@ -516,9 +519,9 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetd
 void LinearBasisSetExpansion::updateTargetDistribution() {
   plumed_massert(targetdist_pntr_!=NULL,"the target distribution hasn't been setup!");
   plumed_massert(targetdist_pntr_->isDynamic(),"this should only be used for dynamically updated target distributions!");
-  updateBiasGrid();
+  if(targetdist_pntr_->biasGridNeeded()){updateBiasGrid();}
   if(biasCutoffActive()){updateBiasWithoutCutoffGrid();}
-  updateFesGrid();
+  if(targetdist_pntr_->fesGridNeeded()){updateFesGrid();}
   targetdist_pntr_->update();
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
