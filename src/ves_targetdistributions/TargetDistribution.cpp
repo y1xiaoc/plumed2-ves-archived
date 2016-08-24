@@ -245,6 +245,7 @@ void TargetDistribution::updateBiasCutoffForTargetDistGrid() {
    double log_value = log_targetdist_grid_pntr_->getValue(l) - std::log(swf);
    log_targetdist_grid_pntr_->setValue(l,log_value);
   }
+  targetdist_grid_pntr_->scaleAllValuesAndDerivatives(1.0/norm);
   log_targetdist_grid_pntr_->setMinToZero();
 }
 
