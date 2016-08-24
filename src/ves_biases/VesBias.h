@@ -118,7 +118,7 @@ private:
 private:
   void initializeCoeffs(CoeffsVector*);
   std::vector<double> computeCovarianceFromAverages(const unsigned int) const;
-  void multiSimSumAverages(const unsigned int);
+  void multiSimSumAverages(const unsigned int, const double walker_weight=1.0);
 protected:
   //
   void checkThatTemperatureIsGiven();

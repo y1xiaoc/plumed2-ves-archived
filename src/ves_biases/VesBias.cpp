@@ -388,18 +388,16 @@ bool VesBias::readCoeffsFromFiles() {
 
 void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
   for(unsigned int k=0; k<ncoeffssets_; k++){
-    // Gradient
+    //
     comm.Sum(sampled_averages[k]);
-    Gradient(k) = TargetDistAverages(k) - sampled_averages[k];
-    if(use_mwalkers_mpi){
-      gradient_pntrs_[k]->sumMultiSimCommMPI(multi_sim_comm);
-    }
-    // Hessian - Option 1 (like done in the old code):
-    // Calculate the covariance from averages of f and f^2.
-    // For multiple walkers the averages f and f^2 are combined
-    // before calculating the Hessian (covariance) matrix.
     comm.Sum(sampled_cross_averages[k]);
-    if(use_mwalkers_mpi){multiSimSumAverages(k);}
+    if(use_mwalkers_mpi){
+      double walker_weight=1.0;
+      if(aver_counters[k]==0){walker_weight=0.0;}
+      multiSimSumAverages(k,walker_weight);
+    }
+    // NOTE: this assumes that all walkers have the same TargetDist, might change later on!!
+    Gradient(k) = TargetDistAverages(k) - sampled_averages[k];
     Hessian(k) = computeCovarianceFromAverages(k);
     Hessian(k) *= getBeta();
     //
@@ -410,16 +408,26 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
 }
 
 
-void VesBias::multiSimSumAverages(const unsigned int c_id) {
+void VesBias::multiSimSumAverages(const unsigned int c_id, const double walker_weight) {
+  if(walker_weight!=1.0){
+    for(size_t i=0; i<sampled_averages[c_id].size(); i++){
+      sampled_averages[c_id][i] *= walker_weight;
+    }
+    for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++){
+      sampled_cross_averages[c_id][i] *= walker_weight;
+    }
+  }
+  //
   if(comm.Get_rank()==0){
     multi_sim_comm.Sum(sampled_averages[c_id]);
     multi_sim_comm.Sum(sampled_cross_averages[c_id]);
-    double nwalkers = static_cast<double>(multi_sim_comm.Get_size());
+    double sum_weight = walker_weight;
+    multi_sim_comm.Sum(sum_weight);
     for(size_t i=0; i<sampled_averages[c_id].size(); i++){
-      sampled_averages[c_id][i] /= nwalkers;
+      sampled_averages[c_id][i] /= sum_weight;
     }
     for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++){
-      sampled_cross_averages[c_id][i] /= nwalkers;
+      sampled_cross_averages[c_id][i] /= sum_weight;
     }
   }
   comm.Bcast(sampled_averages[c_id],0);
