@@ -65,7 +65,6 @@ private:
   std::vector<CoeffsVector*> gradient_pntrs_;
   std::vector<CoeffsMatrix*> hessian_pntrs_;
   std::vector<std::vector<double> > sampled_averages;
-  std::vector<std::vector<double> > sampled_covariance;
   std::vector<std::vector<double> > sampled_cross_averages;
   bool use_multiple_coeffssets_;
   //
@@ -79,7 +78,7 @@ private:
   bool compute_hessian_;
   bool diagonal_hessian_;
   //
-  std::vector<unsigned int> aver_counters;  
+  std::vector<unsigned int> aver_counters;
   //
   double kbt_;
   //

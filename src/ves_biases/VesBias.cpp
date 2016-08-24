@@ -46,7 +46,6 @@ targetdist_averages_pntrs_(0),
 gradient_pntrs_(0),
 hessian_pntrs_(0),
 sampled_averages(0),
-sampled_covariance(0),
 sampled_cross_averages(0),
 use_multiple_coeffssets_(false),
 coeffs_fnames(0),
@@ -341,10 +340,6 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   aver_sampled_tmp.assign(coeffs_pntr_in->numberOfCoeffs(),0.0);
   sampled_averages.push_back(aver_sampled_tmp);
   //
-  std::vector<double> cov_sampled_tmp;
-  cov_sampled_tmp.assign(hessian_tmp->getSize(),0.0);
-  sampled_covariance.push_back(cov_sampled_tmp);
-  //
   std::vector<double> cross_aver_sampled_tmp;
   cross_aver_sampled_tmp.assign(hessian_tmp->getSize(),0.0);
   sampled_cross_averages.push_back(cross_aver_sampled_tmp);
@@ -392,7 +387,6 @@ bool VesBias::readCoeffsFromFiles() {
 
 
 void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
-  bool covariance_from_averages = true;
   for(unsigned int k=0; k<ncoeffssets_; k++){
     // Gradient
     comm.Sum(sampled_averages[k]);
@@ -404,27 +398,12 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     // Calculate the covariance from averages of f and f^2.
     // For multiple walkers the averages f and f^2 are combined
     // before calculating the Hessian (covariance) matrix.
-    if(covariance_from_averages){
-      comm.Sum(sampled_cross_averages[k]);
-      if(use_mwalkers_mpi){multiSimSumAverages(k);}
-      Hessian(k) = computeCovarianceFromAverages(k);
-      Hessian(k) *= getBeta();
-    }
-    // Hessian - Option 2:
-    // Calculate the covariance using the online formula.
-    // For multiple walkers the total Hessian (covariance)
-    // matrix is combined. This is really incorrect.
-    else{
-      comm.Sum(sampled_covariance[k]);
-      Hessian(k) = sampled_covariance[k];
-      Hessian(k) *= getBeta();
-      if(use_mwalkers_mpi){
-        hessian_pntrs_[k]->sumMultiSimCommMPI(multi_sim_comm);
-      }
-    }
+    comm.Sum(sampled_cross_averages[k]);
+    if(use_mwalkers_mpi){multiSimSumAverages(k);}
+    Hessian(k) = computeCovarianceFromAverages(k);
+    Hessian(k) *= getBeta();
     //
     std::fill(sampled_averages[k].begin(), sampled_averages[k].end(), 0.0);
-    std::fill(sampled_covariance[k].begin(), sampled_covariance[k].end(), 0.0);
     std::fill(sampled_cross_averages[k].begin(), sampled_cross_averages[k].end(), 0.0);
     aver_counters[k]=0;
   }
@@ -453,9 +432,6 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
   use the following online equation to calculate the average and covariance
   (see https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance)
       xm[n+1] = xm[n] + (x[n+1]-xm[n])/(n+1)
-      cov(x,y)[n+1] = ( cov(x,y)[n]*n + (n/(n+1))*(x[n+1]-xm[n])*(y[n+1]-ym[n]) ) / (n+1)
-                    = cov(x,y)[n]*(n/(n+1)) + ( n * (x[n+1]-xm[n])/(n+1) * (y[n+1]-ym[n])/(n+1) );
-      n starts at 0.
   */
   double counter_dbl = static_cast<double>(aver_counters[c_id]);
   size_t ncoeffs = numberOfCoeffs(c_id);
@@ -467,7 +443,6 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
     size_t midx = getHessianIndex(i,i,c_id);
     deltas[i] = (values[i]-sampled_averages[c_id][i])/(counter_dbl+1); // (x[n+1]-xm[n])/(n+1)
     sampled_averages[c_id][i] += deltas[i];
-    sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( counter_dbl / (counter_dbl+1) ) + counter_dbl*deltas[i]*deltas[i];
     sampled_cross_averages[c_id][midx] += (values[i]*values[i]-sampled_cross_averages[c_id][midx])/(counter_dbl+1);
   }
   comm.Sum(deltas);
@@ -476,12 +451,11 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
     for(size_t i=rank; i<ncoeffs;i+=stride){
       for(size_t j=(i+1); j<ncoeffs;j++){
         size_t midx = getHessianIndex(i,j,c_id);
-        sampled_covariance[c_id][midx] = sampled_covariance[c_id][midx] * ( counter_dbl / (counter_dbl+1) ) + counter_dbl*deltas[i]*deltas[j];
         sampled_cross_averages[c_id][midx] += (values[i]*values[j]-sampled_cross_averages[c_id][midx])/(counter_dbl+1);
       }
     }
   }
-  // NOTE: the MPI sum for sampled_averages and sampled_covariance is done later
+  // NOTE: the MPI sum for sampled_averages and sampled_cross_averages is done later
   aver_counters[c_id] += 1;
 }
 
@@ -538,16 +512,11 @@ void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
 void VesBias::enableHessian(const bool diagonal_hessian) {
   compute_hessian_=true;
   diagonal_hessian_=diagonal_hessian;
-  sampled_covariance.clear();
   sampled_cross_averages.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
     delete hessian_pntrs_[i];
     std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
-    //
-    std::vector<double> cov_sampled_tmp;
-    cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
-    sampled_covariance.push_back(cov_sampled_tmp);
     //
     std::vector<double> cross_aver_sampled_tmp;
     cross_aver_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
@@ -559,16 +528,11 @@ void VesBias::enableHessian(const bool diagonal_hessian) {
 void VesBias::disableHessian() {
   compute_hessian_=false;
   diagonal_hessian_=true;
-  sampled_covariance.clear();
   sampled_cross_averages.clear();
   for (unsigned int i=0; i<ncoeffssets_; i++){
     delete hessian_pntrs_[i];
     std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
-    //
-    std::vector<double> cov_sampled_tmp;
-    cov_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
-    sampled_covariance.push_back(cov_sampled_tmp);
     //
     std::vector<double> cross_aver_sampled_tmp;
     cross_aver_sampled_tmp.assign(hessian_pntrs_[i]->getSize(),0.0);
