@@ -242,11 +242,11 @@ void TargetDistribution::updateBiasCutoffForTargetDistGrid() {
    // this comes from the derivative of V(s)
    value *= deriv_factor_swf;
    targetdist_grid_pntr_->setValue(l,value);
-   double log_value = log_targetdist_grid_pntr_->getValue(l) - std::log(swf);
-   log_targetdist_grid_pntr_->setValue(l,log_value);
+   // double log_value = log_targetdist_grid_pntr_->getValue(l) - std::log(swf);
+   // log_targetdist_grid_pntr_->setValue(l,log_value);
   }
   targetdist_grid_pntr_->scaleAllValuesAndDerivatives(1.0/norm);
-  log_targetdist_grid_pntr_->setMinToZero();
+  // log_targetdist_grid_pntr_->setMinToZero();
 }
 
 
