@@ -905,7 +905,7 @@ void Optimizer::update() {
       bias_pntrs_[i]->updateGradientAndHessian(use_mwalkers_mpi_);
     }
     for(unsigned int i=0; i<ncoeffssets_; i++){
-      coeffsUpdate(i);
+      if(gradient_pntrs_[i]->isActive()){coeffsUpdate(i);}
       // +1 as this is done before increaseIterationCounter() is used
       unsigned int curr_iter = getIterationCounter()+1;
       double curr_time = getTime();

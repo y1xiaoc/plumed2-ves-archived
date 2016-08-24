@@ -401,6 +401,21 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     Hessian(k) = computeCovarianceFromAverages(k);
     Hessian(k) *= getBeta();
     //
+    Gradient(k).activate();
+    Hessian(k).activate();
+    //
+    // Check the total number of samples (from all walkers) and deactivate the Gradient and Hessian if it
+    // is zero
+    unsigned int total_samples = aver_counters[k];
+    if(use_mwalkers_mpi){
+      if(comm.Get_rank()==0){multi_sim_comm.Sum(total_samples);}
+      comm.Bcast(total_samples,0);
+    }
+    if(total_samples==0){
+      Gradient(k).deactivate();
+      Hessian(k).deactivate();
+    }
+    //
     std::fill(sampled_averages[k].begin(), sampled_averages[k].end(), 0.0);
     std::fill(sampled_cross_averages[k].begin(), sampled_cross_averages[k].end(), 0.0);
     aver_counters[k]=0;
