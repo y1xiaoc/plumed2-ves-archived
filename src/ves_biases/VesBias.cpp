@@ -55,7 +55,7 @@ optimizer_pntr_(NULL),
 optimize_coeffs_(false),
 compute_hessian_(false),
 diagonal_hessian_(true),
-aver_counter(0),
+aver_counters(0),
 kbt_(0.0),
 targetdist_keywords_(0),
 targetdist_pntrs_(0),
@@ -349,6 +349,8 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   cross_aver_sampled_tmp.assign(hessian_tmp->getSize(),0.0);
   sampled_cross_averages.push_back(cross_aver_sampled_tmp);
   //
+  aver_counters.push_back(0);
+  //
   ncoeffssets_++;
 }
 
@@ -424,8 +426,8 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     std::fill(sampled_averages[k].begin(), sampled_averages[k].end(), 0.0);
     std::fill(sampled_covariance[k].begin(), sampled_covariance[k].end(), 0.0);
     std::fill(sampled_cross_averages[k].begin(), sampled_cross_averages[k].end(), 0.0);
+    aver_counters[k]=0;
   }
-  aver_counter=0;
 }
 
 
@@ -455,7 +457,7 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
                     = cov(x,y)[n]*(n/(n+1)) + ( n * (x[n+1]-xm[n])/(n+1) * (y[n+1]-ym[n])/(n+1) );
       n starts at 0.
   */
-  double counter_dbl = static_cast<double>(aver_counter);
+  double counter_dbl = static_cast<double>(aver_counters[c_id]);
   size_t ncoeffs = numberOfCoeffs(c_id);
   std::vector<double> deltas(ncoeffs,0.0);
   size_t stride = comm.Get_size();
@@ -480,7 +482,7 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
     }
   }
   // NOTE: the MPI sum for sampled_averages and sampled_covariance is done later
-  aver_counter += 1;
+  aver_counters[c_id] += 1;
 }
 
 

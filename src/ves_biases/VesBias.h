@@ -79,7 +79,7 @@ private:
   bool compute_hessian_;
   bool diagonal_hessian_;
   //
-  unsigned int aver_counter;  
+  std::vector<unsigned int> aver_counters;  
   //
   double kbt_;
   //
