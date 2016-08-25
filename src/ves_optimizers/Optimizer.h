@@ -105,6 +105,8 @@ private:
   unsigned int fesproj_output_stride_;
   bool targetdist_output_active_;
   unsigned int targetdist_output_stride_;
+  bool targetdist_proj_output_active_;
+  unsigned int targetdist_proj_output_stride_;
   //
   bool isFirstStep;
   //
@@ -212,6 +214,11 @@ public:
   unsigned int getTargetDistOutputStride() const {return targetdist_output_stride_;}
   void setTargetDistOutputStride(unsigned int stride) {targetdist_output_stride_=stride;}
   void writeTargetDistOutputFiles() const;
+  //
+  bool isTargetDistProjOutputActive() const {return targetdist_proj_output_active_;}
+  unsigned int getTargetDistProjOutputStride() const {return targetdist_proj_output_stride_;}
+  void setTargetDistProjOutputStride(unsigned int stride) {targetdist_proj_output_stride_=stride;}
+  void writeTargetDistProjOutputFiles() const;
   //
 };
 
