@@ -170,10 +170,10 @@ bias_cutoff_swfunc_pntr_(NULL)
     //
     if(cutoff_value>0.0){
       if(welltemp_targetdist_){
-        plumed_merror("you cannot combined a cutoff on the bias (i.e. BIAS_CUTOFF) with a well-tempered target distribution (i.e. BIAS_FACTOR)");
+        // plumed_merror("you cannot combined a cutoff on the bias (i.e. BIAS_CUTOFF) with a well-tempered target distribution (i.e. BIAS_FACTOR)");
       }
       if(targetdist_keywords_.size()>0){
-        plumed_merror("you cannot combined a cutoff on the bias (i.e. BIAS_CUTOFF) with a target distribution given with the TARGET_DISTRIBUTION keyword.");
+        // plumed_merror("you cannot combined a cutoff on the bias (i.e. BIAS_CUTOFF) with a target distribution given with the TARGET_DISTRIBUTION keyword.");
       }
       double fermi_lambda=1.0;
       parse("BIAS_CUTOFF_FERMI_LAMBDA",fermi_lambda);
