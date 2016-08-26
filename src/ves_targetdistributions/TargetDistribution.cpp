@@ -30,6 +30,8 @@
 #include "tools/File.h"
 #include "tools/Keywords.h"
 
+#include <iostream>
+
 namespace PLMD {
 
 TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
@@ -45,6 +47,7 @@ name_(to.words[0]),
 input(to.words),
 type_(static_targetdist),
 normalized_(false),
+check_normalization_(true),
 dimension_(0),
 targetdist_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
@@ -115,6 +118,9 @@ void TargetDistribution::setupBiasCutoff() {
   bias_cutoff_active_=true;
   setBiasWithoutCutoffGridNeeded();
   setDynamic();
+  // as the p(s) includes the derivative factor so normalization
+  // check can be misleading
+  check_normalization_=false;
 }
 
 
@@ -218,6 +224,20 @@ Grid TargetDistribution::getMarginalDistributionGrid(Grid* grid_pntr, const std:
 
 Grid TargetDistribution::getMarginal(const std::vector<std::string>& args){
   return TargetDistribution::getMarginalDistributionGrid(targetdist_grid_pntr_,args);
+}
+
+
+void TargetDistribution::update() {
+  updateGrid();
+  if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
+  //
+  if(check_normalization_){
+    double normalization = integrateGrid(targetdist_grid_pntr_);
+    if(normalization < 0.9 || normalization > 1.1){
+      std::cerr << "PLUMED WARNING - the target distribution grid is not proberly normalized, integrating over the grid gives: " << normalization << "\n";
+    }
+  }
+  //
 }
 
 

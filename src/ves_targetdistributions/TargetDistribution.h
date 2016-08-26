@@ -59,6 +59,7 @@ private:
   } type_;
   // is the target distribution normalized
   bool normalized_;
+  bool check_normalization_;
   // dimension of the distribution
   unsigned int dimension_;
   //
@@ -174,13 +175,6 @@ public:
   static double normalizeGrid(Grid*);
   static Grid getMarginalDistributionGrid(Grid*, const std::vector<std::string>&);
 };
-
-
-inline
-void TargetDistribution::update() {
-  updateGrid();
-  if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
-}
 
 
 inline
