@@ -48,6 +48,7 @@ LegendreBF::LegendreBF(const ActionOptions&ao):
  PLUMED_BASISFUNCTIONS_INIT(ao),
  scaled_(false)
 {
+  parseFlag("SCALED",scaled_); addKeywordToList("SCALED",scaled_);
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-1.0","+1.0");
   setNonPeriodic();
@@ -56,7 +57,6 @@ LegendreBF::LegendreBF(const ActionOptions&ao):
   setDescription("Legendre polynomials");
   setLabelPrefix("L");
   setupBF();
-  parseFlag("SCALED",scaled_); addKeywordToList("SCALED",scaled_);
   checkRead();
 }
 
