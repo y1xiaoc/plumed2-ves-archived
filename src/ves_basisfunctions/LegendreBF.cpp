@@ -50,7 +50,7 @@ LegendreBF::LegendreBF(const ActionOptions&ao):
   setNonPeriodic();
   setIntervalBounded();
   setType("Legendre");
-  setDescription("Legendre polynomials of the first kind");
+  setDescription("Legendre polynomials");
   setLabelPrefix("P");
   setupBF();
 }
