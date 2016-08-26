@@ -179,7 +179,6 @@ void BasisFunctions::setupUniformIntegrals() {
 
 
 void BasisFunctions::setupBF() {
-  checkRead();
   if(interval_intrinsic_min_>interval_intrinsic_max_){plumed_merror("setupBF: default intervals are not correctly set");}
   setupInterval();
   setupLabels();
