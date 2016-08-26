@@ -26,6 +26,7 @@
 namespace PLMD{
 
 class LegendreBF : public BasisFunctions {
+  bool scaled_;
   virtual void setupUniformIntegrals();
 public:
   static void registerKeywords(Keywords&);
@@ -40,10 +41,12 @@ PLUMED_REGISTER_ACTION(LegendreBF,"BF_LEGENDRE")
 
 void LegendreBF::registerKeywords(Keywords& keys){
  BasisFunctions::registerKeywords(keys);
+ keys.addFlag("SCALED",false,"scale the polynomials such that they are orthonormal to 1");
 }
 
 LegendreBF::LegendreBF(const ActionOptions&ao):
- PLUMED_BASISFUNCTIONS_INIT(ao)
+ PLUMED_BASISFUNCTIONS_INIT(ao),
+ scaled_(false)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-1.0","+1.0");
@@ -51,8 +54,10 @@ LegendreBF::LegendreBF(const ActionOptions&ao):
   setIntervalBounded();
   setType("Legendre");
   setDescription("Legendre polynomials");
-  setLabelPrefix("P");
+  setLabelPrefix("L");
   setupBF();
+  parseFlag("SCALED",scaled_); addKeywordToList("SCALED",scaled_);
+  checkRead();
 }
 
 
@@ -84,6 +89,14 @@ void LegendreBF::getAllValues(const double arg, double& argT, bool& inside_range
     values[i+1]  = ((2.0*io+1.0)/(io+1.0))*argT*values[i] - (io/(io+1.0))*values[i-1];
     derivsT[i+1] = ((2.0*io+1.0)/(io+1.0))*(values[i]+argT*derivsT[i])-(io/(io+1.0))*derivsT[i-1];
     derivs[i+1]  = intervalDerivf()*derivsT[i+1];
+  }
+  if(scaled_){
+    for(unsigned int i=0; i<values.size(); i++){
+      double io = static_cast<double>(i);
+      double sf = sqrt(io+0.5);
+      values[i] *= sf;
+      derivs[i] *= sf;
+    }
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
 }

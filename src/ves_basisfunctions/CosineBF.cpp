@@ -53,6 +53,7 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setType("trigonometric_cos");
   setDescription("Cosine");
   setupBF();
+  checkRead();
 }
 
 

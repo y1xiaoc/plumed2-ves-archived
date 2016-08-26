@@ -88,6 +88,7 @@ basisf_pntrs_(0)
   setType("combined");
   setDescription("Combined");
   setupBF();
+  checkRead();
 }
 
 

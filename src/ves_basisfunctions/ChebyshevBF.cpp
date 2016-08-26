@@ -53,6 +53,7 @@ ChebyshevBF::ChebyshevBF(const ActionOptions&ao):
   setDescription("Chebyshev polynomials of the first kind");
   setLabelPrefix("T");
   setupBF();
+  checkRead();
 }
 
 

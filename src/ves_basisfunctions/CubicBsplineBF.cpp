@@ -65,6 +65,7 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setLabelPrefix("S");
   setupBF();
   log.printf("   normalization factor: %f\n",normfactor_);
+  checkRead();
 }
 
 
