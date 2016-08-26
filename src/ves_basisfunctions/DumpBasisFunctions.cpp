@@ -134,14 +134,18 @@ bf_pntrs(1)
 
   for(unsigned int i=0; i<targetdist_keywords.size(); i++){
     std::string is; Tools::convert(i+1,is);
+    //
     TargetDistribution* targetdist_pntr = setupTargetDistPntr(targetdist_keywords[i]);
+    if(targetdist_pntr!=NULL){
+      targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
+      targetdist_pntr->update();
+    }
+    //
     std::vector<double> bf_integrals = bf_pntrs[0]->getTargetDistributionIntegrals(targetdist_pntr);
     CoeffsVector targetdist_averages = CoeffsVector("aver.targetdist-"+is,arguments,bf_pntrs,comm,false);
     targetdist_averages.setValues(bf_integrals);
     targetdist_averages.writeToFile(ofile_targetdist_aver,true);
     if(targetdist_pntr!=NULL){
-      targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
-      targetdist_pntr->update();
       Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
       std::string fname = FileBase::appendSuffix(fname_targetdist,is);
       OFile ofile;
