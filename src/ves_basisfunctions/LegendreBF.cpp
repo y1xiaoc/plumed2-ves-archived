@@ -91,6 +91,7 @@ void LegendreBF::getAllValues(const double arg, double& argT, bool& inside_range
     derivs[i+1]  = intervalDerivf()*derivsT[i+1];
   }
   if(scaled_){
+    // L0 is not scaled!
     for(unsigned int i=0; i<values.size(); i++){
       double io = static_cast<double>(i);
       double sf = sqrt(io+0.5);
@@ -104,7 +105,9 @@ void LegendreBF::getAllValues(const double arg, double& argT, bool& inside_range
 
 void LegendreBF::setupUniformIntegrals() {
   setAllUniformIntegralsToZero();
-  setUniformIntegral(0,1.0);
+  double L0_int = 1.0;
+  if(scaled_){L0_int = sqrt(0.5);}
+  setUniformIntegral(0,L0_int);
 }
 
 
