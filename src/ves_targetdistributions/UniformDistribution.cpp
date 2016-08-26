@@ -77,7 +77,6 @@ maxima_(0)
     normalization_ *= maxima_[k]-minima_[k];
   }
   inverse_normalization_=1.0/normalization_;
-  setNormalized();
   checkRead();
 }
 

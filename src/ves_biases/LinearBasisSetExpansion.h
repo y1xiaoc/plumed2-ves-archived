@@ -173,7 +173,7 @@ private:
   //
   Grid* setupGeneralGrid(const std::string&, const bool usederiv=false);
   //
-  void calculateTargetDistAveragesFromGrid(const Grid*, const bool normalize_dist=false);
+  void calculateTargetDistAveragesFromGrid(const Grid*);
   //
   bool isStaticTargetDistFileOutputActive() const;
 };

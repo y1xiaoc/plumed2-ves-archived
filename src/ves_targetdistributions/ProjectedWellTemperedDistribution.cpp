@@ -73,7 +73,6 @@ proj_args(0)
     plumed_merror("PROJECTED_WELL_TEMPERED target distribution: currently only supports one projection argument in PROJ_ARGS");
   }
   setDynamic();
-  setNormalized();
   setFesGridNeeded();
   checkRead();
 }

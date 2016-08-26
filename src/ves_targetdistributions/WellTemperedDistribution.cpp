@@ -64,7 +64,6 @@ bias_factor_(0.0)
     plumed_merror("WELL_TEMPERED target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   }
   setDynamic();
-  setNormalized();
   setFesGridNeeded();
   checkRead();
 }

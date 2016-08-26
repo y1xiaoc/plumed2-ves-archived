@@ -46,7 +46,7 @@ TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
 name_(to.words[0]),
 input(to.words),
 type_(static_targetdist),
-normalized_(false),
+force_normalization_(false),
 check_normalization_(true),
 dimension_(0),
 targetdist_grid_pntr_(NULL),
@@ -231,6 +231,9 @@ void TargetDistribution::update() {
   updateGrid();
   if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
   //
+  if(force_normalization_){
+    normalizeGrid(targetdist_grid_pntr_);
+  }
   if(check_normalization_){
     double normalization = integrateGrid(targetdist_grid_pntr_);
     if(normalization < 0.9 || normalization > 1.1){

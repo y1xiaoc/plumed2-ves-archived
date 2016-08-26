@@ -33,7 +33,6 @@
 namespace PLMD {
 
 class DistributionFromGrid : public TargetDistribution {
-  double normalization_;
   Grid* distGrid_;
   std::vector<double> minima_;
   std::vector<double> maxima_;
@@ -53,14 +52,12 @@ void DistributionFromGrid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
-  keys.addFlag("NORMALIZE",false,"specifies that the target distribution should be normalized by integrating over it. Otherwise it is assumed that it is normalized.");
   keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the given grid are the same as at the boundary. This can be changed by using this flag which will make values outside the grid to be taken as zero.");
 }
 
 
 DistributionFromGrid::DistributionFromGrid(const TargetDistributionOptions& to):
 TargetDistribution(to),
-normalization_(0.0),
 distGrid_(NULL),
 minima_(0),
 maxima_(0),
@@ -68,8 +65,6 @@ zero_outside_(false)
 {
   std::string filename;
   parse("FILE",filename);
-  bool normalize=false;
-  parseFlag("NORMALIZE",normalize);
   parseFlag("ZERO_OUTSIDE",zero_outside_);
   bool no_spline=false;
   // parseFlag("NOSPLINE",no_spline);
@@ -122,16 +117,6 @@ zero_outside_(false)
     if(periodic_[i]){maxima_[i]-=distGrid_->getDx()[i];}
   }
 
-  normalization_ = 0.0;
-  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(distGrid_);
-  for(unsigned int l=0; l<distGrid_->getSize(); l++){
-   normalization_ += integration_weights[l]*distGrid_->getValue(l);
-  }
-
-  if(normalize){
-    distGrid_->scaleAllValuesAndDerivatives(1.0/normalization_);
-  }
-   setNormalized();
 }
 
 

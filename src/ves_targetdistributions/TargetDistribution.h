@@ -58,7 +58,7 @@ private:
     dynamic_targetdist
   } type_;
   // is the target distribution normalized
-  bool normalized_;
+  bool force_normalization_;
   bool check_normalization_;
   // dimension of the distribution
   unsigned int dimension_;
@@ -99,8 +99,8 @@ protected:
   void setStatic(){type_=static_targetdist;}
   void setDynamic(){type_=dynamic_targetdist;}
   // set the that target distribution is normalized
-  void setNormalized(){normalized_=true;};
-  void setNotNormalized(){normalized_=false;};
+  void setForcedNormalization(){force_normalization_=true;}
+  void unsetForcedNormalization(){force_normalization_=false;};
   //
   void setBiasGridNeeded(){needs_bias_grid_=true;}
   void setBiasWithoutCutoffGridNeeded(){needs_bias_withoutcutoff_grid_=true;}
@@ -138,7 +138,7 @@ public:
   bool isStatic() const {return type_==static_targetdist;}
   bool isDynamic() const {return type_==dynamic_targetdist;}
   // is the target distribution normalize or not
-  bool isNormalized() const {return normalized_;};
+  bool forcedNormalization() const {return force_normalization_;};
   //
   bool biasGridNeeded() const {return needs_bias_grid_;}
   bool biasWithoutCutoffGridNeeded() const {return needs_bias_withoutcutoff_grid_;}

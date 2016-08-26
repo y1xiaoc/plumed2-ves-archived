@@ -273,16 +273,6 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const T
     x1[0] = interval_min_+(k)*h;
     weights[k] = targetdist_pntr->getValue(x1);
   }
-  if( !(targetdist_pntr->isNormalized()) ){
-    double norm = 0.0;
-    for(unsigned int k=0; k < nbins_; k++){
-      norm = norm + (weights[k] + weights[k+1]);
-    }
-    norm = 1.0/(0.5*h*norm);
-    for(unsigned int k=0; k < (nbins_+1); k++){
-      weights[k] = norm*weights[k];
-    }
-  }
   //
   bool dummy_bool=true;
   double dummy_dbl=0.0;

@@ -70,8 +70,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(LinearCombinationOfDistributions,"LINEAR_COMBIN
 void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination.");
-  keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally.");
-  keys.addFlag("DO_NOT_NORMALIZE",false,"If the weight should not be normalized. Be warned that this will lead to non-normalized distributions and most likely stange results.");
+  keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally. The weights are always normalized such that WEIGHTS=1,1 and WEIGHTS=0.5,0.5 is equal.");
 }
 
 
@@ -98,17 +97,9 @@ ndist_(0)
   if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(distribution_pntrs_.size(),1.0);}
   plumed_massert(distribution_pntrs_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
   //
-  bool do_not_normalize=false;
-  parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
-  if(!do_not_normalize){
-    double sum_weights=0.0;
-    for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
-    for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
-    setNormalized();
-  }
-  else{
-    setNotNormalized();
-  }
+  double sum_weights=0.0;
+  for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
+  for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
   checkRead();
 }
 

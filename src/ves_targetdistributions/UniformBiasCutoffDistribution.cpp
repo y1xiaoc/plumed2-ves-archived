@@ -52,7 +52,6 @@ TargetDistribution(to),
 bias_cutoff_(0.0)
 {
   parse("CUTOFF",bias_cutoff_);
-  setNormalized();
   setupBiasCutoff();
   checkRead();
 }

@@ -38,7 +38,6 @@ class GaussianDistribution: public TargetDistribution {
   std::vector< std::vector<double> > centers_;
   std::vector< std::vector<double> > correlation_;
   std::vector<double> weights_;
-  bool normalize_distribution_;
   bool diagonal_;
   unsigned int ngaussians_;
   double GaussianDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const bool normalize=true) const;
@@ -59,7 +58,6 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
   keys.add("numbered","SIGMA","The sigmas of the Gaussians.");
   keys.add("numbered","CORRELATION","The correlation between the arguments, currently only works for two-dimensional Gaussians ");
   keys.add("optional","WEIGHTS","The weights of the Gaussians.");
-  keys.addFlag("DO_NOT_NORMALIZE",false,"If the distribution should not be normalized. Be warned that this will most likely lead to stange results");
 }
 
 
@@ -69,7 +67,6 @@ sigmas_(0),
 centers_(0),
 correlation_(0),
 weights_(0),
-normalize_distribution_(true),
 diagonal_(true),
 ngaussians_(0)
 {
@@ -143,18 +140,10 @@ ngaussians_(0)
   if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(centers_.size(),1.0);}
   plumed_massert(centers_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   //
-  bool do_not_normalize=false;
-  parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
-  normalize_distribution_=!do_not_normalize;
-  if(normalize_distribution_){
-    double sum_weights=0.0;
-    for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
-    for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
-    setNormalized();
-  }
-  else{
-    setNotNormalized();
-  }
+  double sum_weights=0.0;
+  for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
+  for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
+  //
   checkRead();
 }
 
@@ -163,12 +152,12 @@ double GaussianDistribution::getValue(const std::vector<double>& argument) const
   double value=0.0;
   if(diagonal_){
     for(unsigned int i=0;i<ngaussians_;i++){
-      value+=weights_[i]*GaussianDiagonal(argument, centers_[i], sigmas_[i],normalize_distribution_);
+      value+=weights_[i]*GaussianDiagonal(argument, centers_[i], sigmas_[i]);
     }
   }
   else if(!diagonal_ && getDimension()==2){
     for(unsigned int i=0;i<ngaussians_;i++){
-      value+=weights_[i]*Gaussian2D(argument, centers_[i], sigmas_[i],correlation_[i],normalize_distribution_);
+      value+=weights_[i]*Gaussian2D(argument, centers_[i], sigmas_[i],correlation_[i]);
     }
   }
   return value;

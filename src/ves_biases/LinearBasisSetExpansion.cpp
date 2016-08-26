@@ -532,27 +532,19 @@ void LinearBasisSetExpansion::updateTargetDistribution() {
 }
 
 
-void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* targetdist_grid_pntr, const bool normalize_dist) {
+void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* targetdist_grid_pntr) {
   plumed_assert(targetdist_grid_pntr!=NULL);
   std::vector<double> targetdist_averages(ncoeffs_,0.0);
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(targetdist_grid_pntr);
   Grid::index_t stride=mycomm_.Get_size();
   Grid::index_t rank=mycomm_.Get_rank();
-  double sum_grid = 0.0;
   for(Grid::index_t l=rank; l<targetdist_grid_pntr->getSize(); l+=stride){
     std::vector<double> args_values = targetdist_grid_pntr->getPoint(l);
     std::vector<double> basisset_values(ncoeffs_);
     getBasisSetValues(args_values,basisset_values,false);
     double weight = integration_weights[l]*targetdist_grid_pntr->getValue(l);
-    sum_grid += weight;
     for(unsigned int i=0; i<ncoeffs_; i++){
       targetdist_averages[i] += weight*basisset_values[i];
-    }
-  }
-  if(normalize_dist){
-    mycomm_.Sum(sum_grid);
-    for(unsigned int i=0; i<ncoeffs_; i++){
-      targetdist_averages[i] /= sum_grid;
     }
   }
   mycomm_.Sum(targetdist_averages);
