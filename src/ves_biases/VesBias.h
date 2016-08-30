@@ -210,10 +210,6 @@ public:
   void disableDynamicTargetDistribution() {dynamic_targetdist_=false;}
   bool dynamicTargetDistribution() const {return dynamic_targetdist_;}
   //
-  void enableUniformTargetDistribution() {uniform_targetdist_=true;}
-  void disableUniformTargetDistribution() {uniform_targetdist_=false;}
-  bool uniformTargetDistribution() const {return uniform_targetdist_;}
-    //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);
   void setGridBins(const unsigned int);
