@@ -137,7 +137,7 @@ valueForce2_(NULL)
   }
   else if(getNumberOfTargetDistributionKeywords()==1){
     bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords()[0]);
-    updateTargetDistributions();
+    // updateTargetDistributions();
     log.printf("  using the following target distribution:\n   %s\n",getTargetDistributionKeywords()[0].c_str());
   }
   else {
