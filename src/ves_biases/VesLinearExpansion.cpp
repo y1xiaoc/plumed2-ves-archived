@@ -80,7 +80,7 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
   VesBias::registerKeywords(keys);
   //
   VesBias::useInitialCoeffsKeywords(keys);
-  VesBias::useTargetDistributionKeywords(keys);
+  VesBias::useNumberedTargetDistributionKeywords(keys);
   VesBias::useWellTemperdKeywords(keys);
   VesBias::useBiasCutoffKeywords(keys);
   VesBias::useGridBinKeywords(keys);
@@ -142,7 +142,7 @@ valueForce2_(NULL)
     log.printf("  using the following target distribution:\n   %s\n",getTargetDistributionKeywords()[0].c_str());
   }
   else {
-    plumed_merror("there should be only one TARGET_DISTRIBUTION keyword given");
+    plumed_merror("problem with the TARGET_DISTRIBUTION keyword, either give no keyword or just one keyword");
   }
   //
   addComponent("force2"); componentIsNotPeriodic("force2");

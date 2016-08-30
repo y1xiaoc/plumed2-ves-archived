@@ -109,20 +109,31 @@ bias_cutoff_swfunc_pntr_(NULL)
   }
 
   if(keywords.exists("TARGET_DISTRIBUTION")){
-    std::string str_ps="";
-    for(int i=1;;i++){
-      if(!parseNumbered("TARGET_DISTRIBUTION",i,str_ps)){break;}
-      targetdist_keywords_.push_back(str_ps);
-    }
-    str_ps="";
-    parse("TARGET_DISTRIBUTION",str_ps);
-    if(str_ps.size()>0){
-      if(targetdist_keywords_.size()>0){
-        plumed_merror("Either give a single target distribution using the TARGET_DISTRIBUTION keyword or multiple using numbered TARGET_DISTRIBUTION1,  TARGET_DISTRIBUTION2 keywords");
+    plumed_massert(targetdist_keywords_.size()==0,"the target distribution keywords should be empty before the reading of the TARGET_DISTRIBUTION keywords");
+    // Single keyword
+    if(!keywords.numbered("TARGET_DISTRIBUTION")){
+      std::string targetdist_str="";
+      parse("TARGET_DISTRIBUTION",targetdist_str);
+      if(targetdist_str.size()>0){
+        targetdist_keywords_.push_back(targetdist_str);
+        plumed_assert(targetdist_keywords_.size()==1);
       }
-      targetdist_keywords_.push_back(str_ps);
+    }
+    // Multiple numbered keywords
+    else{
+      for(int i=1;;i++){
+        std::string targetdist_str="";
+        if(!parseNumbered("TARGET_DISTRIBUTION",i,targetdist_str)){break;}
+        targetdist_keywords_.push_back(targetdist_str);
+      }
+      std::string str_tmp1="";
+      parse("TARGET_DISTRIBUTION",str_tmp1);
+      if(str_tmp1.size()>0){
+        plumed_merror("Using the TARGET_DISTRIBUTION keyword is not allowed. You need to give multiple numbered keywords using TARGET_DISTRIBUTION1, TARGET_DISTRIBUTION2, etc.");
+      }
     }
   }
+
 
   if(getNumberOfArguments()>2){
     disableStaticTargetDistFileOutput();
@@ -238,7 +249,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   //
-  keys.reserve("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
+  keys.reserve("optional","TARGET_DISTRIBUTION","the target distribution to be used.");
     //
   keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
   //
@@ -263,7 +274,15 @@ void VesBias::useInitialCoeffsKeywords(Keywords& keys) {
 
 
 void VesBias::useTargetDistributionKeywords(Keywords& keys) {
+  plumed_massert(!keys.exists("TARGET_DISTRIBUTION"),"you cannot use both useTargetDistributionKeywords and useTargetDistributionKeywords");
   keys.use("TARGET_DISTRIBUTION");
+}
+
+
+void VesBias::useNumberedTargetDistributionKeywords(Keywords& keys) {
+  plumed_massert(!keys.exists("TARGET_DISTRIBUTION"),"you cannot use both useTargetDistributionKeywords and useTargetDistributionKeywords");
+  keys.remove("TARGET_DISTRIBUTION");
+  keys.add("numbered","TARGET_DISTRIBUTION","the target distributions to be used.");
 }
 
 
