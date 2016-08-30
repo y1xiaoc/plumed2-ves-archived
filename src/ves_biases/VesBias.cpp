@@ -63,8 +63,6 @@ targetdist_keywords_(0),
 targetdist_pntrs_(0),
 dynamic_targetdist_(false),
 uniform_targetdist_(false),
-welltemp_biasf_(1.0),
-welltemp_targetdist_(false),
 grid_bins_(0),
 grid_min_(0),
 grid_max_(0),
@@ -139,19 +137,6 @@ bias_cutoff_swfunc_pntr_(NULL)
     disableStaticTargetDistFileOutput();
   }
 
-  if(keywords.exists("BIAS_FACTOR")){
-    parse("BIAS_FACTOR",welltemp_biasf_);
-    if(welltemp_biasf_<1.0){
-      plumed_merror("the well-tempered bias factor doesn't make sense, it should be larger than 1.0");
-    }
-    if(welltemp_biasf_>1.0){
-      welltemp_targetdist_=true;
-      enableDynamicTargetDistribution();
-      if(targetdist_keywords_.size()>0){
-        plumed_merror("you cannot both specify a bias factor for a well-tempered target distribution using the BIAS_FACTOR keyword and give a target distribution with the TARGET_DISTRIBUTION keyword.");
-      }
-    }
-  }
 
   if(keywords.exists("BIAS_FILE")){
     parse("BIAS_FILE",bias_filename_);
@@ -180,12 +165,6 @@ bias_cutoff_swfunc_pntr_(NULL)
     }
     //
     if(cutoff_value>0.0){
-      if(welltemp_targetdist_){
-        // plumed_merror("you cannot combined a cutoff on the bias (i.e. BIAS_CUTOFF) with a well-tempered target distribution (i.e. BIAS_FACTOR)");
-      }
-      if(targetdist_keywords_.size()>0){
-        // plumed_merror("you cannot combined a cutoff on the bias (i.e. BIAS_CUTOFF) with a target distribution given with the TARGET_DISTRIBUTION keyword.");
-      }
       double fermi_lambda=1.0;
       parse("BIAS_CUTOFF_FERMI_LAMBDA",fermi_lambda);
       setupBiasCutoff(cutoff_value,fermi_lambda);
@@ -250,8 +229,6 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   //
   keys.reserve("optional","TARGET_DISTRIBUTION","the target distribution to be used.");
-    //
-  keys.reserve("optional","BIAS_FACTOR","the bias factor to be used for the well-tempered target distribution.");
   //
   keys.reserve("optional","GRID_BINS","the number of bins used for the grid. The default value is 100 bins per dimension.");
   keys.reserve("optional","GRID_MIN","the lower bounds used for the grid.");
@@ -283,11 +260,6 @@ void VesBias::useNumberedTargetDistributionKeywords(Keywords& keys) {
   plumed_massert(!keys.exists("TARGET_DISTRIBUTION"),"you cannot use both useTargetDistributionKeywords and useTargetDistributionKeywords");
   keys.remove("TARGET_DISTRIBUTION");
   keys.add("numbered","TARGET_DISTRIBUTION","the target distributions to be used.");
-}
-
-
-void VesBias::useWellTemperdKeywords(Keywords& keys) {
-  keys.use("BIAS_FACTOR");
 }
 
 

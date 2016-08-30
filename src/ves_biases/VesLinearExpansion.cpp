@@ -81,7 +81,6 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
   //
   VesBias::useInitialCoeffsKeywords(keys);
   VesBias::useNumberedTargetDistributionKeywords(keys);
-  VesBias::useWellTemperdKeywords(keys);
   VesBias::useBiasCutoffKeywords(keys);
   VesBias::useGridBinKeywords(keys);
   VesBias::useProjectionArgKeywords(keys);

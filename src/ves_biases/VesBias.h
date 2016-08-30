@@ -88,8 +88,6 @@ private:
   //
   bool uniform_targetdist_;
   //
-  double welltemp_biasf_;
-  bool welltemp_targetdist_;
   //
   std::vector<unsigned int> grid_bins_;
   std::vector<double> grid_min_;
@@ -217,9 +215,6 @@ public:
   void disableUniformTargetDistribution() {uniform_targetdist_=false;}
   bool uniformTargetDistribution() const {return uniform_targetdist_;}
     //
-  double getWellTemperedBiasFactor() const;
-  bool wellTemperdTargetDistribution() const {return welltemp_targetdist_;}
-  //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);
   void setGridBins(const unsigned int);
@@ -305,11 +300,6 @@ std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const un
 inline
 size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id) const {return hessian_pntrs_[coeffs_id]->getMatrixIndex(index1,index2);}
 
-inline
-double VesBias::getWellTemperedBiasFactor() const {
-  plumed_massert(welltemp_targetdist_,"the well-tempered target distribution is not active so it doesn't make sense to get the value of the bias factor");
-  return welltemp_biasf_;
-}
 
 inline
 double VesBias::getBeta() const {
