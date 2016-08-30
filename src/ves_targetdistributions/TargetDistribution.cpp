@@ -64,7 +64,7 @@ static_grid_calculated(false),
 bias_cutoff_active_(false),
 bias_cutoff_value_(0.0)
 {
-  parse("BIAS_CUTOFF",bias_cutoff_value_);
+  parse("BIAS_CUTOFF",bias_cutoff_value_,true);
   if(bias_cutoff_value_<0.0){
     plumed_merror("a negative value in BIAS_CUTOFF does not make sense");
   }
