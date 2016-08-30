@@ -168,7 +168,7 @@ public:
   CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs_[coeffs_id];}
   //
   std::vector<std::string> getTargetDistributionKeywords() const {return targetdist_keywords_;}
-  std::string getTargetDistributionKeyword(const unsigned int i) const {return targetdist_keywords_[i];}
+  std::string getTargetDistributionKeyword(const unsigned int i=0) const {return targetdist_keywords_[i];}
   unsigned int getNumberOfTargetDistributionKeywords() const {return targetdist_keywords_.size();}
     //
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id]->numberOfCoeffs();}
