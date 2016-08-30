@@ -151,7 +151,6 @@ public:
   static void useInitialCoeffsKeywords(Keywords&);
   static void useTargetDistributionKeywords(Keywords&);
   static void useNumberedTargetDistributionKeywords(Keywords&);
-  static void useWellTemperdKeywords(Keywords&);
   static void useGridBinKeywords(Keywords&);
   static void useGridLimitsKeywords(Keywords&);
   static void useBiasCutoffKeywords(Keywords&);
