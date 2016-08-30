@@ -39,6 +39,7 @@ words(input){}
 
 
 void TargetDistribution::registerKeywords( Keywords& keys ){
+  keys.add("optional","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
 }
 
 
@@ -60,8 +61,16 @@ bias_grid_pntr_(NULL),
 bias_withoutcutoff_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
 static_grid_calculated(false),
-bias_cutoff_active_(false)
+bias_cutoff_active_(false),
+bias_cutoff_value_(0.0)
 {
+  parse("BIAS_CUTOFF",bias_cutoff_value_);
+  if(bias_cutoff_value_<0.0){
+    plumed_merror("a negative value in BIAS_CUTOFF does not make sense");
+  }
+  if(bias_cutoff_value_>0.0){
+    setupBiasCutoff();
+  }
   input.erase( input.begin() );
 }
 

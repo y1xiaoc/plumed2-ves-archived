@@ -43,7 +43,6 @@ VES_REGISTER_TARGET_DISTRIBUTION(UniformBiasCutoffDistribution,"UNIFORM_BIAS_CUT
 
 void UniformBiasCutoffDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","CUTOFF","The cutoff used for the bias");
 }
 
 
@@ -51,8 +50,9 @@ UniformBiasCutoffDistribution::UniformBiasCutoffDistribution(const TargetDistrib
 TargetDistribution(to),
 bias_cutoff_(0.0)
 {
-  parse("CUTOFF",bias_cutoff_);
-  setupBiasCutoff();
+  if(!biasCutoffActive()){
+    plumed_merror("using UNIFORM_BIAS_CUTOFF without a BIAS_CUTOFF keywords does not make sense");
+  }
   checkRead();
 }
 

@@ -78,7 +78,9 @@ private:
   Grid* fes_grid_pntr_;
   //
   bool static_grid_calculated;
+  //
   bool bias_cutoff_active_;
+  double bias_cutoff_value_;
   //
   void calculateStaticDistributionGrid();
   void updateBiasCutoffForTargetDistGrid();
@@ -145,6 +147,7 @@ public:
   bool fesGridNeeded()  const {return needs_fes_grid_;}
   //
   bool biasCutoffActive() const {return bias_cutoff_active_;}
+  double getBiasCutoffValue() const {return bias_cutoff_value_;}
   //
   void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}

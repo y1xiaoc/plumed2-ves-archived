@@ -492,14 +492,15 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
 void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_keyword) {
   std::vector<std::string> words = Tools::getWords(targetdist_keyword);
   targetdist_pntr_ = targetDistributionRegister().create(words);
-  targetdist_pntr_->setupGrids(args_pntrs_,grid_min_,grid_max_,grid_bins_);
+  //
   targetdist_pntr_->linkVesBias(vesbias_pntr_);
+  //
+  targetdist_pntr_->setupGrids(args_pntrs_,grid_min_,grid_max_,grid_bins_);
+  targetdist_grid_pntr_      = targetdist_pntr_->getTargetDistGridPntr();
+  log_targetdist_grid_pntr_  = targetdist_pntr_->getLogTargetDistGridPntr();
   //
   if(targetdist_pntr_->isDynamic()){
     vesbias_pntr_->enableDynamicTargetDistribution();
-  }
-  if(vesbias_pntr_->biasCutoffActive()){
-    targetdist_pntr_->setupBiasCutoff();
   }
   //
   if(targetdist_pntr_->biasGridNeeded()){
@@ -514,9 +515,8 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetd
     setupFesGrid();
     targetdist_pntr_->linkFesGrid(fes_grid_pntr_);
   }
+  //
   targetdist_pntr_->update();
-  targetdist_grid_pntr_      = targetdist_pntr_->getTargetDistGridPntr();
-  log_targetdist_grid_pntr_  = targetdist_pntr_->getLogTargetDistGridPntr();
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
 
