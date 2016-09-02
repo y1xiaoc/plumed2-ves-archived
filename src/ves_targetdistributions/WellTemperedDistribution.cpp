@@ -51,7 +51,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(WellTemperedDistribution,"WELL_TEMPERED")
 
 void WellTemperedDistribution::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","BIAS_FACTOR","The bias factor to be used for the well tempered distribution");
+  keys.add("compulsory","BIASFACTOR","The bias factor to be used for the well tempered distribution");
 }
 
 
