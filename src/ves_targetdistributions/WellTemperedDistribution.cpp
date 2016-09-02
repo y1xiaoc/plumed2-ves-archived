@@ -59,7 +59,7 @@ WellTemperedDistribution::WellTemperedDistribution( const TargetDistributionOpti
 TargetDistribution(to),
 bias_factor_(0.0)
 {
-  parse("BIAS_FACTOR",bias_factor_);
+  parse("BIASFACTOR",bias_factor_);
   if(bias_factor_<=1.0){
     plumed_merror("WELL_TEMPERED target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   }
