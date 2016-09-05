@@ -143,6 +143,7 @@ valueForce2_(NULL)
   else {
     plumed_merror("problem with the TARGET_DISTRIBUTION keyword, either give no keyword or just one keyword");
   }
+  setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
   //
   addComponent("force2"); componentIsNotPeriodic("force2");
   valueForce2_=getPntrToComponent("force2");

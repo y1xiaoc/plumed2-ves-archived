@@ -473,6 +473,7 @@ void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_
 
 void LinearBasisSetExpansion::setupUniformTargetDistribution() {
   std::vector< std::vector <double> > bf_integrals(0);
+  std::vector<double> targetdist_averages(ncoeffs_,0.0);
   //
   for(unsigned int k=0;k<nargs_;k++){
     bf_integrals.push_back(basisf_pntrs_[k]->getUniformIntegrals());
@@ -484,8 +485,9 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
     for(unsigned int k=0;k<nargs_;k++){
       value*=bf_integrals[k][indices[k]];
     }
-    targetdist_averages_pntr_->setValue(i,value);
+    targetdist_averages[i]=value;
   }
+  TargetDistAverages() = targetdist_averages;
 }
 
 
