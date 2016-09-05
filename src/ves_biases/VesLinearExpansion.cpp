@@ -105,9 +105,20 @@ valueForce2_(NULL)
     basisf_pntrs_[i] = plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisf_labels[i]);
     plumed_massert(basisf_pntrs_[i]!=NULL,"basis function "+basisf_labels[i]+" does not exist. NOTE: the basis functions should always be defined BEFORE the VES bias.");
   }
-
   //
   std::vector<Value*> args_pntrs = getArguments();
+  // check arguments and basis functions
+  // this is done to avoid some issues with integration of target distribution
+  // and periodic CVs, needs to be fixed later on.
+  for(unsigned int i=0; i<args_pntrs.size(); i++){
+    if(args_pntrs[i]->isPeriodic() && !(basisf_pntrs_[i]->arePeriodic()) ){
+      plumed_merror("argument "+args_pntrs[i]->getName()+" is periodic while the basis functions " + basisf_pntrs_[i]->getLabel()+ " are not. You need to use the COMBINE action to remove the periodicity of the argument if you want to use these basis functions");
+    }
+    else if(!(args_pntrs[i]->isPeriodic()) && basisf_pntrs_[i]->arePeriodic() ){
+      log.printf("  warning: argument %s is not periodic while the basis functions %s used for it are periodic\n",args_pntrs[i]->getName().c_str(),basisf_pntrs_[i]->getLabel().c_str());
+    }
+  }
+
   addCoeffsSet(args_pntrs,basisf_pntrs_);
   ncoeffs_ = numberOfCoeffs();
   readCoeffsFromFiles();
