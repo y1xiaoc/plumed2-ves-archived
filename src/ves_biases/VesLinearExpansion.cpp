@@ -138,7 +138,7 @@ valueForce2_(NULL)
   }
 
   //
-  readCoeffsFromFiles();
+  //readCoeffsFromFiles();
   //
   addComponent("force2"); componentIsNotPeriodic("force2");
   valueForce2_=getPntrToComponent("force2");
