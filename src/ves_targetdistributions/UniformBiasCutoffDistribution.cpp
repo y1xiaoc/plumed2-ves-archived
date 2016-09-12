@@ -46,7 +46,7 @@ void UniformBiasCutoffDistribution::registerKeywords(Keywords& keys) {
 
 
 UniformBiasCutoffDistribution::UniformBiasCutoffDistribution(const TargetDistributionOptions& to):
-TargetDistribution(to),
+TargetDistribution(to)
 {
   if(!biasCutoffActive()){
     plumed_merror("using UNIFORM_BIAS_CUTOFF without a BIAS_CUTOFF keywords does not make sense");
