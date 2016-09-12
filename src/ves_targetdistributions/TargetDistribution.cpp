@@ -73,7 +73,6 @@ bias_cutoff_value_(0.0)
   if(bias_cutoff_value_>0.0){
     setupBiasCutoff();
   }
-  input.erase( input.begin() );
 }
 
 
