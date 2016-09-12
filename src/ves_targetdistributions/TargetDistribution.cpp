@@ -241,9 +241,8 @@ void TargetDistribution::update() {
   updateGrid();
   if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
   //
-  if(force_normalization_){
-    normalizeGrid(targetdist_grid_pntr_);
-  }
+  if(force_normalization_){normalizeGrid(targetdist_grid_pntr_);}
+  //
   if(check_normalization_){
     double normalization = integrateGrid(targetdist_grid_pntr_);
     if(normalization < 0.9 || normalization > 1.1){
