@@ -20,6 +20,7 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution.h"
+#include "TargetDistModifer.h"
 #include "TargetDistributionRegister.h"
 #include "ves_biases/VesBias.h"
 
@@ -279,6 +280,24 @@ void TargetDistribution::updateBiasCutoffForTargetDistGrid() {
   }
   targetdist_grid_pntr_->scaleAllValuesAndDerivatives(1.0/norm);
   // log_targetdist_grid_pntr_->setMinToZero();
+}
+
+void TargetDistribution::applyTargetDistModiferToGrid(TargetDistModifer* modifer_pntr) {
+  // plumed_massert(targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  // plumed_massert(log_targetdist_grid_pntr_!=NULL,"the grids have not been setup using setupGrids");
+  //
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(targetdist_grid_pntr_);
+  double norm = 0.0;
+  for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
+  {
+   double value = targetdist_grid_pntr_->getValue(l);
+   value = modifer_pntr->getModifedTargetDistValue(value);
+   norm += integration_weights[l]*value;
+   targetdist_grid_pntr_->setValue(l,value);
+   log_targetdist_grid_pntr_->setValue(l,-std::log(value));
+  }
+  targetdist_grid_pntr_->scaleAllValuesAndDerivatives(1.0/norm);
+  log_targetdist_grid_pntr_->setMinToZero();
 }
 
 

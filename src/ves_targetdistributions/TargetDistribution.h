@@ -33,6 +33,8 @@ class Grid;
 class Value;
 class Keywords;
 class Action;
+//
+class TargetDistModifer;
 
 namespace bias{
   class VesBias;
@@ -123,6 +125,8 @@ protected:
   Grid* getFesGridPntr() const {return fes_grid_pntr_;}
   //
   double getBeta() const;
+  //
+  void applyTargetDistModiferToGrid(TargetDistModifer* modifer_pntr);
   //
   virtual void updateGrid(){calculateStaticDistributionGrid();}
 public:
