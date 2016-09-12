@@ -68,6 +68,8 @@ private:
   Grid* targetdist_grid_pntr_;
   Grid* log_targetdist_grid_pntr_;
   //
+  std::vector<TargetDistModifer*> targetdist_modifer_pntrs_;
+  //
   Action* action_pntr_;
   bias::VesBias* vesbias_pntr_;
   //

@@ -53,6 +53,7 @@ check_normalization_(true),
 dimension_(0),
 targetdist_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
+targetdist_modifer_pntrs_(0),
 action_pntr_(NULL),
 vesbias_pntr_(NULL),
 needs_bias_grid_(false),
@@ -73,6 +74,18 @@ bias_cutoff_value_(0.0)
   if(bias_cutoff_value_>0.0){
     setupBiasCutoff();
   }
+  //
+  double welltempered_factor=0.0;
+  parse("WELLTEMPERED_FACTOR",welltempered_factor,true);
+  //
+  if(welltempered_factor>0.0){
+    TargetDistModifer* pntr = new WellTemperedModifer(welltempered_factor);
+    targetdist_modifer_pntrs_.push_back(pntr);
+  }
+  else if(welltempered_factor<0.0){
+    plumed_merror("a negative value in WELLTEMPERED_FACTOR does not make sense");
+  }
+
 }
 
 
@@ -82,6 +95,9 @@ TargetDistribution::~TargetDistribution() {
   }
   if(log_targetdist_grid_pntr_!=NULL){
     delete log_targetdist_grid_pntr_;
+  }
+  for(unsigned int i=0; i<targetdist_modifer_pntrs_.size(); i++){
+    delete targetdist_modifer_pntrs_[i];
   }
 }
 
@@ -239,6 +255,11 @@ Grid TargetDistribution::getMarginal(const std::vector<std::string>& args){
 
 void TargetDistribution::update() {
   updateGrid();
+  //
+  for(unsigned int i=0; i<targetdist_modifer_pntrs_.size(); i++){
+    applyTargetDistModiferToGrid(targetdist_modifer_pntrs_[i]);
+  }
+  //
   if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
   //
   if(force_normalization_){normalizeGrid(targetdist_grid_pntr_);}

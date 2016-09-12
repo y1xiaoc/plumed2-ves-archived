@@ -27,7 +27,7 @@ namespace PLMD {
 class TargetDistModifer{
 public:
   virtual double getModifedTargetDistValue(double input)=0;
-  ~TargetDistModifer(){}
+  virtual ~TargetDistModifer(){}
 };
 
 class WellTemperedModifer:public TargetDistModifer{
