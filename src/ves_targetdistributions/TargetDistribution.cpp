@@ -311,7 +311,8 @@ void TargetDistribution::applyTargetDistModiferToGrid(TargetDistModifer* modifer
   for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
   {
    double value = targetdist_grid_pntr_->getValue(l);
-   value = modifer_pntr->getModifedTargetDistValue(value);
+   std::vector<double> cv_values = targetdist_grid_pntr_->getPoint(l);
+   value = modifer_pntr->getModifedTargetDistValue(value,cv_values);
    norm += integration_weights[l]*value;
    targetdist_grid_pntr_->setValue(l,value);
    log_targetdist_grid_pntr_->setValue(l,-std::log(value));
