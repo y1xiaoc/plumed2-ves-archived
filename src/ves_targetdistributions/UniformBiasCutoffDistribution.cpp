@@ -29,7 +29,6 @@ namespace PLMD {
 
 class UniformBiasCutoffDistribution : public TargetDistribution {
 private:
-  double bias_cutoff_;
 public:
   static void registerKeywords( Keywords&);
   explicit UniformBiasCutoffDistribution( const TargetDistributionOptions& to );
@@ -48,7 +47,6 @@ void UniformBiasCutoffDistribution::registerKeywords(Keywords& keys) {
 
 UniformBiasCutoffDistribution::UniformBiasCutoffDistribution(const TargetDistributionOptions& to):
 TargetDistribution(to),
-bias_cutoff_(0.0)
 {
   if(!biasCutoffActive()){
     plumed_merror("using UNIFORM_BIAS_CUTOFF without a BIAS_CUTOFF keywords does not make sense");
