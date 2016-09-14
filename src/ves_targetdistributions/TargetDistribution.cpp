@@ -265,7 +265,7 @@ void TargetDistribution::update() {
   //
   if(force_normalization_){normalizeGrid(targetdist_grid_pntr_);}
   //
-  if(check_normalization_){
+  if(check_normalization_ && !force_normalization_){
     double normalization = integrateGrid(targetdist_grid_pntr_);
     if(normalization < 0.9 || normalization > 1.1){
       std::cerr << "PLUMED WARNING - the target distribution grid is not proberly normalized, integrating over the grid gives: " << normalization << "\n";
