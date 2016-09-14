@@ -41,6 +41,7 @@ words(input){}
 
 void TargetDistribution::registerKeywords( Keywords& keys ){
   keys.add("optional","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
+  keys.add("optional","WELLTEMPERED_FACTOR","Broaden the target distribution by using well tempered factor.");
 }
 
 
