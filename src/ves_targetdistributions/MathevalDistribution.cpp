@@ -176,6 +176,7 @@ void MathevalDistribution::updateGrid(){
       var_values[cv_var_idx_.size()] = getFesGridPntr()->getValue(l);
     }
     double value = evaluator_evaluate(evaluator_pntr_,var_char.size(),&var_char[0],&var_values[0]);
+    if(value<0.0){plumed_merror("the target distribution function used in MATHEVAL_DIST gives negative values!");}
     targetDistGrid().setValue(l,value);
     norm += integration_weights[l]*value;
     logTargetDistGrid().setValue(l,-std::log(value));
