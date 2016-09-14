@@ -64,7 +64,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(MathevalDistribution,"MATHEVAL_DIST")
 
 void MathevalDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","FUNC","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
+  keys.add("compulsory","FUNCTION","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
 }
 
 
@@ -90,7 +90,7 @@ use_kbt_(false),
 use_beta_(false)
 {
   std::string func_str;
-  parse("FUNC",func_str);
+  parse("FUNCTION",func_str);
   checkRead();
   //
   evaluator_pntr_=evaluator_create(const_cast<char*>(func_str.c_str()));
