@@ -35,20 +35,27 @@
 namespace PLMD {
 
 class MathevalDistribution : public TargetDistribution {
+private:
+  void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
+  //
   void* evaluator_pntr_;
-  std::string func_str_;
-  std::vector<std::string> cv_variables_;
-  std::string fes_variable_;
-  std::vector<std::string> variables_;
-  std::vector<char*> var_char_;
-  bool use_fes;
+  //
+  std::vector<unsigned> cv_var_idx_;
+  //
+  std::string cv_var_prefix_str_;
+  std::string fes_var_str_;
+  std::string kbt_var_str_;
+  std::string beta_var_str_;
+  //
+  bool use_fes_;
+  bool use_kbt_;
+  bool use_beta_;
 public:
   static void registerKeywords( Keywords&);
   explicit MathevalDistribution( const TargetDistributionOptions& to );
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~MathevalDistribution();
-
 };
 
 
@@ -58,8 +65,6 @@ VES_REGISTER_TARGET_DISTRIBUTION(MathevalDistribution,"MATHEVAL_DIST")
 void MathevalDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FUNC","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
-  keys.add("compulsory","CV_VARS","the names of the CV variables used in the function.");
-  keys.add("optional","FES_VAR","the names of the FES variables used in the function.");
 }
 
 
@@ -72,44 +77,60 @@ MathevalDistribution::~MathevalDistribution(){
 MathevalDistribution::MathevalDistribution(const TargetDistributionOptions& to):
 TargetDistribution(to),
 evaluator_pntr_(NULL),
-func_str_(""),
-cv_variables_(0),
-fes_variable_(""),
-variables_(0),
-var_char_(0),
-use_fes(false)
+//
+cv_var_idx_(0),
+//
+cv_var_prefix_str_("s"),
+fes_var_str_("FE"),
+kbt_var_str_("kBT"),
+beta_var_str_("beta"),
+//
+use_fes_(false),
+use_kbt_(false),
+use_beta_(false)
 {
-  parse("FUNC",func_str_);
-  parseVector("CV_VARS",cv_variables_);
-  parse("FES_VAR",fes_variable_,true);
+  std::string func_str;
+  parse("FUNC",func_str);
   checkRead();
   //
-  setDimension(cv_variables_.size());
-  variables_ = cv_variables_;
+  evaluator_pntr_=evaluator_create(const_cast<char*>(func_str.c_str()));
+  if(evaluator_pntr_==NULL) plumed_merror("There was some problem in parsing matheval formula "+func_str);
   //
-  if(fes_variable_.size()>0){
-    variables_.push_back(fes_variable_);
-    setDynamic();
-    setFesGridNeeded();
-    use_fes = true;
+  char** var_names;
+  int var_count;
+  evaluator_get_variables(evaluator_pntr_,&var_names,&var_count);
+  //
+  for(unsigned int i=0; i<var_count; i++){
+    std::string curr_var = var_names[i];
+    unsigned int cv_idx;
+    if(curr_var.substr(0,cv_var_prefix_str_.size())==cv_var_prefix_str_ && Tools::convert(curr_var.substr(cv_var_prefix_str_.size()),cv_idx) && cv_idx>0){
+      cv_var_idx_.push_back(cv_idx-1);
+    }
+    else if(curr_var==fes_var_str_){
+      use_fes_=true;
+      setDynamic();
+      setFesGridNeeded();
+    }
+    else if(curr_var==kbt_var_str_){
+      use_kbt_=true;
+    }
+    else if(curr_var==beta_var_str_){
+      use_beta_=true;
+    }
+    else {
+      plumed_merror("problem with parsing matheval formula: cannot recognise the variable "+curr_var);
+    }
   }
   //
-  var_char_.resize(variables_.size());
-  for(unsigned int i=0; i<variables_.size(); i++){var_char_[i] = const_cast<char*>(variables_[i].c_str());}
-  //
-  evaluator_pntr_=evaluator_create(const_cast<char*>(func_str_.c_str()));
-  if(evaluator_pntr_==NULL) plumed_merror("There was some problem in parsing matheval formula "+func_str_);
-  //
-  char** check_names;
-  int check_count;
-  evaluator_get_variables(evaluator_pntr_,&check_names,&check_count);
-  if(check_count!=variables_.size()){
-    plumed_merror("Mismatch between the number of variables given in FUNC and in CV_VARS and FES_VAR");
+  if(cv_var_idx_.size()>0){
+    std::sort(cv_var_idx_.begin(),cv_var_idx_.end());
   }
-  for(unsigned int i=0; i<variables_.size(); i++){
-    bool found=false;
-    for(unsigned int j=0; j<variables_.size(); j++){if(variables_[i]==check_names[j]){found=true;}}
-    if(!found){plumed_merror("Variable " + variables_[i] + "was not found in the function given in FUNC");}
+}
+
+
+void MathevalDistribution::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins){
+  if(cv_var_idx_.size()>0 && cv_var_idx_[cv_var_idx_.size()-1]>getDimension()){
+    plumed_merror("mismatch between CVs given in FUNC and the dimension of the target distribution");
   }
 }
 
@@ -122,15 +143,39 @@ double MathevalDistribution::getValue(const std::vector<double>& argument) const
 
 void MathevalDistribution::updateGrid(){
   //
-  if(use_fes){plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to use FES_VAR");}
+  std::vector<char*> var_char(cv_var_idx_.size());
+  std::vector<double> var_values(var_char.size(),0.0);
+  for(unsigned int j=0; j<cv_var_idx_.size(); j++){
+    std::string str1; Tools::convert(cv_var_idx_[j]+1,str1);
+    str1 = cv_var_prefix_str_+str1;
+    var_char[j] = const_cast<char*>(str1.c_str());
+  }
+  if(use_fes_){
+    plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to the free energy in the target distribution");
+    var_char.push_back(const_cast<char*>(fes_var_str_.c_str()));
+    var_values.push_back(0.0);
+  }
+  if(use_kbt_){
+    var_char.push_back(const_cast<char*>(kbt_var_str_.c_str()));
+    var_values.push_back(1.0/getBeta());
+  }
+  if(use_beta_){
+    var_char.push_back(const_cast<char*>(beta_var_str_.c_str()));
+    var_values.push_back(getBeta());
+  }
   //
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(getTargetDistGridPntr());
   double norm = 0.0;
   //
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
-    std::vector<double> values = targetDistGrid().getPoint(l);
-    if(use_fes){values.push_back(getFesGridPntr()->getValue(l));}
-    double value = evaluator_evaluate(evaluator_pntr_,var_char_.size(),&var_char_[0],&values[0]);
+    std::vector<double> point = targetDistGrid().getPoint(l);
+    for(unsigned int k=0; k<cv_var_idx_.size() ; k++){
+      var_values[k] = point[cv_var_idx_[k]];
+    }
+    if(use_fes_){
+      var_values[cv_var_idx_.size()] = getFesGridPntr()->getValue(l);
+    }
+    double value = evaluator_evaluate(evaluator_pntr_,var_char.size(),&var_char[0],&var_values[0]);
     targetDistGrid().setValue(l,value);
     norm += integration_weights[l]*value;
     logTargetDistGrid().setValue(l,-std::log(value));
