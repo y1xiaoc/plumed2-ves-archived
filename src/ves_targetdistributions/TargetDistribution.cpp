@@ -51,6 +51,7 @@ input(to.words),
 type_(static_targetdist),
 force_normalization_(false),
 check_normalization_(true),
+check_nonnegative_(true),
 dimension_(0),
 targetdist_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
@@ -268,7 +269,14 @@ void TargetDistribution::update() {
   if(check_normalization_ && !force_normalization_){
     double normalization = integrateGrid(targetdist_grid_pntr_);
     if(normalization < 0.9 || normalization > 1.1){
-      std::cerr << "PLUMED WARNING - the target distribution grid is not proberly normalized, integrating over the grid gives: " << normalization << "\n";
+      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " is not proberly normalized, integrating over the grid gives: " << normalization << "\n";
+    }
+  }
+  //
+  if(check_nonnegative_){
+    double grid_min_value = targetdist_grid_pntr_->getMinValue();
+    if(grid_min_value<0.0){
+      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " has negative values, the lowest value is: " << grid_min_value << "\n";
     }
   }
   //

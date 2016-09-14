@@ -59,9 +59,10 @@ private:
     static_targetdist,
     dynamic_targetdist
   } type_;
-  // is the target distribution normalized
+  //
   bool force_normalization_;
   bool check_normalization_;
+  bool check_nonnegative_;
   // dimension of the distribution
   unsigned int dimension_;
   //
