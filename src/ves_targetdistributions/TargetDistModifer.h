@@ -34,11 +34,7 @@ class WellTemperedModifer:public TargetDistModifer{
 private:
   double invbiasf_;
 public:
-  explicit WellTemperedModifer(double biasfactor):
-  invbiasf_(1.0/biasfactor)
-  {
-    //
-  }
+  explicit WellTemperedModifer(double biasfactor):invbiasf_(1.0/biasfactor){}
   double getModifedTargetDistValue(const double targetdist_value, const std::vector<double>& cv_values) const {
     return std::pow(targetdist_value,invbiasf_);
   }
