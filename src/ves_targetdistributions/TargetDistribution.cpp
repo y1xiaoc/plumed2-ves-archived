@@ -42,6 +42,7 @@ words(input){}
 void TargetDistribution::registerKeywords( Keywords& keys ){
   keys.add("optional","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
   keys.add("optional","WELLTEMPERED_FACTOR","Broaden the target distribution by using well tempered factor.");
+  keys.addFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution.");
 }
 
 
@@ -52,6 +53,7 @@ type_(static_targetdist),
 force_normalization_(false),
 check_normalization_(true),
 check_nonnegative_(true),
+shift_targetdist_to_zero_(false),
 dimension_(0),
 targetdist_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
@@ -87,7 +89,10 @@ bias_cutoff_value_(0.0)
   else if(welltempered_factor<0.0){
     plumed_merror("a negative value in WELLTEMPERED_FACTOR does not make sense");
   }
-
+  //
+  parseFlag("SHIFT_TO_ZERO",shift_targetdist_to_zero_);
+  if(shift_targetdist_to_zero_){check_nonnegative_=false;}
+  //
 }
 
 
@@ -273,10 +278,12 @@ void TargetDistribution::update() {
     }
   }
   //
+  if(shift_targetdist_to_zero_){setMinimumOfTargetDistGridToZero();}
+  //
   if(check_nonnegative_){
     double grid_min_value = targetdist_grid_pntr_->getMinValue();
     if(grid_min_value<0.0){
-      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " has negative values, the lowest value is: " << grid_min_value << "\n";
+      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " has negative values, the lowest value is: " << grid_min_value << " - You can avoid this problem by using the SHIFT_TO_ZERO keyword\n";
     }
   }
   //
@@ -338,6 +345,14 @@ void TargetDistribution::updateLogTargetDistGrid() {
   }
   log_targetdist_grid_pntr_->setMinToZero();
 }
+
+
+void TargetDistribution::setMinimumOfTargetDistGridToZero(){
+  targetDistGrid().setMinToZero();
+  normalizeTargetDistGrid();
+  updateLogTargetDistGrid();
+}
+
 
 
 }

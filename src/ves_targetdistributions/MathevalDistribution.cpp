@@ -19,13 +19,13 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#include "tools/Grid.h"
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
 #include "ves_tools/GridIntegrationWeights.h"
 
-
 #include "tools/Keywords.h"
-#include "tools/Grid.h"
+
 
 
 #ifdef __PLUMED_HAS_MATHEVAL
@@ -67,7 +67,6 @@ VES_REGISTER_TARGET_DISTRIBUTION(MathevalDistribution,"MATHEVAL_DIST")
 void MathevalDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FUNCTION","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
-  keys.addFlag("SHIFT_TO_ZERO",false,"shift the minimum value of the target distribution to zero to avoid negative values.");
 }
 
 
@@ -88,15 +87,12 @@ fes_var_str_("FE"),
 kbt_var_str_("kBT"),
 beta_var_str_("beta"),
 //
-shift_to_zero_(false),
-//
 use_fes_(false),
 use_kbt_(false),
 use_beta_(false)
 {
   std::string func_str;
   parse("FUNCTION",func_str);
-  parseFlag("SHIFT_TO_ZERO",shift_to_zero_);
   checkRead();
   //
   evaluator_pntr_=evaluator_create(const_cast<char*>(func_str.c_str()));
@@ -182,22 +178,13 @@ void MathevalDistribution::updateGrid(){
       var_values[cv_var_idx_.size()] = getFesGridPntr()->getValue(l);
     }
     double value = evaluator_evaluate(evaluator_pntr_,var_char.size(),&var_char[0],&var_values[0]);
-    if(value<0.0 && !shift_to_zero_){plumed_merror("the target distribution function used in MATHEVAL_DIST gives negative values. You can use the SHIFT_TO_ZERO keyword to avoid this problem.");}
+    if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror("the target distribution function used in MATHEVAL_DIST gives negative values. You can use the SHIFT_TO_ZERO keyword to avoid this problem.");}
     targetDistGrid().setValue(l,value);
     norm += integration_weights[l]*value;
     logTargetDistGrid().setValue(l,-std::log(value));
   }
-  if(shift_to_zero_){
-    targetDistGrid().setMinToZero();
-    normalizeTargetDistGrid();
-    updateLogTargetDistGrid();
-  }
-  else{
-    targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
-    logTargetDistGrid().setMinToZero();
-  }
-
-  //
+  targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
+  logTargetDistGrid().setMinToZero();
 }
 
 

@@ -63,6 +63,7 @@ private:
   bool force_normalization_;
   bool check_normalization_;
   bool check_nonnegative_;
+  bool shift_targetdist_to_zero_;
   // dimension of the distribution
   unsigned int dimension_;
   //
@@ -131,6 +132,7 @@ protected:
   //
   void applyTargetDistModiferToGrid(TargetDistModifer* modifer_pntr);
   //
+  void setMinimumOfTargetDistGridToZero();
   void updateLogTargetDistGrid();
   //
   virtual void updateGrid(){calculateStaticDistributionGrid();}
@@ -150,6 +152,7 @@ public:
   bool isDynamic() const {return type_==dynamic_targetdist;}
   // is the target distribution normalize or not
   bool forcedNormalization() const {return force_normalization_;};
+  bool isTargetDistGridShiftedToZero() const {return shift_targetdist_to_zero_;}
   //
   bool biasGridNeeded() const {return needs_bias_grid_;}
   bool biasWithoutCutoffGridNeeded() const {return needs_bias_withoutcutoff_grid_;}
