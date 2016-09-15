@@ -47,6 +47,8 @@ private:
   std::string kbt_var_str_;
   std::string beta_var_str_;
   //
+  bool shift_to_zero_;
+  //
   bool use_fes_;
   bool use_kbt_;
   bool use_beta_;
@@ -65,6 +67,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(MathevalDistribution,"MATHEVAL_DIST")
 void MathevalDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FUNCTION","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
+  keys.addFlag("SHIFT_TO_ZERO",false,"shift the minimum value of the target distribution to zero to avoid negative values.");
 }
 
 
@@ -85,12 +88,15 @@ fes_var_str_("FE"),
 kbt_var_str_("kBT"),
 beta_var_str_("beta"),
 //
+shift_to_zero_(false),
+//
 use_fes_(false),
 use_kbt_(false),
 use_beta_(false)
 {
   std::string func_str;
   parse("FUNCTION",func_str);
+  parseFlag("SHIFT_TO_ZERO",shift_to_zero_);
   checkRead();
   //
   evaluator_pntr_=evaluator_create(const_cast<char*>(func_str.c_str()));
@@ -176,13 +182,22 @@ void MathevalDistribution::updateGrid(){
       var_values[cv_var_idx_.size()] = getFesGridPntr()->getValue(l);
     }
     double value = evaluator_evaluate(evaluator_pntr_,var_char.size(),&var_char[0],&var_values[0]);
-    if(value<0.0){plumed_merror("the target distribution function used in MATHEVAL_DIST gives negative values!");}
+    if(value<0.0 && !shift_to_zero_){plumed_merror("the target distribution function used in MATHEVAL_DIST gives negative values. You can use the SHIFT_TO_ZERO keyword to avoid this problem.");}
     targetDistGrid().setValue(l,value);
     norm += integration_weights[l]*value;
     logTargetDistGrid().setValue(l,-std::log(value));
   }
-  targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
-  logTargetDistGrid().setMinToZero();
+  if(shift_to_zero_){
+    targetDistGrid().setMinToZero();
+    normalizeTargetDistGrid();
+    updateLogTargetDistGrid();
+  }
+  else{
+    targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
+    logTargetDistGrid().setMinToZero();
+  }
+
+  //
 }
 
 
