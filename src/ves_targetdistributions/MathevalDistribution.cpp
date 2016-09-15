@@ -40,14 +40,13 @@ private:
   //
   void* evaluator_pntr_;
   //
-  std::vector<unsigned> cv_var_idx_;
+  std::vector<unsigned int> cv_var_idx_;
+  std::vector<std::string> cv_var_str_;
   //
   std::string cv_var_prefix_str_;
   std::string fes_var_str_;
   std::string kbt_var_str_;
   std::string beta_var_str_;
-  //
-  bool shift_to_zero_;
   //
   bool use_fes_;
   bool use_kbt_;
@@ -81,6 +80,7 @@ TargetDistribution(to),
 evaluator_pntr_(NULL),
 //
 cv_var_idx_(0),
+cv_var_str_(0),
 //
 cv_var_prefix_str_("s"),
 fes_var_str_("FE"),
@@ -124,8 +124,11 @@ use_beta_(false)
     }
   }
   //
-  if(cv_var_idx_.size()>0){
-    std::sort(cv_var_idx_.begin(),cv_var_idx_.end());
+  std::sort(cv_var_idx_.begin(),cv_var_idx_.end());
+  cv_var_str_.resize(cv_var_idx_.size());
+  for(unsigned int j=0; j<cv_var_idx_.size(); j++){
+    std::string str1; Tools::convert(cv_var_idx_[j]+1,str1);
+    cv_var_str_[j] = cv_var_prefix_str_+str1;
   }
 }
 
@@ -144,13 +147,10 @@ double MathevalDistribution::getValue(const std::vector<double>& argument) const
 
 
 void MathevalDistribution::updateGrid(){
-  //
-  std::vector<char*> var_char(cv_var_idx_.size());
-  std::vector<double> var_values(var_char.size(),0.0);
-  for(unsigned int j=0; j<cv_var_idx_.size(); j++){
-    std::string str1; Tools::convert(cv_var_idx_[j]+1,str1);
-    str1 = cv_var_prefix_str_+str1;
-    var_char[j] = const_cast<char*>(str1.c_str());
+  std::vector<char*> var_char(cv_var_str_.size());
+  std::vector<double> var_values(cv_var_str_.size());
+  for(unsigned int j=0; j<cv_var_str_.size(); j++){
+    var_char[j] = const_cast<char*>(cv_var_str_[j].c_str());
   }
   if(use_fes_){
     plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to the free energy in the target distribution");
@@ -178,12 +178,18 @@ void MathevalDistribution::updateGrid(){
       var_values[cv_var_idx_.size()] = getFesGridPntr()->getValue(l);
     }
     double value = evaluator_evaluate(evaluator_pntr_,var_char.size(),&var_char[0],&var_values[0]);
+
     if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror("the target distribution function used in MATHEVAL_DIST gives negative values. You can use the SHIFT_TO_ZERO keyword to avoid this problem.");}
     targetDistGrid().setValue(l,value);
     norm += integration_weights[l]*value;
     logTargetDistGrid().setValue(l,-std::log(value));
   }
-  targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
+  if(norm>0.0){
+    targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
+  }
+  else if(!isTargetDistGridShiftedToZero()){
+    plumed_merror("problem with target distribution function used in MATHEVAL_DIST, it cannot be normalized proberly.  You can use the SHIFT_TO_ZERO keyword to avoid this problem.");
+  }
   logTargetDistGrid().setMinToZero();
 }
 
