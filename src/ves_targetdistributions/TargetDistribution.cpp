@@ -271,14 +271,15 @@ void TargetDistribution::update() {
   //
   if(force_normalization_){normalizeGrid(targetdist_grid_pntr_);}
   //
-  if(check_normalization_ && !force_normalization_){
+  if(shift_targetdist_to_zero_){setMinimumOfTargetDistGridToZero();}
+  //
+  // if(check_normalization_ && !force_normalization_ && !shift_targetdist_to_zero_){
+  if(check_normalization_){
     double normalization = integrateGrid(targetdist_grid_pntr_);
     if(normalization < 0.9 || normalization > 1.1){
       std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " is not proberly normalized, integrating over the grid gives: " << normalization << "\n";
     }
   }
-  //
-  if(shift_targetdist_to_zero_){setMinimumOfTargetDistGridToZero();}
   //
   if(check_nonnegative_){
     double grid_min_value = targetdist_grid_pntr_->getMinValue();
