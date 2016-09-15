@@ -331,4 +331,13 @@ void TargetDistribution::applyTargetDistModiferToGrid(TargetDistModifer* modifer
 }
 
 
+void TargetDistribution::updateLogTargetDistGrid() {
+  for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
+  {
+    log_targetdist_grid_pntr_->setValue(l,-std::log(targetdist_grid_pntr_->getValue(l)));
+  }
+  log_targetdist_grid_pntr_->setMinToZero();
+}
+
+
 }

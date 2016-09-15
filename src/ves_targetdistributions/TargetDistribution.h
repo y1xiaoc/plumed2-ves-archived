@@ -131,6 +131,8 @@ protected:
   //
   void applyTargetDistModiferToGrid(TargetDistModifer* modifer_pntr);
   //
+  void updateLogTargetDistGrid();
+  //
   virtual void updateGrid(){calculateStaticDistributionGrid();}
 public:
   // keywords
