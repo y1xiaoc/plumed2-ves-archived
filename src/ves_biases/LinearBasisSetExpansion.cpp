@@ -80,7 +80,8 @@ bias_grid_pntr_(NULL),
 bias_withoutcutoff_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
-targetdist_grid_pntr_(NULL)
+targetdist_grid_pntr_(NULL),
+targetdist_pntr_(NULL)
 {
   plumed_massert(args_pntrs_.size()==basisf_pntrs_.size(),"number of arguments and basis functions do not match");
   for(unsigned int k=0;k<nargs_;k++){nbasisf_[k]=basisf_pntrs_[k]->getNumberOfBasisFunctions();}

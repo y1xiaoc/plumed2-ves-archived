@@ -86,9 +86,6 @@ private:
   std::vector<TargetDistribution*> targetdist_pntrs_;
   bool dynamic_targetdist_;
   //
-  bool uniform_targetdist_;
-  //
-  //
   std::vector<unsigned int> grid_bins_;
   std::vector<double> grid_min_;
   std::vector<double> grid_max_;
