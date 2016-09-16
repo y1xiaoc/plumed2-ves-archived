@@ -33,9 +33,6 @@
 #include "tools/File.h"
 
 
-#include <iostream>
-
-
 namespace PLMD{
 namespace bias{
 
