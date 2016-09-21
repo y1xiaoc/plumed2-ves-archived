@@ -52,8 +52,6 @@ private:
   //
   Communicator& mycomm;
   //
-  std::string output_fmt_; // format for output
-  //
 public:
   explicit CoeffsVector(
     const std::string&,
@@ -209,10 +207,6 @@ private:
   void readHeaderFromFile(IFile&, const bool ignore_coeffs_info=false);
   size_t readDataFromFile(IFile&, const bool ignore_missing_coeffs=false);
 public:
-  // set output format
-  void setOutputFmt(std::string ss){output_fmt_=ss;}
-  void resetOutputFmt(){output_fmt_="%30.16e";}
-  std::string getOutputFmt() const {return output_fmt_;}
   Communicator& getCommunicator() const {return mycomm;}
 };
 

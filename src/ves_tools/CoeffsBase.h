@@ -87,7 +87,7 @@ private:
   const std::string field_time_;
   const std::string field_iteration_;
   //
-
+  std::string output_fmt_;
   //
   void initializeIndices(const std::vector<unsigned int>&, const std::vector<std::string>&);
   void reinitializeIndices(const std::vector<unsigned int>&);
@@ -173,6 +173,10 @@ public:
   void setIterationCounterAndTime(const unsigned int, const double);
   unsigned int getIterationCounter() const {return iteration_opt;}
   double getTimeValue() const {return time_md;}
+  //
+  void setOutputFmt(std::string ss){ output_fmt_=ss; }
+  void resetOutputFmt(){output_fmt_="%30.16e";}
+  std::string getOutputFmt() const {return output_fmt_;}
   //
 protected:
   void setupBasisFunctionsInfo();

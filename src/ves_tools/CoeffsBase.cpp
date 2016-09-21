@@ -63,7 +63,8 @@ field_ndimensions_("ndimensions"),
 field_ncoeffs_total_("ncoeffs_total"),
 field_shape_prefix_("shape_"),
 field_time_("time"),
-field_iteration_("iteration")
+field_iteration_("iteration"),
+output_fmt_("%30.16e")
 {
   initializeIndices(indices_shape,dimension_labels);
   setAllCoeffsDescriptions();
@@ -98,7 +99,8 @@ field_ndimensions_("ndimensions"),
 field_ncoeffs_total_("ncoeffs_total"),
 field_shape_prefix_("shape_"),
 field_time_("time"),
-field_iteration_("iteration")
+field_iteration_("iteration"),
+output_fmt_("%30.16e")
 {
   plumed_massert(args_.size()==basisf_.size(),"CoeffsBase: number of arguments do not match number of basis functions");
   std::vector<std::string> dimension_labels(args_.size());
@@ -141,7 +143,8 @@ field_ndimensions_("ndimensions"),
 field_ncoeffs_total_("ncoeffs_total"),
 field_shape_prefix_("shape_"),
 field_time_("time"),
-field_iteration_("iteration")
+field_iteration_("iteration"),
+output_fmt_("%30.16e")
 {
   plumed_massert(multicoeffs_args.size()==multicoeffs_basisf.size(),"Multi Coeffs: number of arguments vectors does not match number of basis functions vectors");
   unsigned int num_args = multicoeffs_args[0].size();

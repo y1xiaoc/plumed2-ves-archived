@@ -48,8 +48,7 @@ CoeffsVector::CoeffsVector(
 CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
 data(0),
 averaging_counter(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   clear();
 }
@@ -65,8 +64,7 @@ CoeffsBase(label,args,basisf,use_iteration_counter),
 data(0),
 averaging_counter(0),
 averaging_exp_decay_(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   clear();
 }
@@ -83,8 +81,7 @@ CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
 data(0),
 averaging_counter(0),
 averaging_exp_decay_(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   clear();
 }
@@ -98,8 +95,7 @@ CoeffsBase( *(static_cast<CoeffsBase*>(coeffsMat)) ),
 data(0),
 averaging_counter(0),
 averaging_exp_decay_(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   clear();
 }

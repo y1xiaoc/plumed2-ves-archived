@@ -54,8 +54,7 @@ ncolumns_(0),
 diagonal_(diagonal),
 averaging_counter(0),
 averaging_exp_decay_(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   setupMatrix();
 }
@@ -76,8 +75,7 @@ ncolumns_(0),
 diagonal_(diagonal),
 averaging_counter(0),
 averaging_exp_decay_(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   setupMatrix();
 }
@@ -99,8 +97,7 @@ ncolumns_(0),
 diagonal_(diagonal),
 averaging_counter(0),
 averaging_exp_decay_(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   setupMatrix();
 }
@@ -119,8 +116,7 @@ ncolumns_(0),
 diagonal_(diagonal),
 averaging_counter(0),
 averaging_exp_decay_(0),
-mycomm(cc),
-output_fmt_("%30.16e")
+mycomm(cc)
 {
   setLabels(label);
   setupMatrix();
@@ -668,7 +664,7 @@ void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
       sprintf(s1,int_fmt.c_str(),indices[k]);
       ofile.printField(ilabels[k],s1);
     }
-    ofile.fmtField(" "+output_fmt_).printField(field_coeffs,getValue(i,i));
+    ofile.fmtField(" "+getOutputFmt()).printField(field_coeffs,getValue(i,i));
     sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
     ofile.printField();
   }
@@ -698,7 +694,7 @@ void CoeffsMatrix::writeDataFullToFile(OFile& ofile) {
       ofile.printField(field_index_row,s1);
       sprintf(s1,int_fmt.c_str(),j);
       ofile.printField(field_index_column,s1);
-      ofile.fmtField(" "+output_fmt_).printField(field_coeffs,getValue(i,j));
+      ofile.fmtField(" "+getOutputFmt()).printField(field_coeffs,getValue(i,j));
       ofile.printField();
     }
   }
