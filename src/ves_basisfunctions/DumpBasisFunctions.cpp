@@ -65,9 +65,9 @@ void DumpBasisFunctions::registerKeywords(Keywords& keys){
   keys.add("optional","GRID_BINS","the number of bins used for the grid. The default value is 1000.");
   keys.add("optional","FILE_VALUES","filename of the file on which the basis function values are written. By default it is BASIS_SET.values.data.");
   keys.add("optional","FILE_DERIVS","filename of the file on which the basis function derivatives are written. By default it is BASIS_SET.derivs.data.");
-  keys.add("optional","FORMAT_VALUES_DERIVS","the numerical format of the basis function values and derivatives written to file. By default it is %15.8f\n");
+  keys.add("optional","FORMAT_VALUES_DERIVS","the numerical format of the basis function values and derivatives written to file. By default it is %15.8f.\n");
   keys.add("optional","FILE_TARGETDIST_AVERAGES","filename of the file on which the averages over the target distributions are written. By default it is BASIS_SET.targetdist-averages.data.");
-  keys.add("optional","FORMAT_TARGETDIST_AVERAGES","the numerical format of the target distribution averages written to file. By default it is %15.8f\n");
+  keys.add("optional","FORMAT_TARGETDIST_AVERAGES","the numerical format of the target distribution averages written to file. By default it is %15.8f.\n");
   keys.add("optional","FILE_TARGETDIST","filename of the files on which the target distributions are written. By default it is BASIS_SET.targetdist-#.data.");
   keys.add("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
   keys.addFlag("IGNORE_PERIODICITY",false,"if the periodicity of the basis functions should be ignored.");
