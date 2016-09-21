@@ -345,7 +345,7 @@ void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vect
 }
 
 
-void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins_in, const bool ignore_periodicity) const {
+void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins_in, const bool ignore_periodicity, std::string output_fmt) const {
 
   std::vector<std::string> min(1); min[0]=intervalMinStr();
   std::vector<std::string> max(1); max[0]=intervalMaxStr();
@@ -386,8 +386,8 @@ void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile
   }
 
   getMultipleValue(args,argsT,values,derivs);
-  ofile_values.fmtField("%15.8f");
-  ofile_derivs.fmtField("%15.8f");
+  ofile_values.fmtField(output_fmt);
+  ofile_derivs.fmtField(output_fmt);
   for(unsigned int i=0; i<args.size(); i++){
     ofile_values.printField("arg",args[i]);
     ofile_derivs.printField("arg",args[i]);
