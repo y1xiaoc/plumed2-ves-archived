@@ -59,7 +59,7 @@ public:
   ~MathevalDistribution();
 };
 
-
+#ifdef __PLUMED_HAS_MATHEVAL
 VES_REGISTER_TARGET_DISTRIBUTION(MathevalDistribution,"MATHEVAL_DIST")
 
 
@@ -193,6 +193,8 @@ void MathevalDistribution::updateGrid(){
   logTargetDistGrid().setMinToZero();
 }
 
+
+#endif
 
 
 }
