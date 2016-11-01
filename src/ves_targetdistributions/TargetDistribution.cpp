@@ -364,7 +364,11 @@ void TargetDistribution::setMinimumOfTargetDistGridToZero(){
 
 void TargetDistribution::readInRestartTargetDistGrid(const std::string& grid_fname){
   if(needs_fes_grid_){
-    IFile gridfile; gridfile.open(grid_fname);
+    IFile gridfile;
+    if(!gridfile.FileExist(grid_fname)){
+      plumed_merror("cannot find the file " + grid_fname + " with the previous target distribution when restarting the optimzation");
+    }
+    gridfile.open(grid_fname);
     Grid* restart_grid = Grid::create("targetdist",grid_args_,gridfile,false,false,false);
     VesTools::copyGridValues(restart_grid,targetdist_grid_pntr_);
     updateLogTargetDistGrid();
