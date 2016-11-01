@@ -535,6 +535,11 @@ void LinearBasisSetExpansion::updateTargetDistribution() {
 }
 
 
+void LinearBasisSetExpansion::readInRestartTargetDistribution(const std::string& grid_fname){
+  targetdist_pntr_->readInRestartTargetDistGrid(grid_fname);
+}
+
+
 void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* targetdist_grid_pntr) {
   plumed_assert(targetdist_grid_pntr!=NULL);
   std::vector<double> targetdist_averages(ncoeffs_,0.0);

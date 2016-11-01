@@ -28,6 +28,7 @@
 #include "tools/Grid.h"
 #include "ves_tools/GridProjWeights.h"
 #include "ves_tools/GridIntegrationWeights.h"
+#include "ves_tools/VesTools.h"
 #include "tools/File.h"
 #include "tools/Keywords.h"
 
@@ -55,6 +56,7 @@ check_normalization_(true),
 check_nonnegative_(true),
 shift_targetdist_to_zero_(false),
 dimension_(0),
+grid_args_(0),
 targetdist_grid_pntr_(NULL),
 log_targetdist_grid_pntr_(NULL),
 targetdist_modifer_pntrs_(0),
@@ -186,6 +188,7 @@ void TargetDistribution::setupGrids(const std::vector<Value*>& arguments, const 
   plumed_massert(min.size()==dimension,"TargetDistribution::setupGrids: mismatch between number of values given for grid parameters");
   plumed_massert(max.size()==dimension,"TargetDistribution::setupGrids: mismatch between number of values given for grid parameters");
   plumed_massert(nbins.size()==dimension,"TargetDistribution::setupGrids: mismatch between number of values given for grid parameters");
+  grid_args_=arguments;
   targetdist_grid_pntr_ =     new Grid("targetdist",arguments,min,max,nbins,false,false);
   log_targetdist_grid_pntr_ = new Grid("log_targetdist",arguments,min,max,nbins,false,false);
   setupAdditionalGrids(arguments,min,max,nbins);
@@ -359,5 +362,14 @@ void TargetDistribution::setMinimumOfTargetDistGridToZero(){
 }
 
 
+void TargetDistribution::readInRestartTargetDistGrid(const std::string& grid_fname){
+  if(needs_fes_grid_){
+    IFile gridfile; gridfile.open(grid_fname);
+    Grid* restart_grid = Grid::create("targetdist",grid_args_,gridfile,false,false,false);
+    VesTools::copyGridValues(restart_grid,targetdist_grid_pntr_);
+    updateLogTargetDistGrid();
+    delete restart_grid;
+  }
+}
 
 }

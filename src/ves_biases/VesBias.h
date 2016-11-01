@@ -196,6 +196,7 @@ public:
   void clearGradientAndHessian() {};
   //
   virtual void updateTargetDistributions() {};
+  virtual void restartTargetDistributions() {};
   //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);

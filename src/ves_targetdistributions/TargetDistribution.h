@@ -66,6 +66,8 @@ private:
   bool shift_targetdist_to_zero_;
   // dimension of the distribution
   unsigned int dimension_;
+  // grid parameters
+  std::vector<Value*> grid_args_;
   //
   Grid* targetdist_grid_pntr_;
   Grid* log_targetdist_grid_pntr_;
@@ -185,6 +187,8 @@ public:
   Grid getMarginal(const std::vector<std::string>&);
   //
   void update();
+  //
+  void readInRestartTargetDistGrid(const std::string&);
   //
   static double integrateGrid(const Grid*);
   static double normalizeGrid(Grid*);

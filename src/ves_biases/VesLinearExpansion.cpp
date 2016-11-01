@@ -57,6 +57,7 @@ public:
   ~VesLinearExpansion();
   void calculate();
   void updateTargetDistributions();
+  void restartTargetDistributions();
   //
   void setupBiasFileOutput();
   void writeBiasToFile();
@@ -196,6 +197,13 @@ void VesLinearExpansion::calculate() {
 
 
 void VesLinearExpansion::updateTargetDistributions() {
+  bias_expansion_pntr_->updateTargetDistribution();
+  setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
+}
+
+
+void VesLinearExpansion::restartTargetDistributions() {
+  bias_expansion_pntr_->readInRestartTargetDistribution(getCurrentTargetDistOutputFilename());
   bias_expansion_pntr_->updateTargetDistribution();
   setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
 }

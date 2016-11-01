@@ -167,6 +167,8 @@ public:
   void setupTargetDistribution(const std::string&);
   void updateTargetDistribution();
   //
+  void readInRestartTargetDistribution(const std::string&);
+  //
   bool biasCutoffActive() const;
   //
 private:
