@@ -272,10 +272,11 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegralsFromGrid
   for(unsigned int i=0; i < nbasis_;i++){
     // Trapezoidal rule on a uniform grid with Nbins+1 grid points
     double sum=0.0;
-    for(unsigned int k=0; k < nbins_; k++){
+    for(unsigned int k=0; k < grid_pntr->getSize(); k++){
       double arg = grid_pntr->getPoint(k)[0];
-      sum += integration_weights[k]*getValue(arg,i,dummy_dbl,dummy_bool);
+      sum += (integration_weights[k] * grid_pntr->getValue(k) ) * getValue(arg,i,dummy_dbl,dummy_bool);
     }
+    targetdist_integrals[i] = sum;
   }
   //
   // assume that the first function is the constant
