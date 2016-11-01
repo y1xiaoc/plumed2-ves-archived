@@ -262,8 +262,8 @@ Grid TargetDistribution::getMarginal(const std::vector<std::string>& args){
 
 void TargetDistribution::update() {
   //
-  static double nonnegative_thrshold = -0.01;
-  static double normalization_thrshold = 0.1;
+  const double nonnegative_thrshold = -0.01;
+  const double normalization_thrshold = 0.1;
   //
   updateGrid();
   //
