@@ -38,6 +38,7 @@ Abstract base class for implenting new 1D basis sets.
 
 class Action;
 class TargetDistribution;
+class Grid;
 
 namespace bias{
   class VesBias;
@@ -100,7 +101,7 @@ protected:
   void setupInterval();
   void setNumericalIntegrationBins(const unsigned int nbins) {nbins_=nbins;}
   void numericalUniformIntegrals();
-  std::vector<double> numericalTargetDistributionIntegrals(const TargetDistribution*) const ;
+  std::vector<double> numericalTargetDistributionIntegralsFromGrid(const Grid*) const ;
   virtual void setupLabels();
   virtual void setupUniformIntegrals();
   template<typename T>
@@ -156,8 +157,7 @@ public:
   std::string intervalMinStr() const {return interval_min_str_;}
   std::string intervalMaxStr() const {return interval_max_str_;}
   std::vector<double> getUniformIntegrals() const {return uniform_integrals_;}
-  std::vector<double> getTargetDistributionIntegrals(TargetDistribution*) const;
-  std::vector<double> getTargetDistributionIntegrals(const std::string&) const;
+  std::vector<double> getTargetDistributionIntegrals(const TargetDistribution*) const;
   unsigned getNumberOfDerivatives(){return 0;}
   //
   std::vector<std::string> getKeywordList() const {return bf_keywords_;}
@@ -207,12 +207,6 @@ inline
 Action* BasisFunctions::getPntrToAction() const {
   plumed_massert(action_pntr_!=NULL,"the action has not been linked");
   return action_pntr_;
-}
-
-
-inline
-std::vector<double> BasisFunctions::getTargetDistributionIntegrals(TargetDistribution* targetdist_in) const {
-  return numericalTargetDistributionIntegrals(targetdist_in);
 }
 
 

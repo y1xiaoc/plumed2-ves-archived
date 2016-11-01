@@ -62,37 +62,40 @@ void DumpTargetDistribution::registerKeywords(Keywords& keys){
   keys.add("compulsory","GRID_MIN","the lower bounds for the grid");
   keys.add("compulsory","GRID_MAX","the upper bounds for the grid");
   keys.add("compulsory","GRID_BINS","the number of bins used for the grid.");
-  keys.add("optional","GRID_PERIODICITY","specfiy if the individual arguments should be made periodic (YES) or not (NO). By default all arguments are taken  be not periodic.");
-  keys.add("compulsory","FILE","filename of the files on which the target distribution are written.");
+  keys.add("optional","GRID_PERIODICITY","specfiy if the individual arguments should be made periodic (YES) or not (NO). By default all arguments are taken as not periodic.");
+  keys.add("compulsory","TARGETDIST_FILE","filename of the file for writing the target distribution");
+  keys.add("optional","LOG_TARGETDIST_FILE","filename of the file for writing the log of the target distribution");
   keys.add("compulsory","TARGET_DISTRIBUTION","the target distribution to be used.");
 }
 
 DumpTargetDistribution::DumpTargetDistribution(const ActionOptions&ao):
 Action(ao)
 {
-  std::string targetdist_keyword;
-  parse("TARGET_DISTRIBUTION",targetdist_keyword);
-  std::vector<std::string> words = Tools::getWords(targetdist_keyword);
-  TargetDistribution* targetdist_pntr = targetDistributionRegister().create(words);
 
-  std::string fname;
-  parse("FILE",fname);
+  std::string targetdist_fname;
+  parse("TARGETDIST_FILE",targetdist_fname);
+  std::string log_targetdist_fname;
+  parse("LOG_TARGETDIST_FILE",log_targetdist_fname);
 
-  unsigned int nargs = targetdist_pntr->getDimension();
-
-  std::vector<unsigned int> grid_bins(nargs);
+  std::vector<unsigned int> grid_bins;
   parseVector("GRID_BINS",grid_bins);
-  plumed_massert(grid_bins.size()==nargs,"mismatch between number of values given in GRID_BINS and dimension of target distribution");
+  unsigned int nargs = grid_bins.size();
+
   std::vector<std::string> grid_min(nargs);
   parseVector("GRID_MIN",grid_min);
-  plumed_massert(grid_min.size()==nargs,"mismatch between number of values given in GRID_MIN and dimension of target distribution");
   std::vector<std::string> grid_max(nargs);
   parseVector("GRID_MAX",grid_max);
-  plumed_massert(grid_max.size()==nargs,"mismatch between number of values given in GRID_MIN and dimension of target distribution");
+
   std::vector<std::string> grid_periodicity(nargs);
   parseVector("GRID_PERIODICITY",grid_periodicity);
   if(grid_periodicity.size()==0){grid_periodicity.assign(nargs,"NO");}
-  plumed_massert(grid_periodicity.size()==nargs,"mismatch between number of values given in GRID_PERIODICITY and dimension of target distribution");
+
+  plumed_massert(grid_min.size()==nargs,"mismatch between number of values given for grid parameters");
+  plumed_massert(grid_max.size()==nargs,"mismatch between number of values given for grid parameters");
+  plumed_massert(grid_periodicity.size()==nargs,"mismatch between number of values given for grid parameters");
+
+  std::string targetdist_keyword;
+  parse("TARGET_DISTRIBUTION",targetdist_keyword);
   checkRead();
   //
   std::vector<Value*> arguments(nargs);
@@ -107,36 +110,42 @@ Action(ao)
       arguments[i]->setNotPeriodic();
     }
     else{
-      plumed_merror("wrong value given in GRID_PERIODICITY, either give YES or NO");
+      plumed_merror("wrong value given in GRID_PERIODICITY, either specfiy YES or NO");
     }
   }
-  //
-  Grid ps_grid = Grid("targetdist",arguments,grid_min,grid_max,grid_bins,false,false);
-  targetdist_pntr->calculateDistributionOnGrid(&ps_grid);
 
-  //std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&ps_grid,"weights_grid.data");
-  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&ps_grid);
-  double sum_grid=0.0;
-  for(unsigned int i=0; i<ps_grid.getSize(); i++){
-    sum_grid += integration_weights[i]*ps_grid.getValue(i);
+  std::vector<std::string> words = Tools::getWords(targetdist_keyword);
+  std::string dim_str; Tools::convert(nargs,dim_str);
+  dim_str = "DIMENSION=" + dim_str;
+  words.push_back(dim_str);
+  TargetDistribution* targetdist_pntr = targetDistributionRegister().create(words);
+  if(targetdist_pntr->isDynamic()){
+    plumed_merror("DUMP_TARGET_DISTRIBUTION only works for static target distributions");
   }
+  targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
+  targetdist_pntr->update();
+  Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
+  Grid* log_targetdist_grid_pntr = targetdist_pntr->getLogTargetDistGridPntr();
+
+  double sum_grid = TargetDistribution::integrateGrid(targetdist_grid_pntr);
   log.printf("  target distribution integrated over the grid: %16.12f\n",sum_grid);
+  log.printf("                                                (%30.16e)\n",sum_grid);
   //
   OFile ofile;
   ofile.link(*this);
   ofile.enforceBackup();
-  ofile.open(fname);
-  ps_grid.writeToFile(ofile);
+  ofile.open(targetdist_fname);
+  targetdist_grid_pntr->writeToFile(ofile);
   ofile.close();
-  //
-  ps_grid.logAllValuesAndDerivatives(-1.0);
-  ps_grid.setMinToZero();
-  OFile ofile2;
-  ofile2.link(*this);
-  ofile2.enforceBackup();
-  ofile2.open(FileBase::appendSuffix(fname,".log"));
-  ps_grid.writeToFile(ofile2);
-  ofile2.close();
+  if(log_targetdist_fname.size()>0){
+    OFile ofile2;
+    ofile2.link(*this);
+    ofile2.enforceBackup();
+    ofile2.open(log_targetdist_fname);
+    log_targetdist_grid_pntr->writeToFile(ofile2);
+    ofile2.close();
+  }
+
   //
   delete targetdist_pntr;
   for(unsigned int i=0; i < nargs; i++) {

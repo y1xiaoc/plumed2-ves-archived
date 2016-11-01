@@ -86,11 +86,6 @@ private:
   std::vector<TargetDistribution*> targetdist_pntrs_;
   bool dynamic_targetdist_;
   //
-  bool uniform_targetdist_;
-  //
-  double welltemp_biasf_;
-  bool welltemp_targetdist_;
-  //
   std::vector<unsigned int> grid_bins_;
   std::vector<double> grid_min_;
   std::vector<double> grid_max_;
@@ -126,14 +121,17 @@ protected:
   void addCoeffsSet(const std::vector<std::string>&,const std::vector<unsigned int>&);
   void addCoeffsSet(std::vector<Value*>&,std::vector<BasisFunctions*>&);
   void addCoeffsSet(CoeffsVector*);
+  //
   std::string getCoeffsSetLabelString(const std::string&, const unsigned int coeffs_id = 0) const;
   void clearCoeffsPntrsVector() {coeffs_pntrs_.clear();}
   void addToSampledAverages(const std::vector<double>&, const unsigned int c_id = 0);
   void setTargetDistAverages(const std::vector<double>&, const unsigned int coeffs_id = 0);
   void setTargetDistAverages(const CoeffsVector&, const unsigned int coeffs_id= 0);
   void setTargetDistAveragesToZero(const unsigned int coeffs_id= 0);
-
+  //
   bool readCoeffsFromFiles();
+  //
+  void setTargetDistributionKeywords(const std::vector<std::string>& keywords){targetdist_keywords_=keywords;}
   //
   template<class T>
   bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int);
@@ -149,7 +147,7 @@ public:
   //
   static void useInitialCoeffsKeywords(Keywords&);
   static void useTargetDistributionKeywords(Keywords&);
-  static void useWellTemperdKeywords(Keywords&);
+  static void useNumberedTargetDistributionKeywords(Keywords&);
   static void useGridBinKeywords(Keywords&);
   static void useGridLimitsKeywords(Keywords&);
   static void useBiasCutoffKeywords(Keywords&);
@@ -167,8 +165,9 @@ public:
   CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs_[coeffs_id];}
   //
   std::vector<std::string> getTargetDistributionKeywords() const {return targetdist_keywords_;}
+  std::string getTargetDistributionKeyword(const unsigned int i=0) const {return targetdist_keywords_[i];}
   unsigned int getNumberOfTargetDistributionKeywords() const {return targetdist_keywords_.size();}
-  //
+    //
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id]->numberOfCoeffs();}
   size_t totalNumberOfCoeffs() const {return ncoeffs_total_;}
   unsigned int numberOfCoeffsSets() const {return ncoeffssets_;}
@@ -197,6 +196,7 @@ public:
   void clearGradientAndHessian() {};
   //
   virtual void updateTargetDistributions() {};
+  virtual void restartTargetDistributions() {};
   //
   void linkOptimizer(Optimizer*);
   void enableHessian(const bool diagonal_hessian=true);
@@ -207,13 +207,6 @@ public:
   void enableDynamicTargetDistribution() {dynamic_targetdist_=true;}
   void disableDynamicTargetDistribution() {dynamic_targetdist_=false;}
   bool dynamicTargetDistribution() const {return dynamic_targetdist_;}
-  //
-  void enableUniformTargetDistribution() {uniform_targetdist_=true;}
-  void disableUniformTargetDistribution() {uniform_targetdist_=false;}
-  bool uniformTargetDistribution() const {return uniform_targetdist_;}
-    //
-  double getWellTemperedBiasFactor() const;
-  bool wellTemperdTargetDistribution() const {return welltemp_targetdist_;}
   //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);
@@ -281,9 +274,13 @@ public:
   virtual void writeFesProjToFile() {};
   virtual void resetFesProjFileOutput() {};
   //
-  virtual void setupDynamicTargetDistFileOutput() {};
-  virtual void writeDynamicTargetDistToFile() {};
-  virtual void resetDynamicTargetDistFileOutput() {};
+  virtual void setupTargetDistFileOutput() {};
+  virtual void writeTargetDistToFile() {};
+  virtual void resetTargetDistFileOutput() {};
+  //
+  virtual void setupTargetDistProjFileOutput() {};
+  virtual void writeTargetDistProjToFile() {};
+  virtual void resetTargetDistProjFileOutput() {};
 };
 
 
@@ -296,11 +293,6 @@ std::vector<unsigned int> VesBias::getCoeffsIndices(const size_t index, const un
 inline
 size_t VesBias::getHessianIndex(const size_t index1, const size_t index2, const unsigned int coeffs_id) const {return hessian_pntrs_[coeffs_id]->getMatrixIndex(index1,index2);}
 
-inline
-double VesBias::getWellTemperedBiasFactor() const {
-  plumed_massert(welltemp_targetdist_,"the well-tempered target distribution is not active so it doesn't make sense to get the value of the bias factor");
-  return welltemp_biasf_;
-}
 
 inline
 double VesBias::getBeta() const {

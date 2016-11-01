@@ -82,6 +82,8 @@ fesproj_output_active_(false),
 fesproj_output_stride_(0),
 targetdist_output_active_(false),
 targetdist_output_stride_(0),
+targetdist_proj_output_active_(false),
+targetdist_proj_output_stride_(0),
 isFirstStep(true)
 {
   std::vector<std::string> bias_labels(0);
@@ -560,7 +562,7 @@ isFirstStep(true)
   if(getRestart() && ustride_targetdist_>0){
     for(unsigned int i=0; i<nbiases_; i++){
       if(dynamic_targetdists_[i]){
-        bias_pntrs_[i]->updateTargetDistributions();
+        bias_pntrs_[i]->restartTargetDistributions();
       }
     }
   }
@@ -613,6 +615,14 @@ isFirstStep(true)
     }
   }
 
+  for(unsigned int i=0; i<nbiases_; i++){
+    if(!dynamic_targetdists_[i] && bias_pntrs_[i]->isStaticTargetDistFileOutputActive()){
+      bias_pntrs_[i]->setupTargetDistFileOutput();
+      bias_pntrs_[i]->writeTargetDistToFile();
+      bias_pntrs_[i]->setupTargetDistProjFileOutput();
+      bias_pntrs_[i]->writeTargetDistProjToFile();
+    }
+  }
 
   if(keywords.exists("TARGETDIST_OUTPUT")){
     parse("TARGETDIST_OUTPUT",targetdist_output_stride_);
@@ -628,14 +638,39 @@ isFirstStep(true)
       for(unsigned int i=0; i<nbiases_; i++){
         if(dynamic_targetdists_[i]){
           bias_pntrs_[i]->enableDynamicTargetDistFileOutput();
-          bias_pntrs_[i]->setupDynamicTargetDistFileOutput();
-          bias_pntrs_[i]->writeDynamicTargetDistToFile();
+          bias_pntrs_[i]->setupTargetDistFileOutput();
+          bias_pntrs_[i]->writeTargetDistToFile();
         }
       }
     }
     else{
       targetdist_output_active_=false;
       targetdist_output_stride_=1000;
+    }
+  }
+
+  if(keywords.exists("TARGETDIST_PROJ_OUTPUT")){
+    parse("TARGETDIST_PROJ_OUTPUT",targetdist_proj_output_stride_);
+    if(targetdist_proj_output_stride_>0){
+      if(ustride_targetdist_==0){
+        plumed_merror("it doesn't make sense to use the TARGETDIST_PROJ_OUTPUT keyword if you don't have a target distribution that needs to be updated");
+      }
+      if(targetdist_proj_output_stride_%ustride_targetdist_!=0){
+        plumed_merror("the value given in TARGETDIST_PROJ_OUTPUT doesn't make sense, it should be multiple of TARGETDIST_STRIDE");
+      }
+
+      targetdist_proj_output_active_=true;
+      for(unsigned int i=0; i<nbiases_; i++){
+        if(dynamic_targetdists_[i]){
+          bias_pntrs_[i]->enableDynamicTargetDistFileOutput();
+          bias_pntrs_[i]->setupTargetDistProjFileOutput();
+          bias_pntrs_[i]->writeTargetDistProjToFile();
+        }
+      }
+    }
+    else{
+      targetdist_proj_output_active_=false;
+      targetdist_proj_output_stride_=1000;
     }
   }
 
@@ -754,6 +789,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","TARGETDIST_STRIDE","stride for updating a target distribution that is iteratively updated during the optimization. Note that the value is given in terms of coefficent iterations.");
   keys.reserve("optional","TARGETDIST_OUTPUT","how often the dynamic target distribution(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
+  keys.reserve("optional","TARGETDIST_PROJ_OUTPUT","how often the projections of the dynamic target distribution(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   //
   keys.add("optional","TARGETDIST_AVERAGES_FILE","the name of output file for the target distribution averages. By default it is targetdist-averages.data.");
   keys.add("optional","TARGETDIST_AVERAGES_OUTPUT","how often the target distribution averages should be written out to file. Note that the value is given in terms of coefficent iterations. If no value is given are the averages only written at the begining of the optimization");
@@ -818,6 +854,7 @@ void Optimizer::useMonitorAveragesKeywords(Keywords& keys) {
 void Optimizer::useDynamicTargetDistributionKeywords(Keywords& keys) {
   keys.use("TARGETDIST_STRIDE");
   keys.use("TARGETDIST_OUTPUT");
+  keys.use("TARGETDIST_PROJ_OUTPUT");
 }
 
 
@@ -945,6 +982,9 @@ void Optimizer::update() {
     }
     if(isTargetDistOutputActive() && getIterationCounter()%getTargetDistOutputStride()==0){
       writeTargetDistOutputFiles();
+    }
+    if(isTargetDistProjOutputActive() && getIterationCounter()%getTargetDistProjOutputStride()==0){
+      writeTargetDistProjOutputFiles();
     }
   }
   else {
@@ -1129,7 +1169,16 @@ void Optimizer::writeFesProjOutputFiles() const {
 void Optimizer::writeTargetDistOutputFiles() const {
   for(unsigned int i=0; i<nbiases_; i++){
     if(dynamic_targetdists_[i]){
-      bias_pntrs_[i]->writeDynamicTargetDistToFile();
+      bias_pntrs_[i]->writeTargetDistToFile();
+    }
+  }
+}
+
+
+void Optimizer::writeTargetDistProjOutputFiles() const {
+  for(unsigned int i=0; i<nbiases_; i++){
+    if(dynamic_targetdists_[i]){
+      bias_pntrs_[i]->writeTargetDistProjToFile();
     }
   }
 }

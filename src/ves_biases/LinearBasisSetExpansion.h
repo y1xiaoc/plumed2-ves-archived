@@ -62,17 +62,9 @@ private:
   CoeffsVector* bias_coeffs_pntr_;
   size_t ncoeffs_;
   CoeffsVector* targetdist_averages_pntr_;
-  CoeffsVector* fes_wt_coeffs_pntr_;
   //
-  double bias_fes_scalingf_;
-  bool log_ps_fes_contribution_;
-  //
-  double welltemp_biasf_;
-  double inv_welltemp_biasf_;
-  double welltemp_beta_prime_;
-  //
-  bool bias_cutoff_active_;
-  //
+  std::vector<std::string> grid_min_;
+  std::vector<std::string> grid_max_;
   std::vector<unsigned int> grid_bins_;
   //
   std::string targetdist_grid_label_;
@@ -84,8 +76,10 @@ private:
   Grid* bias_grid_pntr_;
   Grid* bias_withoutcutoff_grid_pntr_;
   Grid* fes_grid_pntr_;
-  Grid* log_ps_grid_pntr_;
-  Grid* dynamic_ps_grid_pntr_;
+  Grid* log_targetdist_grid_pntr_;
+  Grid* targetdist_grid_pntr_;
+  //
+  TargetDistribution* targetdist_pntr_;
 public:
   static void registerKeywords( Keywords& keys );
   // Constructor
@@ -113,7 +107,6 @@ public:
   size_t getNumberOfCoeffs() const {return ncoeffs_;};
   //
   CoeffsVector& BiasCoeffs() const {return *bias_coeffs_pntr_;};
-  CoeffsVector& FesWTCoeffs() const {return *fes_wt_coeffs_pntr_;};
   CoeffsVector& TargetDistAverages() const {return *targetdist_averages_pntr_;};
   //
   void setSerial() {serial_=true;}
@@ -126,7 +119,6 @@ public:
   double getBiasAndForces(const std::vector<double>&, bool&, std::vector<double>&, std::vector<double>&);
   double getBiasAndForces(const std::vector<double>&, bool&, std::vector<double>&);
   double getBias(const std::vector<double>&, bool&, const bool parallel=true);
-  double getFES_WellTempered(const std::vector<double>&, const bool parallel=true);
   //
   static void getBasisSetValues(const std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);
   void getBasisSetValues(const std::vector<double>&, std::vector<double>&, const bool parallel=true);
@@ -137,11 +129,13 @@ public:
   void setStepOfLastBiasGridUpdate(long int step) {step_of_last_biasgrid_update = step;}
   long int getStepOfLastBiasGridUpdate() const {return step_of_last_biasgrid_update;}
   void writeBiasGridToFile(OFile&, const bool append=false) const;
+  //
   void updateBiasWithoutCutoffGrid();
   void resetStepOfLastBiasWithoutCutoffGridUpdate() {step_of_last_biaswithoutcutoffgrid_update = -1000;}
   void setStepOfLastBiasWithoutCutoffGridUpdate(long int step) {step_of_last_biaswithoutcutoffgrid_update = step;}
   long int getStepOfLastBiasWithoutCutoffGridUpdate() const {return step_of_last_biaswithoutcutoffgrid_update;}
   void writeBiasWithoutCutoffGridToFile(OFile&, const bool append=false) const;
+  //
   void setBiasMinimumToZero();
   void setBiasMaximumToZero();
   //
@@ -155,7 +149,10 @@ public:
   void setupFesProjGrid();
   void writeFesProjGridToFile(const std::vector<std::string>&, OFile&, const bool append=false) const;
   //
-  void writeDynamicTargetDistGridToFile(OFile&, const bool append=false) const;
+  void writeTargetDistGridToFile(OFile&, const bool append=false) const;
+  void writeLogTargetDistGridToFile(OFile&, const bool append=false) const;
+  void writeTargetDistProjGridToFile(const std::vector<std::string>&, OFile&, const bool append=false) const;
+  void writeTargetDistributionToFile(const std::string&) const;
   //
   std::vector<unsigned int> getGridBins() const {return grid_bins_;}
   void setGridBins(const std::vector<unsigned int>&);
@@ -163,60 +160,25 @@ public:
   //
   double getBeta() const {return beta_;}
   double getKbT() const {return kbt_;}
+  double beta() const {return beta_;}
+  double kBT() const {return kbt_;}
   //
   void setupUniformTargetDistribution();
-  //
-  void setupTargetDistribution(const std::vector<TargetDistribution*>&);
-  void setupTargetDistribution(const std::vector<std::string>&);
-  void setupTargetDistribution(TargetDistribution*);
   void setupTargetDistribution(const std::string&);
+  void updateTargetDistribution();
   //
+  void readInRestartTargetDistribution(const std::string&);
   //
-  double getBiasToFesScalingFactor() const {return bias_fes_scalingf_;}
-  // Well-Tempered p(s) stuff
-  void setupWellTemperedTargetDistribution(const double);
-  double getWellTemperedBiasFactor() const {return welltemp_biasf_;}
-  double getWellTemperedBetaPrime() const {return welltemp_beta_prime_;}
-  void setWellTemperedBiasFactor(const double);
-  void updateWellTemperedTargetDistribution();
-  //
-  bool biasCutoffActive() const {return bias_cutoff_active_;}
-  void setupBiasCutoffTargetDistribution();
-  void updateBiasCutoffTargetDistribution();
+  bool biasCutoffActive() const;
   //
 private:
   //
-  Grid* setupGeneralGrid(const std::string&, const std::vector<unsigned int>&, const bool usederiv=false);
-  Grid* setupOneDimensionalMarginalGrid(const std::string&, const unsigned int, const unsigned int);
-  void setupSeperableTargetDistribution(const std::vector<TargetDistribution*>&);
-  void setupOneDimensionalTargetDistribution(const std::vector<TargetDistribution*>&);
-  void setupNonSeperableTargetDistribution(const TargetDistribution*);
+  Grid* setupGeneralGrid(const std::string&, const bool usederiv=false);
   //
-  void calculateTargetDistAveragesFromGrid(const Grid*, const bool normalize_dist=false);
-  //
-  void updateWellTemperedFESCoeffs();
-  void updateWellTemperedPsGrid();
-  //
-  void updateBiasCutoffPsGrid();
+  void calculateTargetDistAveragesFromGrid(const Grid*);
   //
   bool isStaticTargetDistFileOutputActive() const;
-  void writeTargetDistGridToFile(Grid*, const std::string& suffix="") const;
 };
-
-
-inline
-void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_keyword) {
-  std::vector<std::string> targetdist_keywords(1);
-  targetdist_keywords[0] = targetdist_keyword;
-  setupTargetDistribution(targetdist_keywords);
-}
-
-inline
-void LinearBasisSetExpansion::setupTargetDistribution(TargetDistribution* targetdist_pntr) {
-  std::vector<TargetDistribution*> targetdist_pntrs(1);
-  targetdist_pntrs[0] = targetdist_pntr;
-  setupTargetDistribution(targetdist_pntrs);
-}
 
 
 inline
@@ -241,20 +203,6 @@ double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values, 
   }
   else{
     return getBiasAndForces(args_values,all_inside,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, NULL);
-  }
-}
-
-
-inline
-double LinearBasisSetExpansion::getFES_WellTempered(const std::vector<double>& args_values, const bool parallel) {
-  std::vector<double> forces_dummy(nargs_);
-  std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
-  bool all_inside_dummy=true;
-  if(parallel){
-    return getBiasAndForces(args_values,all_inside_dummy,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, &mycomm_);
-  }
-  else{
-    return getBiasAndForces(args_values,all_inside_dummy,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, fes_wt_coeffs_pntr_, NULL);
   }
 }
 

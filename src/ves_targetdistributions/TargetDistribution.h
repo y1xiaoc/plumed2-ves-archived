@@ -30,8 +30,11 @@
 namespace PLMD {
 
 class Grid;
+class Value;
 class Keywords;
 class Action;
+//
+class TargetDistModifer;
 
 namespace bias{
   class VesBias;
@@ -48,19 +51,47 @@ public:
 
 class TargetDistribution {
 private:
-  // Name of the one dimensional target distribution
-  std::string type_;
+  // Name of the target distribution
+  std::string name_;
   // The input to the target distribution
   std::vector<std::string> input;
-  // is the target distribution normalize or not
-  bool normalized_;
+  enum TargetDistType {
+    static_targetdist,
+    dynamic_targetdist
+  } type_;
+  //
+  bool force_normalization_;
+  bool check_normalization_;
+  bool check_nonnegative_;
+  bool shift_targetdist_to_zero_;
   // dimension of the distribution
   unsigned int dimension_;
+  // grid parameters
+  std::vector<Value*> grid_args_;
+  //
+  Grid* targetdist_grid_pntr_;
+  Grid* log_targetdist_grid_pntr_;
+  //
+  std::vector<TargetDistModifer*> targetdist_modifer_pntrs_;
   //
   Action* action_pntr_;
   bias::VesBias* vesbias_pntr_;
   //
-  bool force_normalized_grid_;
+  bool needs_bias_grid_;
+  bool needs_bias_withoutcutoff_grid_;
+  bool needs_fes_grid_;
+  //
+  Grid* bias_grid_pntr_;
+  Grid* bias_withoutcutoff_grid_pntr_;
+  Grid* fes_grid_pntr_;
+  //
+  bool static_grid_calculated;
+  //
+  bool bias_cutoff_active_;
+  double bias_cutoff_value_;
+  //
+  void calculateStaticDistributionGrid();
+  void updateBiasCutoffForTargetDistGrid();
 protected:
   // Read a keywords from the input
   template <class T>
@@ -74,11 +105,39 @@ protected:
   bool parseNumberedVector(const std::string& ,const unsigned int, std::vector<T>&);
   // Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
-  // set the that target distribution is normalized
-  void setNormalized(){normalized_=true;};
-  void setNotNormalized(){normalized_=false;};
   //
-  void setDimension(const unsigned int dimension){dimension_=dimension;}
+  void setStatic(){type_=static_targetdist;}
+  void setDynamic(){type_=dynamic_targetdist;}
+  // set the that target distribution is normalized
+  void setForcedNormalization(){force_normalization_=true;}
+  void unsetForcedNormalization(){force_normalization_=false;};
+  //
+  void setBiasGridNeeded(){needs_bias_grid_=true;}
+  void setBiasWithoutCutoffGridNeeded(){needs_bias_withoutcutoff_grid_=true;}
+  void setFesGridNeeded(){needs_fes_grid_=true;}
+  //
+  bias::VesBias* getPntrToVesBias() const;
+  Action* getPntrToAction() const;
+  //
+  virtual void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&) {}
+  //
+  void normalizeTargetDistGrid();
+  //
+  Grid& targetDistGrid() const {return *targetdist_grid_pntr_;}
+  Grid& logTargetDistGrid() const {return *log_targetdist_grid_pntr_;}
+  //
+  Grid* getBiasGridPntr() const {return bias_grid_pntr_;}
+  Grid* getBiasWithoutCutoffGridPntr() const {return bias_withoutcutoff_grid_pntr_;}
+  Grid* getFesGridPntr() const {return fes_grid_pntr_;}
+  //
+  double getBeta() const;
+  //
+  void applyTargetDistModiferToGrid(TargetDistModifer* modifer_pntr);
+  //
+  void setMinimumOfTargetDistGridToZero();
+  void updateLogTargetDistGrid();
+  //
+  virtual void updateGrid(){calculateStaticDistributionGrid();}
 public:
   // keywords
   static void registerKeywords( Keywords&);
@@ -90,28 +149,50 @@ public:
   std::string description();
   // Overwrite this to have a more descriptive output
   virtual std::string rest_of_description(){ return ""; };
-  // is the target distribution normalize or not
-  bool isNormalized() const {return normalized_;};
   //
+  bool isStatic() const {return type_==static_targetdist;}
+  bool isDynamic() const {return type_==dynamic_targetdist;}
+  // is the target distribution normalize or not
+  bool forcedNormalization() const {return force_normalization_;};
+  bool isTargetDistGridShiftedToZero() const {return shift_targetdist_to_zero_;}
+  //
+  bool biasGridNeeded() const {return needs_bias_grid_;}
+  bool biasWithoutCutoffGridNeeded() const {return needs_bias_withoutcutoff_grid_;}
+  bool fesGridNeeded()  const {return needs_fes_grid_;}
+  //
+  bool biasCutoffActive() const {return bias_cutoff_active_;}
+  double getBiasCutoffValue() const {return bias_cutoff_value_;}
+  //
+  void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}
   // get type of distribution
-  std::string getType()const{return type_;};
+  std::string getName()const{return name_;};
   //
-  void linkVesBias(bias::VesBias*);
-  void linkAction(Action*);
-  bias::VesBias* getPntrToVesBias() const;
-  Action* getPntrToAction() const;
+  virtual void linkVesBias(bias::VesBias*);
+  virtual void linkAction(Action*);
+  //
+  virtual void linkBiasGrid(Grid*);
+  virtual void linkBiasWithoutCutoffGrid(Grid*);
+  virtual void linkFesGrid(Grid*);
+  //
+  void setupBiasCutoff();
+  //
+  Grid* getTargetDistGridPntr() const {return targetdist_grid_pntr_;}
+  Grid* getLogTargetDistGridPntr() const {return log_targetdist_grid_pntr_;}
   // calculate the target distribution itself
   virtual double getValue(const std::vector<double>&) const = 0;
-  // write the distribution out to file
-  void writeDistributionToFile(const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
-  static void writeDistributionToFile(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
-  void calculateDistributionOnGrid(Grid*) const;
-  static void writeProbGridToFile(const std::string&, Grid*, const bool do_projections=false);
-  static Grid getMarginalGrid(Grid*, const std::string&);
-  static void calculateSeperableDistributionOnGrid(Grid* grid_pntr, std::vector<TargetDistribution*> targetdist_pntrs);
-  virtual void update() {};
-  virtual double getNormalization() const {return 1.0;}
+  //
+  void setupGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
+  //
+  Grid getMarginal(const std::vector<std::string>&);
+  //
+  void update();
+  //
+  void readInRestartTargetDistGrid(const std::string&);
+  //
+  static double integrateGrid(const Grid*);
+  static double normalizeGrid(Grid*);
+  static Grid getMarginalDistributionGrid(Grid*, const std::vector<std::string>&);
 };
 
 
@@ -129,10 +210,16 @@ Action* TargetDistribution::getPntrToAction() const {
 }
 
 
+inline
+void TargetDistribution::normalizeTargetDistGrid(){
+  normalizeGrid(targetdist_grid_pntr_);
+}
+
+
 template <class T>
 bool TargetDistribution::parse( const std::string& key, T& t, bool optional){
   bool found=Tools::parse(input,key,t);
-  if(!optional && !found) plumed_merror("target distribution " + type_ + " requires " + key + " keyword");
+  if(!optional && !found) plumed_merror("target distribution " + name_ + " requires " + key + " keyword");
   return found;
 }
 
@@ -147,7 +234,7 @@ bool TargetDistribution::parseNumbered(const std::string&key, const unsigned int
 template <class T>
 bool TargetDistribution::parseVector( const std::string& key, std::vector<T>& t , bool optional){
   bool found=Tools::parseVector(input,key,t);
-  if(!optional && !found) plumed_merror("target distribution " + type_ + " requires " + key + " keyword");
+  if(!optional && !found) plumed_merror("target distribution " + name_ + " requires " + key + " keyword");
   return found;
 }
 

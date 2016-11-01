@@ -25,6 +25,8 @@
 #include "ves_biases/VesBias.h"
 #include "ves_tools/VesTools.h"
 #include "tools/Grid.h"
+#include "ves_tools/GridIntegrationWeights.h"
+
 
 
 namespace PLMD{
@@ -257,69 +259,38 @@ void BasisFunctions::numericalUniformIntegrals() {
 }
 
 
-std::vector<double> BasisFunctions::numericalTargetDistributionIntegrals(const TargetDistribution* targetdist_pntr) const {
-  if(targetdist_pntr==NULL){
-    return getUniformIntegrals();
-  }
-  plumed_massert(targetdist_pntr->getDimension()==1,"the target distribution should be one dimensional");
+std::vector<double> BasisFunctions::numericalTargetDistributionIntegralsFromGrid(const Grid* grid_pntr) const {
+  plumed_massert(grid_pntr!=NULL,"the grid is not defined");
+  plumed_massert(grid_pntr->getDimension()==1,"the target distribution grid should be one dimensional");
   //
-  double h=(interval_max_-interval_min_)/nbins_;
   std::vector<double> targetdist_integrals(nbasis_,0.0);
-  //
-  std::vector<double> weights(nbins_+1,0.0);
-  for(unsigned int k=0; k < (nbins_+1); k++){
-    std::vector<double> x1(1);
-    x1[0] = interval_min_+(k)*h;
-    weights[k] = targetdist_pntr->getValue(x1);
-  }
-  if( !(targetdist_pntr->isNormalized()) ){
-    double norm = 0.0;
-    for(unsigned int k=0; k < nbins_; k++){
-      norm = norm + (weights[k] + weights[k+1]);
-    }
-    norm = 1.0/(0.5*h*norm);
-    for(unsigned int k=0; k < (nbins_+1); k++){
-      weights[k] = norm*weights[k];
-    }
-  }
-  //
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(grid_pntr);
+
   bool dummy_bool=true;
   double dummy_dbl=0.0;
   for(unsigned int i=0; i < nbasis_;i++){
     // Trapezoidal rule on a uniform grid with Nbins+1 grid points
     double sum=0.0;
     for(unsigned int k=0; k < nbins_; k++){
-      double x1 = interval_min_+(k)*h;
-      double x2 = interval_min_+(k+1)*h;
-      double v1 = weights[k]*getValue(x1,i,dummy_dbl,dummy_bool);
-      double v2 = weights[k+1]*getValue(x2,i,dummy_dbl,dummy_bool);
-      sum = sum + (v1+v2);
+      double arg = grid_pntr->getPoint(k)[0];
+      sum += integration_weights[k]*getValue(arg,i,dummy_dbl,dummy_bool);
     }
-    // norm with the "volume of the interval"
-    targetdist_integrals[i] = (0.5*h*sum);
   }
   //
   // assume that the first function is the constant
   targetdist_integrals[0] = getValue(0.0,0,dummy_dbl,dummy_bool);
   return targetdist_integrals;
-
 }
 
 
-std::vector<double> BasisFunctions::getTargetDistributionIntegrals(const std::string& targetdist_keyword) const {
-  std::vector<std::string> words = Tools::getWords(targetdist_keyword);
-  TargetDistribution* targetdist_pntr = NULL;
-  if(words[0]=="UNIFORM"){
-    targetdist_pntr = NULL;
+std::vector<double> BasisFunctions::getTargetDistributionIntegrals(const TargetDistribution* targetdist_pntr) const {
+  if(targetdist_pntr==NULL){
+    return getUniformIntegrals();
   }
   else{
-    targetdist_pntr = targetDistributionRegister().create(words);
+    Grid* targetdist_grid = targetdist_pntr->getTargetDistGridPntr();
+    return numericalTargetDistributionIntegralsFromGrid(targetdist_grid);
   }
-  std::vector<double> integrals = getTargetDistributionIntegrals(targetdist_pntr);
-  if(targetdist_pntr!=NULL){
-    delete targetdist_pntr;
-  }
-  return integrals;
 }
 
 

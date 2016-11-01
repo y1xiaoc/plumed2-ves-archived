@@ -23,6 +23,7 @@
 #include "VesTools.h"
 #include "tools/Grid.h"
 #include "tools/IFile.h"
+#include "tools/Exception.h"
 
 namespace PLMD{
 
@@ -30,8 +31,8 @@ namespace PLMD{
 void VesTools::copyGridValues(Grid* grid_pntr_orig, Grid* grid_pntr_copy) {
   // plumed_massert(grid_pntr_orig!=NULL,"grid not defined");
   // plumed_massert(grid_pntr_copy!=NULL,"grid not defined");
-  // plumed_massert(grid_pntr_orig->getSize()==grid_pntr_copy->getSize(),"the two grids are not of the same size");
-  // plumed_massert(grid_pntr_orig->getDimension()==grid_pntr_copy->getDimension(),"the two grids are not of the same dimension");
+  plumed_massert(grid_pntr_orig->getSize()==grid_pntr_copy->getSize(),"the two grids are not of the same size");
+  plumed_massert(grid_pntr_orig->getDimension()==grid_pntr_copy->getDimension(),"the two grids are not of the same dimension");
   //
   for(Grid::index_t i=0; i<grid_pntr_orig->getSize(); i++){
     double value = grid_pntr_orig->getValue(i);

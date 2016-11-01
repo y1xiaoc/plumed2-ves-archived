@@ -23,6 +23,7 @@
 #include "TargetDistributionRegister.h"
 
 #include "tools/Keywords.h"
+#include "tools/Grid.h"
 
 namespace PLMD {
 
@@ -32,15 +33,34 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
+class Grid;
+class Action;
+
+namespace bias{
+  class VesBias;
+}
+
 class LinearCombinationOfDistributions: public TargetDistribution {
-  std::vector<TargetDistribution*> distributions_;
+private:
+  std::vector<TargetDistribution*> distribution_pntrs_;
+  std::vector<Grid*> grid_pntrs_;
   std::vector<double> weights_;
   unsigned int ndist_;
+  void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
   explicit LinearCombinationOfDistributions(const TargetDistributionOptions& to);
-  ~LinearCombinationOfDistributions();
+  void updateGrid();
   double getValue(const std::vector<double>&) const;
+  ~LinearCombinationOfDistributions();
+  //
+  void linkVesBias(bias::VesBias*);
+  void linkAction(Action*);
+  //
+  void linkBiasGrid(Grid*);
+  void linkBiasWithoutCutoffGrid(Grid*);
+  void linkFesGrid(Grid*);
+  //
 };
 
 
@@ -50,14 +70,14 @@ VES_REGISTER_TARGET_DISTRIBUTION(LinearCombinationOfDistributions,"LINEAR_COMBIN
 void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination.");
-  keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally.");
-  keys.addFlag("DO_NOT_NORMALIZE",false,"If the weight should not be normalized. Be warned that this will lead to non-normalized distributions and most likely stange results.");
+  keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally. The weights are always normalized such that WEIGHTS=1,1 and WEIGHTS=0.5,0.5 is equal.");
 }
 
 
 LinearCombinationOfDistributions::LinearCombinationOfDistributions( const TargetDistributionOptions& to ):
 TargetDistribution(to),
-distributions_(0),
+distribution_pntrs_(0),
+grid_pntrs_(0),
 weights_(0),
 ndist_(0)
 {
@@ -65,49 +85,103 @@ ndist_(0)
     std::string keywords;
     if(!parseNumbered("DISTRIBUTION",i,keywords) ){break;}
     std::vector<std::string> words = Tools::getWords(keywords);
-    TargetDistribution* dist_tmp = targetDistributionRegister().create( (words) );
-    distributions_.push_back(dist_tmp);
+    TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
+    if(dist_pntr_tmp->isDynamic()){setDynamic();}
+    if(dist_pntr_tmp->fesGridNeeded()){setFesGridNeeded();}
+    if(dist_pntr_tmp->biasGridNeeded()){setBiasGridNeeded();}
+    distribution_pntrs_.push_back(dist_pntr_tmp);
   }
-  setDimension(distributions_[0]->getDimension());
-  ndist_ = distributions_.size();
-
-  for(unsigned int i=0; i<ndist_; i++){
-    plumed_massert(getDimension()==distributions_[0]->getDimension(),"all distributions have to have the same dimension");
-  }
+  ndist_ = distribution_pntrs_.size();
+  grid_pntrs_.assign(ndist_,NULL);
   //
-  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(distributions_.size(),1.0);}
-  plumed_massert(distributions_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
+  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(distribution_pntrs_.size(),1.0);}
+  plumed_massert(distribution_pntrs_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
   //
-  bool do_not_normalize=false;
-  parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
-  if(!do_not_normalize){
-    double sum_weights=0.0;
-    for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
-    for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
-    setNormalized();
-  }
-  else{
-    setNotNormalized();
-  }
+  double sum_weights=0.0;
+  for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
+  for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
   checkRead();
 }
 
 
 LinearCombinationOfDistributions::~LinearCombinationOfDistributions(){
   for(unsigned int i=0; i<ndist_; i++){
-    delete distributions_[i];
+    delete distribution_pntrs_[i];
   }
 }
 
 
 double LinearCombinationOfDistributions::getValue(const std::vector<double>& argument) const {
-  double value=0.0;
-  for(unsigned int i=0; i<ndist_; i++){
-    value += weights_[i] * distributions_[i]->getValue(argument);
-  }
-  return value;
+  plumed_merror("getValue not implemented for LinearCombinationOfDistributions");
+  return 0.0;
 }
 
+
+void LinearCombinationOfDistributions::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->setupGrids(arguments,min,max,nbins);
+    if(distribution_pntrs_[i]->getDimension()!=this->getDimension()){
+      plumed_merror("Error in LINEAR_COMBINATION: all target distribution need to have the same dimension");
+    }
+    grid_pntrs_[i]=distribution_pntrs_[i]->getTargetDistGridPntr();
+  }
+}
+
+
+void LinearCombinationOfDistributions::updateGrid(){
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->update();
+  }
+  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
+    double value = 0.0;
+    for(unsigned int i=0; i<ndist_; i++){
+      value += weights_[i]*grid_pntrs_[i]->getValue(l);
+    }
+    targetDistGrid().setValue(l,value);
+    logTargetDistGrid().setValue(l,-std::log(value));
+  }
+  logTargetDistGrid().setMinToZero();
+}
+
+
+void LinearCombinationOfDistributions::linkVesBias(bias::VesBias* vesbias_pntr_in){
+  TargetDistribution::linkVesBias(vesbias_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
+  }
+}
+
+
+void LinearCombinationOfDistributions::linkAction(Action* action_pntr_in){
+  TargetDistribution::linkAction(action_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkAction(action_pntr_in);
+  }
+}
+
+
+void LinearCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
+  TargetDistribution::linkBiasGrid(bias_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkBiasGrid(bias_grid_pntr_in);
+  }
+}
+
+
+void LinearCombinationOfDistributions::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
+  TargetDistribution::linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
+  }
+}
+
+
+void LinearCombinationOfDistributions::linkFesGrid(Grid* fes_grid_pntr_in){
+  TargetDistribution::linkFesGrid(fes_grid_pntr_in);
+  for(unsigned int i=0; i<ndist_; i++){
+    distribution_pntrs_[i]->linkFesGrid(fes_grid_pntr_in);
+  }
+}
 
 
 }
