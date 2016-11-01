@@ -366,10 +366,13 @@ void TargetDistribution::readInRestartTargetDistGrid(const std::string& grid_fna
   if(needs_fes_grid_){
     IFile gridfile;
     if(!gridfile.FileExist(grid_fname)){
-      plumed_merror("cannot find the file " + grid_fname + " with the previous target distribution when restarting the optimzation");
+      plumed_merror("Problem with reading previous target distribution when restarting: cannot find file " + grid_fname);
     }
     gridfile.open(grid_fname);
     Grid* restart_grid = Grid::create("targetdist",grid_args_,gridfile,false,false,false);
+    if(restart_grid->getSize()!=targetdist_grid_pntr_->getSize()){
+      plumed_merror("Problem with reading previous target distribution when restarting: the grid is not of the correct size!")
+    }
     VesTools::copyGridValues(restart_grid,targetdist_grid_pntr_);
     updateLogTargetDistGrid();
     delete restart_grid;
