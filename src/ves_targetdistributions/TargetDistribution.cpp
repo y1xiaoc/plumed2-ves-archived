@@ -371,7 +371,7 @@ void TargetDistribution::readInRestartTargetDistGrid(const std::string& grid_fna
     gridfile.open(grid_fname);
     Grid* restart_grid = Grid::create("targetdist",grid_args_,gridfile,false,false,false);
     if(restart_grid->getSize()!=targetdist_grid_pntr_->getSize()){
-      plumed_merror("Problem with reading previous target distribution when restarting: the grid is not of the correct size!")
+      plumed_merror("Problem with reading previous target distribution when restarting: the grid is not of the correct size!");
     }
     VesTools::copyGridValues(restart_grid,targetdist_grid_pntr_);
     updateLogTargetDistGrid();
