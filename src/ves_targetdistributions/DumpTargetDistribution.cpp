@@ -76,6 +76,9 @@ Action(ao)
   parse("TARGETDIST_FILE",targetdist_fname);
   std::string log_targetdist_fname;
   parse("LOG_TARGETDIST_FILE",log_targetdist_fname);
+  if(targetdist_fname==log_targetdist_fname){
+    plumed_merror("error in DUMP_TARGET_DISTRIBUTION: TARGETDIST_FILE and LOG_TARGETDIST_FILE cannot be the same");
+  }
 
   std::vector<unsigned int> grid_bins;
   parseVector("GRID_BINS",grid_bins);
@@ -115,9 +118,6 @@ Action(ao)
   }
 
   std::vector<std::string> words = Tools::getWords(targetdist_keyword);
-  std::string dim_str; Tools::convert(nargs,dim_str);
-  dim_str = "DIMENSION=" + dim_str;
-  words.push_back(dim_str);
   TargetDistribution* targetdist_pntr = targetDistributionRegister().create(words);
   if(targetdist_pntr->isDynamic()){
     plumed_merror("DUMP_TARGET_DISTRIBUTION only works for static target distributions");
