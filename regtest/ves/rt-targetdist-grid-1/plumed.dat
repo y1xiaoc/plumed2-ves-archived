@@ -1,0 +1,36 @@
+arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-6.0
+ GRID_MAX=+6.0
+ GRID_BINS=500
+ TARGET_DISTRIBUTION={GRID_DIST
+                      FILE=targetdist-input-grid-1d.data}
+ TARGETDIST_FILE=targetdist-1.data
+... DUMP_TARGET_DISTRIBUTION
+
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-6.0
+ GRID_MAX=+6.0
+ GRID_BINS=500
+ TARGET_DISTRIBUTION={GRID_DIST
+                      FILE=targetdist-input-grid-1d.data
+                      ZERO_OUTSIDE}
+ TARGETDIST_FILE=targetdist-2.data
+... DUMP_TARGET_DISTRIBUTION
+
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0,-4.0
+ GRID_MAX=+4.0,+4.0
+ GRID_BINS=110,110
+ TARGET_DISTRIBUTION={GRID_DIST
+                      FILE=targetdist-input-grid-2d.data
+                      ZERO_OUTSIDE}
+ TARGETDIST_FILE=targetdist-3.data
+... DUMP_TARGET_DISTRIBUTION
+
+
+
+

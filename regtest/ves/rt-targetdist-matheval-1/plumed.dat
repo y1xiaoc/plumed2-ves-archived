@@ -1,0 +1,23 @@
+arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0
+ GRID_MAX=+4.0
+ GRID_BINS=200
+ TARGET_DISTRIBUTION={MATHEVAL_DIST
+                      FUNCTION=exp(-0.5*((s1+1.5)/0.8)^2)}
+ TARGETDIST_FILE=targetdist-1.data
+ LOG_TARGETDIST_FILE=targetdist-1.log.data
+... DUMP_TARGET_DISTRIBUTION
+# should be the same as {GAUSSIAN CENTER=-1.5 SIGMA=0.8}
+
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0,-4.0
+ GRID_MAX=+4.0,+4.0
+ GRID_BINS=100,100
+ TARGET_DISTRIBUTION={MATHEVAL_DIST
+                      FUNCTION=1.0*exp(-0.5*((s1+1.5)/0.8)^2)*exp(-0.5*((s2-1.5)/0.3)^2)+4.0*exp(-0.5*((s1-1.5)/0.3)^2)*exp(-0.5*((s2+1.5)/0.8)^2)}
+ TARGETDIST_FILE=targetdist-2.data
+... DUMP_TARGET_DISTRIBUTION
+# should be the same as {GAUSSIAN  CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3  CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8  WEIGHTS=1.0,4.0}

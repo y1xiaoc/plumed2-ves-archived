@@ -1,0 +1,4 @@
+type=driver
+arg="--plumed plumed.dat --noatoms"
+plumed_needs="matheval"
+

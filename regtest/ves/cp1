@@ -1,3 +1,0 @@
-cp tmp/bf2.values.data bf2.values.data.reference
-cp tmp/bf2.derivs.data bf2.derivs.data.reference
-cp tmp/bf2.targetdist-averages.data bf2.targetdist-averages.data.reference
