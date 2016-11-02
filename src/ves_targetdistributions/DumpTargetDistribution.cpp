@@ -66,6 +66,7 @@ void DumpTargetDistribution::registerKeywords(Keywords& keys){
   keys.add("compulsory","TARGETDIST_FILE","filename of the file for writing the target distribution");
   keys.add("optional","LOG_TARGETDIST_FILE","filename of the file for writing the log of the target distribution");
   keys.add("compulsory","TARGET_DISTRIBUTION","the target distribution to be used.");
+  keys.addFlag("DO_1D_PROJECTIONS",false,"Also output the one-dimensional marginal distributions for multi-dimensional target distribution.");
 }
 
 DumpTargetDistribution::DumpTargetDistribution(const ActionOptions&ao):
@@ -92,6 +93,12 @@ Action(ao)
   std::vector<std::string> grid_periodicity(nargs);
   parseVector("GRID_PERIODICITY",grid_periodicity);
   if(grid_periodicity.size()==0){grid_periodicity.assign(nargs,"NO");}
+
+  bool do_1d_proj = false;
+  parseFlag("DO_1D_PROJECTIONS",do_1d_proj);
+  if(do_1d_proj && nargs==1){
+    plumed_merror("doesn't make sense to use the DO_1D_PROJECTIONS keyword for a one-dimensional distribution");
+  }
 
   plumed_massert(grid_min.size()==nargs,"mismatch between number of values given for grid parameters");
   plumed_massert(grid_max.size()==nargs,"mismatch between number of values given for grid parameters");
@@ -144,6 +151,25 @@ Action(ao)
     ofile2.open(log_targetdist_fname);
     log_targetdist_grid_pntr->writeToFile(ofile2);
     ofile2.close();
+  }
+
+  if(do_1d_proj){
+    for(unsigned int i=0; i<nargs; i++){
+      std::vector<std::string> arg1d(1);
+      arg1d[0] = arguments[i]->getName();
+      Grid marginal_grid = targetdist_pntr->getMarginal(arg1d);
+      //
+      std::string suffix;
+      Tools::convert(i+1,suffix);
+      suffix = "proj-" + suffix;
+      std::string marginal_fname = FileBase::appendSuffix(targetdist_fname,"."+suffix);
+      //
+      OFile ofile3;
+      ofile3.link(*this);
+      ofile3.enforceBackup();
+      ofile3.open(marginal_fname);
+      marginal_grid.writeToFile(ofile3);
+    }
   }
 
   //

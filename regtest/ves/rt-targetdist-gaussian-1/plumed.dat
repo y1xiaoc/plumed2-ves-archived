@@ -68,6 +68,7 @@ DUMP_TARGET_DISTRIBUTION ...
                       CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8
                       WEIGHTS=1.0,4.0}
  TARGETDIST_FILE=targetdist-6.data
+ DO_1D_PROJECTIONS
 ... DUMP_TARGET_DISTRIBUTION
 
 
