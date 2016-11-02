@@ -45,7 +45,7 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(DistributionFromGrid,"GRID")
+VES_REGISTER_TARGET_DISTRIBUTION(DistributionFromGrid,"GRID_DIST")
 
 
 void DistributionFromGrid::registerKeywords(Keywords& keys) {
