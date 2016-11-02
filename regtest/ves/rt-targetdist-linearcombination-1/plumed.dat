@@ -17,6 +17,7 @@ DUMP_TARGET_DISTRIBUTION ...
                       WEIGHTS=1.0,1.0,2.0}
  TARGETDIST_FILE=targetdist-1.data
  LOG_TARGETDIST_FILE=targetdist-1.log.data
+ FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
@@ -37,4 +38,5 @@ DUMP_TARGET_DISTRIBUTION ...
                       WEIGHTS=1.0,1.0,2.0}
  TARGETDIST_FILE=targetdist-2.data
  LOG_TARGETDIST_FILE=targetdist-2.log.data
+ FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION

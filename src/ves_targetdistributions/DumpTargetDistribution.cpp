@@ -66,6 +66,7 @@ void DumpTargetDistribution::registerKeywords(Keywords& keys){
   keys.add("compulsory","TARGETDIST_FILE","filename of the file for writing the target distribution");
   keys.add("optional","LOG_TARGETDIST_FILE","filename of the file for writing the log of the target distribution");
   keys.add("compulsory","TARGET_DISTRIBUTION","the target distribution to be used.");
+  keys.add("optional","FMT_GRIDS","the numerical format of the target distribution grids written to file. By default it is %14.9f");
   keys.addFlag("DO_1D_PROJECTIONS",false,"Also output the one-dimensional marginal distributions for multi-dimensional target distribution.");
 }
 
@@ -93,6 +94,9 @@ Action(ao)
   std::vector<std::string> grid_periodicity(nargs);
   parseVector("GRID_PERIODICITY",grid_periodicity);
   if(grid_periodicity.size()==0){grid_periodicity.assign(nargs,"NO");}
+
+  std::string fmt_grids="%14.9f";
+  parse("FMT_GRIDS",fmt_grids);
 
   bool do_1d_proj = false;
   parseFlag("DO_1D_PROJECTIONS",do_1d_proj);
@@ -134,6 +138,7 @@ Action(ao)
   Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
   Grid* log_targetdist_grid_pntr = targetdist_pntr->getLogTargetDistGridPntr();
 
+
   double sum_grid = TargetDistribution::integrateGrid(targetdist_grid_pntr);
   log.printf("  target distribution integrated over the grid: %16.12f\n",sum_grid);
   log.printf("                                                (%30.16e)\n",sum_grid);
@@ -142,6 +147,7 @@ Action(ao)
   ofile.link(*this);
   ofile.enforceBackup();
   ofile.open(targetdist_fname);
+  targetdist_grid_pntr->setOutputFmt(fmt_grids);
   targetdist_grid_pntr->writeToFile(ofile);
   ofile.close();
   if(log_targetdist_fname.size()>0){
@@ -149,6 +155,7 @@ Action(ao)
     ofile2.link(*this);
     ofile2.enforceBackup();
     ofile2.open(log_targetdist_fname);
+    log_targetdist_grid_pntr->setOutputFmt(fmt_grids);
     log_targetdist_grid_pntr->writeToFile(ofile2);
     ofile2.close();
   }
@@ -168,6 +175,7 @@ Action(ao)
       ofile3.link(*this);
       ofile3.enforceBackup();
       ofile3.open(marginal_fname);
+      marginal_grid.setOutputFmt(fmt_grids);
       marginal_grid.writeToFile(ofile3);
     }
   }

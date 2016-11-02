@@ -7,6 +7,7 @@ DUMP_TARGET_DISTRIBUTION ...
  TARGET_DISTRIBUTION={GRID_DIST
                       FILE=targetdist-input-grid-1d.data}
  TARGETDIST_FILE=targetdist-1.data
+ FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
@@ -18,6 +19,7 @@ DUMP_TARGET_DISTRIBUTION ...
                       FILE=targetdist-input-grid-1d.data
                       ZERO_OUTSIDE}
  TARGETDIST_FILE=targetdist-2.data
+ FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
@@ -29,6 +31,7 @@ DUMP_TARGET_DISTRIBUTION ...
                       FILE=targetdist-input-grid-2d.data
                       ZERO_OUTSIDE}
  TARGETDIST_FILE=targetdist-3.data
+ FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 

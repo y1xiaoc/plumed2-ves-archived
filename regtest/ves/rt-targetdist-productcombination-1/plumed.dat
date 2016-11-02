@@ -13,6 +13,7 @@ DUMP_TARGET_DISTRIBUTION ...
                                  SIGMA=0.5}}
  TARGETDIST_FILE=targetdist-1.data
  LOG_TARGETDIST_FILE=targetdist-1.log.data
+ FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
@@ -28,4 +29,5 @@ DUMP_TARGET_DISTRIBUTION ...
                                  CENTER=-2.0
                                  SIGMA=0.5}}
  TARGETDIST_FILE=targetdist-2.data
+ FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
