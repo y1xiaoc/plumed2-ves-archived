@@ -166,6 +166,15 @@ bias_cutoff_swfunc_pntr_(NULL)
     }
   }
 
+  if(keywords.exists("BIAS_FACTOR")){
+    std::string bias_factor;
+    parse("BIAS_FACTOR",bias_factor);
+    if(bias_factor.size()>0){
+      plumed_merror("the BIAS_FACTOR keyword has be discontinued, use TARGET_DISTRIBUTION={WELL_TEMPERED BIASFACTOR="+bias_factor+"} instead.");
+    }
+  }
+
+
   if(keywords.exists("PROJ_ARG")){
     std::vector<std::string> proj_arg;
     for(int i=1;;i++){
@@ -237,6 +246,8 @@ void VesBias::registerKeywords( Keywords& keys ) {
   keys.reserve("optional","BIAS_CUTOFF_FERMI_LAMBDA","the lambda value used in the Fermi switching function for the bias cutoff (BIAS_CUTOFF). Lambda is by default 1.0.");
   //
   keys.reserve("numbered","PROJ_ARG","arguments for doing projections of the FES or the target distribution.");
+  //
+  keys.add("hidden","BIAS_FACTOR","Old way of specifing the bias factor for the well-tempered target distribution, should not be used anymore.");
 }
 
 
