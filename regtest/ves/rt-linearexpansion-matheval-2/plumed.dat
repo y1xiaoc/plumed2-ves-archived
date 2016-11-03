@@ -10,7 +10,8 @@ VES_LINEAR_EXPANSION ...
  LABEL=ves1
  TEMP=300.0
  GRID_BINS=100
- TARGET_DISTRIBUTION={MATHEVAL_DIST FUNCTION=exp(-(beta/10.0)*FE)+exp(-(beta/10.0)*(FE+s1))}
+ TARGET_DISTRIBUTION={MATHEVAL_DIST FUNCTION=exp(-(beta/10.0)*FE)+exp(-(1.0/(kBT*10.0))*(FE+s1))}
+ #TARGET_DISTRIBUTION={MATHEVAL_DIST FUNCTION=exp(-(beta/10.0)*FE)+exp(-(beta/10.0)*(FE+s1))}
 ... VES_LINEAR_EXPANSION
 
 # NOTE: These parameters do not reflect parameters used in real simulations! 
