@@ -1,3 +1,5 @@
+# vim:ft=plumed
+
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
 BF_CUBIC_B_SPLINES ...
