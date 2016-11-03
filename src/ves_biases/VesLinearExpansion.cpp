@@ -207,7 +207,7 @@ void VesLinearExpansion::updateTargetDistributions() {
 
 void VesLinearExpansion::restartTargetDistributions() {
   bias_expansion_pntr_->readInRestartTargetDistribution(getCurrentTargetDistOutputFilename());
-  bias_expansion_pntr_->updateTargetDistribution();
+  bias_expansion_pntr_->restartTargetDistribution();
   setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
 }
 
@@ -229,6 +229,7 @@ void VesLinearExpansion::writeBiasToFile() {
     ofile_pntr2->close(); delete ofile_pntr2;
   }
 }
+
 
 void VesLinearExpansion::resetBiasFileOutput() {
   bias_expansion_pntr_->resetStepOfLastBiasGridUpdate();

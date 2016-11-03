@@ -168,6 +168,7 @@ public:
   void updateTargetDistribution();
   //
   void readInRestartTargetDistribution(const std::string&);
+  void restartTargetDistribution();
   //
   bool biasCutoffActive() const;
   //

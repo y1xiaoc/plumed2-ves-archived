@@ -540,6 +540,13 @@ void LinearBasisSetExpansion::readInRestartTargetDistribution(const std::string&
 }
 
 
+void LinearBasisSetExpansion::restartTargetDistribution() {
+  plumed_massert(targetdist_pntr_!=NULL,"the target distribution hasn't been setup!");
+  plumed_massert(targetdist_pntr_->isDynamic(),"this should only be used for dynamically updated target distributions!");
+  calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
+}
+
+
 void LinearBasisSetExpansion::calculateTargetDistAveragesFromGrid(const Grid* targetdist_grid_pntr) {
   plumed_assert(targetdist_grid_pntr!=NULL);
   std::vector<double> targetdist_averages(ncoeffs_,0.0);
