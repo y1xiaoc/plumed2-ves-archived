@@ -63,6 +63,7 @@ hessianOFiles_(0),
 hessian_output_fmt_(""),
 targetdist_averages_wstride_(0),
 targetdist_averagesOFiles_(0),
+targetdist_averages_output_fmt_(""),
 nbiases_(0),
 bias_pntrs_(0),
 ncoeffssets_(0),
@@ -471,6 +472,12 @@ isFirstStep(true)
       }
     }
     setupOFiles(targetdist_averages_fnames,targetdist_averagesOFiles_,mw_single_files);
+    parse("TARGETDIST_AVERAGES_FMT",targetdist_averages_output_fmt_);
+    if(targetdist_averages_output_fmt_.size()>0){
+      for(unsigned int i=0; i<ncoeffssets_; i++){
+        targetdist_averages_pntrs_[i]->setOutputFmt(targetdist_averages_output_fmt_);
+      }
+    }
 
     for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
       targetdist_averages_pntrs_[i]->writeToFile(*targetdist_averagesOFiles_[i]);
@@ -793,6 +800,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   //
   keys.add("optional","TARGETDIST_AVERAGES_FILE","the name of output file for the target distribution averages. By default it is targetdist-averages.data.");
   keys.add("optional","TARGETDIST_AVERAGES_OUTPUT","how often the target distribution averages should be written out to file. Note that the value is given in terms of coefficent iterations. If no value is given are the averages only written at the begining of the optimization");
+  keys.add("hidden","TARGETDIST_AVERAGES_FMT","specify format for target distribution averages file(s) (useful for decrease the number of digits in regtests)");
   //
   keys.add("optional","BIAS_OUTPUT","how often the bias(es) should be written out to file. Note that the value is given in terms of coefficent iterations.");
   keys.add("optional","FES_OUTPUT","how often the FES(s) should be written out to file. Note that the value is given in terms of coefficent iterations.");

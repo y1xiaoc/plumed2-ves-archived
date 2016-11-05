@@ -82,6 +82,7 @@ private:
   //
   unsigned int targetdist_averages_wstride_;
   std::vector<OFile*> targetdist_averagesOFiles_;
+  std::string targetdist_averages_output_fmt_;
   //
   unsigned int nbiases_;
   std::vector<bias::VesBias*> bias_pntrs_;
