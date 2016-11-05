@@ -49,11 +49,17 @@ void FesDumper::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   keys.remove("COEFFS_FILE");
   keys.remove("COEFFS_OUTPUT");
+  keys.remove("COEFFS_FMT");
   keys.remove("GRADIENT_FILE");
   keys.remove("GRADIENT_OUTPUT");
+  keys.remove("GRADIENT_FMT");
   keys.remove("COEFFS_SET_ID_PREFIX");
   keys.remove("INITIAL_COEFFS");
   keys.remove("STRIDE");
+  keys.remove("TARGETDIST_AVERAGES_FILE");
+  keys.remove("TARGETDIST_AVERAGES_OUTPUT");
+  keys.remove("TARGETDIST_AVERAGES_FMT");
+  keys.remove("RESTART");
   keys.add("compulsory","COEFFS_INPUT","coeffs.data","the name of input coefficient file");
   //
 }
