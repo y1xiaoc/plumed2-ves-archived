@@ -15,6 +15,8 @@ VES_LINEAR_EXPANSION ...
  TARGET_DISTRIBUTION={GAUSSIAN
                       CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3
                       CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8}
+ PROJ_ARG1=phi
+ PROJ_ARG2=psi
 ... VES_LINEAR_EXPANSION
 
 # NOTE: These parameters do not reflect parameters used in real simulations! 
@@ -36,6 +38,7 @@ AVERAGED_SGD ...
   HESSIAN_OUTPUT=1
   HESSIAN_FMT=%12.6f
   FES_OUTPUT=10
+  FES_PROJ_OUTPUT=10
   BIAS_OUTPUT=10
   TARGETDIST_AVERAGES_FMT=%12.6f
 ... AVERAGED_SGD
