@@ -543,6 +543,7 @@ void LinearBasisSetExpansion::readInRestartTargetDistribution(const std::string&
 void LinearBasisSetExpansion::restartTargetDistribution() {
   plumed_massert(targetdist_pntr_!=NULL,"the target distribution hasn't been setup!");
   plumed_massert(targetdist_pntr_->isDynamic(),"this should only be used for dynamically updated target distributions!");
+  if(biasCutoffActive()){updateBiasWithoutCutoffGrid();}
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
 
