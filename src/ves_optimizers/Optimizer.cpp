@@ -451,60 +451,6 @@ isFirstStep(true)
   }
 
 
-  std::vector<std::string> targetdist_averages_fnames;
-  if(keywords.exists("TARGETDIST_AVERAGES_FILE")){
-    parseFilenames("TARGETDIST_AVERAGES_FILE",targetdist_averages_fnames,"targetdist-averages.data");
-    parse("TARGETDIST_AVERAGES_OUTPUT",targetdist_averages_wstride_);
-
-    if(coeffs_fnames.size()>0){
-      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
-        plumed_massert(targetdist_averages_fnames[i]!=coeffs_fnames[i],"COEFFS_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
-      }
-    }
-    if(gradient_fnames.size()>0){
-      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
-        plumed_massert(targetdist_averages_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
-      }
-    }
-    if(hessian_fnames.size()>0){
-      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
-        plumed_massert(targetdist_averages_fnames[i]!=hessian_fnames[i],"HESSIAN_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
-      }
-    }
-    setupOFiles(targetdist_averages_fnames,targetdist_averagesOFiles_,mw_single_files);
-    parse("TARGETDIST_AVERAGES_FMT",targetdist_averages_output_fmt_);
-    if(targetdist_averages_output_fmt_.size()>0){
-      for(unsigned int i=0; i<ncoeffssets_; i++){
-        targetdist_averages_pntrs_[i]->setOutputFmt(targetdist_averages_output_fmt_);
-      }
-    }
-
-    for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
-      targetdist_averages_pntrs_[i]->writeToFile(*targetdist_averagesOFiles_[i]);
-    }
-
-    if(targetdist_averages_wstride_==0){
-      for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
-        targetdist_averagesOFiles_[i]->close();
-        delete targetdist_averagesOFiles_[i];
-      }
-      targetdist_averagesOFiles_.clear();
-    }
-
-    if(targetdist_averages_fnames.size()>0 && targetdist_averages_wstride_ > 0){
-      if(ncoeffssets_==1){
-        log.printf("  Target distribution averages will be written out to file %s every %u iterations\n",targetdist_averagesOFiles_[0]->getPath().c_str(),targetdist_averages_wstride_);
-      }
-      else {
-        log.printf("  Target distribution averages will be written out to the following files every %u iterations:\n",targetdist_averages_wstride_);
-        for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
-          log.printf("   coefficient set %u: %s\n",i,targetdist_averagesOFiles_[i]->getPath().c_str());
-        }
-      }
-    }
-  }
-
-
   //
   if(keywords.exists("MASK_FILE")){
     std::vector<std::string> mask_fnames_in;
@@ -573,6 +519,61 @@ isFirstStep(true)
       }
     }
   }
+
+
+  std::vector<std::string> targetdist_averages_fnames;
+  if(keywords.exists("TARGETDIST_AVERAGES_FILE")){
+    parseFilenames("TARGETDIST_AVERAGES_FILE",targetdist_averages_fnames,"targetdist-averages.data");
+    parse("TARGETDIST_AVERAGES_OUTPUT",targetdist_averages_wstride_);
+
+    if(coeffs_fnames.size()>0){
+      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+        plumed_massert(targetdist_averages_fnames[i]!=coeffs_fnames[i],"COEFFS_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
+      }
+    }
+    if(gradient_fnames.size()>0){
+      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+        plumed_massert(targetdist_averages_fnames[i]!=gradient_fnames[i],"GRADIENT_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
+      }
+    }
+    if(hessian_fnames.size()>0){
+      for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+        plumed_massert(targetdist_averages_fnames[i]!=hessian_fnames[i],"HESSIAN_FILE and TARGETDIST_AVERAGES_FILE cannot be the same");
+      }
+    }
+    setupOFiles(targetdist_averages_fnames,targetdist_averagesOFiles_,mw_single_files);
+    parse("TARGETDIST_AVERAGES_FMT",targetdist_averages_output_fmt_);
+    if(targetdist_averages_output_fmt_.size()>0){
+      for(unsigned int i=0; i<ncoeffssets_; i++){
+        targetdist_averages_pntrs_[i]->setOutputFmt(targetdist_averages_output_fmt_);
+      }
+    }
+
+    for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
+      targetdist_averages_pntrs_[i]->writeToFile(*targetdist_averagesOFiles_[i]);
+    }
+
+    if(targetdist_averages_wstride_==0){
+      for(unsigned int i=0; i<targetdist_averagesOFiles_.size(); i++){
+        targetdist_averagesOFiles_[i]->close();
+        delete targetdist_averagesOFiles_[i];
+      }
+      targetdist_averagesOFiles_.clear();
+    }
+
+    if(targetdist_averages_fnames.size()>0 && targetdist_averages_wstride_ > 0){
+      if(ncoeffssets_==1){
+        log.printf("  Target distribution averages will be written out to file %s every %u iterations\n",targetdist_averagesOFiles_[0]->getPath().c_str(),targetdist_averages_wstride_);
+      }
+      else {
+        log.printf("  Target distribution averages will be written out to the following files every %u iterations:\n",targetdist_averages_wstride_);
+        for(unsigned int i=0; i<targetdist_averages_fnames.size(); i++){
+          log.printf("   coefficient set %u: %s\n",i,targetdist_averagesOFiles_[i]->getPath().c_str());
+        }
+      }
+    }
+  }
+
 
   if(keywords.exists("BIAS_OUTPUT")){
     parse("BIAS_OUTPUT",bias_output_stride_);
