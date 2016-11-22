@@ -160,6 +160,9 @@ valueForce2_(NULL)
   //
   if(coeffs_read && biasCutoffActive()){
     updateTargetDistributions();
+  }
+  // 
+  if(coeffs_read){
     setupBiasFileOutput();
     writeBiasToFile();
   }
