@@ -378,4 +378,8 @@ void TargetDistribution::readInRestartTargetDistGrid(const std::string& grid_fna
   delete restart_grid;
 }
 
+void TargetDistribution::clearLogTargetDistGrid(){
+  log_targetdist_grid_pntr_->clear();
+}
+
 }

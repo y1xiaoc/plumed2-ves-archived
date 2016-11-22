@@ -537,6 +537,7 @@ void LinearBasisSetExpansion::updateTargetDistribution() {
 
 void LinearBasisSetExpansion::readInRestartTargetDistribution(const std::string& grid_fname){
   targetdist_pntr_->readInRestartTargetDistGrid(grid_fname);
+  if(biasCutoffActive()){targetdist_pntr_->clearLogTargetDistGrid();}
 }
 
 

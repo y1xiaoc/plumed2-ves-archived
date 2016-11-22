@@ -179,6 +179,8 @@ public:
   //
   Grid* getTargetDistGridPntr() const {return targetdist_grid_pntr_;}
   Grid* getLogTargetDistGridPntr() const {return log_targetdist_grid_pntr_;}
+  //
+  void clearLogTargetDistGrid();
   // calculate the target distribution itself
   virtual double getValue(const std::vector<double>&) const = 0;
   //
