@@ -66,6 +66,7 @@ void UniformBiasCutoffDistribution::updateGrid(){
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
     targetDistGrid().setValue(l,1.0);
   }
+  logTargetDistGrid().clear();
 }
 
 
