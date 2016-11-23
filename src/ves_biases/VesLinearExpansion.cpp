@@ -122,8 +122,7 @@ valueForce2_(NULL)
 
   addCoeffsSet(args_pntrs,basisf_pntrs_);
   ncoeffs_ = numberOfCoeffs();
-  bool coeffs_read = false;
-  coeffs_read = readCoeffsFromFiles();
+  bool coeffs_read = readCoeffsFromFiles();
 
   checkThatTemperatureIsGiven();
   bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),getBeta(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
@@ -161,7 +160,7 @@ valueForce2_(NULL)
   if(coeffs_read && biasCutoffActive()){
     updateTargetDistributions();
   }
-  // 
+  //
   if(coeffs_read){
     setupBiasFileOutput();
     writeBiasToFile();
