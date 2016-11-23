@@ -7,11 +7,24 @@ DUMP_TARGET_DISTRIBUTION ...
  GRID_MAX=+4.0
  GRID_BINS=200
  TARGET_DISTRIBUTION={GAUSSIAN
-                      CENTER=-1.5 SIGMA=0.1
-                      WELLTEMPERED_FACTOR=49.0}
- # Equal to SIGMA=0.7
+                      CENTER=-1.5 SIGMA=0.4
+                      WELLTEMPERED_FACTOR=4.0}
+ # Equal to SIGMA=0.8
  TARGETDIST_FILE=targetdist-1.data
  LOG_TARGETDIST_FILE=targetdist-1.log.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0
+ GRID_MAX=+4.0
+ GRID_BINS=200
+ TARGET_DISTRIBUTION={GAUSSIAN
+                      CENTER=-1.5 SIGMA=0.8
+                      WELLTEMPERED_FACTOR=1.0}
+ # Equal to SIGMA=0.8
+ TARGETDIST_FILE=targetdist-1b.data
+ LOG_TARGETDIST_FILE=targetdist-1b.log.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
@@ -21,10 +34,21 @@ DUMP_TARGET_DISTRIBUTION ...
  GRID_MAX=+4.0,+4.0
  GRID_BINS=100,100
  TARGET_DISTRIBUTION={GAUSSIAN
-                      CENTER=-1.5,+1.5 SIGMA=0.1,0.1
-                      WELLTEMPERED_FACTOR=49.0}
+                      CENTER=-1.5,+1.5 SIGMA=0.4,0.15
+                      WELLTEMPERED_FACTOR=4.0}
  TARGETDIST_FILE=targetdist-2.data
- LOG_TARGETDIST_FILE=targetdist-2.log.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0,-4.0
+ GRID_MAX=+4.0,+4.0
+ GRID_BINS=100,100
+ TARGET_DISTRIBUTION={GAUSSIAN
+                      CENTER=-1.5,+1.5 SIGMA=0.8,0.30
+                      WELLTEMPERED_FACTOR=1.0}
+ TARGETDIST_FILE=targetdist-2b.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
@@ -42,7 +66,6 @@ DUMP_TARGET_DISTRIBUTION ...
                                      SIGMA=0.5}
                       WELLTEMPERED_FACTOR=2.0}
  TARGETDIST_FILE=targetdist-3.data
- LOG_TARGETDIST_FILE=targetdist-3.log.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
