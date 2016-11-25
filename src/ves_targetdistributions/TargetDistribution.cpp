@@ -44,6 +44,7 @@ void TargetDistribution::registerKeywords( Keywords& keys ){
   keys.add("optional","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
   keys.add("optional","WELLTEMPERED_FACTOR","Broaden the target distribution by using well tempered factor.");
   keys.addFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution.");
+  keys.addFlag("FORCE_NORMALIZATION",false,"Force normalization of the target distribution.");
 }
 
 
@@ -95,6 +96,8 @@ bias_cutoff_value_(0.0)
   parseFlag("SHIFT_TO_ZERO",shift_targetdist_to_zero_);
   if(shift_targetdist_to_zero_){check_nonnegative_=false;}
   //
+  parseFlag("FORCE_NORMALIZATION",force_normalization_);
+  if(force_normalization_){check_normalization_=false;}
 }
 
 
@@ -282,7 +285,7 @@ void TargetDistribution::update() {
     double normalization = integrateGrid(targetdist_grid_pntr_);
     const double normalization_thrshold = 0.1;
     if(normalization < 1.0-normalization_thrshold || normalization > 1.0+normalization_thrshold){
-      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " is not proberly normalized, integrating over the grid gives: " << normalization << "\n";
+      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " is not proberly normalized, integrating over the grid gives: " << normalization << " - You can avoid this problem by using the FORCE_NORMALIZATION keyword\n";
     }
   }
   //

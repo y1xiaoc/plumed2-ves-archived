@@ -109,8 +109,8 @@ protected:
   void setStatic(){type_=static_targetdist;}
   void setDynamic(){type_=dynamic_targetdist;}
   // set the that target distribution is normalized
-  void setForcedNormalization(){force_normalization_=true;}
-  void unsetForcedNormalization(){force_normalization_=false;};
+  void setForcedNormalization(){force_normalization_=true; check_normalization_=false;}
+  void unsetForcedNormalization(){force_normalization_=false; check_normalization_=true;};
   //
   void setBiasGridNeeded(){needs_bias_grid_=true;}
   void setBiasWithoutCutoffGridNeeded(){needs_bias_withoutcutoff_grid_=true;}
