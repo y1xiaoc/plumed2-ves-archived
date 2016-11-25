@@ -217,6 +217,9 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     if(bf_keyword.size()==0){
       error("basis_functions_"+is+" is needed");
     }
+    if(bf_keyword.at(0)=='{' && bf_keyword.at(bf_keyword.size()-1)=='}'){
+      bf_keyword = bf_keyword.substr(1,bf_keyword.size()-2);
+    }
     basisf_keywords[i] = bf_keyword;
     plumed_bf->readInputLine(bf_keyword+" LABEL=dim"+is);
     basisf_pntrs[i] = plumed_bf->getActionSet().selectWithLabel<BasisFunctions*>("dim"+is);
@@ -373,7 +376,15 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   std::vector<Vector> positions(1), velocities(1), forces(1);
   for(unsigned int k=0; k<dim; k++){
     positions[0][k] = initPos[inter.Get_rank()][k];
+    if(periodic[k]){
+      positions[0][k] = positions[0][k] - floor(positions[0][k]/interval_range[k]+0.5)*interval_range[k];
+    }
+    else {
+      if(positions[0][k]>interval_max[k]){positions[0][k]=interval_max[k];}
+      if(positions[0][k]<interval_min[k]){positions[0][k]=interval_min[k];}
+    }
   }
+
 
   for(unsigned k=0;k<dim;++k){
     velocities[0][k]=random.Gaussian() * sqrt( temp );
@@ -407,8 +418,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
       positions[0][k] = positions[0][k] + tstep*velocities[0][k];
 
       if(periodic[k]){
-        if(positions[0][k]>interval_max[k]){positions[0][k]-=interval_range[k];}
-        if(positions[0][k]<=interval_min[k]){positions[0][k]+=interval_range[k];}
+        positions[0][k] = positions[0][k] - floor(positions[0][k]/interval_range[k]+0.5)*interval_range[k];
       }
       else {
         if(positions[0][k]>interval_max[k]){
