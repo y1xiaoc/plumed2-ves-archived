@@ -308,19 +308,12 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
 
   if(plumedon) plumed=new PLMD::PlumedMain;
 
-  // Define inter and intra communicators
-  // int me=(pc.Get_rank() % coresPerPart);
-  int iworld=(pc.Get_rank() / coresPerPart);
-  //MPI_Comm multi;
-  //MPI_Comm_split(pc.Get_comm(),iworld,0,&multi);
-  //int value;
-  //MPI_Comm_rank(multi,&value);
   Communicator intra, inter;
-  pc.Split(iworld,0,intra);
-  pc.Split(intra.Get_rank(),0,inter);
-  //pc.Barrier();
-  //printf("me: %d, iworld: %d, comm: %d, multi: %d numcores: %d, numpartitions: %d \n", me, iworld, intra.Get_rank(), inter.Get_rank(), intra.Get_size(), inter.Get_size() );
-  //pc.Barrier();
+  if(Communicator::initialized()){
+    int iworld=(pc.Get_rank() / coresPerPart);
+    pc.Split(iworld,0,intra);
+    pc.Split(intra.Get_rank(),0,inter);
+  }
 
   if(plumed){
     int s=sizeof(double);
