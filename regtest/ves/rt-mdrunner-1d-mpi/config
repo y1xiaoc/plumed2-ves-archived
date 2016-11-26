@@ -1,0 +1,4 @@
+mpiprocs=2
+type=cltool
+arg="md_linearexpansion input"
+

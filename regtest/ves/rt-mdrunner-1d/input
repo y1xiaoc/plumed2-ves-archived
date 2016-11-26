@@ -1,0 +1,12 @@
+nstep             100
+tstep             0.005
+temperature       1.0
+friction          10.0
+random_seed       4525
+plumed_input      plumed.dat
+dimension         1
+partitions        1
+basis_functions_1 BF_LEGENDRE ORDER=6 INTERVAL_MIN=-5.0 INTERVAL_MAX=+5.0
+input_coeffs       pot_coeffs_input.data
+output_coeffs      pot_coeffs_output.data
+initial_position   +6.0
