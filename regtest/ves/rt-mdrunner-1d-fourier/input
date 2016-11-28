@@ -12,3 +12,6 @@ output_coeffs      pot_coeffs_output.data
 # kJ/mol to kBT units
 coeffs_prefactor   -0.400906
 initial_position   +3.20
+output_potential        potential.data
+output_potential_grid   300
+output_histogram        histogram.data
