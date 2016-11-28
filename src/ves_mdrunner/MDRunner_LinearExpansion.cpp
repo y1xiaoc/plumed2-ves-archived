@@ -392,8 +392,17 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     fprintf(fp,"%d %f %f %f %f %f %f %f %f \n", 0, 0., positions[0][0], positions[0][1], positions[0][2], conserved, ttt, potential, therm_eng );
   }
 
+  if(plumed){
+    int step_tmp = 0;
+    plumed->cmd("setStep",&step_tmp);
+    plumed->cmd("setMasses",&masses[0]);
+    plumed->cmd("setForces",&forces[0]);
+    plumed->cmd("setEnergy",&potential);
+    plumed->cmd("setPositions",&positions[0]);
+    plumed->cmd("calc");
+  }
 
-  for(unsigned int istep=1;istep<nsteps;++istep){
+  for(unsigned int istep=0;istep<nsteps;++istep){
     //if( istep%20==0 && pc.Get_rank()==0 ) printf("Doing step %d\n",istep);
 
     // Langevin thermostat

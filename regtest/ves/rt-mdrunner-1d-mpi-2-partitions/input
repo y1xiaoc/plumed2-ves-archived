@@ -9,4 +9,4 @@ partitions        2
 basis_functions_1 BF_LEGENDRE ORDER=6 INTERVAL_MIN=-5.0 INTERVAL_MAX=+5.0
 input_coeffs       pot_coeffs_input.data
 output_coeffs      pot_coeffs_output.data
-initial_position   +6.0,-6.0
+initial_position   +6.0,-4.0
