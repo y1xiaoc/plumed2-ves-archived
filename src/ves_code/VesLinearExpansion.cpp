@@ -21,10 +21,10 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "VesBias.h"
 #include "LinearBasisSetExpansion.h"
-#include "ves_tools/CoeffsVector.h"
-#include "ves_tools/CoeffsMatrix.h"
-#include "ves_basisfunctions/BasisFunctions.h"
-#include "ves_optimizers/Optimizer.h"
+#include "CoeffsVector.h"
+#include "CoeffsMatrix.h"
+#include "BasisFunctions.h"
+#include "Optimizer.h"
 
 #include "bias/Bias.h"
 #include "core/ActionRegister.h"

@@ -21,8 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
-#include "ves_tools/GridIntegrationWeights.h"
-#include "ves_tools/VesTools.h"
+#include "GridIntegrationWeights.h"
+#include "VesTools.h"
 
 
 #include "tools/Keywords.h"

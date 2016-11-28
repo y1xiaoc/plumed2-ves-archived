@@ -28,7 +28,7 @@
 
 #include "CoeffsVector.h"
 #include "CoeffsMatrix.h"
-#include "ves_basisfunctions/BasisFunctions.h"
+#include "BasisFunctions.h"
 
 #include "tools/Tools.h"
 #include "core/Value.h"

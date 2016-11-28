@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "Optimizer.h"
-#include "ves_tools/CoeffsVector.h"
-#include "ves_tools/CoeffsMatrix.h"
+#include "CoeffsVector.h"
+#include "CoeffsMatrix.h"
 
 #include "core/ActionRegister.h"
 

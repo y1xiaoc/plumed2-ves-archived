@@ -27,7 +27,7 @@
 #include <cmath>
 #include "core/ActionPilot.h"
 #include "core/ActionWithValue.h"
-#include "ves_biases/VesBias.h"
+#include "VesBias.h"
 
 #define PLUMED_OPTIMIZER_INIT(ao) Action(ao),Optimizer(ao)
 

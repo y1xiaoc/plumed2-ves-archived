@@ -25,13 +25,13 @@
 
 #include "LinearBasisSetExpansion.h"
 #include "VesBias.h"
-#include "ves_tools/CoeffsVector.h"
-#include "ves_tools/VesTools.h"
-#include "ves_tools/GridIntegrationWeights.h"
-#include "ves_basisfunctions/BasisFunctions.h"
-#include "ves_targetdistributions/TargetDistribution.h"
-#include "ves_targetdistributions/TargetDistributionRegister.h"
-#include "ves_tools/GridProjWeights.h"
+#include "CoeffsVector.h"
+#include "VesTools.h"
+#include "GridIntegrationWeights.h"
+#include "BasisFunctions.h"
+#include "TargetDistribution.h"
+#include "TargetDistributionRegister.h"
+#include "GridProjWeights.h"
 
 
 

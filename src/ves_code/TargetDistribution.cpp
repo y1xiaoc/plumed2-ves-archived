@@ -22,13 +22,13 @@
 #include "TargetDistribution.h"
 #include "TargetDistModifer.h"
 #include "TargetDistributionRegister.h"
-#include "ves_biases/VesBias.h"
+#include "VesBias.h"
 
 #include "core/Value.h"
 #include "tools/Grid.h"
-#include "ves_tools/GridProjWeights.h"
-#include "ves_tools/GridIntegrationWeights.h"
-#include "ves_tools/VesTools.h"
+#include "GridProjWeights.h"
+#include "GridIntegrationWeights.h"
+#include "VesTools.h"
 #include "tools/File.h"
 #include "tools/Keywords.h"
 

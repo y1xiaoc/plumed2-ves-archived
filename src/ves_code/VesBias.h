@@ -22,8 +22,8 @@
 #ifndef __PLUMED_ves_biases_VesBias_h
 #define __PLUMED_ves_biases_VesBias_h
 
-#include "ves_tools/CoeffsVector.h"
-#include "ves_tools/CoeffsMatrix.h"
+#include "CoeffsVector.h"
+#include "CoeffsMatrix.h"
 
 #include "core/ActionPilot.h"
 #include "core/ActionWithValue.h"

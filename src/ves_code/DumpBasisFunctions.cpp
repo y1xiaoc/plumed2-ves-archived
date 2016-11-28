@@ -20,9 +20,9 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "BasisFunctions.h"
-#include "ves_targetdistributions/TargetDistribution.h"
-#include "ves_targetdistributions/TargetDistributionRegister.h"
-#include "ves_tools/CoeffsVector.h"
+#include "TargetDistribution.h"
+#include "TargetDistributionRegister.h"
+#include "CoeffsVector.h"
 
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"

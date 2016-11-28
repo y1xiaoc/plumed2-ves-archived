@@ -20,12 +20,12 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "VesBias.h"
-#include "ves_basisfunctions/BasisFunctions.h"
-#include "ves_tools/CoeffsVector.h"
-#include "ves_tools/CoeffsMatrix.h"
-#include "ves_optimizers/Optimizer.h"
-#include "ves_tools/FermiSwitchingFunction.h"
-#include "ves_tools/VesTools.h"
+#include "BasisFunctions.h"
+#include "CoeffsVector.h"
+#include "CoeffsMatrix.h"
+#include "Optimizer.h"
+#include "FermiSwitchingFunction.h"
+#include "VesTools.h"
 
 #include "tools/Communicator.h"
 #include "core/PlumedMain.h"

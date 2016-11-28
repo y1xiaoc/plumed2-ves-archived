@@ -21,12 +21,12 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
-#include "ves_tools/GridIntegrationWeights.h"
+#include "GridIntegrationWeights.h"
 
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
 
-#include "ves_tools/GridProjWeights.h"
+#include "GridProjWeights.h"
 
 namespace PLMD {
 

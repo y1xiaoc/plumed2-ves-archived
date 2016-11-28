@@ -23,8 +23,8 @@
 #include <string>
 
 #include "CoeffsBase.h"
-#include "ves_basisfunctions/BasisFunctions.h"
-#include "ves_biases/VesBias.h"
+#include "BasisFunctions.h"
+#include "VesBias.h"
 
 #include "tools/Tools.h"
 #include "tools/File.h"

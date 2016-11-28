@@ -35,10 +35,10 @@
 #include <vector>
 #include <iostream>
 //
-#include "ves_basisfunctions/BasisFunctions.h"
-#include "ves_biases/LinearBasisSetExpansion.h"
-#include "ves_tools/CoeffsVector.h"
-#include "ves_tools/GridIntegrationWeights.h"
+#include "BasisFunctions.h"
+#include "LinearBasisSetExpansion.h"
+#include "CoeffsVector.h"
+#include "GridIntegrationWeights.h"
 
 #ifdef __PLUMED_HAS_MPI
 #include <mpi.h>

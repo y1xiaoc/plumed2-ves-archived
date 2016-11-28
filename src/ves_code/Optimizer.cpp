@@ -20,9 +20,9 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 #include "Optimizer.h"
-#include "ves_tools/CoeffsVector.h"
-#include "ves_tools/CoeffsMatrix.h"
-#include "ves_biases/VesBias.h"
+#include "CoeffsVector.h"
+#include "CoeffsMatrix.h"
+#include "VesBias.h"
 
 #include "tools/Exception.h"
 #include "core/PlumedMain.h"
