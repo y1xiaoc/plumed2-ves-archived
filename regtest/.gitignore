@@ -20,5 +20,4 @@
 tmp
 report.txt
 
-# VES related regtests
-!/ves
+!/ves_code
