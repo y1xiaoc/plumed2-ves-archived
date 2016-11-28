@@ -27,20 +27,20 @@
 
 namespace PLMD{
 
-class RobbinsMonroSGD : public Optimizer {
+class Opt_RobbinsMonroSGD : public Optimizer {
 private:
   double decay_constant_;
 public:
   static void registerKeywords(Keywords&);
-  explicit RobbinsMonroSGD(const ActionOptions&);
+  explicit Opt_RobbinsMonroSGD(const ActionOptions&);
   void coeffsUpdate(const unsigned int c_id = 0);
 };
 
 
-PLUMED_REGISTER_ACTION(RobbinsMonroSGD,"ROBBINS_MONRO_SGD")
+PLUMED_REGISTER_ACTION(Opt_RobbinsMonroSGD,"ROBBINS_MONRO_SGD")
 
 
-void RobbinsMonroSGD::registerKeywords(Keywords& keys){
+void Opt_RobbinsMonroSGD::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   Optimizer::useDynamicStepSizeKeywords(keys);
   Optimizer::useMultipleWalkersKeywords(keys);
@@ -52,7 +52,7 @@ void RobbinsMonroSGD::registerKeywords(Keywords& keys){
   }
 
 
-RobbinsMonroSGD::RobbinsMonroSGD(const ActionOptions&ao):
+Opt_RobbinsMonroSGD::Opt_RobbinsMonroSGD(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao),
 decay_constant_(1.0)
 {
@@ -67,7 +67,7 @@ decay_constant_(1.0)
 }
 
 
-void RobbinsMonroSGD::coeffsUpdate(const unsigned int c_id) {
+void Opt_RobbinsMonroSGD::coeffsUpdate(const unsigned int c_id) {
   // getIterationCounterDbl() gives n-1 as it is updated afterwards.
   double current_stepsize =  StepSize(c_id) /(1.0 + getIterationCounterDbl()/decay_constant_);
   setCurrentStepSize(current_stepsize,c_id);

@@ -27,19 +27,19 @@
 
 namespace PLMD{
 
-class FakeOptimizer : public Optimizer {
+class Opt_FakeOptimizer : public Optimizer {
 
 public:
   static void registerKeywords(Keywords&);
-  explicit FakeOptimizer(const ActionOptions&);
+  explicit Opt_FakeOptimizer(const ActionOptions&);
   void coeffsUpdate(const unsigned int c_id = 0);
 };
 
 
-PLUMED_REGISTER_ACTION(FakeOptimizer,"FAKE_OPTIMIZER")
+PLUMED_REGISTER_ACTION(Opt_FakeOptimizer,"FAKE_OPTIMIZER")
 
 
-void FakeOptimizer::registerKeywords(Keywords& keys){
+void Opt_FakeOptimizer::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   //
   Optimizer::useMultipleWalkersKeywords(keys);
@@ -48,7 +48,7 @@ void FakeOptimizer::registerKeywords(Keywords& keys){
 }
 
 
-FakeOptimizer::FakeOptimizer(const ActionOptions&ao):
+Opt_FakeOptimizer::Opt_FakeOptimizer(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
   log.printf("  fake optimizer that does not update coefficients\n");
@@ -67,7 +67,7 @@ PLUMED_OPTIMIZER_INIT(ao)
 }
 
 
-void FakeOptimizer::coeffsUpdate(const unsigned int c_id) {}
+void Opt_FakeOptimizer::coeffsUpdate(const unsigned int c_id) {}
 
 
 }

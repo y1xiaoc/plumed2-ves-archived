@@ -28,7 +28,7 @@
 
 namespace PLMD{
 
-class BachAveragedSGD : public Optimizer {
+class Opt_BachAveragedSGD : public Optimizer {
 private:
   std::vector<CoeffsVector*> combinedgradient_pntrs_;
   unsigned int combinedgradient_wstride_;
@@ -37,16 +37,16 @@ private:
   CoeffsVector& CombinedGradient(const unsigned int c_id) const {return *combinedgradient_pntrs_[c_id];}
 public:
   static void registerKeywords(Keywords&);
-  explicit BachAveragedSGD(const ActionOptions&);
-  ~BachAveragedSGD();
+  explicit Opt_BachAveragedSGD(const ActionOptions&);
+  ~Opt_BachAveragedSGD();
   void coeffsUpdate(const unsigned int c_id = 0);
 };
 
 
-PLUMED_REGISTER_ACTION(BachAveragedSGD,"AVERAGED_SGD")
+PLUMED_REGISTER_ACTION(Opt_BachAveragedSGD,"AVERAGED_SGD")
 
 
-void BachAveragedSGD::registerKeywords(Keywords& keys){
+void Opt_BachAveragedSGD::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   Optimizer::useFixedStepSizeKeywords(keys);
   Optimizer::useMultipleWalkersKeywords(keys);
@@ -61,7 +61,7 @@ void BachAveragedSGD::registerKeywords(Keywords& keys){
 }
 
 
-BachAveragedSGD::~BachAveragedSGD(){
+Opt_BachAveragedSGD::~Opt_BachAveragedSGD(){
   for(unsigned int i=0; i<combinedgradient_pntrs_.size(); i++){
     delete combinedgradient_pntrs_[i];
   }
@@ -72,7 +72,7 @@ BachAveragedSGD::~BachAveragedSGD(){
 }
 
 
-BachAveragedSGD::BachAveragedSGD(const ActionOptions&ao):
+Opt_BachAveragedSGD::Opt_BachAveragedSGD(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao),
 combinedgradient_pntrs_(0),
 combinedgradient_wstride_(100),
@@ -116,7 +116,7 @@ combinedgradientOFiles_(0)
 }
 
 
-void BachAveragedSGD::coeffsUpdate(const unsigned int c_id) {
+void Opt_BachAveragedSGD::coeffsUpdate(const unsigned int c_id) {
   //
   if(combinedgradientOFiles_.size()>0 && (getIterationCounter()+1)%combinedgradient_wstride_==0){
     CombinedGradient(c_id) = ( Gradient(c_id) + Hessian(c_id)*(AuxCoeffs(c_id)-Coeffs(c_id)) );

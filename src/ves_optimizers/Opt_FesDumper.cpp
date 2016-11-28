@@ -32,20 +32,20 @@
 
 namespace PLMD{
 
-class FesDumper : public Optimizer {
+class Opt_FesDumper : public Optimizer {
 
 public:
   static void registerKeywords(Keywords&);
-  explicit FesDumper(const ActionOptions&);
+  explicit Opt_FesDumper(const ActionOptions&);
   void update() {};
   void coeffsUpdate(const unsigned int c_id = 0) {};
 };
 
 
-PLUMED_REGISTER_ACTION(FesDumper,"FES_DUMPER")
+PLUMED_REGISTER_ACTION(Opt_FesDumper,"FES_DUMPER")
 
 
-void FesDumper::registerKeywords(Keywords& keys){
+void Opt_FesDumper::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   keys.remove("COEFFS_FILE");
   keys.remove("COEFFS_OUTPUT");
@@ -65,7 +65,7 @@ void FesDumper::registerKeywords(Keywords& keys){
 }
 
 
-FesDumper::FesDumper(const ActionOptions&ao):
+Opt_FesDumper::Opt_FesDumper(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
   turnOffHessian();

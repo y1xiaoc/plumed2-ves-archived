@@ -27,33 +27,33 @@
 
 namespace PLMD{
 
-class SteepestDecent : public Optimizer {
+class Opt_SteepestDecent : public Optimizer {
 
 public:
   static void registerKeywords(Keywords&);
-  explicit SteepestDecent(const ActionOptions&);
+  explicit Opt_SteepestDecent(const ActionOptions&);
   void coeffsUpdate(const unsigned int c_id = 0);
 };
 
 
-PLUMED_REGISTER_ACTION(SteepestDecent,"STEEPEST_DECENT")
+PLUMED_REGISTER_ACTION(Opt_SteepestDecent,"STEEPEST_DECENT")
 
 
-void SteepestDecent::registerKeywords(Keywords& keys){
+void Opt_SteepestDecent::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   Optimizer::useFixedStepSizeKeywords(keys);
   Optimizer::useMultipleWalkersKeywords(keys);
 }
 
 
-SteepestDecent::SteepestDecent(const ActionOptions&ao):
+Opt_SteepestDecent::Opt_SteepestDecent(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao)
 {
   checkRead();
 }
 
 
-void SteepestDecent::coeffsUpdate(const unsigned int c_id) {
+void Opt_SteepestDecent::coeffsUpdate(const unsigned int c_id) {
   Coeffs(c_id) = Coeffs(c_id) - StepSize(c_id)*Gradient(c_id);
   // 
   double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
