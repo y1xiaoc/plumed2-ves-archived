@@ -95,6 +95,9 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ){
     keys.add("compulsory","output_coeffs","potential-coeffs.out.data","Filename of the output coefficent file for the potential.");
     keys.add("optional","coeffs_prefactor","prefactor for multiplying the coefficents with. ");
     keys.add("optional","template_coeffs_file","only generate a template coefficent file with the filename given and exit.");
+    keys.add("compulsory","output_potential_grid","100","The number of grid points used for the potential and histogram output files.");
+    keys.add("compulsory","output_potential","potential.data","Filename of the potential output file.");
+    keys.add("compulsory","output_histogram","histogram.data","Filename of the histogram output file.");
 }
 
 
@@ -255,6 +258,9 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   parse("coeffs_prefactor",coeffs_prefactor);
   if(coeffs_prefactor!=1.0){coeffs_pntr->scaleAllValues(coeffs_prefactor);}
 
+  unsigned int pot_grid_bins;
+  parse("output_potential_grid",pot_grid_bins);
+  potential_expansion_pntr->setGridBins(pot_grid_bins);
   potential_expansion_pntr->setupBiasGrid(false);
   potential_expansion_pntr->updateBiasGrid();
   potential_expansion_pntr->setBiasMinimumToZero();
@@ -262,7 +268,9 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
 
   OFile ofile_potential;
   ofile_potential.link(pc);
-  ofile_potential.open("potential.data");
+  std::string output_potential_fname;
+  parse("output_potential",output_potential_fname);
+  ofile_potential.open(output_potential_fname);
   potential_expansion_pntr->writeBiasGridToFile(ofile_potential);
   ofile_potential.close();
 
@@ -275,11 +283,13 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     histo_grid.setValue(i,value);
   }
   histo_grid.scaleAllValuesAndDerivatives(1.0/norm);
-  OFile ofile_histog;
-  ofile_histog.link(pc);
-  ofile_histog.open("histogram.data");
-  histo_grid.writeToFile(ofile_histog);
-  ofile_histog.close();
+  OFile ofile_histogram;
+  ofile_histogram.link(pc);
+  std::string output_histogram_fname;
+  parse("output_histogram",output_histogram_fname);
+  ofile_histogram.open(output_histogram_fname);
+  histo_grid.writeToFile(ofile_histogram);
+  ofile_histogram.close();
 
   OFile ofile_coeffsout;
   ofile_coeffsout.link(pc);
