@@ -39,7 +39,7 @@ class GaussianDistribution: public TargetDistribution {
   std::vector< std::vector<double> > correlation_;
   std::vector<double> weights_;
   bool diagonal_;
-  unsigned int ngaussians_;
+  unsigned int ncenters_;
   double GaussianDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const bool normalize=true) const;
   double Gaussian2D(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const bool normalize=true) const;
 public:
@@ -68,7 +68,7 @@ centers_(0),
 correlation_(0),
 weights_(0),
 diagonal_(true),
-ngaussians_(0)
+ncenters_(0)
 {
   for(unsigned int i=1;; i++) {
     std::vector<double> tmp_center;
@@ -96,16 +96,16 @@ ngaussians_(0)
   }
   //
   setDimension(centers_[0].size());
-  ngaussians_ = centers_.size();
+  ncenters_ = centers_.size();
   // check centers and sigmas
-  for(unsigned int i=0; i<ngaussians_; i++) {
+  for(unsigned int i=0; i<ncenters_; i++) {
     plumed_massert(centers_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
     plumed_massert(sigmas_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
   }
   //
-  correlation_.resize(ngaussians_);
+  correlation_.resize(ncenters_);
 
-  if(ngaussians_==1){
+  if(ncenters_==1){
     std::vector<double> corr(1,0.0);
     if(parseVector("CORRELATION",corr,true)){
       diagonal_ = false;
@@ -113,7 +113,7 @@ ngaussians_(0)
     correlation_[0] = corr;
   }
   else {
-    for(unsigned int i=0;i<ngaussians_; i++){
+    for(unsigned int i=0;i<ncenters_; i++){
       std::vector<double> corr(1,0.0);
       if(parseNumberedVector("CORRELATION",(i+1),corr)){
         diagonal_ = false;
@@ -151,12 +151,12 @@ ngaussians_(0)
 double GaussianDistribution::getValue(const std::vector<double>& argument) const {
   double value=0.0;
   if(diagonal_){
-    for(unsigned int i=0;i<ngaussians_;i++){
+    for(unsigned int i=0;i<ncenters_;i++){
       value+=weights_[i]*GaussianDiagonal(argument, centers_[i], sigmas_[i]);
     }
   }
   else if(!diagonal_ && getDimension()==2){
-    for(unsigned int i=0;i<ngaussians_;i++){
+    for(unsigned int i=0;i<ncenters_;i++){
       value+=weights_[i]*Gaussian2D(argument, centers_[i], sigmas_[i],correlation_[i]);
     }
   }
