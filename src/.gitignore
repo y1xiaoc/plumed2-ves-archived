@@ -34,12 +34,6 @@
 !/vesselbase
 !/wrapper
 
-!/ves_basisfunctions
-!/ves_biases
-!/ves_mdrunner
-!/ves_optimizers
-!/ves_targetdistributions
-!/ves_tools
 !/ves_code
 
 # And just ignore these files
