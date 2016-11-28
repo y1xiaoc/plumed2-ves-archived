@@ -24,40 +24,40 @@
 
 namespace PLMD{
 
-class CosineBF : public BasisFunctions {
+class BF_Fourier : public BasisFunctions {
   virtual void setupLabels();
   virtual void setupUniformIntegrals();
 public:
   static void registerKeywords(Keywords&);
-  explicit CosineBF(const ActionOptions&);
+  explicit BF_Fourier(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
-PLUMED_REGISTER_ACTION(CosineBF,"BF_COSINE")
+PLUMED_REGISTER_ACTION(BF_Fourier,"BF_FOURIER")
 
 
-void CosineBF::registerKeywords(Keywords& keys){
+void BF_Fourier::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
 }
 
 
-CosineBF::CosineBF(const ActionOptions&ao):
+BF_Fourier::BF_Fourier(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
-  setNumberOfBasisFunctions(getOrder()+1);
+  setNumberOfBasisFunctions(2*getOrder()+1);
   setIntrinsicInterval("-pi","+pi");
   setPeriodic();
   setIntervalBounded();
-  setType("trigonometric_cos");
-  setDescription("Cosine");
+  setType("trigonometric_cos-sin");
+  setDescription("Trigonometric (cos/sin)");
   setupBF();
   checkRead();
 }
 
 
-double CosineBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+double BF_Fourier::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
   plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
   argT=translateArgument(arg, inside_range);
@@ -65,15 +65,19 @@ double CosineBF::getValue(const double arg, const unsigned int n, double& argT, 
   if(n == 0){
     value=1.0;
   }
-  else {
-    double k = n;
+  else if(n%2 == 1){
+    double k = (n+1.0)/2.0;
     value=cos(k*argT);
+  }
+  else if(n%2 == 0){
+    double k = n/2.0;
+    value=sin(k*argT);
   }
   return value;
 }
 
 
-void CosineBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_Fourier::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   // plumed_assert(values.size()==numberOfBasisFunctions());
   // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
@@ -84,8 +88,10 @@ void CosineBF::getAllValues(const double arg, double& argT, bool& inside_range, 
     double io = i;
     double cos_tmp = cos(io*argT);
     double sin_tmp = sin(io*argT);
-    values[i] = cos_tmp;
-    derivs[i] = -io*sin_tmp*intervalDerivf();
+    values[2*i-1] = cos_tmp;
+    derivs[2*i-1] = -io*sin_tmp*intervalDerivf();
+    values[2*i] = sin_tmp;
+    derivs[2*i] = io*cos_tmp*intervalDerivf();
   }
   if(!inside_range){
     for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}
@@ -93,16 +99,17 @@ void CosineBF::getAllValues(const double arg, double& argT, bool& inside_range, 
 }
 
 
-void CosineBF::setupLabels() {
+void BF_Fourier::setupLabels() {
   setLabel(0,"1");
   for(unsigned int i=1; i < getOrder()+1;i++){
     std::string is; Tools::convert(i,is);
-    setLabel(i,"cos("+is+"*s)");
+    setLabel(2*i-1,"cos("+is+"*s)");
+    setLabel(2*i,"sin("+is+"*s)");
   }
 }
 
 
-void CosineBF::setupUniformIntegrals() {
+void BF_Fourier::setupUniformIntegrals() {
   setAllUniformIntegralsToZero();
   setUniformIntegral(0,1.0);
 }

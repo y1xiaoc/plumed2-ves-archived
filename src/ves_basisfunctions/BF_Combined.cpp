@@ -27,23 +27,23 @@
 
 namespace PLMD{
 
-class CombinedBF : public BasisFunctions {
+class BF_Combined : public BasisFunctions {
   std::vector<BasisFunctions*> basisf_pntrs_;
   virtual void setupLabels();
   virtual void setupUniformIntegrals();
   void getBFandValueIndices(const unsigned int, unsigned int&, unsigned int&) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit CombinedBF(const ActionOptions&);
+  explicit BF_Combined(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
-PLUMED_REGISTER_ACTION(CombinedBF,"BF_COMBINED")
+PLUMED_REGISTER_ACTION(BF_Combined,"BF_COMBINED")
 
 
-void CombinedBF::registerKeywords(Keywords& keys){
+void BF_Combined::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
   keys.remove("ORDER");
   keys.remove("INTERVAL_MAX");
@@ -52,7 +52,7 @@ void CombinedBF::registerKeywords(Keywords& keys){
 }
 
 
-CombinedBF::CombinedBF(const ActionOptions&ao):
+BF_Combined::BF_Combined(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao),
 basisf_pntrs_(0)
 {
@@ -92,7 +92,7 @@ basisf_pntrs_(0)
 }
 
 
-void CombinedBF::getBFandValueIndices(const unsigned int n, unsigned int& bf_index, unsigned int& value_index) const {
+void BF_Combined::getBFandValueIndices(const unsigned int n, unsigned int& bf_index, unsigned int& value_index) const {
   bf_index = 0; value_index = 0;
   if(n==0){
     bf_index = 0;
@@ -114,7 +114,7 @@ void CombinedBF::getBFandValueIndices(const unsigned int n, unsigned int& bf_ind
   }
 }
 
-double CombinedBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+double BF_Combined::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
   plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   unsigned int bf_index;
   unsigned int value_index;
@@ -123,7 +123,7 @@ double CombinedBF::getValue(const double arg, const unsigned int n, double& argT
 }
 
 
-void CombinedBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_Combined::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   // first BF, constant, argT, and inside_range taken from here
   unsigned int r=0;
   std::vector<double> values_tmp(basisf_pntrs_[0]->numberOfBasisFunctions(),0.0);
@@ -149,7 +149,7 @@ void CombinedBF::getAllValues(const double arg, double& argT, bool& inside_range
 }
 
 
-void CombinedBF::setupLabels() {
+void BF_Combined::setupLabels() {
   setLabel(0,basisf_pntrs_[0]->getBasisFunctionLabel(0));
   unsigned int r=1;
   for(unsigned int i=0; i<basisf_pntrs_.size(); i++){
@@ -161,7 +161,7 @@ void CombinedBF::setupLabels() {
 }
 
 
-void CombinedBF::setupUniformIntegrals() {
+void BF_Combined::setupUniformIntegrals() {
   setUniformIntegral(0,basisf_pntrs_[0]->getUniformIntegrals()[0]);
   unsigned int r=1;
   for(unsigned int i=0; i<basisf_pntrs_.size(); i++){

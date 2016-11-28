@@ -25,43 +25,39 @@
 
 namespace PLMD{
 
-class LegendreBF : public BasisFunctions {
-  bool scaled_;
+class BF_Chebyshev : public BasisFunctions {
   virtual void setupUniformIntegrals();
 public:
   static void registerKeywords(Keywords&);
-  explicit LegendreBF(const ActionOptions&);
+  explicit BF_Chebyshev(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
-PLUMED_REGISTER_ACTION(LegendreBF,"BF_LEGENDRE")
+PLUMED_REGISTER_ACTION(BF_Chebyshev,"BF_CHEBYSHEV")
 
 
-void LegendreBF::registerKeywords(Keywords& keys){
+void BF_Chebyshev::registerKeywords(Keywords& keys){
  BasisFunctions::registerKeywords(keys);
- keys.addFlag("SCALED",false,"scale the polynomials such that they are orthonormal to 1");
 }
 
-LegendreBF::LegendreBF(const ActionOptions&ao):
- PLUMED_BASISFUNCTIONS_INIT(ao),
- scaled_(false)
+BF_Chebyshev::BF_Chebyshev(const ActionOptions&ao):
+ PLUMED_BASISFUNCTIONS_INIT(ao)
 {
-  parseFlag("SCALED",scaled_); addKeywordToList("SCALED",scaled_);
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-1.0","+1.0");
   setNonPeriodic();
   setIntervalBounded();
-  setType("Legendre");
-  setDescription("Legendre polynomials");
-  setLabelPrefix("L");
+  setType("chebyshev-1st-kind");
+  setDescription("Chebyshev polynomials of the first kind");
+  setLabelPrefix("T");
   setupBF();
   checkRead();
 }
 
 
-double LegendreBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+double BF_Chebyshev::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
   plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
   std::vector<double> tmp_values(numberOfBasisFunctions());
@@ -71,7 +67,7 @@ double LegendreBF::getValue(const double arg, const unsigned int n, double& argT
 }
 
 
-void LegendreBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_Chebyshev::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   // plumed_assert(values.size()==numberOfBasisFunctions());
   // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
@@ -85,29 +81,23 @@ void LegendreBF::getAllValues(const double arg, double& argT, bool& inside_range
   derivsT[1]=1.0;
   derivs[1]=intervalDerivf();
   for(unsigned int i=1; i < getOrder();i++){
-    double io = static_cast<double>(i);
-    values[i+1]  = ((2.0*io+1.0)/(io+1.0))*argT*values[i] - (io/(io+1.0))*values[i-1];
-    derivsT[i+1] = ((2.0*io+1.0)/(io+1.0))*(values[i]+argT*derivsT[i])-(io/(io+1.0))*derivsT[i-1];
+    values[i+1]  = 2.0*argT*values[i]-values[i-1];
+    derivsT[i+1] = 2.0*values[i]+2.0*argT*derivsT[i]-derivsT[i-1];
     derivs[i+1]  = intervalDerivf()*derivsT[i+1];
-  }
-  if(scaled_){
-    // L0 is not scaled!
-    for(unsigned int i=0; i<values.size(); i++){
-      double io = static_cast<double>(i);
-      double sf = sqrt(io+0.5);
-      values[i] *= sf;
-      derivs[i] *= sf;
-    }
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
 }
 
 
-void LegendreBF::setupUniformIntegrals() {
-  setAllUniformIntegralsToZero();
-  double L0_int = 1.0;
-  if(scaled_){L0_int = sqrt(0.5);}
-  setUniformIntegral(0,L0_int);
+void BF_Chebyshev::setupUniformIntegrals() {
+  for(unsigned int i=0; i<numberOfBasisFunctions(); i++){
+    double io = i;
+    double value = 0.0;
+    if(i % 2 == 0){
+      value = -2.0/( pow(io,2.0)-1.0)*0.5;
+    }
+    setUniformIntegral(i,value);
+  }
 }
 
 

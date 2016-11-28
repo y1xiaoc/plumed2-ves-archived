@@ -24,40 +24,40 @@
 
 namespace PLMD{
 
-class SineBF : public BasisFunctions {
+class BF_Cosine : public BasisFunctions {
   virtual void setupLabels();
   virtual void setupUniformIntegrals();
 public:
   static void registerKeywords(Keywords&);
-  explicit SineBF(const ActionOptions&);
+  explicit BF_Cosine(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
-PLUMED_REGISTER_ACTION(SineBF,"BF_SINE")
+PLUMED_REGISTER_ACTION(BF_Cosine,"BF_COSINE")
 
 
-void SineBF::registerKeywords(Keywords& keys){
+void BF_Cosine::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
 }
 
 
-SineBF::SineBF(const ActionOptions&ao):
+BF_Cosine::BF_Cosine(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-pi","+pi");
   setPeriodic();
   setIntervalBounded();
-  setType("trigonometric_sin");
-  setDescription("Sine");
+  setType("trigonometric_cos");
+  setDescription("Cosine");
   setupBF();
   checkRead();
 }
 
 
-double SineBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+double BF_Cosine::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
   plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
   argT=translateArgument(arg, inside_range);
@@ -67,13 +67,13 @@ double SineBF::getValue(const double arg, const unsigned int n, double& argT, bo
   }
   else {
     double k = n;
-    value=sin(k*argT);
+    value=cos(k*argT);
   }
   return value;
 }
 
 
-void SineBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_Cosine::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   // plumed_assert(values.size()==numberOfBasisFunctions());
   // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
@@ -84,8 +84,8 @@ void SineBF::getAllValues(const double arg, double& argT, bool& inside_range, st
     double io = i;
     double cos_tmp = cos(io*argT);
     double sin_tmp = sin(io*argT);
-    values[i] = sin_tmp;
-    derivs[i] = io*cos_tmp*intervalDerivf();
+    values[i] = cos_tmp;
+    derivs[i] = -io*sin_tmp*intervalDerivf();
   }
   if(!inside_range){
     for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}
@@ -93,16 +93,16 @@ void SineBF::getAllValues(const double arg, double& argT, bool& inside_range, st
 }
 
 
-void SineBF::setupLabels() {
+void BF_Cosine::setupLabels() {
   setLabel(0,"1");
   for(unsigned int i=1; i < getOrder()+1;i++){
     std::string is; Tools::convert(i,is);
-    setLabel(i,"sin("+is+"*s)");
+    setLabel(i,"cos("+is+"*s)");
   }
 }
 
 
-void SineBF::setupUniformIntegrals() {
+void BF_Cosine::setupUniformIntegrals() {
   setAllUniformIntegralsToZero();
   setUniformIntegral(0,1.0);
 }

@@ -19,85 +19,92 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "BasisFunctions.h"
-
 #include "core/ActionRegister.h"
+#include "BasisFunctions.h"
 
 namespace PLMD{
 
-class ChebyshevBF : public BasisFunctions {
+class BF_Sine : public BasisFunctions {
+  virtual void setupLabels();
   virtual void setupUniformIntegrals();
 public:
   static void registerKeywords(Keywords&);
-  explicit ChebyshevBF(const ActionOptions&);
+  explicit BF_Sine(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
-PLUMED_REGISTER_ACTION(ChebyshevBF,"BF_CHEBYSHEV")
+PLUMED_REGISTER_ACTION(BF_Sine,"BF_SINE")
 
 
-void ChebyshevBF::registerKeywords(Keywords& keys){
- BasisFunctions::registerKeywords(keys);
+void BF_Sine::registerKeywords(Keywords& keys){
+  BasisFunctions::registerKeywords(keys);
 }
 
-ChebyshevBF::ChebyshevBF(const ActionOptions&ao):
- PLUMED_BASISFUNCTIONS_INIT(ao)
+
+BF_Sine::BF_Sine(const ActionOptions&ao):
+PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
-  setIntrinsicInterval("-1.0","+1.0");
-  setNonPeriodic();
+  setIntrinsicInterval("-pi","+pi");
+  setPeriodic();
   setIntervalBounded();
-  setType("chebyshev-1st-kind");
-  setDescription("Chebyshev polynomials of the first kind");
-  setLabelPrefix("T");
+  setType("trigonometric_sin");
+  setDescription("Sine");
   setupBF();
   checkRead();
 }
 
 
-double ChebyshevBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+double BF_Sine::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
   plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
-  std::vector<double> tmp_values(numberOfBasisFunctions());
-  std::vector<double> tmp_derivs(numberOfBasisFunctions());
-  getAllValues(arg, argT, inside_range, tmp_values, tmp_derivs);
-  return tmp_values[n];
+  argT=translateArgument(arg, inside_range);
+  double value=0.0;
+  if(n == 0){
+    value=1.0;
+  }
+  else {
+    double k = n;
+    value=sin(k*argT);
+  }
+  return value;
 }
 
 
-void ChebyshevBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_Sine::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   // plumed_assert(values.size()==numberOfBasisFunctions());
   // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
   argT=translateArgument(arg, inside_range);
-  std::vector<double> derivsT(derivs.size());
-  //
   values[0]=1.0;
-  derivsT[0]=0.0;
   derivs[0]=0.0;
-  values[1]=argT;
-  derivsT[1]=1.0;
-  derivs[1]=intervalDerivf();
-  for(unsigned int i=1; i < getOrder();i++){
-    values[i+1]  = 2.0*argT*values[i]-values[i-1];
-    derivsT[i+1] = 2.0*values[i]+2.0*argT*derivsT[i]-derivsT[i-1];
-    derivs[i+1]  = intervalDerivf()*derivsT[i+1];
+  for(unsigned int i=1; i < getOrder()+1;i++){
+    double io = i;
+    double cos_tmp = cos(io*argT);
+    double sin_tmp = sin(io*argT);
+    values[i] = sin_tmp;
+    derivs[i] = io*cos_tmp*intervalDerivf();
   }
-  if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
+  if(!inside_range){
+    for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}
+  }
 }
 
 
-void ChebyshevBF::setupUniformIntegrals() {
-  for(unsigned int i=0; i<numberOfBasisFunctions(); i++){
-    double io = i;
-    double value = 0.0;
-    if(i % 2 == 0){
-      value = -2.0/( pow(io,2.0)-1.0)*0.5;
-    }
-    setUniformIntegral(i,value);
+void BF_Sine::setupLabels() {
+  setLabel(0,"1");
+  for(unsigned int i=1; i < getOrder()+1;i++){
+    std::string is; Tools::convert(i,is);
+    setLabel(i,"sin("+is+"*s)");
   }
+}
+
+
+void BF_Sine::setupUniformIntegrals() {
+  setAllUniformIntegralsToZero();
+  setUniformIntegral(0,1.0);
 }
 
 

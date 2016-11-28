@@ -25,46 +25,51 @@
 
 namespace PLMD{
 
-class PowersBF : public BasisFunctions {
+class BF_CubicBspline : public BasisFunctions {
+  double spacing_;
+  double inv_spacing_;
   double inv_normfactor_;
-  virtual void setupLabels();
+  double spline(const double, double&) const;
 public:
   static void registerKeywords( Keywords&);
-  explicit PowersBF(const ActionOptions&);
+  explicit BF_CubicBspline(const ActionOptions&);
   double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 
-PLUMED_REGISTER_ACTION(PowersBF,"BF_POWERS")
+PLUMED_REGISTER_ACTION(BF_CubicBspline,"BF_CUBIC_B_SPLINES")
 
 // See DOI 10.1007/s10614-007-9092-4 for more information;
 
 
-void PowersBF::registerKeywords(Keywords& keys){
+void BF_CubicBspline::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
-  keys.add("optional","NORMALIZATION","the normalization factor that is used to normalize the basis functions by dividing the values. By default it is 1.0.");
+  keys.add("optional","NORMALIZATION","the normalization factor that is used to normalize the basis functions by dividing the values. By default it is 2.");
 }
 
-PowersBF::PowersBF(const ActionOptions&ao):
+BF_CubicBspline::BF_CubicBspline(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao)
 {
-  setNumberOfBasisFunctions(getOrder()+1);
+  setNumberOfBasisFunctions((getOrder()+3)+1);
   setIntrinsicInterval(intervalMin(),intervalMax());
-  double normfactor_=1.0;
+  spacing_=(intervalMax()-intervalMin())/static_cast<double>(getOrder());
+  inv_spacing_ = 1.0/spacing_;
+  double normfactor_=2.0;
   parse("NORMALIZATION",normfactor_);
   inv_normfactor_=1.0/normfactor_;
   setNonPeriodic();
   setIntervalBounded();
-  setType("polynom_powers");
-  setDescription("Polynomial Powers");
+  setType("splines_2nd-order");
+  setDescription("Cubic B-splines (2nd order splines)");
+  setLabelPrefix("S");
   setupBF();
   log.printf("   normalization factor: %f\n",normfactor_);
   checkRead();
 }
 
 
-double PowersBF::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
+double BF_CubicBspline::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
   plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
   inside_range=true;
   argT=checkIfArgumentInsideInterval(arg,inside_range);
@@ -73,12 +78,16 @@ double PowersBF::getValue(const double arg, const unsigned int n, double& argT, 
     return 1.0;
   }
   else{
-    return pow(argT,static_cast<double>(n));
+    double argx = ((argT-intervalMin())*inv_spacing_) - (static_cast<double>(n)-2.0);
+    double tmp_dbl=0.0;
+    return spline(argx, tmp_dbl);
   }
 }
 
 
-void PowersBF::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_CubicBspline::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+  // plumed_assert(values.size()==numberOfBasisFunctions());
+  // plumed_assert(derivs.size()==numberOfBasisFunctions());
   inside_range=true;
   argT=checkIfArgumentInsideInterval(arg,inside_range);
   //
@@ -86,20 +95,44 @@ void PowersBF::getAllValues(const double arg, double& argT, bool& inside_range, 
   derivs[0]=0.0;
   //
   for(unsigned int i=1; i < getNumberOfBasisFunctions(); i++){
-    double io = static_cast<double>(i);
-    values[i] = pow(argT,io);
-    derivs[i] = io*pow(argT,io-1.0);
+    double argx = ((argT-intervalMin())*inv_spacing_) - (static_cast<double>(i)-2.0);
+    values[i]  = spline(argx, derivs[i]);
+    derivs[i]*=inv_spacing_;
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
 }
 
 
-void PowersBF::setupLabels() {
-  setLabel(0,"1");
-  for(unsigned int i=1; i < getOrder()+1;i++){
-    std::string is; Tools::convert(i,is);
-    setLabel(i,"s^"+is);
+double BF_CubicBspline::spline(const double arg, double& deriv) const {
+  double value=0.0;
+  double x=arg;
+  // derivative of abs(x);
+  double dx = 1.0;
+  if(x < 0){
+    x=-x;
+    dx = -1.0;
   }
+  //
+  if(x > 2){
+    value=0.0;
+    deriv=0.0;
+  }
+  else if(x >= 1){
+    value = ((2.0-x)*(2.0-x)*(2.0-x));
+    deriv = dx*(-3.0*(2.0-x)*(2.0-x));
+    // value=((2.0-x)*(2.0-x)*(2.0-x))/6.0;
+    // deriv=-x*x*(2.0-x)*(2.0-x);
+  }
+  else{
+    value = 4.0-6.0*x*x+3.0*x*x*x;
+    deriv = dx*(-12.0*x+9.0*x*x);
+    // value=x*x*x*0.5-x*x+2.0/3.0;
+    // deriv=(3.0/2.0)*x*x-2.0*x;
+  }
+  value *= inv_normfactor_;
+  deriv *= inv_normfactor_;
+  return value;
 }
+
 
 }
