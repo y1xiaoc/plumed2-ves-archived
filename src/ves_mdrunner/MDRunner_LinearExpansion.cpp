@@ -93,6 +93,7 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ){
     keys.add("optional","basis_functions_3","Basis functions for dimension 3 if needed.");
     keys.add("compulsory","input_coeffs","potential-coeffs.in.data","Filename of the input coefficent file for the potential.");
     keys.add("compulsory","output_coeffs","potential-coeffs.out.data","Filename of the output coefficent file for the potential.");
+    keys.add("compulsory","output_coeffs_fmt","%30.16e","Format of the output coefficent file for the potential. Useful for regtests.");
     keys.add("optional","coeffs_prefactor","prefactor for multiplying the coefficents with. ");
     keys.add("optional","template_coeffs_file","only generate a template coefficent file with the filename given and exit.");
     keys.add("compulsory","output_potential_grid","100","The number of grid points used for the potential and histogram output files.");
@@ -250,8 +251,6 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
 
   std::string input_coeffs_fname;
   parse("input_coeffs",input_coeffs_fname);
-  std::string output_coeffs_fname;
-  parse("output_coeffs",output_coeffs_fname);
   if(input_coeffs_fname.size()==0){error("you need to give a coeffs file using the coeffs_file keyword.");}
   coeffs_pntr->readFromFile(input_coeffs_fname,true,true);
   double coeffs_prefactor = 1.0;
@@ -291,6 +290,11 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   histo_grid.writeToFile(ofile_histogram);
   ofile_histogram.close();
 
+  std::string output_coeffs_fname;
+  parse("output_coeffs",output_coeffs_fname);
+  std::string output_coeffs_fmt;
+  parse("output_coeffs_fmt",output_coeffs_fmt);
+  coeffs_pntr->setOutputFmt(output_coeffs_fmt);
   OFile ofile_coeffsout;
   ofile_coeffsout.link(pc);
   ofile_coeffsout.open(output_coeffs_fname);
