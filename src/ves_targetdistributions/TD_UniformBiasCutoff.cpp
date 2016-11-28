@@ -27,25 +27,25 @@
 
 namespace PLMD {
 
-class UniformBiasCutoffDistribution : public TargetDistribution {
+class TD_UniformBiasCutoff : public TargetDistribution {
 private:
 public:
   static void registerKeywords( Keywords&);
-  explicit UniformBiasCutoffDistribution( const TargetDistributionOptions& to );
+  explicit TD_UniformBiasCutoff( const TargetDistributionOptions& to );
   void updateGrid();
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(UniformBiasCutoffDistribution,"UNIFORM_BIAS_CUTOFF")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_UniformBiasCutoff,"UNIFORM_BIAS_CUTOFF")
 
 
-void UniformBiasCutoffDistribution::registerKeywords(Keywords& keys) {
+void TD_UniformBiasCutoff::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
 }
 
 
-UniformBiasCutoffDistribution::UniformBiasCutoffDistribution(const TargetDistributionOptions& to):
+TD_UniformBiasCutoff::TD_UniformBiasCutoff(const TargetDistributionOptions& to):
 TargetDistribution(to)
 {
   if(!biasCutoffActive()){
@@ -55,13 +55,13 @@ TargetDistribution(to)
 }
 
 
-double UniformBiasCutoffDistribution::getValue(const std::vector<double>& argument) const {
-  plumed_merror("getValue not implemented for UniformBiasCutoffDistribution");
+double TD_UniformBiasCutoff::getValue(const std::vector<double>& argument) const {
+  plumed_merror("getValue not implemented for TD_UniformBiasCutoff");
   return 0.0;
 }
 
 
-void UniformBiasCutoffDistribution::updateGrid(){
+void TD_UniformBiasCutoff::updateGrid(){
   plumed_massert(biasCutoffActive(),"The UNIFORM_BIAS_CUTOFF should only be used when employing a bias cutoff");
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
     targetDistGrid().setValue(l,1.0);

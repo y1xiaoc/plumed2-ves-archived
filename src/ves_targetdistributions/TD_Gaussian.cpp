@@ -32,7 +32,7 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class GaussianDistribution: public TargetDistribution {
+class TD_Gaussian: public TargetDistribution {
   // properties of the Gaussians
   std::vector< std::vector<double> > sigmas_;
   std::vector< std::vector<double> > centers_;
@@ -44,15 +44,15 @@ class GaussianDistribution: public TargetDistribution {
   double Gaussian2D(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const bool normalize=true) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit GaussianDistribution(const TargetDistributionOptions& to);
+  explicit TD_Gaussian(const TargetDistributionOptions& to);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(GaussianDistribution,"GAUSSIAN")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_Gaussian,"GAUSSIAN")
 
 
-void GaussianDistribution::registerKeywords(Keywords& keys){
+void TD_Gaussian::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","CENTER","The centers of the Gaussians.");
   keys.add("numbered","SIGMA","The sigmas of the Gaussians.");
@@ -61,7 +61,7 @@ void GaussianDistribution::registerKeywords(Keywords& keys){
 }
 
 
-GaussianDistribution::GaussianDistribution( const TargetDistributionOptions& to ):
+TD_Gaussian::TD_Gaussian( const TargetDistributionOptions& to ):
 TargetDistribution(to),
 sigmas_(0),
 centers_(0),
@@ -148,7 +148,7 @@ ncenters_(0)
 }
 
 
-double GaussianDistribution::getValue(const std::vector<double>& argument) const {
+double TD_Gaussian::getValue(const std::vector<double>& argument) const {
   double value=0.0;
   if(diagonal_){
     for(unsigned int i=0;i<ncenters_;i++){
@@ -164,7 +164,7 @@ double GaussianDistribution::getValue(const std::vector<double>& argument) const
 }
 
 
-double GaussianDistribution::GaussianDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& sigma, bool normalize) const {
+double TD_Gaussian::GaussianDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& sigma, bool normalize) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
     double arg=(argument[k]-center[k])/sigma[k];
@@ -176,7 +176,7 @@ double GaussianDistribution::GaussianDiagonal(const std::vector<double>& argumen
 }
 
 
-double GaussianDistribution::Gaussian2D(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& sigma, const std::vector<double>& correlation, bool normalize) const {
+double TD_Gaussian::Gaussian2D(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& sigma, const std::vector<double>& correlation, bool normalize) const {
   double arg1 = (argument[0]-center[0])/sigma[0];
   double arg2 = (argument[1]-center[1])/sigma[1];
   double corr = correlation[0];

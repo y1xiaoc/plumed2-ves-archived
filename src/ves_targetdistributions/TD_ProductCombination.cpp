@@ -33,7 +33,7 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class ProductCombinationOfDistributions: public TargetDistribution {
+class TD_ProductCombination: public TargetDistribution {
 private:
   std::vector<TargetDistribution*> distribution_pntrs_;
   std::vector<Grid*> grid_pntrs_;
@@ -41,10 +41,10 @@ private:
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
-  explicit ProductCombinationOfDistributions(const TargetDistributionOptions& to);
+  explicit TD_ProductCombination(const TargetDistributionOptions& to);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~ProductCombinationOfDistributions();
+  ~TD_ProductCombination();
   //
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
@@ -54,16 +54,16 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(ProductCombinationOfDistributions,"PRODUCT_COMBINATION")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductCombination,"PRODUCT_COMBINATION")
 
 
-void ProductCombinationOfDistributions::registerKeywords(Keywords& keys){
+void TD_ProductCombination::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DIST_ARG","The one dimensional target distributions to be used in the product combination for each argument");
 }
 
 
-ProductCombinationOfDistributions::ProductCombinationOfDistributions( const TargetDistributionOptions& to ):
+TD_ProductCombination::TD_ProductCombination( const TargetDistributionOptions& to ):
 TargetDistribution(to),
 distribution_pntrs_(0),
 grid_pntrs_(0),
@@ -87,20 +87,20 @@ ndist_(0)
 }
 
 
-ProductCombinationOfDistributions::~ProductCombinationOfDistributions(){
+TD_ProductCombination::~TD_ProductCombination(){
   for(unsigned int i=0; i<ndist_; i++){
     delete distribution_pntrs_[i];
   }
 }
 
 
-double ProductCombinationOfDistributions::getValue(const std::vector<double>& argument) const {
-  plumed_merror("getValue not implemented for ProductCombinationOfDistributions");
+double TD_ProductCombination::getValue(const std::vector<double>& argument) const {
+  plumed_merror("getValue not implemented for TD_ProductCombination");
   return 0.0;
 }
 
 
-void ProductCombinationOfDistributions::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+void TD_ProductCombination::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
   for(unsigned int i=0; i<ndist_; i++){
     std::vector<Value*> arg1d(1);
     std::vector<std::string> min1d(1);
@@ -119,7 +119,7 @@ void ProductCombinationOfDistributions::setupAdditionalGrids(const std::vector<V
 }
 
 
-void ProductCombinationOfDistributions::updateGrid(){
+void TD_ProductCombination::updateGrid(){
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->update();
   }
@@ -136,7 +136,7 @@ void ProductCombinationOfDistributions::updateGrid(){
 }
 
 
-void ProductCombinationOfDistributions::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void TD_ProductCombination::linkVesBias(bias::VesBias* vesbias_pntr_in){
   TargetDistribution::linkVesBias(vesbias_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
@@ -144,7 +144,7 @@ void ProductCombinationOfDistributions::linkVesBias(bias::VesBias* vesbias_pntr_
 }
 
 
-void ProductCombinationOfDistributions::linkAction(Action* action_pntr_in){
+void TD_ProductCombination::linkAction(Action* action_pntr_in){
   TargetDistribution::linkAction(action_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkAction(action_pntr_in);
@@ -152,7 +152,7 @@ void ProductCombinationOfDistributions::linkAction(Action* action_pntr_in){
 }
 
 
-void ProductCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
+void TD_ProductCombination::linkBiasGrid(Grid* bias_grid_pntr_in){
   TargetDistribution::linkBiasGrid(bias_grid_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkBiasGrid(bias_grid_pntr_in);
@@ -160,7 +160,7 @@ void ProductCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
 }
 
 
-void ProductCombinationOfDistributions::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
+void TD_ProductCombination::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
   TargetDistribution::linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
@@ -168,7 +168,7 @@ void ProductCombinationOfDistributions::linkBiasWithoutCutoffGrid(Grid* bias_wit
 }
 
 
-void ProductCombinationOfDistributions::linkFesGrid(Grid* fes_grid_pntr_in){
+void TD_ProductCombination::linkFesGrid(Grid* fes_grid_pntr_in){
   TargetDistribution::linkFesGrid(fes_grid_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkFesGrid(fes_grid_pntr_in);

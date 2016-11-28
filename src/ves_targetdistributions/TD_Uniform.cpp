@@ -26,29 +26,29 @@
 
 namespace PLMD {
 
-class UniformDistribution : public TargetDistribution {
+class TD_Uniform : public TargetDistribution {
   double normalization_;
   double inverse_normalization_;
   std::vector<double> minima_;
   std::vector<double> maxima_;
 public:
   static void registerKeywords( Keywords&);
-  explicit UniformDistribution( const TargetDistributionOptions& to );
+  explicit TD_Uniform( const TargetDistributionOptions& to );
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(UniformDistribution,"UNIFORM")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_Uniform,"UNIFORM")
 
 
-void UniformDistribution::registerKeywords(Keywords& keys) {
+void TD_Uniform::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMA","The minima of the intervals on which the target distribution is defined.");
   keys.add("compulsory","MAXIMA","The maxima of the intervals on which the target distribution is defined.");
 }
 
 
-UniformDistribution::UniformDistribution(const TargetDistributionOptions& to):
+TD_Uniform::TD_Uniform(const TargetDistributionOptions& to):
 TargetDistribution(to),
 normalization_(1.0),
 inverse_normalization_(1.0),
@@ -81,7 +81,7 @@ maxima_(0)
 }
 
 
-double UniformDistribution::getValue(const std::vector<double>& argument) const {
+double TD_Uniform::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
   double inside = inverse_normalization_;
   for(unsigned int k=0; k<getDimension(); k++){

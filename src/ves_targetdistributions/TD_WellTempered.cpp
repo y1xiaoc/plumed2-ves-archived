@@ -26,8 +26,6 @@
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
 
-#include "ves_tools/GridProjWeights.h"
-
 namespace PLMD {
 
 //+PLUMEDOC INTERNAL GAUSSIAN
@@ -36,41 +34,34 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class ProjectedWellTemperedDistribution: public TargetDistribution {
+class TD_WellTempered: public TargetDistribution {
 private:
   double bias_factor_;
-  std::vector<std::string> proj_args;
 public:
   static void registerKeywords(Keywords&);
-  explicit ProjectedWellTemperedDistribution(const TargetDistributionOptions& to);
+  explicit TD_WellTempered(const TargetDistributionOptions& to);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~ProjectedWellTemperedDistribution(){}
+  ~TD_WellTempered(){}
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(ProjectedWellTemperedDistribution,"PROJECTED_WELL_TEMPERED")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_WellTempered,"WELL_TEMPERED")
 
 
-void ProjectedWellTemperedDistribution::registerKeywords(Keywords& keys){
+void TD_WellTempered::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","BIAS_FACTOR","The bias factor to be used for the well tempered distribution");
-  keys.add("compulsory","PROJ_ARGS","The arguments to be used for the projection of the free energy surface");
+  keys.add("compulsory","BIASFACTOR","The bias factor to be used for the well tempered distribution");
 }
 
 
-ProjectedWellTemperedDistribution::ProjectedWellTemperedDistribution( const TargetDistributionOptions& to ):
+TD_WellTempered::TD_WellTempered( const TargetDistributionOptions& to ):
 TargetDistribution(to),
-bias_factor_(0.0),
-proj_args(0)
+bias_factor_(0.0)
 {
-  parse("BIAS_FACTOR",bias_factor_);
+  parse("BIASFACTOR",bias_factor_);
   if(bias_factor_<=1.0){
-    plumed_merror("PROJECTED_WELL_TEMPERED target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
-  }
-  parseVector("PROJ_ARGS",proj_args);
-  if(proj_args.size()!=1){
-    plumed_merror("PROJECTED_WELL_TEMPERED target distribution: currently only supports one projection argument in PROJ_ARGS");
+    plumed_merror("WELL_TEMPERED target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   }
   setDynamic();
   setFesGridNeeded();
@@ -78,26 +69,19 @@ proj_args(0)
 }
 
 
-double ProjectedWellTemperedDistribution::getValue(const std::vector<double>& argument) const {
-  plumed_merror("getValue not implemented for ProjectedWellTemperedDistribution");
+double TD_WellTempered::getValue(const std::vector<double>& argument) const {
+  plumed_merror("getValue not implemented for TD_WellTempered");
   return 0.0;
 }
 
 
-void ProjectedWellTemperedDistribution::updateGrid(){
+void TD_WellTempered::updateGrid(){
   double beta_prime = getBeta()/bias_factor_;
-  plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to use ProjectedWellTemperedDistribution!");
-  //
-  FesWeight* Fw = new FesWeight(getBeta());
-  Grid fes_proj = getFesGridPntr()->project(proj_args,Fw);
-  delete Fw;
-  plumed_massert(fes_proj.getSize()==targetDistGrid().getSize(),"problem with FES projection");
-  plumed_massert(fes_proj.getDimension()==1,"problem with FES projection");
-  //
+  plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to use TD_WellTempered!");
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(getTargetDistGridPntr());
   double norm = 0.0;
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
-    double value = beta_prime * fes_proj.getValue(l);
+    double value = beta_prime * getFesGridPntr()->getValue(l);
     logTargetDistGrid().setValue(l,value);
     value = exp(-value);
     norm += integration_weights[l]*value;
@@ -106,9 +90,6 @@ void ProjectedWellTemperedDistribution::updateGrid(){
   targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
   logTargetDistGrid().setMinToZero();
 }
-
-
-
 
 
 }

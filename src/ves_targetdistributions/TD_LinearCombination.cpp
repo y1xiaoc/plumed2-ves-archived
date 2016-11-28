@@ -40,7 +40,7 @@ namespace bias{
   class VesBias;
 }
 
-class LinearCombinationOfDistributions: public TargetDistribution {
+class TD_LinearCombination: public TargetDistribution {
 private:
   std::vector<TargetDistribution*> distribution_pntrs_;
   std::vector<Grid*> grid_pntrs_;
@@ -49,10 +49,10 @@ private:
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
-  explicit LinearCombinationOfDistributions(const TargetDistributionOptions& to);
+  explicit TD_LinearCombination(const TargetDistributionOptions& to);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~LinearCombinationOfDistributions();
+  ~TD_LinearCombination();
   //
   void linkVesBias(bias::VesBias*);
   void linkAction(Action*);
@@ -64,17 +64,17 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(LinearCombinationOfDistributions,"LINEAR_COMBINATION")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_LinearCombination,"LINEAR_COMBINATION")
 
 
-void LinearCombinationOfDistributions::registerKeywords(Keywords& keys){
+void TD_LinearCombination::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination.");
   keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally. The weights are always normalized such that WEIGHTS=1,1 and WEIGHTS=0.5,0.5 is equal.");
 }
 
 
-LinearCombinationOfDistributions::LinearCombinationOfDistributions( const TargetDistributionOptions& to ):
+TD_LinearCombination::TD_LinearCombination( const TargetDistributionOptions& to ):
 TargetDistribution(to),
 distribution_pntrs_(0),
 grid_pntrs_(0),
@@ -104,20 +104,20 @@ ndist_(0)
 }
 
 
-LinearCombinationOfDistributions::~LinearCombinationOfDistributions(){
+TD_LinearCombination::~TD_LinearCombination(){
   for(unsigned int i=0; i<ndist_; i++){
     delete distribution_pntrs_[i];
   }
 }
 
 
-double LinearCombinationOfDistributions::getValue(const std::vector<double>& argument) const {
-  plumed_merror("getValue not implemented for LinearCombinationOfDistributions");
+double TD_LinearCombination::getValue(const std::vector<double>& argument) const {
+  plumed_merror("getValue not implemented for TD_LinearCombination");
   return 0.0;
 }
 
 
-void LinearCombinationOfDistributions::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+void TD_LinearCombination::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->setupGrids(arguments,min,max,nbins);
     if(distribution_pntrs_[i]->getDimension()!=this->getDimension()){
@@ -128,7 +128,7 @@ void LinearCombinationOfDistributions::setupAdditionalGrids(const std::vector<Va
 }
 
 
-void LinearCombinationOfDistributions::updateGrid(){
+void TD_LinearCombination::updateGrid(){
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->update();
   }
@@ -144,7 +144,7 @@ void LinearCombinationOfDistributions::updateGrid(){
 }
 
 
-void LinearCombinationOfDistributions::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void TD_LinearCombination::linkVesBias(bias::VesBias* vesbias_pntr_in){
   TargetDistribution::linkVesBias(vesbias_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
@@ -152,7 +152,7 @@ void LinearCombinationOfDistributions::linkVesBias(bias::VesBias* vesbias_pntr_i
 }
 
 
-void LinearCombinationOfDistributions::linkAction(Action* action_pntr_in){
+void TD_LinearCombination::linkAction(Action* action_pntr_in){
   TargetDistribution::linkAction(action_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkAction(action_pntr_in);
@@ -160,7 +160,7 @@ void LinearCombinationOfDistributions::linkAction(Action* action_pntr_in){
 }
 
 
-void LinearCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
+void TD_LinearCombination::linkBiasGrid(Grid* bias_grid_pntr_in){
   TargetDistribution::linkBiasGrid(bias_grid_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkBiasGrid(bias_grid_pntr_in);
@@ -168,7 +168,7 @@ void LinearCombinationOfDistributions::linkBiasGrid(Grid* bias_grid_pntr_in){
 }
 
 
-void LinearCombinationOfDistributions::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
+void TD_LinearCombination::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
   TargetDistribution::linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
@@ -176,7 +176,7 @@ void LinearCombinationOfDistributions::linkBiasWithoutCutoffGrid(Grid* bias_with
 }
 
 
-void LinearCombinationOfDistributions::linkFesGrid(Grid* fes_grid_pntr_in){
+void TD_LinearCombination::linkFesGrid(Grid* fes_grid_pntr_in){
   TargetDistribution::linkFesGrid(fes_grid_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkFesGrid(fes_grid_pntr_in);

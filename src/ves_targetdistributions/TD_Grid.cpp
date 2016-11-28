@@ -32,7 +32,7 @@
 
 namespace PLMD {
 
-class DistributionFromGrid : public TargetDistribution {
+class TD_Grid : public TargetDistribution {
   Grid* distGrid_;
   std::vector<double> minima_;
   std::vector<double> maxima_;
@@ -40,15 +40,15 @@ class DistributionFromGrid : public TargetDistribution {
   bool zero_outside_;
 public:
   static void registerKeywords( Keywords&);
-  explicit DistributionFromGrid( const TargetDistributionOptions& to );
+  explicit TD_Grid( const TargetDistributionOptions& to );
   double getValue(const std::vector<double>&) const ;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(DistributionFromGrid,"GRID_DIST")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_Grid,"GRID_DIST")
 
 
-void DistributionFromGrid::registerKeywords(Keywords& keys) {
+void TD_Grid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
@@ -56,7 +56,7 @@ void DistributionFromGrid::registerKeywords(Keywords& keys) {
 }
 
 
-DistributionFromGrid::DistributionFromGrid(const TargetDistributionOptions& to):
+TD_Grid::TD_Grid(const TargetDistributionOptions& to):
 TargetDistribution(to),
 distGrid_(NULL),
 minima_(0),
@@ -120,7 +120,7 @@ zero_outside_(false)
 }
 
 
-double DistributionFromGrid::getValue(const std::vector<double>& argument) const {
+double TD_Grid::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
   std::vector<double> arg = argument;
   for(unsigned int k=0; k<getDimension(); k++){

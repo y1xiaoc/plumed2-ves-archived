@@ -34,7 +34,7 @@
 
 namespace PLMD {
 
-class MathevalDistribution : public TargetDistribution {
+class TD_Matheval : public TargetDistribution {
 private:
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   //
@@ -53,29 +53,29 @@ private:
   bool use_beta_;
 public:
   static void registerKeywords( Keywords&);
-  explicit MathevalDistribution( const TargetDistributionOptions& to );
+  explicit TD_Matheval( const TargetDistributionOptions& to );
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~MathevalDistribution();
+  ~TD_Matheval();
 };
 
 #ifdef __PLUMED_HAS_MATHEVAL
-VES_REGISTER_TARGET_DISTRIBUTION(MathevalDistribution,"MATHEVAL_DIST")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_Matheval,"MATHEVAL_DIST")
 
 
-void MathevalDistribution::registerKeywords(Keywords& keys) {
+void TD_Matheval::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FUNCTION","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
 }
 
 
-MathevalDistribution::~MathevalDistribution(){
+TD_Matheval::~TD_Matheval(){
   evaluator_destroy(evaluator_pntr_);
 }
 
 
 
-MathevalDistribution::MathevalDistribution(const TargetDistributionOptions& to):
+TD_Matheval::TD_Matheval(const TargetDistributionOptions& to):
 TargetDistribution(to),
 evaluator_pntr_(NULL),
 //
@@ -133,20 +133,20 @@ use_beta_(false)
 }
 
 
-void MathevalDistribution::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins){
+void TD_Matheval::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins){
   if(cv_var_idx_.size()>0 && cv_var_idx_[cv_var_idx_.size()-1]>getDimension()){
     plumed_merror("mismatch between CVs given in FUNC and the dimension of the target distribution");
   }
 }
 
 
-double MathevalDistribution::getValue(const std::vector<double>& argument) const {
-  plumed_merror("getValue not implemented for MathevalDistribution");
+double TD_Matheval::getValue(const std::vector<double>& argument) const {
+  plumed_merror("getValue not implemented for TD_Matheval");
   return 0.0;
 }
 
 
-void MathevalDistribution::updateGrid(){
+void TD_Matheval::updateGrid(){
   std::vector<char*> var_char(cv_var_str_.size());
   std::vector<double> var_values(cv_var_str_.size());
   for(unsigned int j=0; j<cv_var_str_.size(); j++){

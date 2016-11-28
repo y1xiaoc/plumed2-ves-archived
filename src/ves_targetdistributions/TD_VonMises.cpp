@@ -34,7 +34,7 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class VonMisesDistribution: public TargetDistribution {
+class TD_VonMises: public TargetDistribution {
   // properties of the Gaussians
   std::vector< std::vector<double> > sigmas_;
   std::vector< std::vector<double> > kappas_;
@@ -45,15 +45,15 @@ class VonMisesDistribution: public TargetDistribution {
   double VonMisesDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit VonMisesDistribution(const TargetDistributionOptions& to);
+  explicit TD_VonMises(const TargetDistributionOptions& to);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(VonMisesDistribution,"VON_MISES")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_VonMises,"VON_MISES")
 
 
-void VonMisesDistribution::registerKeywords(Keywords& keys){
+void TD_VonMises::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","CENTER","The centers of the Von Mises distributions.");
   keys.add("numbered","SIGMA","The sigmas of the Von Mises distributions.");
@@ -62,7 +62,7 @@ void VonMisesDistribution::registerKeywords(Keywords& keys){
 }
 
 
-VonMisesDistribution::VonMisesDistribution( const TargetDistributionOptions& to ):
+TD_VonMises::TD_VonMises( const TargetDistributionOptions& to ):
 TargetDistribution(to),
 sigmas_(0),
 centers_(0),
@@ -129,7 +129,7 @@ ncenters_(0)
 }
 
 
-double VonMisesDistribution::getValue(const std::vector<double>& argument) const {
+double TD_VonMises::getValue(const std::vector<double>& argument) const {
   double value=0.0;
   for(unsigned int i=0;i<ncenters_;i++){
     value+=weights_[i]*VonMisesDiagonal(argument, centers_[i], kappas_[i]);
@@ -138,7 +138,7 @@ double VonMisesDistribution::getValue(const std::vector<double>& argument) const
 }
 
 
-double VonMisesDistribution::VonMisesDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& kappa) const {
+double TD_VonMises::VonMisesDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& kappa) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
     double arg = kappa[k]*cos( ((2*pi)/periods_[k])*(argument[k]-center[k]) );
