@@ -9,6 +9,7 @@ partitions        1
 basis_functions_1 BF_LEGENDRE ORDER=6 INTERVAL_MIN=-5.0 INTERVAL_MAX=+5.0
 input_coeffs       pot_coeffs_input.data
 output_coeffs      pot_coeffs_output.data
+output_coeffs_fmt  %22.8e
 initial_position   +4.0
 output_potential        potential.data
 output_potential_grid   300
