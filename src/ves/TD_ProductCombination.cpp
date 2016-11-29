@@ -29,9 +29,9 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL GAUSSIAN
+//+PLUMEDOC INTERNAL PRODUCT_COMBINATION
 /*
-  Gaussian target distribution
+  Product target distribution
 */
 //+ENDPLUMEDOC
 

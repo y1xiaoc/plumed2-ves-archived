@@ -31,9 +31,9 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL GAUSSIAN
+//+PLUMEDOC INTERNAL VON_MISES
 /*
-  Gaussian target distribution
+  von Mises target distribution
 */
 //+ENDPLUMEDOC
 

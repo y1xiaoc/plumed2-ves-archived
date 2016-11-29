@@ -34,9 +34,9 @@ class Action;
 
 namespace ves{
 
-//+PLUMEDOC INTERNAL GAUSSIAN
+//+PLUMEDOC INTERNAL LINEAR_COMBINATION
 /*
-  Gaussian target distribution
+  bla
 */
 //+ENDPLUMEDOC
 

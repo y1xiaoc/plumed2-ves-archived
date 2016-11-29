@@ -36,9 +36,9 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BIAS MOVINGRESTRAINT
+//+PLUMEDOC BIAS VES_LINEAR_EXPANSION
 /*
-
+   sfsfsf 
 */
 //+ENDPLUMEDOC
 

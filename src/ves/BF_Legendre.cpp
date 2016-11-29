@@ -28,6 +28,12 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC BASIS_FUNCTIONS BF_LEGENDRE
+/*
+   sfsfsf
+*/
+//+ENDPLUMEDOC
+
 class BF_Legendre : public BasisFunctions {
   bool scaled_;
   virtual void setupUniformIntegrals();

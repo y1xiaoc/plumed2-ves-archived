@@ -28,6 +28,12 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC BASIS_FUNCTIONS BF_POWERS
+/*
+   sfsfsf
+*/
+//+ENDPLUMEDOC
+
 class BF_Powers : public BasisFunctions {
   double inv_normfactor_;
   virtual void setupLabels();

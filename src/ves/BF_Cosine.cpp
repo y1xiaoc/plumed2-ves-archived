@@ -28,6 +28,13 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC BASIS_FUNCTIONS BF_COSINE
+/*
+   sfsfsf
+*/
+//+ENDPLUMEDOC
+
+
 class BF_Cosine : public BasisFunctions {
   virtual void setupLabels();
   virtual void setupUniformIntegrals();

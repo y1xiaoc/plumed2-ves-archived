@@ -33,9 +33,9 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL GAUSSIAN
+//+PLUMEDOC INTERNAL PROJECTED_WELL_TEMPERED
 /*
-  Gaussian target distribution
+  xxx target distribution
 */
 //+ENDPLUMEDOC
 

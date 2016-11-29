@@ -29,6 +29,12 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC INTERNAL UNIFORM
+/*
+  Uniform target distribution
+*/
+//+ENDPLUMEDOC
+
 class TD_Uniform : public TargetDistribution {
   double normalization_;
   double inverse_normalization_;

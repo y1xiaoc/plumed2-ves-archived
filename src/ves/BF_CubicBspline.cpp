@@ -28,6 +28,12 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC BASIS_FUNCTIONS BF_CUBIC_B_SPLINES
+/*
+   sfsfsf
+*/
+//+ENDPLUMEDOC
+
 class BF_CubicBspline : public BasisFunctions {
   double spacing_;
   double inv_spacing_;

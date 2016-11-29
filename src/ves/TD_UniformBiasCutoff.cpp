@@ -30,6 +30,13 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC INTERNAL UNIFORM_BIAS_CUTOFF
+/*
+  Uniform-cutoff target distribution
+*/
+//+ENDPLUMEDOC
+
+
 class TD_UniformBiasCutoff : public TargetDistribution {
 private:
 public:

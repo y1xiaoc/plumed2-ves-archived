@@ -28,6 +28,12 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC BASIS_FUNCTIONS BF_SINE
+/*
+   sfsfsf
+*/
+//+ENDPLUMEDOC
+
 class BF_Sine : public BasisFunctions {
   virtual void setupLabels();
   virtual void setupUniformIntegrals();

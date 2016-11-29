@@ -30,6 +30,12 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC BASIS_FUNCTIONS BF_COMBINED
+/*
+   sfsfsf
+*/
+//+ENDPLUMEDOC
+
 class BF_Combined : public BasisFunctions {
   std::vector<BasisFunctions*> basisf_pntrs_;
   virtual void setupLabels();

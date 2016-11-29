@@ -28,6 +28,13 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC BASIS_FUNCTIONS BF_CHEBYSHEV
+/*
+   sfsfsf
+*/
+//+ENDPLUMEDOC
+
+
 class BF_Chebyshev : public BasisFunctions {
   virtual void setupUniformIntegrals();
 public:
