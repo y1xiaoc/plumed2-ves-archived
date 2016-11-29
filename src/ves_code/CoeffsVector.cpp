@@ -19,12 +19,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include <vector>
-#include <cmath>
-#include <iostream>
-#include <sstream>
-#include <cstdio>
-#include <cfloat>
 
 #include "CoeffsVector.h"
 #include "CoeffsMatrix.h"
@@ -36,6 +30,14 @@
 #include "tools/Exception.h"
 #include "tools/Random.h"
 #include "tools/Communicator.h"
+
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include <sstream>
+#include <cstdio>
+#include <cfloat>
+
 
 namespace PLMD{
 

@@ -19,6 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #include "Optimizer.h"
 #include "CoeffsVector.h"
 #include "CoeffsMatrix.h"
@@ -30,7 +31,6 @@
 #include "tools/Communicator.h"
 #include "tools/File.h"
 #include "tools/FileBase.h"
-
 
 
 namespace PLMD{

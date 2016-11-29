@@ -19,13 +19,16 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #ifndef __PLUMED_ves_targetdistributions_TargetDistribution_h
 #define __PLUMED_ves_targetdistributions_TargetDistribution_h
 
-#include <vector>
-#include <string>
 #include "tools/Exception.h"
 #include "tools/Tools.h"
+
+#include <vector>
+#include <string>
+
 
 namespace PLMD {
 

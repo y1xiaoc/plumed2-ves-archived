@@ -19,9 +19,11 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #include "BasisFunctions.h"
 
 #include "core/ActionRegister.h"
+
 
 namespace PLMD{
 

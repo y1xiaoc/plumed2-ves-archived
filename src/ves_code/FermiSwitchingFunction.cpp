@@ -19,9 +19,12 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #include "FermiSwitchingFunction.h"
+
 #include "tools/Tools.h"
 #include "tools/Keywords.h"
+
 #include <vector>
 #include <limits>
 

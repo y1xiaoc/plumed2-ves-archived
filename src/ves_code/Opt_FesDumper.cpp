@@ -19,15 +19,13 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #include "Optimizer.h"
 #include "CoeffsVector.h"
 
 #include "tools/File.h"
-
 #include "core/ActionRegister.h"
 #include "core/PlumedMain.h"
-
-#include <iostream>
 
 
 namespace PLMD{

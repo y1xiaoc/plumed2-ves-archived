@@ -24,6 +24,7 @@
 
 #include "tools/File.h"
 
+
 namespace PLMD{
 
 CounterBase::CounterBase(const bool active):

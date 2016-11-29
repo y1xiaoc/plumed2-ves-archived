@@ -19,18 +19,20 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #include "TargetDistribution.h"
 #include "TargetDistModifer.h"
 #include "TargetDistributionRegister.h"
 #include "VesBias.h"
+#include "GridIntegrationWeights.h"
+#include "VesTools.h"
 
 #include "core/Value.h"
 #include "tools/Grid.h"
-#include "GridProjWeights.h"
-#include "GridIntegrationWeights.h"
-#include "VesTools.h"
 #include "tools/File.h"
 #include "tools/Keywords.h"
+
+#include "GridProjWeights.h"
 
 #include <iostream>
 

@@ -19,15 +19,16 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #ifndef __PLUMED_ves_tools_VesTools_h
 #define __PLUMED_ves_tools_VesTools_h
-
 
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <limits>
 #include <vector>
+
 
 namespace PLMD{
 

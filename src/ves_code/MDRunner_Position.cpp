@@ -19,11 +19,13 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #include "colvar/Colvar.h"
 #include "core/ActionRegister.h"
 
 #include <string>
 #include <cmath>
+
 
 namespace PLMD{
 namespace ves_mdrunner{

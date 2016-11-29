@@ -21,9 +21,11 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "VesTools.h"
+
 #include "tools/Grid.h"
 #include "tools/IFile.h"
 #include "tools/Exception.h"
+
 
 namespace PLMD{
 

@@ -19,11 +19,13 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #ifndef __PLUMED_ves_biases_LinearBasisSetExpansion_h
 #define __PLUMED_ves_biases_LinearBasisSetExpansion_h
 
 #include <vector>
 #include <string>
+
 
 namespace PLMD {
 

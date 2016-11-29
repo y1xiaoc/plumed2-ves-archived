@@ -19,6 +19,12 @@
    You should have received a copy of the GNU Lesser General Public License
    along with plumed.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+#include "BasisFunctions.h"
+#include "LinearBasisSetExpansion.h"
+#include "CoeffsVector.h"
+#include "GridIntegrationWeights.h"
+
 #include "cltools/CLTool.h"
 #include "cltools/CLToolRegister.h"
 #include "tools/Vector.h"
@@ -29,16 +35,12 @@
 #include "core/PlumedMain.h"
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
+
 #include <string>
 #include <cstdio>
 #include <cmath>
 #include <vector>
 #include <iostream>
-//
-#include "BasisFunctions.h"
-#include "LinearBasisSetExpansion.h"
-#include "CoeffsVector.h"
-#include "GridIntegrationWeights.h"
 
 #ifdef __PLUMED_HAS_MPI
 #include <mpi.h>

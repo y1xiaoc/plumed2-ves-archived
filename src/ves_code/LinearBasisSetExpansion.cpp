@@ -19,9 +19,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#include "tools/Keywords.h"
-#include "tools/Grid.h"
-#include "tools/Communicator.h"
 
 #include "LinearBasisSetExpansion.h"
 #include "VesBias.h"
@@ -31,10 +28,12 @@
 #include "BasisFunctions.h"
 #include "TargetDistribution.h"
 #include "TargetDistributionRegister.h"
+
+#include "tools/Keywords.h"
+#include "tools/Grid.h"
+#include "tools/Communicator.h"
+
 #include "GridProjWeights.h"
-
-
-
 
 namespace PLMD{
 namespace bias{

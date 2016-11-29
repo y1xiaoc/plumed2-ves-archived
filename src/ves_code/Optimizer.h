@@ -19,15 +19,19 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #ifndef __PLUMED_ves_optimizers_Optimizer_h
 #define __PLUMED_ves_optimizers_Optimizer_h
+
+#include "VesBias.h"
+
+#include "core/ActionPilot.h"
+#include "core/ActionWithValue.h"
 
 #include <vector>
 #include <string>
 #include <cmath>
-#include "core/ActionPilot.h"
-#include "core/ActionWithValue.h"
-#include "VesBias.h"
+
 
 #define PLUMED_OPTIMIZER_INIT(ao) Action(ao),Optimizer(ao)
 

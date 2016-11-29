@@ -19,13 +19,16 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 #ifndef __PLUMED_ves_basisfunctions_BasisFunctions_h
 #define __PLUMED_ves_basisfunctions_BasisFunctions_h
+
+#include "core/ActionWithValue.h"
 
 #include <vector>
 #include <string>
 #include <cmath>
-#include "core/ActionWithValue.h"
+
 
 #define PLUMED_BASISFUNCTIONS_INIT(ao) Action(ao),BasisFunctions(ao)
 
