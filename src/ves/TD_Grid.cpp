@@ -34,6 +34,17 @@
 namespace PLMD{
 namespace ves{
 
+
+//+PLUMEDOC VES_TARGETDIST GRID_DIST
+/*
+Grid target distribution
+
+\par Examples
+
+*/
+//+ENDPLUMEDOC
+
+
 class TD_Grid : public TargetDistribution {
   Grid* distGrid_;
   std::vector<double> minima_;

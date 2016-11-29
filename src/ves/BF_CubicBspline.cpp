@@ -28,9 +28,14 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_CUBIC_B_SPLINES
+//+PLUMEDOC VES_BASISF BF_CUBIC_B_SPLINES
 /*
-   sfsfsf
+Cubic B spline basis functions
+
+\par Examples
+
+\par Test
+
 */
 //+ENDPLUMEDOC
 

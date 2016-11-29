@@ -29,9 +29,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL PRODUCT_COMBINATION
+//+PLUMEDOC VES_TARGETDIST PRODUCT_COMBINATION
 /*
-  Product target distribution
+Product combination of target distributions
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

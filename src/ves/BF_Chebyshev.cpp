@@ -28,9 +28,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_CHEBYSHEV
+//+PLUMEDOC VES_BASISF BF_CHEBYSHEV
 /*
-   sfsfsf
+Chebyshev basis functions
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

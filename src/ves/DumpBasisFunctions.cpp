@@ -35,8 +35,11 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC FUNCTION DUMP_BASISFUNCTIONS
+//+PLUMEDOC VES_BASISF DUMP_BASISFUNCTIONS
 /*
+Dump basis functions to file
+
+\par Examples 
 
 */
 //+ENDPLUMEDOC

@@ -28,9 +28,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_SINE
+//+PLUMEDOC VES_BASISF BF_SINE
 /*
-   sfsfsf
+Sine basis functions
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

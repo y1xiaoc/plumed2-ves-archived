@@ -30,9 +30,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL UNIFORM_BIAS_CUTOFF
+//+PLUMEDOC VES_TARGETDIST UNIFORM_BIAS_CUTOFF
 /*
-  Uniform-cutoff target distribution
+Uniform-cutoff target distribution
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

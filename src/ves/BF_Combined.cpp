@@ -30,9 +30,19 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_COMBINED
+//+PLUMEDOC VES_BASISF BF_COMBINED
 /*
-   sfsfsf
+Combining other basis functions types
+
+\par Examples
+
+afafa
+fafaf
+
+\verbatim
+BF_COMBINED
+\endverbatim
+
 */
 //+ENDPLUMEDOC
 

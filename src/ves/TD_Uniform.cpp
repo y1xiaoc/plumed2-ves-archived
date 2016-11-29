@@ -29,9 +29,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL UNIFORM
+//+PLUMEDOC VES_TARGETDIST UNIFORM
 /*
-  Uniform target distribution
+Uniform target distribution
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

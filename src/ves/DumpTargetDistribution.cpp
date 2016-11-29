@@ -34,9 +34,11 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC FUNCTION DUMP_TARGET_DISTRIBUTION
+//+PLUMEDOC VES_BASISF DUMP_TARGET_DISTRIBUTION
 /*
-  vsvasgsga
+Dump target distribution to file
+
+\par Examples
 */
 //+ENDPLUMEDOC
 

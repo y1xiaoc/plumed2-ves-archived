@@ -28,9 +28,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_LEGENDRE
+//+PLUMEDOC VES_BASISF BF_LEGENDRE
 /*
-   sfsfsf
+Legendre basis functions
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

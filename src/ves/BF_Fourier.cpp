@@ -28,9 +28,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_FOURIER
+//+PLUMEDOC VES_BASISF BF_FOURIER
 /*
-   sfsfsf
+Fourier basis functions
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

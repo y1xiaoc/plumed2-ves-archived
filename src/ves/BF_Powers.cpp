@@ -28,9 +28,13 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_POWERS
+//+PLUMEDOC VES_BASISF BF_POWERS
 /*
-   sfsfsf
+Polynomial powers basis functions
+
+\par Examples
+
+
 */
 //+ENDPLUMEDOC
 

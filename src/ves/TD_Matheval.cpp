@@ -37,7 +37,10 @@ namespace ves{
 
 //+PLUMEDOC INTERNAL MATHEVAL_DIST
 /*
-  Matheval target distribution
+Matheval target distribution
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

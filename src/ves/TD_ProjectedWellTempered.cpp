@@ -33,9 +33,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL PROJECTED_WELL_TEMPERED
+//+PLUMEDOC VES_TARGETDIST PROJECTED_WELL_TEMPERED
 /*
-  xxx target distribution
+Projected well-tempered target distribution
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

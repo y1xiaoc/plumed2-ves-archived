@@ -34,9 +34,12 @@ class Action;
 
 namespace ves{
 
-//+PLUMEDOC INTERNAL LINEAR_COMBINATION
+//+PLUMEDOC VES_TARGETDIST LINEAR_COMBINATION
 /*
-  bla
+Linear combination of target distributions
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

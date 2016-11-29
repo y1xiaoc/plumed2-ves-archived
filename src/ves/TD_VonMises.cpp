@@ -31,9 +31,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL VON_MISES
+//+PLUMEDOC VES_TARGETDIST VON_MISES
 /*
-  von Mises target distribution
+Von Mises target distribution
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 

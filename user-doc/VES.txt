@@ -1,0 +1,32 @@
+/**
+
+\page vesintro Variationally Enhanced Sampling
+
+Variationally Enhanced Sampling (VES) is a method
+
+- rrrr
+- ffff
+
+- \subpage test1
+
+\page test1 Various things
+
+Here are some things
+
+- \subpage basisf
+- \subpage targetdist
+
+
+\page basisf Basis functions
+
+The following list contains the basis functions currently available in VES.
+
+@VES_BASISF@
+
+\page targetdist Target Distributions
+
+The following list contains the target distributions currently available in VES.
+
+@VES_TARGETDIST@
+
+*/

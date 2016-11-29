@@ -28,9 +28,12 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC BASIS_FUNCTIONS BF_COSINE
+//+PLUMEDOC VES_BASISF BF_COSINE
 /*
-   sfsfsf
+Cosine basis functions
+
+\par Examples
+
 */
 //+ENDPLUMEDOC
 
