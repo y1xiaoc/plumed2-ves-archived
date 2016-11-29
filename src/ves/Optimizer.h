@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_optimizers_Optimizer_h
-#define __PLUMED_ves_optimizers_Optimizer_h
+#ifndef __PLUMED_ves_Optimizer_h
+#define __PLUMED_ves_Optimizer_h
 
 #include "VesBias.h"
 
@@ -45,7 +45,7 @@ Abstract base class for implenting new optimization methods
 class OFile;
 
 namespace ves{
-  
+
 class CoeffsVector;
 class VesBias;
 

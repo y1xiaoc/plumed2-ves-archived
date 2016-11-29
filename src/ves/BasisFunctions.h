@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_basisfunctions_BasisFunctions_h
-#define __PLUMED_ves_basisfunctions_BasisFunctions_h
+#ifndef __PLUMED_ves_BasisFunctions_h
+#define __PLUMED_ves_BasisFunctions_h
 
 #include "core/ActionWithValue.h"
 

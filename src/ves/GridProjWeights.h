@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_tools_GridProjWeights_h
-#define __PLUMED_ves_tools_GridProjWeights_h
+#ifndef __PLUMED_ves_GridProjWeights_h
+#define __PLUMED_ves_GridProjWeights_h
 
 
 namespace PLMD{

@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_targetdistributions_TargetDistModifer_h
-#define __PLUMED_ves_targetdistributions_TargetDistModifer_h
+#ifndef __PLUMED_ves_TargetDistModifer_h
+#define __PLUMED_ves_TargetDistModifer_h
 
 namespace PLMD{
 namespace ves{

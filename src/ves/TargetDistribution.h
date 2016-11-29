@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_targetdistributions_TargetDistribution_h
-#define __PLUMED_ves_targetdistributions_TargetDistribution_h
+#ifndef __PLUMED_ves_TargetDistribution_h
+#define __PLUMED_ves_TargetDistribution_h
 
 #include "tools/Exception.h"
 #include "tools/Tools.h"

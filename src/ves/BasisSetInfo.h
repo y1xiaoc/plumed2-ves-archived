@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_basisfunctions_BasisSetInfo_h
-#define __PLUMED_ves_basisfunctions_BasisSetInfo_h
+#ifndef __PLUMED_ves_BasisSetInfo_h
+#define __PLUMED_ves_BasisSetInfo_h
 
 #include <vector>
 #include <string>
@@ -36,7 +36,7 @@ class IFile;
 class OFile;
 
 namespace ves{
-  
+
 class BasisFunctions;
 
 class BasisSetInfo

@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_biases_VesBias_h
-#define __PLUMED_ves_biases_VesBias_h
+#ifndef __PLUMED_ves_VesBias_h
+#define __PLUMED_ves_VesBias_h
 
 #include "CoeffsVector.h"
 #include "CoeffsMatrix.h"

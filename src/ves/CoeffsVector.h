@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_tools_CoeffsVector_h
-#define __PLUMED_ves_tools_CoeffsVector_h
+#ifndef __PLUMED_ves_CoeffsVector_h
+#define __PLUMED_ves_CoeffsVector_h
 
 #include "CoeffsBase.h"
 

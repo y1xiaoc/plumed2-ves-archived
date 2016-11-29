@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_tools_FermiFermiSwitchingFunction_h
-#define __PLUMED_ves_tools_FermiFermiSwitchingFunction_h
+#ifndef __PLUMED_ves_FermiSwitchingFunction_h
+#define __PLUMED_ves_FermiSwitchingFunction_h
 
 #include <string>
 

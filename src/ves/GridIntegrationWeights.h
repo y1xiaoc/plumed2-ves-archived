@@ -20,8 +20,8 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#ifndef __PLUMED_ves_tools_GridIntegrationWeights_h
-#define __PLUMED_ves_tools_GridIntegrationWeights_h
+#ifndef __PLUMED_ves_GridIntegrationWeights_h
+#define __PLUMED_ves_GridIntegrationWeights_h
 
 #include <vector>
 #include <string>
