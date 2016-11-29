@@ -29,7 +29,6 @@
 #include <limits>
 
 
-using namespace std;
 namespace PLMD{
 
 //+PLUMEDOC INTERNAL fermiswitchingfunction
@@ -45,9 +44,9 @@ void FermiSwitchingFunction::registerKeywords( Keywords& keys ){
 }
 
 void FermiSwitchingFunction::set(const std::string& definition,std::string& errormsg){
-  vector<string> data=Tools::getWords(definition);
+  std::vector<std::string> data=Tools::getWords(definition);
   if( data.size()<1 ) errormsg="missing all input for switching function";
-  string name=data[0];
+  std::string name=data[0];
   data.erase(data.begin());
   if(name!="FERMI"){errormsg="only FERMI is supported";}
   type=fermi;

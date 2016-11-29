@@ -33,9 +33,6 @@
 #include "core/PlumedMain.h"
 
 
-using namespace std;
-
-
 namespace PLMD{
 namespace bias{
 

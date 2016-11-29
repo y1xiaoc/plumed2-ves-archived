@@ -47,8 +47,6 @@
 #endif
 
 
-using namespace std;
-
 namespace PLMD{
 namespace md_runner{
 
@@ -65,7 +63,7 @@ given with linear basis set expansion. Supports 1 to 3 dimensions.
 
 class MDRunner_LinearExpansion : public PLMD::CLTool {
 public:
-  string description() const {return "dynamics of one atom on energy landscape";}
+  std::string description() const {return "dynamics of one atom on energy landscape";}
   static void registerKeywords( Keywords& keys );
   explicit MDRunner_LinearExpansion( const CLToolOptions& co );
   int main( FILE* in, FILE* out, PLMD::Communicator& pc);
@@ -354,7 +352,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   std::string stats_filename = "stats.out";
   std::string plumed_input = plumed_inputfiles[0];
   if(inter.Get_size()>1){
-    string suffix;
+    std::string suffix;
     Tools::convert(inter.Get_rank(),suffix);
     plumed_logfile = FileBase::appendSuffix(plumed_logfile,"."+suffix);
     stats_filename = FileBase::appendSuffix(stats_filename,"."+suffix);
@@ -441,11 +439,11 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
       else {
         if(positions[0][k]>interval_max[k]){
           positions[0][k]=interval_max[k];
-          velocities[0][k]=-abs(velocities[0][k]);
+          velocities[0][k]=-std::abs(velocities[0][k]);
         }
         if(positions[0][k]<interval_min[k]){
           positions[0][k]=interval_min[k];
-          velocities[0][k]=-abs(velocities[0][k]);
+          velocities[0][k]=-std::abs(velocities[0][k]);
         }
       }
     }
