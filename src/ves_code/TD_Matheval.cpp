@@ -102,7 +102,7 @@ use_beta_(false)
   int var_count;
   evaluator_get_variables(evaluator_pntr_,&var_names,&var_count);
   //
-  for(unsigned int i=0; i<var_count; i++){
+  for(int i=0; i<var_count; i++){
     std::string curr_var = var_names[i];
     unsigned int cv_idx;
     if(curr_var.substr(0,cv_var_prefix_str_.size())==cv_var_prefix_str_ && Tools::convert(curr_var.substr(cv_var_prefix_str_.size()),cv_idx) && cv_idx>0){
