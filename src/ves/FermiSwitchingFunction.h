@@ -30,6 +30,9 @@ namespace PLMD {
 
 class Keywords;
 
+namespace ves {
+
+
 /// \ingroup TOOLBOX
 /// Small class to compute fermi switching function.
 /// kept similar to the orignal SwitchingFunction class.
@@ -65,6 +68,7 @@ public:
   double get_r0() const;
 };
 
+}
 }
 
 #endif

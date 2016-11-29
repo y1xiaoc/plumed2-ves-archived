@@ -28,6 +28,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 std::vector<double> GridIntegrationWeights::getIntegrationWeights(const Grid* grid_pntr, const std::string& fname_weights_grid, const std::string& weights_type) {
   std::vector<double> dx = grid_pntr->getDx();
@@ -90,10 +91,5 @@ std::vector<double> GridIntegrationWeights::getOneDimensionalTrapezoidalWeights(
 }
 
 
-
-
-
-
-
-
+}
 }

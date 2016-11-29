@@ -32,7 +32,8 @@
 #endif
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 class TD_Matheval : public TargetDistribution {
 private:
@@ -197,4 +198,5 @@ void TD_Matheval::updateGrid(){
 #endif
 
 
+}
 }

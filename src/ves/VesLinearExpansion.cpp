@@ -34,7 +34,7 @@
 
 
 namespace PLMD{
-namespace bias{
+namespace ves{
 
 //+PLUMEDOC BIAS MOVINGRESTRAINT
 /*

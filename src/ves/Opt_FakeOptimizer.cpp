@@ -27,6 +27,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class Opt_FakeOptimizer : public Optimizer {
 
@@ -71,4 +72,5 @@ PLUMED_OPTIMIZER_INIT(ao)
 void Opt_FakeOptimizer::coeffsUpdate(const unsigned int c_id) {}
 
 
+}
 }

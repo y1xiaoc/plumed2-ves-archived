@@ -33,7 +33,7 @@
 
 
 namespace PLMD{
-namespace generic{
+namespace ves{
 
 //+PLUMEDOC FUNCTION DUMP_BASISFUNCTIONS
 /*

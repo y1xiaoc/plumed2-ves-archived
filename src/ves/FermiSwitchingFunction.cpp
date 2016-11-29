@@ -30,6 +30,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 //+PLUMEDOC INTERNAL fermiswitchingfunction
 /*
@@ -139,4 +140,5 @@ FermiSwitchingFunction::~FermiSwitchingFunction(){
 }
 
 
+}
 }

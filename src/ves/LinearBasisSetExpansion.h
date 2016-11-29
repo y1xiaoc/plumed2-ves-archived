@@ -35,12 +35,14 @@ class Value;
 class Communicator;
 class Grid;
 class OFile;
+
+
+namespace ves{
+
 class CoeffsVector;
 class BasisFunctions;
 class TargetDistribution;
-
-namespace bias{
-  class VesBias;
+class VesBias;
 
 
 class LinearBasisSetExpansion{
@@ -48,7 +50,7 @@ private:
   std::string label_;
   //
   Action* action_pntr_;
-  bias::VesBias* vesbias_pntr_;
+  ves::VesBias* vesbias_pntr_;
   Communicator& mycomm_;
   bool serial_;
   //
@@ -114,7 +116,7 @@ public:
   void setSerial() {serial_=true;}
   void setParallel() {serial_=false;}
   //
-  void linkVesBias(bias::VesBias*);
+  void linkVesBias(ves::VesBias*);
   void linkAction(Action*);
   // calculate bias and derivatives
   static double getBiasAndForces(const std::vector<double>&, bool&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);

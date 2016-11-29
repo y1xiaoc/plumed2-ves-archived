@@ -33,13 +33,11 @@ class Action;
 class Value;
 class IFile;
 class OFile;
+
+namespace ves{
+
 class BasisFunctions;
-
-namespace bias{
-  class VesBias;
-}
-
-
+class VesBias;
 
 /// \ingroup TOOLBOX
 class CoeffsBase
@@ -64,7 +62,7 @@ private:
   bool active;
   //
   Action* action_pntr_;
-  bias::VesBias* vesbias_pntr_;
+  ves::VesBias* vesbias_pntr_;
   //
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
@@ -125,9 +123,9 @@ public:
   CoeffsType getType() const {return coeffs_type_;}
   std::string getTypeStr() const;
   void setType(const CoeffsType coeffs_type);
-  void linkVesBias(bias::VesBias*);
+  void linkVesBias(ves::VesBias*);
   void linkAction(Action*);
-  bias::VesBias* getPntrToVesBias() const {return vesbias_pntr_;}
+  ves::VesBias* getPntrToVesBias() const {return vesbias_pntr_;}
   Action* getPntrToAction() const {return action_pntr_;}
   bool isGenericCoeffs() const {return coeffs_type_==Generic;}
   bool isLinearBasisSetCoeffs() const {return coeffs_type_==LinearBasisSet;}
@@ -256,4 +254,6 @@ std::vector<unsigned int> CoeffsBase::getIndices(const size_t index) const {
 
 
 }
+}
+
 #endif

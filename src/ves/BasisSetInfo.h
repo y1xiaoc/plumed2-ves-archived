@@ -34,9 +34,11 @@ namespace PLMD{
 class Value;
 class IFile;
 class OFile;
+
+namespace ves{
+  
 class BasisFunctions;
 
-/// \ingroup TOOLBOX
 class BasisSetInfo
 {
 private:
@@ -75,6 +77,7 @@ public:
   std::string getBasisSetDescription(std::vector<unsigned int>&) const;
   //
 };
+}
 }
 
 

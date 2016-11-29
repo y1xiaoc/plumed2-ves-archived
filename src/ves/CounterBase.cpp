@@ -26,6 +26,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 CounterBase::CounterBase(const bool active):
 counter(0),
@@ -125,4 +126,5 @@ void CounterBase::writeCounterInfoToFile(OFile& ofile) const {
 }
 
 
+}
 }

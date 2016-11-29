@@ -31,7 +31,8 @@
 #include "tools/File.h"
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 class TD_Grid : public TargetDistribution {
   Grid* distGrid_;
@@ -139,4 +140,5 @@ double TD_Grid::getValue(const std::vector<double>& argument) const {
 }
 
 
+}
 }

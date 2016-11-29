@@ -34,6 +34,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 CoeffsBase::CoeffsBase(
   const std::string& label,
@@ -310,7 +311,7 @@ void CoeffsBase::setType(const CoeffsType coeffs_type) {
 }
 
 
-void CoeffsBase::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void CoeffsBase::linkVesBias(ves::VesBias* vesbias_pntr_in){
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 }
@@ -496,4 +497,5 @@ bool CoeffsBase::getIterationCounterAndTimeFromFile(IFile& ifile) {
 }
 
 
+}
 }

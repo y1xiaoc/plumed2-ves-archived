@@ -27,6 +27,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class Opt_RobbinsMonroSGD : public Optimizer {
 private:
@@ -79,4 +80,5 @@ void Opt_RobbinsMonroSGD::coeffsUpdate(const unsigned int c_id) {
 }
 
 
+}
 }

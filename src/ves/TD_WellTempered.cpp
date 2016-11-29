@@ -28,7 +28,8 @@
 #include "tools/Grid.h"
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 //+PLUMEDOC INTERNAL GAUSSIAN
 /*
@@ -94,4 +95,5 @@ void TD_WellTempered::updateGrid(){
 }
 
 
+}
 }

@@ -36,7 +36,7 @@
 #include "GridProjWeights.h"
 
 namespace PLMD{
-namespace bias{
+namespace ves{
 
 //+PLUMEDOC VES LinearBasisSetExpansion
 /*
@@ -136,7 +136,7 @@ bool LinearBasisSetExpansion::isStaticTargetDistFileOutputActive() const {
 }
 
 
-void LinearBasisSetExpansion::linkVesBias(bias::VesBias* vesbias_pntr_in) {
+void LinearBasisSetExpansion::linkVesBias(ves::VesBias* vesbias_pntr_in) {
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 

@@ -25,6 +25,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 BasisSetInfo::BasisSetInfo(
   const std::string& basisset_label,
@@ -125,4 +126,5 @@ std::string BasisSetInfo::getBasisSetDescription(std::vector<unsigned int>& indi
 }
 
 
+}
 }

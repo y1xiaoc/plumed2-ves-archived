@@ -28,6 +28,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class BF_Combined : public BasisFunctions {
   std::vector<BasisFunctions*> basisf_pntrs_;
@@ -176,4 +177,5 @@ void BF_Combined::setupUniformIntegrals() {
 }
 
 
+}
 }

@@ -31,6 +31,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 
 
@@ -64,4 +65,6 @@ TargetDistributionRegister& targetDistributionRegister();
   } classname##RegisterMeObject;
 
 }
+}
+
 #endif

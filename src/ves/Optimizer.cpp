@@ -34,6 +34,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 Optimizer::Optimizer(const ActionOptions&ao):
 Action(ao),
@@ -95,7 +96,7 @@ isFirstStep(true)
   bias_pntrs_.resize(nbiases_);
   //
   for(unsigned int i=0; i<nbiases_; i++) {
-    bias_pntrs_[i]=plumed.getActionSet().selectWithLabel<bias::VesBias*>(bias_labels[i]);
+    bias_pntrs_[i]=plumed.getActionSet().selectWithLabel<ves::VesBias*>(bias_labels[i]);
     if(!bias_pntrs_[i]){plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES biases.");}
     //
     bias_pntrs_[i]->linkOptimizer(this);
@@ -910,7 +911,7 @@ void Optimizer::turnOffHessian() {
 }
 
 
-std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in, const bool diagonal_hessian) {
+std::vector<CoeffsMatrix*> Optimizer::enableHessian(ves::VesBias* bias_pntr_in, const bool diagonal_hessian) {
   plumed_massert(use_hessian_,"the Hessian should not be used");
   bias_pntr_in->enableHessian(diagonal_hessian);
   std::vector<CoeffsMatrix*> hessian_pntrs_out = bias_pntr_in->getHessianPntrs();
@@ -921,7 +922,7 @@ std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in,
 }
 
 
-// CoeffsMatrix* Optimizer::switchToDiagonalHessian(bias::VesBias* bias_pntr_in) {
+// CoeffsMatrix* Optimizer::switchToDiagonalHessian(ves::VesBias* bias_pntr_in) {
 //   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
 //   diagonal_hessian_=true;
 //   bias_pntr_in->enableHessian(diagonal_hessian_);
@@ -933,7 +934,7 @@ std::vector<CoeffsMatrix*> Optimizer::enableHessian(bias::VesBias* bias_pntr_in,
 // }
 
 
-// CoeffsMatrix* Optimizer::switchToFullHessian(bias::VesBias* bias_pntr_in) {
+// CoeffsMatrix* Optimizer::switchToFullHessian(ves::VesBias* bias_pntr_in) {
 //   plumed_massert(use_hessian_,"it does not make sense to switch to diagonal Hessian if it Hessian is not used");
 //   diagonal_hessian_=false;
 //   bias_pntr_in->enableHessian(diagonal_hessian_);
@@ -1194,4 +1195,5 @@ void Optimizer::writeTargetDistProjOutputFiles() const {
 
 
 
+}
 }

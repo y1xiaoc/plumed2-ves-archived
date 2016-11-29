@@ -30,7 +30,8 @@
 #include "GridProjWeights.h"
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 //+PLUMEDOC INTERNAL GAUSSIAN
 /*
@@ -109,8 +110,5 @@ void TD_ProjectedWellTempered::updateGrid(){
   logTargetDistGrid().setMinToZero();
 }
 
-
-
-
-
+}
 }

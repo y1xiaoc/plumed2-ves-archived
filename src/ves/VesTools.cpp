@@ -28,6 +28,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 
 void VesTools::copyGridValues(Grid* grid_pntr_orig, Grid* grid_pntr_copy) {
@@ -89,4 +90,5 @@ unsigned int VesTools::getGridFileInfo(const std::string& filepath, std::string&
 }
 
 
+}
 }

@@ -31,6 +31,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 void BasisFunctions::registerKeywords(Keywords& keys){
   Action::registerKeywords(keys);
@@ -226,7 +227,7 @@ void BasisFunctions::printInfo() const {
 }
 
 
-void BasisFunctions::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void BasisFunctions::linkVesBias(ves::VesBias* vesbias_pntr_in){
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 }
@@ -377,4 +378,5 @@ void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile
 }
 
 
+}
 }

@@ -36,7 +36,8 @@
 
 #include <iostream>
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
 words(input){}
@@ -128,7 +129,7 @@ void TargetDistribution::setDimension(const unsigned int dimension){
 }
 
 
-void TargetDistribution::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void TargetDistribution::linkVesBias(ves::VesBias* vesbias_pntr_in){
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 }
@@ -386,4 +387,5 @@ void TargetDistribution::clearLogTargetDistGrid(){
   log_targetdist_grid_pntr_->clear();
 }
 
+}
 }

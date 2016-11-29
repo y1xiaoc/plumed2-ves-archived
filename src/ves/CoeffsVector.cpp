@@ -40,6 +40,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 CoeffsVector::CoeffsVector(
   const std::string& label,
@@ -861,4 +862,5 @@ size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_co
 }
 
 
+}
 }

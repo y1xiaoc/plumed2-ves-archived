@@ -28,7 +28,7 @@
 
 
 namespace PLMD{
-namespace ves_mdrunner{
+namespace ves{
 
 class MDRunner_Position : public Colvar {
 public:

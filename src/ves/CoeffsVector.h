@@ -37,6 +37,9 @@ class Value;
 class IFile;
 class OFile;
 class Communicator;
+
+namespace ves{
+
 class BasisFunctions;
 class CoeffsMatrix;
 
@@ -224,6 +227,8 @@ double CoeffsVector::getValue(const std::vector<unsigned int>& indices) const {
   return data[getIndex(indices)];
 }
 
+
+}
 
 }
 

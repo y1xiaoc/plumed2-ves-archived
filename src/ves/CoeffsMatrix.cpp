@@ -40,6 +40,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
@@ -709,4 +710,5 @@ void CoeffsMatrix::writeDataFullToFile(OFile& ofile) {
 }
 
 
+}
 }

@@ -48,7 +48,7 @@
 
 
 namespace PLMD{
-namespace md_runner{
+namespace ves{
 
 //+PLUMEDOC TOOLS guineapig
 /*
@@ -69,7 +69,7 @@ public:
   int main( FILE* in, FILE* out, PLMD::Communicator& pc);
 private:
   unsigned int dim;
-  bias::LinearBasisSetExpansion* potential_expansion_pntr;
+  LinearBasisSetExpansion* potential_expansion_pntr;
   //
   double calc_energy( const std::vector<Vector>& , std::vector<Vector>& );
   double calc_temp( const std::vector<Vector>& );
@@ -236,7 +236,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   }
   Communicator comm_dummy;
   CoeffsVector* coeffs_pntr = new CoeffsVector("pot.coeffs",args,basisf_pntrs,comm_dummy,false);
-  potential_expansion_pntr = new bias::LinearBasisSetExpansion("potential",1.0/temp,comm_dummy,args,basisf_pntrs,coeffs_pntr);
+  potential_expansion_pntr = new LinearBasisSetExpansion("potential",1.0/temp,comm_dummy,args,basisf_pntrs,coeffs_pntr);
 
   std::string template_coeffs_fname="";
   parse("template_coeffs_file",template_coeffs_fname);

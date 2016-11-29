@@ -28,7 +28,8 @@
 #include "tools/Tools.h"
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 //+PLUMEDOC INTERNAL GAUSSIAN
 /*
@@ -150,4 +151,5 @@ double TD_VonMises::VonMisesDiagonal(const std::vector<double>& argument, const 
 }
 
 
+}
 }

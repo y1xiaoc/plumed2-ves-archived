@@ -30,18 +30,18 @@
 #include <string>
 
 
-namespace PLMD {
+namespace PLMD{
 
 class Grid;
 class Value;
 class Keywords;
 class Action;
-//
-class TargetDistModifer;
 
-namespace bias{
-  class VesBias;
-}
+namespace ves{
+
+class TargetDistModifer;
+class VesBias;
+
 
 class TargetDistributionOptions{
 friend class TargetDistributionRegister;
@@ -78,7 +78,7 @@ private:
   std::vector<TargetDistModifer*> targetdist_modifer_pntrs_;
   //
   Action* action_pntr_;
-  bias::VesBias* vesbias_pntr_;
+  ves::VesBias* vesbias_pntr_;
   //
   bool needs_bias_grid_;
   bool needs_bias_withoutcutoff_grid_;
@@ -119,7 +119,7 @@ protected:
   void setBiasWithoutCutoffGridNeeded(){needs_bias_withoutcutoff_grid_=true;}
   void setFesGridNeeded(){needs_fes_grid_=true;}
   //
-  bias::VesBias* getPntrToVesBias() const;
+  ves::VesBias* getPntrToVesBias() const;
   Action* getPntrToAction() const;
   //
   virtual void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&) {}
@@ -171,7 +171,7 @@ public:
   // get type of distribution
   std::string getName()const{return name_;};
   //
-  virtual void linkVesBias(bias::VesBias*);
+  virtual void linkVesBias(ves::VesBias*);
   virtual void linkAction(Action*);
   //
   virtual void linkBiasGrid(Grid*);
@@ -202,7 +202,7 @@ public:
 
 
 inline
-bias::VesBias* TargetDistribution::getPntrToVesBias() const {
+ves::VesBias* TargetDistribution::getPntrToVesBias() const {
   plumed_massert(vesbias_pntr_!=NULL,"the VES bias has not been linked");
   return vesbias_pntr_;
 }
@@ -253,5 +253,6 @@ bool TargetDistribution::parseNumberedVector( const std::string& key, const unsi
 
 
 
+}
 }
 #endif

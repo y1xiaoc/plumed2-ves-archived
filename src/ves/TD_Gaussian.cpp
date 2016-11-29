@@ -26,7 +26,8 @@
 #include "tools/Keywords.h"
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 //+PLUMEDOC INTERNAL GAUSSIAN
 /*
@@ -191,4 +192,5 @@ double TD_Gaussian::Gaussian2D(const std::vector<double>& argument, const std::v
   return value;
 }
 
+}
 }

@@ -27,7 +27,12 @@
 #include "tools/Grid.h"
 
 
-namespace PLMD {
+namespace PLMD{
+
+// class Grid;
+class Action;
+
+namespace ves{
 
 //+PLUMEDOC INTERNAL GAUSSIAN
 /*
@@ -35,12 +40,7 @@ namespace PLMD {
 */
 //+ENDPLUMEDOC
 
-class Grid;
-class Action;
-
-namespace bias{
-  class VesBias;
-}
+class VesBias;
 
 class TD_LinearCombination: public TargetDistribution {
 private:
@@ -56,7 +56,7 @@ public:
   double getValue(const std::vector<double>&) const;
   ~TD_LinearCombination();
   //
-  void linkVesBias(bias::VesBias*);
+  void linkVesBias(ves::VesBias*);
   void linkAction(Action*);
   //
   void linkBiasGrid(Grid*);
@@ -146,7 +146,7 @@ void TD_LinearCombination::updateGrid(){
 }
 
 
-void TD_LinearCombination::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void TD_LinearCombination::linkVesBias(ves::VesBias* vesbias_pntr_in){
   TargetDistribution::linkVesBias(vesbias_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
@@ -186,4 +186,5 @@ void TD_LinearCombination::linkFesGrid(Grid* fes_grid_pntr_in){
 }
 
 
+}
 }

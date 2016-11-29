@@ -26,6 +26,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class BF_Cosine : public BasisFunctions {
   virtual void setupLabels();
@@ -111,4 +112,5 @@ void BF_Cosine::setupUniformIntegrals() {
 }
 
 
+}
 }

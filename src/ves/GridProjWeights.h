@@ -25,6 +25,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 
 class MarginalWeight:public WeightBase{
@@ -42,6 +43,7 @@ class FesWeight:public WeightBase{
       double projectOuterLoop(double &v){return -invbeta*std::log(v);}
 };
 
+}
 }
 
 #endif

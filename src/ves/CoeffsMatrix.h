@@ -37,11 +37,13 @@ class Value;
 class IFile;
 class OFile;
 class Communicator;
+
+namespace ves{
+
 class BasisFunctions;
 class CoeffsVector;
 
 
-/// \ingroup TOOLBOX
 class CoeffsMatrix:
   public CoeffsBase
 {
@@ -203,6 +205,7 @@ public:
   Communicator& getCommunicator() const {return mycomm;}
 
 };
+}
 }
 
 

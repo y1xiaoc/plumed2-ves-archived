@@ -32,12 +32,10 @@
 
 namespace PLMD{
 
-
 class Grid;
 
+namespace ves{
 
-/// \ingroup TOOLBOX
-/// Empty class which just contains several (static) tools
 class VesTools{
 public:
   // Convert double into a string with more digits
@@ -63,6 +61,7 @@ void VesTools::convertDbl2Str(const double value,std::string& str){
 }
 
 
+}
 }
 
 #endif

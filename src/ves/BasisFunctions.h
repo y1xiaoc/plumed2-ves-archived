@@ -40,13 +40,12 @@ Abstract base class for implenting new 1D basis sets.
 */
 
 class Action;
-class TargetDistribution;
 class Grid;
 
-namespace bias{
-  class VesBias;
-}
+namespace ves{
 
+class VesBias;
+class TargetDistribution;
 
 class BasisFunctions :
   public ActionWithValue
@@ -96,7 +95,7 @@ private:
   // the integrals of the basis functions over the interval on which they are defined
   std::vector <double> uniform_integrals_;
   //
-  bias::VesBias* vesbias_pntr_;
+  ves::VesBias* vesbias_pntr_;
   Action* action_pntr_;
 protected:
   // setup various stuff
@@ -169,9 +168,9 @@ public:
   std::string getBasisFunctionLabel(const unsigned int index) const {return bf_labels_[index];}
   std::vector<std::string> getBasisFunctionLabels() const {return bf_labels_;}
   //
-  void linkVesBias(bias::VesBias*);
+  void linkVesBias(ves::VesBias*);
   void linkAction(Action*);
-  bias::VesBias* getPntrToVesBias() const;
+  ves::VesBias* getPntrToVesBias() const;
   Action* getPntrToAction() const;
   //
   double translateArgument(const double, bool&) const;
@@ -200,7 +199,7 @@ void BasisFunctions::setNumberOfBasisFunctions(const unsigned int nbasis_in) {
 
 
 inline
-bias::VesBias* BasisFunctions::getPntrToVesBias() const {
+ves::VesBias* BasisFunctions::getPntrToVesBias() const {
   plumed_massert(vesbias_pntr_!=NULL,"the VES bias has not been linked");
   return vesbias_pntr_;
 }
@@ -311,6 +310,7 @@ void BasisFunctions::addKeywordToList(const std::string& keyword, const bool val
 }
 
 
+}
 }
 
 #endif

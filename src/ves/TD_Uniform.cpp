@@ -26,7 +26,8 @@
 #include "tools/Keywords.h"
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 class TD_Uniform : public TargetDistribution {
   double normalization_;
@@ -93,4 +94,5 @@ double TD_Uniform::getValue(const std::vector<double>& argument) const {
 }
 
 
+}
 }

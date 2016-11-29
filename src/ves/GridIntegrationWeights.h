@@ -33,7 +33,7 @@ namespace PLMD{
 class Grid;
 
 
-/// \ingroup TOOLBOX
+namespace ves{
 
 class GridIntegrationWeights{
 private:
@@ -44,6 +44,7 @@ public:
 
 
 
+}
 }
 
 #endif

@@ -30,7 +30,8 @@ namespace PLMD{
 class IFile;
 class OFile;
 
-/// \ingroup TOOLBOX
+namespace ves{
+
 class CounterBase{
 private:
   unsigned int counter;
@@ -62,6 +63,7 @@ public:
   void writeCounterInfoToFile(OFile&) const;
   //
 };
+}
 }
 
 #endif

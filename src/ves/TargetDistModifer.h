@@ -23,7 +23,8 @@
 #ifndef __PLUMED_ves_targetdistributions_TargetDistModifer_h
 #define __PLUMED_ves_targetdistributions_TargetDistModifer_h
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 class TargetDistModifer{
 public:
@@ -45,4 +46,6 @@ public:
 
 
 }
+}
+
 #endif

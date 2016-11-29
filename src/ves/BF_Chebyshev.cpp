@@ -26,6 +26,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class BF_Chebyshev : public BasisFunctions {
   virtual void setupUniformIntegrals();
@@ -103,4 +104,5 @@ void BF_Chebyshev::setupUniformIntegrals() {
 }
 
 
+}
 }

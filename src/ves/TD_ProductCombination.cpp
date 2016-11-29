@@ -26,7 +26,8 @@
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 //+PLUMEDOC INTERNAL GAUSSIAN
 /*
@@ -47,7 +48,7 @@ public:
   double getValue(const std::vector<double>&) const;
   ~TD_ProductCombination();
   //
-  void linkVesBias(bias::VesBias*);
+  void linkVesBias(ves::VesBias*);
   void linkAction(Action*);
   void linkBiasGrid(Grid*);
   void linkBiasWithoutCutoffGrid(Grid*);
@@ -137,7 +138,7 @@ void TD_ProductCombination::updateGrid(){
 }
 
 
-void TD_ProductCombination::linkVesBias(bias::VesBias* vesbias_pntr_in){
+void TD_ProductCombination::linkVesBias(ves::VesBias* vesbias_pntr_in){
   TargetDistribution::linkVesBias(vesbias_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
@@ -177,4 +178,5 @@ void TD_ProductCombination::linkFesGrid(Grid* fes_grid_pntr_in){
 }
 
 
+}
 }

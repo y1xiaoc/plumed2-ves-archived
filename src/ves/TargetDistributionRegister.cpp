@@ -25,6 +25,7 @@
 #include <iostream>
 
 namespace PLMD{
+namespace ves{
 
 TargetDistributionRegister::~TargetDistributionRegister(){
   if(m.size()>0){
@@ -69,4 +70,5 @@ TargetDistribution* TargetDistributionRegister::create( const TargetDistribution
   return lselect;
 }
 
+}
 }

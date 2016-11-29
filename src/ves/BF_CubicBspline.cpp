@@ -26,6 +26,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class BF_CubicBspline : public BasisFunctions {
   double spacing_;
@@ -137,4 +138,5 @@ double BF_CubicBspline::spline(const double arg, double& deriv) const {
 }
 
 
+}
 }

@@ -26,6 +26,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class BF_Legendre : public BasisFunctions {
   bool scaled_;
@@ -113,4 +114,5 @@ void BF_Legendre::setupUniformIntegrals() {
 }
 
 
+}
 }

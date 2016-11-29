@@ -27,7 +27,8 @@
 #include "tools/Grid.h"
 
 
-namespace PLMD {
+namespace PLMD{
+namespace ves{
 
 class TD_UniformBiasCutoff : public TargetDistribution {
 private:
@@ -72,4 +73,5 @@ void TD_UniformBiasCutoff::updateGrid(){
 }
 
 
+}
 }

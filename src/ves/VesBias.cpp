@@ -35,7 +35,7 @@
 
 
 namespace PLMD{
-namespace bias{
+namespace ves{
 
 VesBias::VesBias(const ActionOptions&ao):
 Action(ao),

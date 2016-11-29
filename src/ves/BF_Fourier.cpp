@@ -26,6 +26,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class BF_Fourier : public BasisFunctions {
   virtual void setupLabels();
@@ -118,4 +119,5 @@ void BF_Fourier::setupUniformIntegrals() {
 }
 
 
+}
 }

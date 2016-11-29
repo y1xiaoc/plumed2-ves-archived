@@ -26,6 +26,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class BF_Powers : public BasisFunctions {
   double inv_normfactor_;
@@ -104,4 +105,5 @@ void BF_Powers::setupLabels() {
   }
 }
 
+}
 }

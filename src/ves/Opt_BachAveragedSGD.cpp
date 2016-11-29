@@ -28,6 +28,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class Opt_BachAveragedSGD : public Optimizer {
 private:
@@ -132,4 +133,5 @@ void Opt_BachAveragedSGD::coeffsUpdate(const unsigned int c_id) {
 }
 
 
+}
 }

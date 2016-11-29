@@ -40,15 +40,16 @@
 
 namespace PLMD{
 
-  class CoeffsVector;
-  class CoeffsMatrix;
-  class BasisFunctions;
-  class Value;
-  class Optimizer;
-  class TargetDistribution;
-  class FermiSwitchingFunction;
+class Value;
 
-namespace bias{
+namespace ves{
+
+class CoeffsVector;
+class CoeffsMatrix;
+class BasisFunctions;
+class Optimizer;
+class TargetDistribution;
+class FermiSwitchingFunction;
 
 /**
 \ingroup INHERIT
@@ -57,7 +58,7 @@ to include functions related to the variational approach.
 */
 
 class VesBias:
-public Bias
+public bias::Bias
 {
 private:
   unsigned int ncoeffssets_;

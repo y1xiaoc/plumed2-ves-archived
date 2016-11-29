@@ -29,6 +29,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class Opt_FesDumper : public Optimizer {
 
@@ -98,4 +99,5 @@ PLUMED_OPTIMIZER_INIT(ao)
 }
 
 
+}
 }

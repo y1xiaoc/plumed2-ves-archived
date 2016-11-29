@@ -27,6 +27,7 @@
 
 
 namespace PLMD{
+namespace ves{
 
 class Opt_SteepestDecent : public Optimizer {
 
@@ -63,4 +64,5 @@ void Opt_SteepestDecent::coeffsUpdate(const unsigned int c_id) {
 }
 
 
+}
 }
