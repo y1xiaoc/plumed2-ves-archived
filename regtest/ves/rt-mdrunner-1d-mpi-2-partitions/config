@@ -1,3 +1,4 @@
+plumed_modules=ves
 mpiprocs=4
 type=cltool
 arg="md_linearexpansion input"
