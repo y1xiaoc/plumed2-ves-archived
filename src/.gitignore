@@ -34,7 +34,7 @@
 !/vesselbase
 !/wrapper
 
-!/ves_code
+!/ves
 
 # And just ignore these files
 *.xxd

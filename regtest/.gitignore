@@ -16,8 +16,8 @@
 !/manyrestraints
 !/molfile_plugin
 !/metainference
+!/ves
 # These files we just want to ignore completely
 tmp
 report.txt
 
-!/ves_code
