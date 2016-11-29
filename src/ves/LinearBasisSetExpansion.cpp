@@ -136,7 +136,7 @@ bool LinearBasisSetExpansion::isStaticTargetDistFileOutputActive() const {
 }
 
 
-void LinearBasisSetExpansion::linkVesBias(ves::VesBias* vesbias_pntr_in) {
+void LinearBasisSetExpansion::linkVesBias(VesBias* vesbias_pntr_in) {
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 

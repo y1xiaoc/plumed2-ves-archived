@@ -93,7 +93,7 @@ private:
   std::string targetdist_averages_output_fmt_;
   //
   unsigned int nbiases_;
-  std::vector<ves::VesBias*> bias_pntrs_;
+  std::vector<VesBias*> bias_pntrs_;
   //
   unsigned int ncoeffssets_;
   std::vector<CoeffsVector*> coeffs_pntrs_;
@@ -127,9 +127,9 @@ private:
 protected:
   void turnOnHessian();
   void turnOffHessian();
-  std::vector<CoeffsMatrix*> enableHessian(ves::VesBias*, const bool diagonal_hessian=false);
-  // CoeffsMatrix* switchToDiagonalHessian(ves::VesBias*);
-  // CoeffsMatrix* switchToFullHessian(ves::VesBias*);
+  std::vector<CoeffsMatrix*> enableHessian(VesBias*, const bool diagonal_hessian=false);
+  // CoeffsMatrix* switchToDiagonalHessian(VesBias*);
+  // CoeffsMatrix* switchToFullHessian(VesBias*);
   //
   CoeffsVector& Coeffs(const unsigned int coeffs_id = 0) const;
   CoeffsVector& AuxCoeffs(const unsigned int coeffs_id = 0) const;
@@ -196,7 +196,7 @@ public:
   //
   bool useMultipleWalkers() const {return use_mwalkers_mpi_;}
   //
-  std::vector<ves::VesBias*> getBiasPntrs() const {return bias_pntrs_;}
+  std::vector<VesBias*> getBiasPntrs() const {return bias_pntrs_;}
   std::vector<CoeffsVector*> getCoeffsPntrs() const {return coeffs_pntrs_;}
   std::vector<CoeffsVector*> getAuxCoeffsPntrs() const {return aux_coeffs_pntrs_;}
   std::vector<CoeffsVector*> getGradientPntrs()const {return gradient_pntrs_;}

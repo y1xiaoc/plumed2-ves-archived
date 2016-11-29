@@ -227,7 +227,7 @@ void BasisFunctions::printInfo() const {
 }
 
 
-void BasisFunctions::linkVesBias(ves::VesBias* vesbias_pntr_in){
+void BasisFunctions::linkVesBias(VesBias* vesbias_pntr_in){
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 }

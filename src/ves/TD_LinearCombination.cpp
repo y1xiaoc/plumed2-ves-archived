@@ -56,7 +56,7 @@ public:
   double getValue(const std::vector<double>&) const;
   ~TD_LinearCombination();
   //
-  void linkVesBias(ves::VesBias*);
+  void linkVesBias(VesBias*);
   void linkAction(Action*);
   //
   void linkBiasGrid(Grid*);
@@ -146,7 +146,7 @@ void TD_LinearCombination::updateGrid(){
 }
 
 
-void TD_LinearCombination::linkVesBias(ves::VesBias* vesbias_pntr_in){
+void TD_LinearCombination::linkVesBias(VesBias* vesbias_pntr_in){
   TargetDistribution::linkVesBias(vesbias_pntr_in);
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);

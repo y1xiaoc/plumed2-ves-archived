@@ -50,7 +50,7 @@ private:
   std::string label_;
   //
   Action* action_pntr_;
-  ves::VesBias* vesbias_pntr_;
+  VesBias* vesbias_pntr_;
   Communicator& mycomm_;
   bool serial_;
   //
@@ -116,7 +116,7 @@ public:
   void setSerial() {serial_=true;}
   void setParallel() {serial_=false;}
   //
-  void linkVesBias(ves::VesBias*);
+  void linkVesBias(VesBias*);
   void linkAction(Action*);
   // calculate bias and derivatives
   static double getBiasAndForces(const std::vector<double>&, bool&, std::vector<double>&, std::vector<double>&, std::vector<BasisFunctions*>&, CoeffsVector*, Communicator* comm_in=NULL);

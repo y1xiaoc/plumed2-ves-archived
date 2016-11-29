@@ -129,7 +129,7 @@ void TargetDistribution::setDimension(const unsigned int dimension){
 }
 
 
-void TargetDistribution::linkVesBias(ves::VesBias* vesbias_pntr_in){
+void TargetDistribution::linkVesBias(VesBias* vesbias_pntr_in){
   vesbias_pntr_ = vesbias_pntr_in;
   action_pntr_ = static_cast<Action*>(vesbias_pntr_in);
 }

@@ -62,7 +62,7 @@ private:
   bool active;
   //
   Action* action_pntr_;
-  ves::VesBias* vesbias_pntr_;
+  VesBias* vesbias_pntr_;
   //
   unsigned int ndimensions_;
   std::vector<unsigned int> indices_shape_;
@@ -123,9 +123,9 @@ public:
   CoeffsType getType() const {return coeffs_type_;}
   std::string getTypeStr() const;
   void setType(const CoeffsType coeffs_type);
-  void linkVesBias(ves::VesBias*);
+  void linkVesBias(VesBias*);
   void linkAction(Action*);
-  ves::VesBias* getPntrToVesBias() const {return vesbias_pntr_;}
+  VesBias* getPntrToVesBias() const {return vesbias_pntr_;}
   Action* getPntrToAction() const {return action_pntr_;}
   bool isGenericCoeffs() const {return coeffs_type_==Generic;}
   bool isLinearBasisSetCoeffs() const {return coeffs_type_==LinearBasisSet;}

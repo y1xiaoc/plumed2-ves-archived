@@ -95,7 +95,7 @@ private:
   // the integrals of the basis functions over the interval on which they are defined
   std::vector <double> uniform_integrals_;
   //
-  ves::VesBias* vesbias_pntr_;
+  VesBias* vesbias_pntr_;
   Action* action_pntr_;
 protected:
   // setup various stuff
@@ -168,9 +168,9 @@ public:
   std::string getBasisFunctionLabel(const unsigned int index) const {return bf_labels_[index];}
   std::vector<std::string> getBasisFunctionLabels() const {return bf_labels_;}
   //
-  void linkVesBias(ves::VesBias*);
+  void linkVesBias(VesBias*);
   void linkAction(Action*);
-  ves::VesBias* getPntrToVesBias() const;
+  VesBias* getPntrToVesBias() const;
   Action* getPntrToAction() const;
   //
   double translateArgument(const double, bool&) const;
@@ -199,7 +199,7 @@ void BasisFunctions::setNumberOfBasisFunctions(const unsigned int nbasis_in) {
 
 
 inline
-ves::VesBias* BasisFunctions::getPntrToVesBias() const {
+VesBias* BasisFunctions::getPntrToVesBias() const {
   plumed_massert(vesbias_pntr_!=NULL,"the VES bias has not been linked");
   return vesbias_pntr_;
 }
