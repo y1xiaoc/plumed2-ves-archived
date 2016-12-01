@@ -20,7 +20,4 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#include <vector>
-#include <cmath>
 #include "TargetDistModifer.h"
-

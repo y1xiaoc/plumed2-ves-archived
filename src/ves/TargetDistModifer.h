@@ -23,6 +23,9 @@
 #ifndef __PLUMED_ves_TargetDistModifer_h
 #define __PLUMED_ves_TargetDistModifer_h
 
+#include <vector>
+#include <cmath>
+
 namespace PLMD{
 namespace ves{
 
