@@ -92,3 +92,29 @@ DUMP_TARGET_DISTRIBUTION ...
 ... DUMP_TARGET_DISTRIBUTION
 
 
+# Frechet distribution
+# https://en.wikipedia.org/wiki/Frechet_distribution
+# a=3.0 s=10.0 m=-20.0001
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-20.0
+ GRID_MAX=+50.0
+ GRID_BINS=200
+ TARGET_DISTRIBUTION={MATHEVAL_DIST
+                      FUNCTION=(3.0/10.0)*((s1+20.0001)/10.0)^(-1.0-3.0)*exp(-((s1+20.0001)/10.0)^(-3.0))}
+ TARGETDIST_FILE=targetdist-8.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
+
+# Frechet distribution
+# https://en.wikipedia.org/wiki/Frechet_distribution
+# a=3.0 s=3.0 m=-20.0001
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-20.0
+ GRID_MAX=+0.0
+ GRID_BINS=200
+ TARGET_DISTRIBUTION={MATHEVAL_DIST
+                      FUNCTION=(3.0/3.0)*((s1+20.0001)/3.0)^(-1.0-3.0)*exp(-((s1+20.0001)/3.0)^(-3.0))}
+ TARGETDIST_FILE=targetdist-9.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
