@@ -30,6 +30,15 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC VES_OPTIMIZER AVERAGED_SGD
+/*
+Bach's averaged stochastic gradient decent. 
+
+\par Examples
+
+*/
+//+ENDPLUMEDOC
+
 class Opt_BachAveragedSGD : public Optimizer {
 private:
   std::vector<CoeffsVector*> combinedgradient_pntrs_;

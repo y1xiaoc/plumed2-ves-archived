@@ -29,6 +29,15 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC VES_OPTIMIZER STEEPEST_DECENT
+/*
+Steepest decent optimizer.
+
+\par Examples
+
+*/
+//+ENDPLUMEDOC
+
 class Opt_SteepestDecent : public Optimizer {
 
 public:

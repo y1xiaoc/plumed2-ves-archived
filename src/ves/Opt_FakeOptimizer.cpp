@@ -29,6 +29,17 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC VES_OPTIMIZER FAKE_OPTIMIZER
+/*
+Dummy optimizer for debugging.
+
+\par Examples
+
+*/
+//+ENDPLUMEDOC
+
+
+
 class Opt_FakeOptimizer : public Optimizer {
 
 public:

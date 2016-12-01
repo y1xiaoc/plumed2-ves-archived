@@ -35,7 +35,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL MATHEVAL_DIST
+//+PLUMEDOC VES_TARGETDIST MATHEVAL_DIST
 /*
 Matheval target distribution
 

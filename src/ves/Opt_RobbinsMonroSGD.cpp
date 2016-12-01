@@ -29,6 +29,15 @@
 namespace PLMD{
 namespace ves{
 
+//+PLUMEDOC VES_OPTIMIZER ROBBINS_MONRO_SGD
+/*
+Robbins-Monro stochastic gradient decent.
+
+\par Examples
+
+*/
+//+ENDPLUMEDOC
+
 class Opt_RobbinsMonroSGD : public Optimizer {
 private:
   double decay_constant_;
