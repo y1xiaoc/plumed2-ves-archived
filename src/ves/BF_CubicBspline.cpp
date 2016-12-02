@@ -47,7 +47,6 @@ class BF_CubicBspline : public BasisFunctions {
 public:
   static void registerKeywords( Keywords&);
   explicit BF_CubicBspline(const ActionOptions&);
-  double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
@@ -80,22 +79,6 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setupBF();
   log.printf("   normalization factor: %f\n",normfactor_);
   checkRead();
-}
-
-
-double BF_CubicBspline::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
-  plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
-  inside_range=true;
-  argT=checkIfArgumentInsideInterval(arg,inside_range);
-  //
-  if(n==0){
-    return 1.0;
-  }
-  else{
-    double argx = ((argT-intervalMin())*inv_spacing_) - (static_cast<double>(n)-2.0);
-    double tmp_dbl=0.0;
-    return spline(argx, tmp_dbl);
-  }
 }
 
 

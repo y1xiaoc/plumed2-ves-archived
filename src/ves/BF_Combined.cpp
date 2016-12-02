@@ -54,7 +54,6 @@ class BF_Combined : public BasisFunctions {
 public:
   static void registerKeywords(Keywords&);
   explicit BF_Combined(const ActionOptions&);
-  double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
@@ -131,14 +130,6 @@ void BF_Combined::getBFandValueIndices(const unsigned int n, unsigned int& bf_in
       }
     }
   }
-}
-
-double BF_Combined::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
-  plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
-  unsigned int bf_index;
-  unsigned int value_index;
-  getBFandValueIndices(n,bf_index,value_index);
-  return basisf_pntrs_[bf_index]->getValue(arg,value_index,argT,inside_range);
 }
 
 

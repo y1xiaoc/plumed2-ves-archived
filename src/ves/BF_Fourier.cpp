@@ -43,7 +43,6 @@ class BF_Fourier : public BasisFunctions {
 public:
   static void registerKeywords(Keywords&);
   explicit BF_Fourier(const ActionOptions&);
-  double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
@@ -67,26 +66,6 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setDescription("Trigonometric (cos/sin)");
   setupBF();
   checkRead();
-}
-
-
-double BF_Fourier::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
-  plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
-  inside_range=true;
-  argT=translateArgument(arg, inside_range);
-  double value=0.0;
-  if(n == 0){
-    value=1.0;
-  }
-  else if(n%2 == 1){
-    double k = (n+1.0)/2.0;
-    value=cos(k*argT);
-  }
-  else if(n%2 == 0){
-    double k = n/2.0;
-    value=sin(k*argT);
-  }
-  return value;
 }
 
 

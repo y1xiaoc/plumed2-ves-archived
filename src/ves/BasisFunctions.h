@@ -179,7 +179,7 @@ public:
   void apply(){};
   void calculate(){};
   // calculate the value for the n-th basis function
-  virtual double getValue(const double, const unsigned int, double&, bool&) const = 0;
+  double getValue(const double, const unsigned int, double&, bool&) const;
   // calcuate the values for all basis functions
   virtual void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const = 0;
   //virtual void get2ndDerivaties(const double, std::vector<double>&)=0;

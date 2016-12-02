@@ -51,8 +51,6 @@ public:
 
 PLUMED_REGISTER_ACTION(BF_Powers,"BF_POWERS")
 
-// See DOI 10.1007/s10614-007-9092-4 for more information;
-
 
 void BF_Powers::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
@@ -74,20 +72,6 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setupBF();
   log.printf("   normalization factor: %f\n",normfactor_);
   checkRead();
-}
-
-
-double BF_Powers::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
-  plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
-  inside_range=true;
-  argT=checkIfArgumentInsideInterval(arg,inside_range);
-  //
-  if(n==0){
-    return 1.0;
-  }
-  else{
-    return pow(argT,static_cast<double>(n));
-  }
 }
 
 

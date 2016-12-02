@@ -43,7 +43,6 @@ class BF_Legendre : public BasisFunctions {
 public:
   static void registerKeywords(Keywords&);
   explicit BF_Legendre(const ActionOptions&);
-  double getValue(const double, const unsigned int, double&, bool&) const;
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
@@ -70,16 +69,6 @@ BF_Legendre::BF_Legendre(const ActionOptions&ao):
   setLabelPrefix("L");
   setupBF();
   checkRead();
-}
-
-
-double BF_Legendre::getValue(const double arg, const unsigned int n, double& argT, bool& inside_range) const {
-  plumed_massert(n<numberOfBasisFunctions(),"getValue: n is outside range of the defined order of the basis set");
-  inside_range=true;
-  std::vector<double> tmp_values(numberOfBasisFunctions());
-  std::vector<double> tmp_derivs(numberOfBasisFunctions());
-  getAllValues(arg, argT, inside_range, tmp_values, tmp_derivs);
-  return tmp_values[n];
 }
 
 
