@@ -92,7 +92,7 @@ void BF_Legendre::getAllValues(const double arg, double& argT, bool& inside_rang
     derivs[i+1]  = intervalDerivf()*derivsT[i+1];
   }
   if(scaled_){
-    // L0 is not scaled!
+    // L0 is also scaled!
     for(unsigned int i=0; i<values.size(); i++){
       double io = static_cast<double>(i);
       double sf = sqrt(io+0.5);
