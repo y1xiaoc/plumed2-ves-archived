@@ -50,10 +50,10 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC TOOLS guineapig
+//+PLUMEDOC VES_CLTOOLS md_linearexpansion
 /*
 
-Simple piece of code to do MD of a single atom on a energy landscape that is
+Simple MD code for dynamics on a energy landscape that is
 given with linear basis set expansion. Supports 1 to 3 dimensions.
 
 \par Examples
