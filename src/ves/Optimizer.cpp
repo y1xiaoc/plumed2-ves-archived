@@ -764,6 +764,8 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   Action::registerKeywords(keys);
   ActionPilot::registerKeywords(keys);
   ActionWithValue::registerKeywords(keys);
+  //
+  keys.remove("NUMERICAL_DERIVATIVES");  
   // Default always active keywords
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");

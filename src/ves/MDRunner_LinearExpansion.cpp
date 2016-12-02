@@ -52,9 +52,7 @@ namespace ves{
 
 //+PLUMEDOC VES_CLTOOLS md_linearexpansion
 /*
-
-Simple MD code for dynamics on a energy landscape that is
-given with linear basis set expansion. Supports 1 to 3 dimensions.
+Simple MD code for dynamics on a energy landscape given by a linear basis set expansion.
 
 \par Examples
 

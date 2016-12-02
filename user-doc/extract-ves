@@ -28,7 +28,7 @@ awk 'BEGIN{gfile="automatic-ves/VES_GLOSSARY.list"; dfile="automatic-ves/VES_DIC
      if(inside==3){ printf "%s", $0 > dfile; }
   }
   if($1=="//+PLUMEDOC"){
-    if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_CLTOOLS"){
+    if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_CLTOOLS" || $2=="VES_UTILS" ){
       if(lfile!="") close(lfile)
       lfile="automatic-ves/"$2".list"
 
@@ -90,7 +90,7 @@ done
 sed -ie 's/<b> --/<b> \\c \\-\\-/g' automatic-ves/*.txt
 rm automatic-ves/*.txte
 
-for file in VES_BASISF VES_TARGETDIST VES_OPTIMIZER VES_GLOSSARY VES_DICTIONARY VES_CLTOOLS
+for file in VES_BASISF VES_TARGETDIST VES_OPTIMIZER VES_GLOSSARY VES_DICTIONARY VES_CLTOOLS VES_UTILS
 do
   mv automatic-ves/$file.list automatic-ves/$file.1.list
   {
@@ -123,6 +123,7 @@ cat $file.txt |
     /^ *@VES_BASISF@ *$/r automatic-ves/VES_BASISF.list
     /^ *@VES_TARGETDIST@ *$/r automatic-ves/VES_TARGETDIST.list
     /^ *@VES_OPTIMIZER@ *$/r automatic-ves/VES_OPTIMIZER.list
+    /^ *@VES_UTILS@ *$/r automatic-ves/VES_UTILS.list
     /^ *@VES_CLTOOLS@ *$/r automatic-ves/VES_CLTOOLS.list
 " | grep -Ev '^ *@[A-Z_]*@ *$' > ${file}PP.txt
 done
