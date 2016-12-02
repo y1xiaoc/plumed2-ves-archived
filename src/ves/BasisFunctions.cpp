@@ -239,25 +239,20 @@ void BasisFunctions::linkAction(Action* action_pntr_in){
 
 
 void BasisFunctions::numericalUniformIntegrals() {
-  double h=(interval_max_-interval_min_)/nbins_;
+  std::vector<std::string> grid_min(1); grid_min[0]=intervalMinStr();
+  std::vector<std::string> grid_max(1); grid_max[0]=intervalMaxStr();
+  std::vector<unsigned int> grid_bins(1); grid_bins[0]=nbins_;
+  std::vector<Value*> arguments(1); arguments[0]= new Value(NULL,"arg",false);
+  if(arePeriodic()){arguments[0]->setDomain(intervalMinStr(),intervalMaxStr());}
+  else{arguments[0]->setNotPeriodic();}
+  Grid* uniform_grid = new Grid("uniform",arguments,grid_min,grid_max,grid_bins,false,false);
   //
-  bool dummy_bool=true;
-  double dummy_dbl=0.0;
-  for(unsigned int i=0; i < nbasis_;i++){
-    // Trapezoidal rule on a uniform grid with Nbins+1 grid points
-    double sum=0.0;
-    for(unsigned int k=0; k < nbins_;k++){
-      double x1 = interval_min_+(k)*h;
-      double x2 = interval_min_+(k+1)*h;
-      double v1 = getValue(x1,i,dummy_dbl,dummy_bool);
-      double v2 = getValue(x2,i,dummy_dbl,dummy_bool);
-      sum = sum + (v1+v2);
-    }
-    // norm with the "volume of the interval"
-    uniform_integrals_[i] = (0.5*h*sum)/interval_range_;
+  double inverse_normalization = 1.0/(intervalMax()-intervalMin());
+  for(Grid::index_t l=0; l<uniform_grid->getSize(); l++){
+    uniform_grid->setValue(l,inverse_normalization);
   }
-  // assume that the first function is the constant
-  uniform_integrals_[0] = getValue(0.0,0,dummy_dbl,dummy_bool);
+  uniform_integrals_ = numericalTargetDistributionIntegralsFromGrid(uniform_grid);
+  delete uniform_grid;
 }
 
 
@@ -268,20 +263,21 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegralsFromGrid
   std::vector<double> targetdist_integrals(nbasis_,0.0);
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(grid_pntr);
 
-  bool dummy_bool=true;
-  double dummy_dbl=0.0;
-  for(unsigned int i=0; i < nbasis_; i++){
-    // Trapezoidal rule on a uniform grid with Nbins+1 grid points
-    double sum=0.0;
-    for(unsigned int k=0; k < grid_pntr->getSize(); k++){
-      double arg = grid_pntr->getPoint(k)[0];
-      sum += (integration_weights[k] * grid_pntr->getValue(k) ) * getValue(arg,i,dummy_dbl,dummy_bool);
+  for(unsigned int k=0; k < grid_pntr->getSize(); k++){
+    double arg = grid_pntr->getPoint(k)[0];
+    std::vector<double> bf_values(nbasis_);
+    std::vector<double> bf_derivs(nbasis_);
+    bool inside=true;
+    double argT=0.0;
+    getAllValues(arg,argT,inside,bf_values,bf_derivs);
+    for(unsigned int i=0; i < nbasis_; i++){
+      targetdist_integrals[i] += (integration_weights[k] * grid_pntr->getValue(k)) * bf_values[i];
     }
-    targetdist_integrals[i] = sum;
   }
-  //
   // assume that the first function is the constant
-  targetdist_integrals[0] = getValue(0.0,0,dummy_dbl,dummy_bool);
+  bool inside=true;
+  double argT=0.0;
+  targetdist_integrals[0] = getValue(0.0,0,argT,inside);
   return targetdist_integrals;
 }
 
