@@ -35,7 +35,6 @@ namespace ves{
 
 void BasisFunctions::registerKeywords(Keywords& keys){
   Action::registerKeywords(keys);
-  ActionWithValue::registerKeywords(keys);
   keys.add("compulsory","ORDER","The order of the basis functions.");
   keys.add("compulsory","INTERVAL_MIN","the minimum of the interval on which the basis functions are defined");
   keys.add("compulsory","INTERVAL_MAX","the maximum of the interval on which the basis functions are defined");
@@ -47,7 +46,6 @@ void BasisFunctions::registerKeywords(Keywords& keys){
 
 BasisFunctions::BasisFunctions(const ActionOptions&ao):
 Action(ao),
-ActionWithValue(ao),
 print_debug_info_(false),
 has_been_set(false),
 description_("Undefined"),

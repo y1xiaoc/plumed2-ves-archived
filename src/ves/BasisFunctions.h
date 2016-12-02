@@ -23,14 +23,14 @@
 #ifndef __PLUMED_ves_BasisFunctions_h
 #define __PLUMED_ves_BasisFunctions_h
 
-#include "core/ActionWithValue.h"
+#include "core/Action.h"
 
 #include <vector>
 #include <string>
 #include <cmath>
 
 
-#define PLUMED_BASISFUNCTIONS_INIT(ao) Action(ao),BasisFunctions(ao)
+#define PLUMED_BASISFUNCTIONS_INIT(ao) BasisFunctions(ao)
 
 namespace PLMD{
 
@@ -48,7 +48,7 @@ class VesBias;
 class TargetDistribution;
 
 class BasisFunctions :
-  public ActionWithValue
+  public Action
 {
 private:
   // print extra info about the basis set
