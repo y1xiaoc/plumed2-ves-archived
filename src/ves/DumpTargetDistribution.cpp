@@ -34,7 +34,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_BASISF DUMP_TARGET_DISTRIBUTION
+//+PLUMEDOC VES_TARGETDIST DUMP_TARGET_DISTRIBUTION
 /*
 Dump target distribution to file
 
