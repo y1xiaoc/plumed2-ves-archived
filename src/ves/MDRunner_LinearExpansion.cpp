@@ -276,7 +276,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   Grid histo_grid(*potential_expansion_pntr->getPntrToBiasGrid());
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(&histo_grid);
   double norm=0.0;
-  for(unsigned int i=0; i<histo_grid.getSize(); i++){
+  for(Grid::index_t i=0; i<histo_grid.getSize(); i++){
     double value = integration_weights[i]*exp(-histo_grid.getValue(i)/temp);
     norm += value;
     histo_grid.setValue(i,value);

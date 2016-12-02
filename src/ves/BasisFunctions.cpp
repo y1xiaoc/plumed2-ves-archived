@@ -261,7 +261,7 @@ std::vector<double> BasisFunctions::numericalTargetDistributionIntegralsFromGrid
   std::vector<double> targetdist_integrals(nbasis_,0.0);
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(grid_pntr);
 
-  for(unsigned int k=0; k < grid_pntr->getSize(); k++){
+  for(Grid::index_t k=0; k < grid_pntr->getSize(); k++){
     double arg = grid_pntr->getPoint(k)[0];
     std::vector<double> bf_values(nbasis_);
     std::vector<double> bf_derivs(nbasis_);
