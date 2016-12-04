@@ -23,6 +23,8 @@
 #ifndef __PLUMED_ves_GridProjWeights_h
 #define __PLUMED_ves_GridProjWeights_h
 
+#include "tools/Grid.h"
+
 
 namespace PLMD{
 namespace ves{

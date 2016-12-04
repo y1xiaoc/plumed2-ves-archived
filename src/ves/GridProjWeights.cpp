@@ -20,6 +20,4 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#include "tools/Grid.h"
 #include "GridProjWeights.h"
-

@@ -38,6 +38,10 @@ namespace colvar{
 /*
 
 
+\par Examples
+aacc
+
+
 */
 //+ENDPLUMEDOC
 
