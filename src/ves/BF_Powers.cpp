@@ -64,6 +64,7 @@ PLUMED_BASISFUNCTIONS_INIT(ao)
   setIntrinsicInterval(intervalMin(),intervalMax());
   double normfactor_=1.0;
   parse("NORMALIZATION",normfactor_);
+  if(normfactor_!=1.0){addKeywordToList("NORMALIZATION",normfactor_);}
   inv_normfactor_=1.0/normfactor_;
   setNonPeriodic();
   setIntervalBounded();
