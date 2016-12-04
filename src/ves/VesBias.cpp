@@ -233,7 +233,7 @@ void VesBias::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   //
-  keys.reserve("optional","TARGET_DISTRIBUTION","the target distribution to be used.");
+  keys.reserve("optional","TARGET_DISTRIBUTION","the target distribution to be used. See the list in \\ref ves_targetdist");
   //
   keys.reserve("optional","GRID_BINS","the number of bins used for the grid. The default value is 100 bins per dimension.");
   keys.reserve("optional","GRID_MIN","the lower bounds used for the grid.");

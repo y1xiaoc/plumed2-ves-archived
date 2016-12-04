@@ -4,12 +4,20 @@
 
 Variationally Enhanced Sampling (VES) is a method
 
+- \subpage ves_biases
 - \subpage ves_basisf
 - \subpage ves_targetdist
 - \subpage ves_optimizer
 - \subpage ves_utils
 - \subpage ves_cltools
 - \subpage ves_glossary
+
+
+\page ves_biases Biases
+
+The following list contains the biases  available in VES.
+
+@VES_BIASES@
 
 \page ves_basisf Basis functions
 
