@@ -32,11 +32,6 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC INTERNAL fermiswitchingfunction
-/*
-
-*/
-//+ENDPLUMEDOC
 
 void FermiSwitchingFunction::registerKeywords( Keywords& keys ){
   keys.add("compulsory","R_0","the value of R_0 in the switching function");

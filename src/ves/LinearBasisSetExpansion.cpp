@@ -38,11 +38,6 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES LinearBasisSetExpansion
-/*
-*/
-//+ENDPLUMEDOC
-
 void LinearBasisSetExpansion::registerKeywords(Keywords& keys) {
 }
 

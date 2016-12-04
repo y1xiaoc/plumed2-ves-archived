@@ -37,6 +37,15 @@ public:
   virtual void calculate();
 };
 
+//+PLUMEDOC VES_COLVAR MDRUNNER_POSITION
+/*
+Use as CVs the postions from dynamics of \ref md_linearexpansion
+
+\par Examples
+
+*/
+//+ENDPLUMEDOC
+
 PLUMED_REGISTER_ACTION(MDRunner_Position,"MDRUNNER_POSITION")
 
 void MDRunner_Position::registerKeywords( Keywords& keys ){
