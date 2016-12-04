@@ -59,6 +59,7 @@ PLUMED_REGISTER_ACTION(BF_CubicBspline,"BF_CUBIC_B_SPLINES")
 void BF_CubicBspline::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
   keys.add("optional","NORMALIZATION","the normalization factor that is used to normalize the basis functions by dividing the values. By default it is 2.");
+  keys.remove("NUMERICAL_INTEGRALS");
 }
 
 BF_CubicBspline::BF_CubicBspline(const ActionOptions&ao):

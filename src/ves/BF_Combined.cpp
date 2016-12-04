@@ -66,6 +66,8 @@ void BF_Combined::registerKeywords(Keywords& keys){
   keys.remove("ORDER");
   keys.remove("INTERVAL_MAX");
   keys.remove("INTERVAL_MIN");
+  keys.remove("NUMERICAL_INTEGRALS");
+  keys.remove("NGRID_POINTS");
   keys.add("compulsory","BASIS_FUNCTIONS","the basis functions that you want to combine");
 }
 

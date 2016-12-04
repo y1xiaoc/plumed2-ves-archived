@@ -55,6 +55,7 @@ PLUMED_REGISTER_ACTION(BF_Powers,"BF_POWERS")
 void BF_Powers::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
   keys.add("optional","NORMALIZATION","the normalization factor that is used to normalize the basis functions by dividing the values. By default it is 1.0.");
+  keys.remove("NUMERICAL_INTEGRALS");
 }
 
 BF_Powers::BF_Powers(const ActionOptions&ao):

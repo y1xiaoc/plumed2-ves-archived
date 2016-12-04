@@ -59,6 +59,7 @@ void BF_Matheval::registerKeywords(Keywords& keys){
   keys.remove("ORDER");
   keys.add("numbered","FUNC","The basis functions f_i(s) given in a matheval format using s as a variable.");
   keys.addFlag("PERIODIC",false,"Indicate that the basis functions are periodic.");
+  keys.remove("NUMERICAL_INTEGRALS");
 }
 
 BF_Matheval::BF_Matheval(const ActionOptions&ao):
