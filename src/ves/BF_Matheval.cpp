@@ -68,18 +68,18 @@ evaluator_pntrs_(0),
 derivs_pntrs_(0),
 variable_str_("s")
 {
-  std::vector<std::string> bf_str_;
+  std::vector<std::string> bf_str;
   std::string str_t1="1";
-  bf_str_.push_back(str_t1);
+  bf_str.push_back(str_t1);
   for(int i=1;; i++){
     std::string str_t2;
     if(!parseNumbered("FUNC",i,str_t2)){break;}
     std::string is; Tools::convert(i,is);
     addKeywordToList("FUNC"+is,str_t2);
-    bf_str_.push_back(str_t2);
+    bf_str.push_back(str_t2);
   }
   //
-  setOrder(bf_str_.size()-1);
+  setOrder(bf_str.size()-1);
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval(intervalMin(),intervalMax());
   bool periodic = false;
@@ -93,25 +93,30 @@ variable_str_("s")
   evaluator_pntrs_.resize(getNumberOfBasisFunctions());
   derivs_pntrs_.resize(getNumberOfBasisFunctions());
   //
-  evaluator_pntrs_[0]=evaluator_create(const_cast<char*>(bf_str_[0].c_str()));
+  evaluator_pntrs_[0]=evaluator_create(const_cast<char*>(bf_str[0].c_str()));
   derivs_pntrs_[0]=evaluator_derivative(evaluator_pntrs_[0],const_cast<char*>(variable_str_.c_str()));
   //
   for(unsigned int i=1; i<getNumberOfBasisFunctions(); i++){
-    evaluator_pntrs_[i]=evaluator_create(const_cast<char*>(bf_str_[i].c_str()));
+    evaluator_pntrs_[i]=evaluator_create(const_cast<char*>(bf_str[i].c_str()));
     std::string is; Tools::convert(i,is);
     if(evaluator_pntrs_[i]==NULL){
-      plumed_merror("There was some problem in parsing matheval formula "+bf_str_[i]+" given in FUNC"+is);
+      plumed_merror("There was some problem in parsing matheval formula "+bf_str[i]+" given in FUNC"+is);
     }
     char** var_names;
     int var_count;
     evaluator_get_variables(evaluator_pntrs_[i],&var_names,&var_count);
     if(var_count!=1){
-      plumed_merror("Problem with function "+bf_str_[i]+" given in FUNC"+is+": there should only be one variable");
+      plumed_merror("Problem with function "+bf_str[i]+" given in FUNC"+is+": there should only be one variable");
     }
     if(var_names[0]!=variable_str_){
-      plumed_merror("Problem with function "+bf_str_[i]+" given in FUNC"+is+": you should use "+variable_str_+" as a variable");
+      plumed_merror("Problem with function "+bf_str[i]+" given in FUNC"+is+": you should use "+variable_str_+" as a variable");
     }
     derivs_pntrs_[i]=evaluator_derivative(evaluator_pntrs_[i],const_cast<char*>(variable_str_.c_str()));
+  }
+  //
+  log.printf("  Using the following functions (matheval function and derivative):\n");
+  for(unsigned int i=0; i<getNumberOfBasisFunctions(); i++){
+    log.printf("   %i:  %s  ( %s / %s )\n",i,bf_str[i].c_str(),evaluator_get_string(evaluator_pntrs_[i]),evaluator_get_string(derivs_pntrs_[i]));
   }
   //
   setupBF();
