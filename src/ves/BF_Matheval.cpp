@@ -84,8 +84,8 @@ variable_str_("s")
   setIntrinsicInterval(intervalMin(),intervalMax());
   bool periodic = false;
   parseFlag("PERIODIC",periodic); addKeywordToList("PERIODIC",periodic);
-  if(periodic){setNonPeriodic();}
-  else{setPeriodic();}
+  if(periodic){setPeriodic();}
+  else{setNonPeriodic();}
   setIntervalBounded();
   setType("matheval_functions");
   setDescription("Matheval Functions");
