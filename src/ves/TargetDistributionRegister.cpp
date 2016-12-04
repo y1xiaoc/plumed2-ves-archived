@@ -22,7 +22,11 @@
 
 #include "TargetDistributionRegister.h"
 
+#include "tools/Keywords.h"
+
 #include <iostream>
+#include <algorithm>
+
 
 namespace PLMD{
 namespace ves{
@@ -48,9 +52,11 @@ void TargetDistributionRegister::remove(creator_pointer f){
   }
 }
 
-void TargetDistributionRegister::add( std::string type, creator_pointer f ){
+void TargetDistributionRegister::add( std::string type, creator_pointer f , keywords_pointer kf){
   plumed_massert(m.count(type)==0,"type has already been registered");
   m.insert(std::pair<std::string,creator_pointer>(type,f));
+  Keywords keys; kf(keys);
+  mk.insert(std::pair<std::string,Keywords>(type,keys));
 }
 
 bool TargetDistributionRegister::check(std::string type){
@@ -69,6 +75,38 @@ TargetDistribution* TargetDistributionRegister::create( const TargetDistribution
   }
   return lselect;
 }
+
+
+std::vector<std::string> TargetDistributionRegister::list()const{
+  std::vector<std::string> s;
+  for(const_mIterator it=m.begin();it!=m.end();++it)
+    s.push_back((*it).first);
+  sort(s.begin(),s.end());
+  return s;
+}
+
+
+std::ostream & operator<<(std::ostream &log,const TargetDistributionRegister&ar){
+  std::vector<std::string> s(ar.list());
+  for(unsigned int i=0;i<s.size();i++) log<<"  "<<s[i]<<"\n";
+  return log;
+}
+
+
+bool TargetDistributionRegister::printManual( const std::string& type, const bool& vimout){
+  if(check(type)){
+    if(vimout){
+       printf("%s",type.c_str()); mk[type].print_vim(); printf("\n");
+    } else {
+       mk[type].print_html();
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
 
 }
 }

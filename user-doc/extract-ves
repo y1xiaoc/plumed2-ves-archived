@@ -74,7 +74,9 @@ do
         cp $file automatic-ves/$flag.txt
   else
      if ! ../src/lib/plumed --no-mpi manual --action=$flag > automatic-ves/$flag.man 2> /dev/null ; then
-        echo Full manual for action $flag will not be generated as you are building the manual from a code where this action was not compiled >> errors-ves
+        if ! ../src/lib/plumed --no-mpi manual_ves --targetdist=$flag > automatic-ves/$flag.man 2> /dev/null ; then
+          echo Full manual for action $flag will not be generated as you are building the manual from a code where this action was not compiled >> errors-ves
+        fi
      elif ! grep -q "\par Examples" $file 1>/dev/null 2>/dev/null
      then
        echo There are no examples inside documentation for action: $flag >> errors-ves
