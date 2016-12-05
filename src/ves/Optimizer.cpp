@@ -127,7 +127,7 @@ isFirstStep(true)
       }
       aux_coeffs_tmp->setLabels(aux_label);
       aux_coeffs_pntrs_.push_back(aux_coeffs_tmp);
-      AuxCoeffs(i) = Coeffs(i);
+      AuxCoeffs(i).setValues( Coeffs(i) );
     }
   }
   ncoeffssets_ = coeffs_pntrs_.size();
@@ -343,7 +343,7 @@ isFirstStep(true)
         setIterationCounter(0);
         log.printf("  Optimization started afresh at iteration %u\n",getIterationCounter());
         for(unsigned int i=0; i<ncoeffssets_; i++){
-          AuxCoeffs(i) = Coeffs(i);
+          AuxCoeffs(i).setValues( Coeffs(i) );
         }
       }
       else{
@@ -765,7 +765,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   ActionPilot::registerKeywords(keys);
   ActionWithValue::registerKeywords(keys);
   //
-  keys.remove("NUMERICAL_DERIVATIVES");  
+  keys.remove("NUMERICAL_DERIVATIVES");
   // Default always active keywords
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
   keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
@@ -1123,7 +1123,7 @@ void Optimizer::readCoeffsFromFiles(const std::vector<std::string>& fnames, cons
       ifile.close();
     }
     else{
-      AuxCoeffs(i) = Coeffs(i);
+      AuxCoeffs(i).setValues( Coeffs(i) );
     }
   }
 }

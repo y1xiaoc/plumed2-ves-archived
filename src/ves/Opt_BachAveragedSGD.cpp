@@ -32,7 +32,7 @@ namespace ves{
 
 //+PLUMEDOC VES_OPTIMIZER AVERAGED_SGD
 /*
-Bach's averaged stochastic gradient decent. 
+Bach's averaged stochastic gradient decent.
 
 \par Examples
 
@@ -130,13 +130,13 @@ combinedgradientOFiles_(0)
 void Opt_BachAveragedSGD::coeffsUpdate(const unsigned int c_id) {
   //
   if(combinedgradientOFiles_.size()>0 && (getIterationCounter()+1)%combinedgradient_wstride_==0){
-    CombinedGradient(c_id) = ( Gradient(c_id) + Hessian(c_id)*(AuxCoeffs(c_id)-Coeffs(c_id)) );
+    CombinedGradient(c_id).setValues( ( Gradient(c_id) + Hessian(c_id)*(AuxCoeffs(c_id)-Coeffs(c_id)) ) );
     combinedgradient_pntrs_[c_id]->setIterationCounterAndTime(getIterationCounter()+1,getTime());
     combinedgradient_pntrs_[c_id]->writeToFile(*combinedgradientOFiles_[c_id]);
   }
   //
   double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
-  AuxCoeffs(c_id) = AuxCoeffs(c_id) - StepSize(c_id)*CoeffsMask(c_id) * ( Gradient(c_id) + Hessian(c_id)*(AuxCoeffs(c_id)-Coeffs(c_id)) );
+  AuxCoeffs(c_id) += - StepSize(c_id)*CoeffsMask(c_id) * ( Gradient(c_id) + Hessian(c_id)*(AuxCoeffs(c_id)-Coeffs(c_id)) );
   //AuxCoeffs() = AuxCoeffs() - StepSize() * ( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
   Coeffs(c_id) += aver_decay * ( AuxCoeffs(c_id)-Coeffs(c_id) );
 }

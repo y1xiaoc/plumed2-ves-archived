@@ -82,7 +82,7 @@ void Opt_RobbinsMonroSGD::coeffsUpdate(const unsigned int c_id) {
   // getIterationCounterDbl() gives n-1 as it is updated afterwards.
   double current_stepsize =  StepSize(c_id) /(1.0 + getIterationCounterDbl()/decay_constant_);
   setCurrentStepSize(current_stepsize,c_id);
-  Coeffs(c_id) = Coeffs(c_id) - current_stepsize * CoeffsMask(c_id) * Gradient(c_id);
+  Coeffs(c_id) += - current_stepsize * CoeffsMask(c_id) * Gradient(c_id);
   //
   double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
   AuxCoeffs(c_id) += aver_decay * ( Coeffs(c_id)-AuxCoeffs(c_id) );

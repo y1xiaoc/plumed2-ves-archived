@@ -398,7 +398,7 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
       multiSimSumAverages(k,walker_weight);
     }
     // NOTE: this assumes that all walkers have the same TargetDist, might change later on!!
-    Gradient(k) = TargetDistAverages(k) - sampled_averages[k];
+    Gradient(k).setValues( TargetDistAverages(k) - sampled_averages[k] );
     Hessian(k) = computeCovarianceFromAverages(k);
     Hessian(k) *= getBeta();
     //
@@ -495,7 +495,7 @@ void VesBias::setTargetDistAverages(const std::vector<double>& coeffderivs_aver_
 
 
 void VesBias::setTargetDistAverages(const CoeffsVector& coeffderivs_aver_ps, const unsigned int coeffs_id) {
-  TargetDistAverages(coeffs_id) = coeffderivs_aver_ps;
+  TargetDistAverages(coeffs_id).setValues( coeffderivs_aver_ps );
   TargetDistAverages(coeffs_id).setIterationCounterAndTime(this->getIterationCounter(),this->getTime());
 }
 

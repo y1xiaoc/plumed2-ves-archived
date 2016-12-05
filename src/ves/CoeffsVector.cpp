@@ -309,10 +309,10 @@ CoeffsVector& CoeffsVector::operator=(const std::vector<double>& values) {
 }
 
 
-CoeffsVector& CoeffsVector::operator=(const CoeffsVector& other_coeffsvector) {
-  setValues(other_coeffsvector);
-  return *this;
-}
+// CoeffsVector& CoeffsVector::operator=(const CoeffsVector& other_coeffsvector) {
+//   setValues(other_coeffsvector);
+//   return *this;
+// }
 
 
 CoeffsVector CoeffsVector::operator+() const {

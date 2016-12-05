@@ -57,6 +57,7 @@ private:
   //
   Communicator& mycomm;
   //
+  CoeffsVector& operator=(const CoeffsVector&);
 public:
   explicit CoeffsVector(
     const std::string&,
@@ -135,7 +136,7 @@ public:
   void setValues(const CoeffsVector&);
   CoeffsVector& operator=(const double);
   CoeffsVector& operator=(const std::vector<double>&);
-  CoeffsVector& operator=(const CoeffsVector&);
+  // CoeffsVector& operator=(const CoeffsVector&);
   // add to all values
   CoeffsVector operator+() const;
   CoeffsVector operator-() const;
