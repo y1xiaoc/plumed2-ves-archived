@@ -51,6 +51,7 @@ CoeffsVector::CoeffsVector(
 CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
 data(0),
 averaging_counter(0),
+averaging_exp_decay_(0),
 mycomm(cc)
 {
   clear();
