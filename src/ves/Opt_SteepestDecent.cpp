@@ -54,6 +54,7 @@ void Opt_SteepestDecent::registerKeywords(Keywords& keys){
   Optimizer::registerKeywords(keys);
   Optimizer::useFixedStepSizeKeywords(keys);
   Optimizer::useMultipleWalkersKeywords(keys);
+  Optimizer::useMaskKeywords(keys);
 }
 
 
@@ -65,7 +66,7 @@ PLUMED_OPTIMIZER_INIT(ao)
 
 
 void Opt_SteepestDecent::coeffsUpdate(const unsigned int c_id) {
-  Coeffs(c_id) += - StepSize(c_id)*Gradient(c_id);
+  Coeffs(c_id) += - StepSize(c_id) * CoeffsMask(c_id) * Gradient(c_id);
   //
   double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
   AuxCoeffs(c_id) += aver_decay * ( Coeffs(c_id)-AuxCoeffs(c_id) );
