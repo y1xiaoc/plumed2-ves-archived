@@ -38,7 +38,11 @@ namespace ves{
 
 //+PLUMEDOC VES_BIASES VES_LINEAR_EXPANSION
 /*
-Lineare basis set expansion bias.
+Linear basis set expansion bias.
+
+\f[
+V(s_{1},s_{2};\boldsymbol{\alpha}) = \sum_{i_{1},i_{2}} \alpha_{i_{1},i_{2}} \, f_{i_{1}}(s_{1}) \, f_{i_{2}}(s_{2})
+\f]
 
 \par Examples
 

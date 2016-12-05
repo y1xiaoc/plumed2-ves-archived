@@ -2,7 +2,24 @@
 
 \page ves_intro Variationally Enhanced Sampling
 
+The ves-code is a module outside the PLUMED core that implements the 
+
+\par Introduction to VES
+
 Variationally Enhanced Sampling (VES) is a method
+
+\f[
+\Omega[V] = \frac{1}{\beta} \log
+\frac{\int d\mathbf{s} \, e^{-\beta [F(\mathbf{s}+V(\mathbf{s}))]}}
+{\int d\mathbf{s} \, e^{-\beta F(\mathbf{s}}}
++ \int d\mathbf{s} \, p(\mathbf{s}) V(\mathbf{s})
+\f]
+
+which is minimized by
+
+\f[
+V(\mathbf{s}) = - F(\mathbf{s}) - \frac{1}{\beta} \log p(\mathbf{s})
+\f]
 
 - \subpage ves_biases
 - \subpage ves_basisf
@@ -13,8 +30,13 @@ Variationally Enhanced Sampling (VES) is a method
 - \subpage ves_cltools
 - \subpage ves_glossary
 
+[VES homepage](http://www.ves-code.org)
 
-\page ves_biases Biases
+
+
+
+
+\page ves_biases Bias
 
 The following list contains the biases  available in VES.
 

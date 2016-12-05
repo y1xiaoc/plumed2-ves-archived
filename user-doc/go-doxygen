@@ -2,14 +2,17 @@
 
 source ../sourceme.sh
 
+LIST_VES="`ls VES*PP.txt` automatic-ves"
+
 LIST="
  IntroPP.txt ../CHANGES InstallationPP.txt SyntaxPP.txt ColvarPP.txt GroupPP.txt FunctionsPP.txt AnalysisPP.txt
-  BiasPP.txt ToolsPP.txt MiscPP.txt PerformancesPP.txt VESPP.txt RegexPP.txt FilesPP.txt ModulesPP.txt TutorialsPP.txt GlossaryPP.txt automatic automatic-ves tutorials other" 
+  BiasPP.txt ${LIST_VES} ToolsPP.txt MiscPP.txt PerformancesPP.txt RegexPP.txt FilesPP.txt ModulesPP.txt TutorialsPP.txt GlossaryPP.txt automatic tutorials other" 
+
 
 {
   cat Doxyfile
   echo "PROJECT_NUMBER = \"$(../src/lib/plumed --no-mpi info --long-version)\""
-  echo "INPUT+=" $LIST
+  echo "INPUT+=" $LIST $LIST_VES
   # add this to manually control layout:
   # echo "LAYOUT_FILE=PlumedLayout.xml"
 } | doxygen -

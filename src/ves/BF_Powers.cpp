@@ -32,6 +32,8 @@ namespace ves{
 /*
 Polynomial powers basis functions
 
+ __This basis set should not be used in conventional simulations__. Instead you should use a orthogonal basis functions like \ref BF_LEGENDRE or \ref BF_CHEBYSHEV.
+
 \par Examples
 
 
