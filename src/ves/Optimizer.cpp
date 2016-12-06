@@ -823,7 +823,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
 
 
 void Optimizer::useHessianKeywords(Keywords& keys) {
-  keys.use("FULL_HESSIAN");
+  // keys.use("FULL_HESSIAN");
   keys.use("HESSIAN_FILE");
   keys.use("HESSIAN_OUTPUT");
   keys.use("HESSIAN_FMT");
