@@ -33,7 +33,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST WELL_TEMPERED
 /*
-Well-tempered target distribution
+Well-tempered target distribution (dynamic).
 
 \par Examples
 

@@ -31,7 +31,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST GAUSSIAN
 /*
-Gaussian target distribution
+Target distribution given by a sum of Gaussians (static).
 
 \par Examples
 

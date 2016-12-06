@@ -37,7 +37,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST MATHEVAL_DIST
 /*
-Matheval target distribution
+Arbitrary target distribution given by a matheval parsed function (static or dynamic).
 
 \par Examples
 

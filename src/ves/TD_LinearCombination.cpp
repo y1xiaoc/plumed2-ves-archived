@@ -36,7 +36,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST LINEAR_COMBINATION
 /*
-Linear combination of target distributions
+Target distribution given by linear combination of distributions (static or dynamic).
 
 \par Examples
 

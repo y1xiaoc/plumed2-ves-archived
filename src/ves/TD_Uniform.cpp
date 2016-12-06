@@ -31,7 +31,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST UNIFORM
 /*
-Uniform target distribution
+Uniform target distribution (static).
 
 \par Examples
 

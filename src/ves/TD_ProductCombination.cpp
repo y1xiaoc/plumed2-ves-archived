@@ -31,7 +31,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST PRODUCT_COMBINATION
 /*
-Product combination of target distributions
+Target distribution given by a product combination of one-dimensional distributions (static or dynamic).
 
 \par Examples
 

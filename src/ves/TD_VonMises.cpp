@@ -33,7 +33,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST VON_MISES
 /*
-Von Mises target distribution
+Von Mises target distribution (static).
 
 \par Examples
 

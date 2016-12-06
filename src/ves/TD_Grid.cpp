@@ -37,7 +37,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST GRID_DIST
 /*
-Grid target distribution
+Target distribution from a grid file (static).
 
 \par Examples
 

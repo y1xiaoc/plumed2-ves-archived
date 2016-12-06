@@ -32,7 +32,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST UNIFORM_BIAS_CUTOFF
 /*
-Uniform-cutoff target distribution
+Uniform target distribution with a bias cutoff (dynamic).
 
 \par Examples
 

@@ -35,7 +35,7 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST PROJECTED_WELL_TEMPERED
 /*
-Projected well-tempered target distribution
+One-dimensional marginal well-tempered target distribution (dynamic).
 
 \par Examples
 
