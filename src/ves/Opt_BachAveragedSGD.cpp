@@ -32,7 +32,33 @@ namespace ves{
 
 //+PLUMEDOC VES_OPTIMIZER AVERAGED_SGD
 /*
-Bach's averaged stochastic gradient decent.
+Averaged stochastic gradient decent.
+
+\par Algorithim
+
+This optimizer updates the coefficents according to the averaged stochastic gradient decent algorithim described in ref \cite Bach-NIPS-2013. This algorithim considers two sets of coefficents, the so-called instantaneous coefficents that are updated according to the recursion formula given by
+\f[
+\boldsymbol{\alpha}^{(n+1)} = \boldsymbol{\alpha}^{(n)} -
+\mu \left[
+\nabla \Omega(\bar{\boldsymbol{\alpha}}^{(n)}) +
+\mathbf{H}(\bar{\boldsymbol{\alpha}}^{(n)})
+[\boldsymbol{\alpha}^{(n)}-\bar{\boldsymbol{\alpha}}^{(n)}]
+\right],
+\f]
+where \f$\mu\f$ is a fixed step size and the gradient \f$ \nabla\Omega(\bar{\boldsymbol{\alpha}}^{(n)})\f$ and the Hessian \f$\mathbf{H}(\bar{\boldsymbol{\alpha}}^{(n)})\f$ depend on the averaged coefficents defined as
+\f[
+\bar{\boldsymbol{\alpha}}^{(n)} = \frac{1}{n+1} \sum_{k=0}^{n} \boldsymbol{\alpha}^{(k)}.
+\f]
+This means that the bias acting on the system depends on the averaged coefficents \f$\bar{\boldsymbol{\alpha}}^{(n)}\f$ which leads to a smooth convergence of the bias and the estimated free energy surface. Furthermore, this allows for a rather short sampling time for each iteration, for classical MD simulations typical sampling times are on the order of few ps (around 1000-2000 MD steps).
+
+Currently it is only supported to employ the diagonal part of the Hessian which is generally sufficent. Support for employing the full Hessian will be added later on.
+
+\par Multiple walkers
+
+This optimizer supports the usage of multiple walkers where different copies of the system share the same bias potential (i.e. coefficents) and cooperatively sample the averages needed for the gradient and Hessian. This can significally help with convergence in diffucult cases. It is of course best to start the different copies from different postions in CV space. To activate this option you just need to add the MULTIPLE_WALKERS flag. Note that this is only supported if the MD code support running multiple replicas connected via MPI.
+
+\par Mask file
+
 
 \par Examples
 

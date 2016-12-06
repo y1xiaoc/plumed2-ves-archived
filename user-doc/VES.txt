@@ -1,26 +1,12 @@
 /**
 
-\page ves_intro Variationally Enhanced Sampling
+\page ves_main Variationally Enhanced Sampling
 
-The ves-code is a module outside the PLUMED core that implements the 
+The VES code is a module outside the PLUMED core that implements enhanced sampling methods based on _Variationally Enhanced Sampling_ (VES) \cite Valsson-PRL-2014. The theory of VES is explained in more detail \ref ves_theory "here".
 
-\par Introduction to VES
+[homepage of the VES code](http://www.ves-code.org)
 
-Variationally Enhanced Sampling (VES) is a method
-
-\f[
-\Omega[V] = \frac{1}{\beta} \log
-\frac{\int d\mathbf{s} \, e^{-\beta [F(\mathbf{s}+V(\mathbf{s}))]}}
-{\int d\mathbf{s} \, e^{-\beta F(\mathbf{s}}}
-+ \int d\mathbf{s} \, p(\mathbf{s}) V(\mathbf{s})
-\f]
-
-which is minimized by
-
-\f[
-V(\mathbf{s}) = - F(\mathbf{s}) - \frac{1}{\beta} \log p(\mathbf{s})
-\f]
-
+- \subpage ves_theory
 - \subpage ves_biases
 - \subpage ves_basisf
 - \subpage ves_targetdist
@@ -30,10 +16,23 @@ V(\mathbf{s}) = - F(\mathbf{s}) - \frac{1}{\beta} \log p(\mathbf{s})
 - \subpage ves_cltools
 - \subpage ves_glossary
 
-[VES homepage](http://www.ves-code.org)
 
 
 
+
+\page ves_theory Theory of VES
+
+In Variationally Enhanced Sampling \cite Valsson-PRL-2014 an external biasing potential \f$V(\mathbf{s})\f$ in some space of collective variables (CVs) \f$s\f$ is constructed by minimizing the following convex functional
+\f[
+\Omega[V] = \frac{1}{\beta} \log
+\frac{\int d\mathbf{s} \, e^{-\beta [F(\mathbf{s}+V(\mathbf{s}))]}}
+{\int d\mathbf{s} \, e^{-\beta F(\mathbf{s}}}
++ \int d\mathbf{s} \, p(\mathbf{s}) V(\mathbf{s}),
+\f]
+where \f$F(\mathbf{s})\f$ is the free energy surface (FES) associated to the CVs at temperature \f$T\f$ and \f$p(\mathbf{s})\f$ is a so-called target distribution that is assumed to be normalized. It can be shown that the minimum of \f$\Omega[V]\f$ is given by
+\f[
+V(\mathbf{s}) = - F(\mathbf{s}) - \frac{1}{\beta} \log p(\mathbf{s}).
+\f]
 
 
 \page ves_biases Bias
@@ -50,6 +49,9 @@ The following list contains the basis functions available in VES.
 
 
 \page ves_targetdist Target Distributions
+
+The
+Various target distributions are available for usage in the
 
 The following list contains the target distributions available in VES.
 
