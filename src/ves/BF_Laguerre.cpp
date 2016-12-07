@@ -39,6 +39,7 @@ Laguerre basis functions.
 
 class BF_Laguerre : public BasisFunctions {
   double scalingf_;
+  virtual void setupLabels();
 public:
   static void registerKeywords(Keywords&);
   explicit BF_Laguerre(const ActionOptions&);
@@ -59,17 +60,15 @@ BF_Laguerre::BF_Laguerre(const ActionOptions&ao):
  PLUMED_BASISFUNCTIONS_INIT(ao),
  scalingf_(1.0)
 {
-  setNumberOfBasisFunctions(getOrder()+1);
+  setNumberOfBasisFunctions(getOrder()+2);
   setIntrinsicInterval(intervalMin(),intervalMax());
-  // scalingf_ = 20.0/(intervalMax()-intervalMin());
   scalingf_ = 1.0;
   parse("SCALING_FACTOR",scalingf_);
   if(scalingf_!=1.0){addKeywordToList("SCALING_FACTOR",scalingf_);}
   setNonPeriodic();
   setIntervalBounded();
   setType("Laguerre");
-  setDescription("Laguerre polynomials");
-  setLabelPrefix("L");
+  setDescription("Laguerre functions");
   setupBF();
   checkRead();
 }
@@ -82,9 +81,10 @@ void BF_Laguerre::getAllValues(const double arg, double& argT, bool& inside_rang
   argT=checkIfArgumentInsideInterval(arg,inside_range);
   argT = scalingf_*(argT-intervalMin());
   //
-  std::vector<double> valuesL(values.size());
-  std::vector<double> derivsL(derivs.size());
+  std::vector<double> valuesL(getOrder()+1);
+  std::vector<double> derivsL(getOrder()+1);
   //
+  // calculate the Laguerre polynomials
   valuesL[0]=1.0;
   derivsL[0]=0.0;
   valuesL[1]=1.0-argT;
@@ -94,14 +94,25 @@ void BF_Laguerre::getAllValues(const double arg, double& argT, bool& inside_rang
     valuesL[i+1]  = ((2.0*io+1.0-argT)/(io+1.0))*valuesL[i] - (io/(io+1.0))*valuesL[i-1];
     derivsL[i+1]  = ((2.0*io+1.0-argT)/(io+1.0))*derivsL[i] - (1.0/(io+1.0))*valuesL[i] - (io/(io+1.0))*derivsL[i-1];
   }
-  values[0]=valuesL[0];
-  derivs[0]=derivsL[0];
+  // calculate the Laguerre functions, the constant has index 0, the index is then shifted
+  // index 1: exp(-x/2)*L0(x) = exp(-x/2), index 2: exp(-x/2)*L1(x), etc.
+  values[0]=1.0;
+  derivs[0]=0.0;
   double vexp = exp(-0.5*argT);
   for(unsigned int i=1; i < getNumberOfBasisFunctions();i++){
-    values[i] = vexp*valuesL[i];
-    derivs[i] = scalingf_*vexp*(-0.5*valuesL[i]+derivsL[i]);
+    values[i] = vexp*valuesL[i-1];
+    derivs[i] = scalingf_*vexp*(-0.5*valuesL[i-1]+derivsL[i-1]);
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
+}
+
+
+void BF_Laguerre::setupLabels() {
+  setLabel(0,"1");
+  for(unsigned int i=1; i < getNumberOfBasisFunctions() ;i++){
+    std::string is; Tools::convert(i-1,is);
+    setLabel(i,"l"+is+"(s)");
+  }
 }
 
 
