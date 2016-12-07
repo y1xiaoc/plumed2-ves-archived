@@ -1,0 +1,16 @@
+out_file=derivs-diff.data
+NumFields=`awk '{print NF}' bf.derivs.data | tail -n 1 `
+cat bf.derivs.data | grep -v "^#" | awk '{print $1}' > ${out_file}
+for ((i=2; i <= NumFields ; i++))
+do
+  cat bf.derivs.data            |  grep -v "^#"  |  awk -v f=$i '{print $f}' > $$.d1  
+  cat bf.derivs-numerical.data  |  grep -v "^#"  |  awk -v f=$i '{print $f}' > $$.d2  
+  paste $$.d1 $$.d2 | awk '{printf "%13.6f\n",$1-$2}' > $$.diff
+  cp ${out_file} $$.save
+  paste $$.save $$.diff > ${out_file}
+  rm -f $$.d1 $$.d2 $$.save $$.diff
+done
+cp ${out_file} $$.data
+grep "^#" bf.derivs.data > $$.header
+cat $$.header $$.data > ${out_file}
+rm -f $$.data $$.header
