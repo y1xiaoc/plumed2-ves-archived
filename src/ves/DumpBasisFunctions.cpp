@@ -72,6 +72,7 @@ void DumpBasisFunctions::registerKeywords(Keywords& keys){
   keys.add("optional","FILE_TARGETDIST","filename of the files on which the target distributions are written. By default it is BASIS_SET.targetdist-#.data.");
   keys.add("numbered","TARGET_DISTRIBUTION","the target distribution to be used.");
   keys.addFlag("IGNORE_PERIODICITY",false,"if the periodicity of the basis functions should be ignored.");
+  keys.addFlag("NUMERICAL_DERIVATIES",false,"if the derivatives of the basis functions should be calculated numerically.");
 }
 
 DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
@@ -103,6 +104,9 @@ bf_pntrs(1)
   bool ignore_periodicity = false;
   parseFlag("IGNORE_PERIODICITY",ignore_periodicity);
 
+  bool numerical_deriv = false;
+  parseFlag("NUMERICAL_DERIVATIES",numerical_deriv);
+
   std::vector<std::string> targetdist_keywords;
   std::string str_ps="";
   for(int i=1;;i++){
@@ -119,7 +123,7 @@ bf_pntrs(1)
   ofile_derivs.link(*this);
   ofile_derivs.enforceBackup();
   ofile_derivs.open(fname_derives);
-  bf_pntrs[0]->writeBasisFunctionsToFile(ofile_values,ofile_derivs,nbins,ignore_periodicity,fmt_values_derivs);
+  bf_pntrs[0]->writeBasisFunctionsToFile(ofile_values,ofile_derivs,nbins,ignore_periodicity,fmt_values_derivs,numerical_deriv);
   ofile_values.close();
   ofile_derivs.close();
   //

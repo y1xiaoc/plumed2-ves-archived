@@ -28,6 +28,7 @@
 #include "GridIntegrationWeights.h"
 
 #include "tools/Grid.h"
+#include "tools/Tools.h"
 
 
 namespace PLMD{
@@ -308,7 +309,24 @@ double BasisFunctions::getValue(const double arg, const unsigned int n, double& 
 }
 
 
-void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vector<double>& argsT, std::vector<std::vector<double> >& values, std::vector<std::vector<double> >& derivs) const {
+void BasisFunctions::getAllValuesNumericalDerivs(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+  // use forward difference, unless very close to the boundary
+  double delta = sqrt(epsilon);
+  if((arg+delta)>intervalMax()){
+    delta *= -1.0;
+  }
+  inside_range=true;
+  std::vector<double> values_delta(numberOfBasisFunctions());
+  std::vector<double> derivs_dummy(numberOfBasisFunctions());
+  getAllValues(arg+delta, argT, inside_range, values_delta, derivs_dummy);
+  getAllValues(arg, argT, inside_range, values, derivs_dummy);
+  for(unsigned int i=0; i<numberOfBasisFunctions(); i++){
+    derivs[i] = (values_delta[i]-values[i])/delta;
+  }
+}
+
+
+void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vector<double>& argsT, std::vector<std::vector<double> >& values, std::vector<std::vector<double> >& derivs, const bool numerical_deriv) const {
   argsT.resize(args.size());
   values.clear();
   derivs.clear();
@@ -316,14 +334,18 @@ void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vect
     std::vector<double> tmp_values(getNumberOfBasisFunctions());
     std::vector<double> tmp_derivs(getNumberOfBasisFunctions());
     bool inside_interval=true;
-    getAllValues(args[i],argsT[i],inside_interval,tmp_values,tmp_derivs);
+    if(!numerical_deriv){
+      getAllValues(args[i],argsT[i],inside_interval,tmp_values,tmp_derivs);
+    } else {
+      getAllValuesNumericalDerivs(args[i],argsT[i],inside_interval,tmp_values,tmp_derivs);
+    }
     values.push_back(tmp_values);
     derivs.push_back(tmp_derivs);
   }
 }
 
 
-void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins_in, const bool ignore_periodicity, std::string output_fmt) const {
+void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, unsigned int nbins_in, const bool ignore_periodicity, const std::string output_fmt, const bool numerical_deriv) const {
 
   std::vector<std::string> min(1); min[0]=intervalMinStr();
   std::vector<std::string> max(1); max[0]=intervalMaxStr();
@@ -363,7 +385,7 @@ void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile
     ofile_derivs.addConstantField("periodic").printField("periodic","false");
   }
 
-  getMultipleValue(args,argsT,values,derivs);
+  getMultipleValue(args,argsT,values,derivs,numerical_deriv);
   ofile_values.fmtField(output_fmt);
   ofile_derivs.fmtField(output_fmt);
   for(unsigned int i=0; i<args.size(); i++){

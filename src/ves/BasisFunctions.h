@@ -97,6 +97,9 @@ private:
   //
   VesBias* vesbias_pntr_;
   Action* action_pntr_;
+  //
+  void getAllValuesNumericalDerivs(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
+
 protected:
   // setup various stuff
   void setupBF();
@@ -185,8 +188,8 @@ public:
   //virtual void get2ndDerivaties(const double, std::vector<double>&)=0;
   void printInfo() const;
   //
-  void getMultipleValue(const std::vector<double>&, std::vector<double>&, std::vector<std::vector<double> >&, std::vector<std::vector<double> >&) const;
-  void writeBasisFunctionsToFile(OFile&, OFile&, unsigned int nbins=1000, const bool ignore_periodicity=false, std::string output_fmt="%15.8f") const;
+  void getMultipleValue(const std::vector<double>&, std::vector<double>&, std::vector<std::vector<double> >&, std::vector<std::vector<double> >&, const bool numerical_deriv=false) const;
+  void writeBasisFunctionsToFile(OFile&, OFile&, unsigned int nbins=1000, const bool ignore_periodicity=false, const std::string output_fmt="%15.8f", const bool numerical_deriv=false) const;
 };
 
 
