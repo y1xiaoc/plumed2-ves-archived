@@ -63,7 +63,9 @@ PLUMED_REGISTER_ACTION(DumpBasisFunctions,"DUMP_BASISFUNCTIONS")
 void DumpBasisFunctions::registerKeywords(Keywords& keys){
   Action::registerKeywords(keys);
   keys.add("compulsory","BASIS_SET","the label of the basis set that you want to use");
-  keys.add("optional","GRID_BINS","the number of bins used for the grid. The default value is 1000.");
+  keys.add("optional","GRID_BINS","the number of bins used for the grid for writing the basis function values and derivatives. The default value is 1000.");
+  keys.add("optional","GRID_MIN","the minimum of the grid for writing the basis function values and derivatives. By default it is the minimum of the interval on which the basis functions are defined.");
+  keys.add("optional","GRID_MAX","the maximum of the grid for writing the basis function values and derivatives. By default it is the maximum of the interval on which the basis functions are defined.");
   keys.add("optional","FILE_VALUES","filename of the file on which the basis function values are written. By default it is BASIS_SET.values.data.");
   keys.add("optional","FILE_DERIVS","filename of the file on which the basis function derivatives are written. By default it is BASIS_SET.derivs.data.");
   keys.add("optional","FORMAT_VALUES_DERIVS","the numerical format of the basis function values and derivatives written to file. By default it is %15.8f.\n");
@@ -86,6 +88,11 @@ bf_pntrs(1)
 
   unsigned int nbins = 1000;
   parse("GRID_BINS",nbins);
+
+  std::string min_str = bf_pntrs[0]->intervalMinStr();
+  std::string max_str = bf_pntrs[0]->intervalMaxStr();
+  parse("GRID_MIN",min_str);
+  parse("GRID_MAX",max_str);
 
   std::string fname_values = bf_pntrs[0]->getLabel()+".values.data";
   parse("FILE_VALUES",fname_values);
@@ -123,7 +130,7 @@ bf_pntrs(1)
   ofile_derivs.link(*this);
   ofile_derivs.enforceBackup();
   ofile_derivs.open(fname_derives);
-  bf_pntrs[0]->writeBasisFunctionsToFile(ofile_values,ofile_derivs,nbins,ignore_periodicity,fmt_values_derivs,numerical_deriv);
+  bf_pntrs[0]->writeBasisFunctionsToFile(ofile_values,ofile_derivs,min_str,max_str,nbins,ignore_periodicity,fmt_values_derivs,numerical_deriv);
   ofile_values.close();
   ofile_derivs.close();
   //
