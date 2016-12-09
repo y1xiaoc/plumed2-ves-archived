@@ -28,9 +28,9 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_BASISF BF_LAGUERRE
+//+PLUMEDOC VES_BASISF BF_HERMITE
 /*
-Laguerre basis functions.
+Hermite basis functions.
 
 \par Examples
 
