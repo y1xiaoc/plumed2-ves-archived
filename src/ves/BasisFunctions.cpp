@@ -345,7 +345,7 @@ void BasisFunctions::getMultipleValue(const std::vector<double>& args, std::vect
 }
 
 
-void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, const std::string& min_in, const std::string& max_in, unsigned int nbins_in, const bool ignore_periodicity, const std::string output_fmt, const bool numerical_deriv) const {
+void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile_derivs, const std::string& min_in, const std::string& max_in, unsigned int nbins_in, const bool ignore_periodicity, const std::string& output_fmt, const bool numerical_deriv) const {
   std::vector<std::string> min(1); min[0]=min_in;
   std::vector<std::string> max(1); max[0]=max_in;
   std::vector<unsigned int> nbins(1); nbins[0]=nbins_in;
