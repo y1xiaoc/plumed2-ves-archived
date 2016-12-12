@@ -96,17 +96,23 @@ ncenters_(0)
       sigmas_.push_back(tmp_sigma);
     }
   }
-  plumed_massert(centers_.size()==sigmas_.size(),"there has to be an equal amount of CENTER and SIGMA keywords");
+  if(centers_.size()!=sigmas_.size()){
+    plumed_merror(getName()+": there has to be an equal amount of CENTER and SIGMA keywords");
+  }
   if(centers_.size()==0){
-    plumed_merror("GAUSSIAN: CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
+    plumed_merror(getName()+": CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
   }
   //
   setDimension(centers_[0].size());
   ncenters_ = centers_.size();
   // check centers and sigmas
   for(unsigned int i=0; i<ncenters_; i++) {
-    plumed_massert(centers_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
-    plumed_massert(sigmas_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
+    if(centers_[i].size()!=getDimension()){
+      plumed_merror(getName()+": one of the CENTER keyword does not match the given dimension");
+    }
+    if(sigmas_[i].size()!=getDimension()){
+      plumed_merror(getName()+": one of the SIGMA keyword does not match the given dimension");
+    }
   }
   //
   correlation_.resize(ncenters_);
@@ -129,22 +135,23 @@ ncenters_(0)
   }
 
   if(!diagonal_ && getDimension()!=2){
-    plumed_merror("GAUSSIAN: CORRELATION is only defined for two-dimensional Gaussians for now.");
+    plumed_merror(getName()+": CORRELATION is only defined for two-dimensional Gaussians for now.");
   }
   for(unsigned int i=0; i<correlation_.size(); i++){
     if(correlation_[i].size()!=1){
-      plumed_merror("GAUSSIAN: only one value should be given in CORRELATION");
+      plumed_merror(getName()+": only one value should be given in CORRELATION");
     }
     for(unsigned int k=0;k<correlation_[i].size(); k++){
       if(correlation_[i][k] <= -1.0 ||  correlation_[i][k] >= 1.0){
-        plumed_merror("GAUSSIAN: values given in CORRELATION should be between -1.0 and 1.0" );
+        plumed_merror(getName()+": values given in CORRELATION should be between -1.0 and 1.0" );
       }
     }
   }
-
   //
   if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(centers_.size(),1.0);}
-  plumed_massert(centers_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
+  if(centers_.size()!=weights_.size()){
+    plumed_merror(getName()+": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
+  }
   //
   double sum_weights=0.0;
   for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
