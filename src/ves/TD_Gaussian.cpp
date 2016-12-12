@@ -39,9 +39,8 @@ Target distribution given by a sum of Gaussians (static).
 //+ENDPLUMEDOC
 
 class TD_Gaussian: public TargetDistribution {
-  // properties of the Gaussians
-  std::vector< std::vector<double> > sigmas_;
   std::vector< std::vector<double> > centers_;
+  std::vector< std::vector<double> > sigmas_;
   std::vector< std::vector<double> > correlation_;
   std::vector<double> weights_;
   bool diagonal_;
@@ -60,17 +59,17 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Gaussian,"GAUSSIAN")
 
 void TD_Gaussian::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","CENTER","The centers of the Gaussians.");
-  keys.add("numbered","SIGMA","The sigmas of the Gaussians.");
-  keys.add("numbered","CORRELATION","The correlation between the arguments, currently only works for two-dimensional Gaussians ");
-  keys.add("optional","WEIGHTS","The weights of the Gaussians.");
+  keys.add("numbered","CENTER","The center of each Gaussian distribution.");
+  keys.add("numbered","SIGMA","The sigma parameters for each Gaussian distribution.");
+  keys.add("numbered","CORRELATION","The correlation between the arguments for each Gaussian distribution. Currently only works for two-dimensional Gaussians.");
+  keys.add("optional","WEIGHTS","The weights of the Gaussian distribution. By default all are weighted equally.");
 }
 
 
 TD_Gaussian::TD_Gaussian( const TargetDistributionOptions& to ):
 TargetDistribution(to),
-sigmas_(0),
 centers_(0),
+sigmas_(0),
 correlation_(0),
 weights_(0),
 diagonal_(true),
@@ -96,11 +95,13 @@ ncenters_(0)
       sigmas_.push_back(tmp_sigma);
     }
   }
+  //
+  if(centers_.size()==0){
+    plumed_merror(getName()+": CENTER keywords seem to be missing. Note that numbered keywords start at CENTER1.");
+  }
+  //
   if(centers_.size()!=sigmas_.size()){
     plumed_merror(getName()+": there has to be an equal amount of CENTER and SIGMA keywords");
-  }
-  if(centers_.size()==0){
-    plumed_merror(getName()+": CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
   }
   //
   setDimension(centers_[0].size());
