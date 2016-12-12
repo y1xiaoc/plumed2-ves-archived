@@ -77,6 +77,26 @@ DUMP_TARGET_DISTRIBUTION ...
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-40.0
+ GRID_MAX=+40.0
+ GRID_BINS=200
+ TARGET_DISTRIBUTION={MATHEVAL_DIST
+                      FUNCTION=exp(-(abs(s1-20.0)/5.0)^4.0)+exp(-(abs(s1+20.0)/5.0)^4.0)}
+ TARGETDIST_FILE=targetdist-6b.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-40.0
+ GRID_MAX=+40.0
+ GRID_BINS=200
+ TARGET_DISTRIBUTION={MATHEVAL_DIST
+                      FUNCTION=1.0*exp(-(abs(s1-20.0)/5.0)^4.0)+4.0*exp(-(abs(s1+20.0)/5.0)^4.0)}
+ TARGETDIST_FILE=targetdist-6c.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
 
 # Generalized Normal, or exponential power distribution, or generalized error distribution
 # https://en.wikipedia.org/wiki/Generalized_normal_distribution
