@@ -118,6 +118,10 @@ ncenters_(0)
   //
   setDimension(centers_[0].size());
   ncenters_ = centers_.size();
+  //
+  if(ncenters_>1){
+    plumed_merror("For now " + getName() + " only supports one center. Use LINEAR_COMBINATION to create multiple centers.");
+  }
   // check centers and sigmas
   for(unsigned int i=0; i<ncenters_; i++) {
     if(centers_[i].size()!=getDimension()){
