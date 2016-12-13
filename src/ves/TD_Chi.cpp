@@ -72,7 +72,15 @@ normalization_(0)
 {
   parseVector("MINIMA",minima_);
   parseVector("SIGMA",sigma_);
-  parseVector("KAPPA",kappa_);
+
+  std::vector<unsigned int> kappa_int(0);
+  parseVector("KAPPA",kappa_int,true);
+  if(kappa_int.size()==0){plumed_merror(getName()+": some problem with KAPPA keyword, should given as postive integer(s) larger than 0");}
+  kappa_.resize(kappa_int.size());
+  for(unsigned int k=0; k<kappa_int.size(); k++){
+    if(kappa_int[k] < 1){plumed_merror(getName()+": KAPPA should be a integers larger than 0");}
+    kappa_[k] = static_cast<double>(kappa_int[k]);
+  }
 
   setDimension(minima_.size());
   if(sigma_.size()!=getDimension()){plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
