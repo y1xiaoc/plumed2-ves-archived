@@ -25,8 +25,6 @@
 
 #include "tools/Keywords.h"
 
-#include <math.h>
-
 
 namespace PLMD{
 namespace ves{
