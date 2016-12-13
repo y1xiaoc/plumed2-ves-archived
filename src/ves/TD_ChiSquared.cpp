@@ -105,7 +105,7 @@ double TD_ChiSquared::ChiSquaredDiagonal(const std::vector<double>& argument, co
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
     double arg=(argument[k]-minima[k])/sigma[k];
-    value *= normalization[k] * pow(arg,0.5*kappa_[k]-1.0) * exp(-0.5*arg);
+    value *= normalization[k] * pow(arg,0.5*kappa[k]-1.0) * exp(-0.5*arg);
   }
   return value;
 }

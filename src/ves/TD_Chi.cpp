@@ -105,7 +105,7 @@ double TD_Chi::ChiDiagonal(const std::vector<double>& argument, const std::vecto
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
     double arg=(argument[k]-minima[k])/sigma[k];
-    value *= normalization[k] * pow(arg,kappa_[k]-1.0) * exp(-0.5*arg*arg);
+    value *= normalization[k] * pow(arg,kappa[k]-1.0) * exp(-0.5*arg*arg);
   }
   return value;
 }
