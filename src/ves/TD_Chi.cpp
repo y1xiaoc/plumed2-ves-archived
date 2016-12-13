@@ -1,0 +1,109 @@
+/* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   Copyright (c) 2015-2016 The ves-code team
+   (see the PEOPLE-VES file at the root of the distribution for a list of names)
+
+   See http://www.ves-code.org for more information.
+
+   This file is part of ves-code, version 1.
+
+   ves-code is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   ves-code is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+#include "TargetDistribution.h"
+#include "TargetDistributionRegister.h"
+
+#include "tools/Keywords.h"
+
+#include "math.h"
+
+namespace PLMD{
+namespace ves{
+
+//+PLUMEDOC VES_TARGETDIST CHI
+/*
+Chi distribution (static).
+
+\par Examples
+
+*/
+//+ENDPLUMEDOC
+
+class TD_Chi: public TargetDistribution {
+  std::vector<double> minima_;
+  std::vector<double> sigma_;
+  std::vector<double> kappa_;
+  std::vector<double> normalization_;
+  double ChiDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
+public:
+  static void registerKeywords(Keywords&);
+  explicit TD_Chi(const TargetDistributionOptions& to);
+  double getValue(const std::vector<double>&) const;
+};
+
+
+VES_REGISTER_TARGET_DISTRIBUTION(TD_Chi,"CHI")
+
+
+void TD_Chi::registerKeywords(Keywords& keys){
+  TargetDistribution::registerKeywords(keys);
+  keys.add("compulsory","MINIMA","The minima of each exponential power distribution.");
+  keys.add("compulsory","SIGMA","The sigma parameters for each exponential power distribution.");
+  keys.add("compulsory","KAPPA","The kappa parameters for each exponential power distribution.");
+}
+
+
+TD_Chi::TD_Chi( const TargetDistributionOptions& to ):
+TargetDistribution(to),
+minima_(0),
+sigma_(0),
+kappa_(0),
+normalization_(0)
+{
+  parseVector("MINIMA",minima_);
+  parseVector("SIGMA",sigma_);
+  parseVector("KAPPA",kappa_);
+
+  setDimension(minima_.size());
+  if(sigma_.size()!=getDimension()){plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
+  if(kappa_.size()!=getDimension()){plumed_merror(getName()+": the KAPPA keyword does not match the given dimension in MINIMA");}
+
+  normalization_.resize(getDimension());
+  for(unsigned int k=0; k<getDimension(); k++){
+    normalization_[k] = pow(2.0,(1.0-0.5*kappa_[k]))/(tgamma(0.5*kappa_[k])*sigma_[k]);
+  }
+  checkRead();
+}
+
+
+double TD_Chi::getValue(const std::vector<double>& argument) const {
+  for(unsigned int k=0; k<argument.size(); k++){
+    if(argument[k]<minima_[k]){plumed_merror(getName()+": the chi distribution is not defined for values less that ones given in MINIMA");}
+  }
+  return ChiDiagonal(argument,minima_,sigma_,kappa_,normalization_);
+}
+
+
+double TD_Chi::ChiDiagonal(const std::vector<double>& argument, const std::vector<double>& minima, const std::vector<double>& sigma, const std::vector<double>& kappa, const std::vector<double>& normalization) const {
+  double value = 1.0;
+  for(unsigned int k=0; k<argument.size(); k++){
+    double arg=(argument[k]-minima[k])/sigma[k];
+    value *= normalization[k] * pow(arg,kappa_[k]-1.0) * exp(-0.5*arg*arg);
+  }
+  return value;
+}
+
+
+
+}
+}
