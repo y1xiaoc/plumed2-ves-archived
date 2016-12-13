@@ -25,7 +25,6 @@
 
 #include "tools/Keywords.h"
 
-
 namespace PLMD{
 namespace ves{
 
@@ -42,9 +41,10 @@ class TD_ExponentialPower: public TargetDistribution {
   std::vector< std::vector<double> > centers_;
   std::vector< std::vector<double> > alphas_;
   std::vector< std::vector<double> > betas_;
+  std::vector< std::vector<double> > normalization_;
   std::vector<double> weights_;
   unsigned int ncenters_;
-  double ExponentialPowerDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
+  double ExponentialPowerDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
   static void registerKeywords(Keywords&);
   explicit TD_ExponentialPower(const TargetDistributionOptions& to);
@@ -69,6 +69,7 @@ TargetDistribution(to),
 centers_(0),
 alphas_(0),
 betas_(0),
+normalization_(0),
 weights_(0),
 ncenters_(0)
 {
@@ -119,9 +120,6 @@ ncenters_(0)
   setDimension(centers_[0].size());
   ncenters_ = centers_.size();
   //
-  if(ncenters_>1){
-    plumed_merror("For now " + getName() + " only supports one center. Use LINEAR_COMBINATION to create multiple centers.");
-  }
   // check centers and sigmas
   for(unsigned int i=0; i<ncenters_; i++) {
     if(centers_[i].size()!=getDimension()){
@@ -144,7 +142,13 @@ ncenters_(0)
   for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
   for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
   //
-  setForcedNormalization();
+  normalization_.resize(ncenters_);
+  for(unsigned int i=0; i<ncenters_; i++) {
+    normalization_[i].resize(getDimension());
+    for(unsigned int k=0; k<getDimension(); k++){
+      normalization_[i][k] = 0.5*betas_[i][k]/(alphas_[i][k]*tgamma(1.0/betas_[i][k]));
+    }
+  }
   checkRead();
 }
 
@@ -152,18 +156,18 @@ ncenters_(0)
 double TD_ExponentialPower::getValue(const std::vector<double>& argument) const {
   double value=0.0;
   for(unsigned int i=0;i<ncenters_;i++){
-    value+=weights_[i]*ExponentialPowerDiagonal(argument,centers_[i],alphas_[i],betas_[i]);
+    value+=weights_[i]*ExponentialPowerDiagonal(argument,centers_[i],alphas_[i],betas_[i],normalization_[i]);
   }
   return value;
 }
 
 
-double TD_ExponentialPower::ExponentialPowerDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& alpha, const std::vector<double>& beta) const {
+double TD_ExponentialPower::ExponentialPowerDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& alpha, const std::vector<double>& beta, const std::vector<double>& normalization) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
     double arg=(std::abs(argument[k]-center[k]))/alpha[k];
     arg = pow(arg,beta[k]);
-    value*=exp(-arg);
+    value*=normalization[k]*exp(-arg);
   }
   return value;
 }
