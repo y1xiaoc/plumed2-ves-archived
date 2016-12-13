@@ -78,7 +78,7 @@ normalization_(0)
   if(kappa_int.size()==0){plumed_merror(getName()+": some problem with KAPPA keyword, should given as postive integer(s) larger than 0");}
   kappa_.resize(kappa_int.size());
   for(unsigned int k=0; k<kappa_int.size(); k++){
-    if(kappa_int[k] < 1){plumed_merror(getName()+": KAPPA should be a integers larger than 0");}
+    if(kappa_int[k] < 1){plumed_merror(getName()+": KAPPA should be a integers 1 or higher");}
     kappa_[k] = static_cast<double>(kappa_int[k]);
   }
 
