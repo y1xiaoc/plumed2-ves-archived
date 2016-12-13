@@ -83,7 +83,7 @@ ncenters_(0)
     std::vector<double> tmp_sigma;
     if(!parseNumberedVector("SIGMA",i,tmp_sigma) ){break;}
     for(unsigned int k=0; k<tmp_sigma.size(); k++){
-      if(tmp_sigma[k]<=0.0){plumed_merror(getName()+": the values given in sigma should be postive");}
+      if(tmp_sigma[k]<=0.0){plumed_merror(getName()+": the values given in SIGMA should be postive");}
     }
     sigmas_.push_back(tmp_sigma);
   }
@@ -91,7 +91,7 @@ ncenters_(0)
     std::vector<double> tmp_lambda;
     if(!parseNumberedVector("LAMBDA",i,tmp_lambda) ){break;}
     for(unsigned int k=0; k<tmp_lambda.size(); k++){
-      if(tmp_lambda[k]<=0.0){plumed_merror(getName()+": the values given in lambda should be postive");}
+      if(tmp_lambda[k]<=0.0){plumed_merror(getName()+": the values given in LAMBDA should be postive");}
     }
     lambdas_.push_back(tmp_lambda);
   }
@@ -115,7 +115,7 @@ ncenters_(0)
   }
   //
   if(centers_.size()!=sigmas_.size() || centers_.size()!=lambdas_.size() ){
-    plumed_merror(getName()+": there has to be an equal amount of CENTER, sigma, and lambda keywords");
+    plumed_merror(getName()+": there has to be an equal amount of CENTER, SIGMA, and LAMBDA keywords");
   }
   //
   setDimension(centers_[0].size());
@@ -127,10 +127,10 @@ ncenters_(0)
       plumed_merror(getName()+": one of the CENTER keyword does not match the given dimension");
     }
     if(sigmas_[i].size()!=getDimension()){
-      plumed_merror(getName()+": one of the sigma keyword does not match the given dimension");
+      plumed_merror(getName()+": one of the SIGMA keyword does not match the given dimension");
     }
     if(lambdas_[i].size()!=getDimension()){
-      plumed_merror(getName()+": one of the lambda keyword does not match the given dimension");
+      plumed_merror(getName()+": one of the LAMBDA keyword does not match the given dimension");
     }
   }
   //
@@ -143,7 +143,6 @@ ncenters_(0)
   for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
   for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
   //
-  // setForcedNormalization();
   checkRead();
 }
 
