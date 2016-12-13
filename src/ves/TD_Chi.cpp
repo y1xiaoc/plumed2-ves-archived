@@ -57,7 +57,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Chi,"CHI")
 
 void TD_Chi::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","MINIMA","The minima of chi distribution.");
+  keys.add("compulsory","MINIMA","The minima of the chi distribution.");
   keys.add("compulsory","SIGMA","The sigma parameters for the chi distribution.");
   keys.add("compulsory","KAPPA","The kappa parameters for the chi distribution.");
 }
