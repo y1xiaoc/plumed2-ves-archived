@@ -1,5 +1,9 @@
 # vim:ft=plumed
 
+# Exponential power distribution, or generalized normal distribution (type 1)
+# See https://en.wikipedia.org/wiki/Generalized_normal_distribution
+
+
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
 

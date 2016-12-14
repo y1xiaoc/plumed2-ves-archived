@@ -1,5 +1,8 @@
 # vim:ft=plumed
 
+# Von Mises distribution
+# see https://en.wikipedia.org/wiki/Von_Mises_distribution
+
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
 DUMP_TARGET_DISTRIBUTION ...

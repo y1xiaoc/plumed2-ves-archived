@@ -1,5 +1,8 @@
 # vim:ft=plumed
 
+# Generalized extreme value distribution
+# see https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution
+
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
 

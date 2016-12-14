@@ -1,5 +1,8 @@
 # vim:ft=plumed
 
+# Chi-squared distribution
+# see https://en.wikipedia.org/wiki/Chi-squared_distribution
+
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
 

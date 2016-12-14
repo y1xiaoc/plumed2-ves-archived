@@ -1,5 +1,8 @@
 # vim:ft=plumed
 
+# Exponentially modified Gaussian distribution
+# see https://en.wikipedia.org/wiki/Exponentially_modified_Gaussian_distribution
+
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
 
