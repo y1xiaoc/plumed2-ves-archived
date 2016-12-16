@@ -6,7 +6,7 @@ for ((i=2; i <= NumFields ; i++))
 do
   cat $BF.derivs.data            |  grep -v "^#"  |  awk -v f=$i '{print $f}' > $$.d1  
   cat $BF.derivs-numerical.data  |  grep -v "^#"  |  awk -v f=$i '{print $f}' > $$.d2  
-  paste $$.d1 $$.d2 | awk '{printf "%13.6f\n",$1-$2}' > $$.diff
+  paste $$.d1 $$.d2 | awk '{printf "%13.5f\n",$1-$2}' > $$.diff
   cp ${out_file} $$.save
   paste $$.save $$.diff > ${out_file}
   rm -f $$.d1 $$.d2 $$.save $$.diff
