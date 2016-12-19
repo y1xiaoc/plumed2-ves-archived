@@ -72,6 +72,19 @@ std::vector<double> GridIntegrationWeights::getIntegrationWeights(const Grid* gr
 }
 
 
+void GridIntegrationWeights::getOneDimensionalIntegrationPointsAndWeights(std::vector<double>& points, std::vector<double>& weights, const unsigned int nbins, const double min, const double max, const std::string& weights_type) {
+  double dx = (max-min)/(static_cast<double>(nbins)-1.0);
+  points.resize(nbins);
+  for(unsigned int i=0; i<nbins; i++){points[i] = min + i*dx;}
+  if(weights_type=="trapezoidal"){
+    weights = getOneDimensionalTrapezoidalWeights(nbins,dx,false);
+  }
+  else {
+    plumed_merror("getOneDimensionalIntegrationWeights: unknown weight type, the available type is trapezoidal");
+  }
+ }
+
+
 std::vector<double> GridIntegrationWeights::getOneDimensionalTrapezoidalWeights(const unsigned int nbins, const double dx, const bool periodic) {
   std::vector<double> weights_1d(nbins);
   for(unsigned int i=1; i<(nbins-1); i++){
