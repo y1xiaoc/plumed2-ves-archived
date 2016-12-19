@@ -26,6 +26,10 @@
 
 #include "tools/Keywords.h"
 #include "tools/Tools.h"
+#include "GridIntegrationWeights.h"
+
+#include <iostream>
+
 
 
 namespace PLMD{
@@ -45,10 +49,12 @@ class TD_VonMises: public TargetDistribution {
   std::vector< std::vector<double> > sigmas_;
   std::vector< std::vector<double> > kappas_;
   std::vector< std::vector<double> > centers_;
+  std::vector< std::vector<double> > normalization_;
   std::vector<double> weights_;
   std::vector<double> periods_;
   unsigned int ncenters_;
-  double VonMisesDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
+  double VonMisesDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
+  double getNormalization(const double, const double) const;
 public:
   static void registerKeywords(Keywords&);
   explicit TD_VonMises(const TargetDistributionOptions& to);
@@ -72,7 +78,9 @@ TD_VonMises::TD_VonMises( const TargetDistributionOptions& to ):
 TargetDistribution(to),
 sigmas_(0),
 centers_(0),
+normalization_(0),
 weights_(0),
+periods_(0),
 ncenters_(0)
 {
   for(unsigned int i=1;; i++) {
@@ -103,9 +111,6 @@ ncenters_(0)
   setDimension(centers_[0].size());
   ncenters_ = centers_.size();
   //
-  if(ncenters_>1){
-    plumed_merror("For now VON_MISES only supports one center. Use LINEAR_COMBINATION to create a sum of von Mises distributions.");
-  }
   // check centers and sigmas
   for(unsigned int i=0; i<ncenters_; i++) {
     plumed_massert(centers_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
@@ -130,7 +135,13 @@ ncenters_(0)
   for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
   for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
   //
-  setForcedNormalization();
+  normalization_.resize(ncenters_);
+  for(unsigned int i=0; i<ncenters_; i++){
+    normalization_[i].resize(getDimension());
+    for(unsigned int k=0; k<getDimension(); k++){
+      normalization_[i][k] = getNormalization(kappas_[i][k],periods_[k]);
+    }
+  }
   checkRead();
 }
 
@@ -138,19 +149,46 @@ ncenters_(0)
 double TD_VonMises::getValue(const std::vector<double>& argument) const {
   double value=0.0;
   for(unsigned int i=0;i<ncenters_;i++){
-    value+=weights_[i]*VonMisesDiagonal(argument, centers_[i], kappas_[i]);
+    value+=weights_[i]*VonMisesDiagonal(argument, centers_[i], kappas_[i],periods_,normalization_[i]);
   }
   return value;
 }
 
 
-double TD_VonMises::VonMisesDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& kappa) const {
+double TD_VonMises::VonMisesDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& kappa, const std::vector<double>& periods, const std::vector<double>& normalization) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
-    double arg = kappa[k]*cos( ((2*pi)/periods_[k])*(argument[k]-center[k]) );
-    value*=exp(arg);
+    double arg = kappa[k]*cos( ((2*pi)/periods[k])*(argument[k]-center[k]) );
+    value*=normalization[k]*exp(arg);
   }
   return value;
+}
+
+
+double TD_VonMises::getNormalization(const double kappa, const double period) const {
+  //
+  std::vector<double> centers(1);
+  centers[0] = 0.0;
+  std::vector<double> kappas(1);
+  kappas[0] = kappa;
+  std::vector<double> periods(1);
+  periods[0] = period;
+  std::vector<double> norm(1);
+  norm[0] = 1.0;
+  //
+  const unsigned int nbins = 1001;
+  std::vector<double> points;
+  std::vector<double> weights;
+  double min = 0.0;
+  double max = period;
+  GridIntegrationWeights::getOneDimensionalIntegrationPointsAndWeights(points,weights,nbins,min,max);
+  //
+  double sum = 0.0;
+  for(unsigned int l=0; l<nbins; l++){
+    std::vector<double> arg(1); arg[0]= points[l];
+    sum += weights[l] * VonMisesDiagonal(arg,centers,kappas,periods,norm);
+  }
+  return 1.0/sum;
 }
 
 
