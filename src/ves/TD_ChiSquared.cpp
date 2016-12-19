@@ -43,7 +43,6 @@ class TD_ChiSquared: public TargetDistribution {
   std::vector<double> sigma_;
   std::vector<double> kappa_;
   std::vector<double> normalization_;
-  double ChiSquaredDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
   static void registerKeywords(Keywords&);
   explicit TD_ChiSquared(const TargetDistributionOptions& to);
@@ -71,6 +70,9 @@ normalization_(0)
 {
   parseVector("MINIMA",minima_);
   parseVector("SIGMA",sigma_);
+  for(unsigned int k=0; k<sigma_.size(); k++){
+    if(sigma_[k] < 0.0){plumed_merror(getName()+": the values given in SIGMA should be postive.");}
+  }
 
   std::vector<unsigned int> kappa_int(0);
   parseVector("KAPPA",kappa_int,true);
@@ -94,22 +96,14 @@ normalization_(0)
 
 
 double TD_ChiSquared::getValue(const std::vector<double>& argument) const {
-  for(unsigned int k=0; k<argument.size(); k++){
-    if(argument[k]<minima_[k]){plumed_merror(getName()+": the chi distribution is not defined for values less that ones given in MINIMA");}
-  }
-  return ChiSquaredDiagonal(argument,minima_,sigma_,kappa_,normalization_);
-}
-
-
-double TD_ChiSquared::ChiSquaredDiagonal(const std::vector<double>& argument, const std::vector<double>& minima, const std::vector<double>& sigma, const std::vector<double>& kappa, const std::vector<double>& normalization) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
-    double arg=(argument[k]-minima[k])/sigma[k];
-    value *= normalization[k] * pow(arg,0.5*kappa[k]-1.0) * exp(-0.5*arg);
+    double arg=(argument[k]-minima_[k])/sigma_[k];
+    if(arg<0.0){plumed_merror(getName()+": the chi-squared istribution is not defined for values less that ones given in MINIMA");}
+    value *= normalization_[k] * pow(arg,0.5*kappa_[k]-1.0) * exp(-0.5*arg);
   }
   return value;
 }
-
 
 
 }

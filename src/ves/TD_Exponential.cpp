@@ -41,7 +41,6 @@ Exponential distribution (static).
 class TD_Exponential: public TargetDistribution {
   std::vector<double> minima_;
   std::vector<double> lambda_;
-  double ExponentialDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
   static void registerKeywords(Keywords&);
   explicit TD_Exponential(const TargetDistributionOptions& to);
@@ -66,6 +65,9 @@ lambda_(0)
 {
   parseVector("MINIMA",minima_);
   parseVector("LAMBDA",lambda_);
+  for(unsigned int k=0; k<lambda_.size(); k++){
+    if(lambda_[k] < 0.0){plumed_merror(getName()+": the values given in LAMBDA should be postive.");}
+  }
 
 
   setDimension(minima_.size());
@@ -75,17 +77,11 @@ lambda_(0)
 
 
 double TD_Exponential::getValue(const std::vector<double>& argument) const {
-  for(unsigned int k=0; k<argument.size(); k++){
-    if(argument[k]<minima_[k]){plumed_merror(getName()+": the exponential distribution is not defined for values less that ones given in MINIMA");}
-  }
-  return ExponentialDiagonal(argument,minima_,lambda_);
-}
-
-
-double TD_Exponential::ExponentialDiagonal(const std::vector<double>& argument, const std::vector<double>& minima, const std::vector<double>& lambda) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++){
-    value *= lambda[k]*exp(-(argument[k]-minima[k])*lambda[k]);
+    double arg = (argument[k]-minima_[k])*lambda_[k];
+    if(arg<0.0){plumed_merror(getName()+": the exponential distribution is not defined for values less that ones given in MINIMA");}
+    value *= lambda_[k]*exp(-arg);
   }
   return value;
 }
