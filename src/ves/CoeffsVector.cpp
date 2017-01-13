@@ -1,6 +1,6 @@
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    Copyright (c) 2015-2016 The ves-code team
-   (see the PEOPLE-VES file at the root of the distribution for a list of names)
+   (see the PEOPLE-VES file at the root of this folder for a list of names)
 
    See http://www.ves-code.org for more information.
 
