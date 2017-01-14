@@ -64,6 +64,26 @@ for file in automatic-ves/*.list ; do
   mv $file-1 $file
 done
 
+# Generate links to tutorial pages
+for file in ./tutorials-ves/*.txt ; do
+
+    link=`grep link: $file | sed -e 's/link://'`
+    describe=`grep description: $file | sed -e 's/description://'`
+
+    echo "<tr> <td> $link </td> <td> $describe </td> </tr>" >> automatic-ves/VES_TUTORIALS.list
+
+done
+
+# Generate links to websites
+for file in ./tutorials-ves/*.site; do
+
+   link=`grep link: $file | sed -e 's/link://'`
+   describe=`grep description: $file | sed -e 's/description://'`
+
+   echo "<tr> <td> $link </td> <td> $describe </td> </tr>" >> automatic-ves/VES_WEBSITES.list
+
+done
+
 
 # Generate all the documentation from keywords
 for file in automatic-ves/*.tmp
@@ -92,7 +112,7 @@ done
 sed -ie 's/<b> --/<b> \\c \\-\\-/g' automatic-ves/*.txt
 rm automatic-ves/*.txte
 
-for file in VES_BASISF VES_TARGETDIST VES_OPTIMIZER VES_BIASES VES_GLOSSARY VES_DICTIONARY VES_CLTOOLS VES_UTILS VES_COLVAR
+for file in VES_BASISF VES_TARGETDIST VES_OPTIMIZER VES_BIASES VES_GLOSSARY VES_DICTIONARY VES_CLTOOLS VES_UTILS VES_COLVAR VES_TUTORIALS VES_WEBSITES
 do
   mv automatic-ves/$file.list automatic-ves/$file.1.list
   {
@@ -110,7 +130,6 @@ rm automatic-ves/*.txte
 txtfiles_ves="
 VES.txt
 "
-
 for f in ${txtfiles_ves}
 do
 file=${f%.txt}
@@ -129,5 +148,7 @@ cat $file.txt |
     /^ *@VES_COLVAR@ *$/r automatic-ves/VES_COLVAR.list
     /^ *@VES_UTILS@ *$/r automatic-ves/VES_UTILS.list
     /^ *@VES_CLTOOLS@ *$/r automatic-ves/VES_CLTOOLS.list
+    /^ *@VES_WEBSITES@ *$/r automatic-ves/VES_WEBSITES.list
+    /^ *@VES_TUTORIALS@ *$/r automatic-ves/VES_TUTORIALS.list
 " | grep -Ev '^ *@[A-Z_]*@ *$' > ${file}PP.txt
 done

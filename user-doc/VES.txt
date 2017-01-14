@@ -7,6 +7,8 @@ The VES code is a module outside the PLUMED core that implements enhanced sampli
 [homepage of the VES code](http://www.ves-code.org)
 
 - \subpage ves_theory
+- \subpage ves_tutorials
+
 - \subpage ves_biases
 - \subpage ves_basisf
 - \subpage ves_targetdist
@@ -15,7 +17,6 @@ The VES code is a module outside the PLUMED core that implements enhanced sampli
 - \subpage ves_utils
 - \subpage ves_cltools
 - \subpage ves_glossary
-
 
 
 
@@ -93,6 +94,14 @@ The following list contains the target distributions currently available in VES.
 The following list contains all actions available in VES
 
 @VES_GLOSSARY@
+
+
+\page ves_tutorials Tutorials
+
+The following tutorials are available for VES
+
+@VES_TUTORIALS@
+
 
 
 */

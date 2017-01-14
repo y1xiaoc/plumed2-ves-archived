@@ -21,6 +21,7 @@ ifeq ($(make_doc),yes)
 	make_pdfdoc=$(make_pdfdoc) ./go-doxygen
 	cp *png html/
 	./report_errors
+	./report_errors-ves
 endif
 endif
 

@@ -2,7 +2,7 @@
 
 source ../sourceme.sh
 
-LIST_VES="`ls VES*PP.txt` automatic-ves"
+LIST_VES="`ls VES*PP.txt` automatic-ves tutorials-ves"
 
 LIST="
  IntroPP.txt ../CHANGES InstallationPP.txt SyntaxPP.txt ColvarPP.txt GroupPP.txt FunctionsPP.txt AnalysisPP.txt
