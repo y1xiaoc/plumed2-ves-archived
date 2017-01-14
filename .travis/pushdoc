@@ -43,10 +43,10 @@ set +x
 git remote add doc https://vescodebot:$GIT_TOKEN@github.com/ves-code/doc-${TRAVIS_BRANCH}.git
 set -x
 cat > README.md << EOF
-Precompiled manual for PLUMED with VES-Code ${TRAVIS_BRANCH}
+Precompiled manual for PLUMED (with VES-Code) ${TRAVIS_BRANCH}
 -----------------------------
 
-This repository hosts a precompiled manual for [PLUMED](http://www.plumed.org) with [VES-Code](http://www.ves-code.org)${TRAVIS_BRANCH},
+This repository hosts a precompiled manual for [PLUMED](http://www.plumed.org) (with [VES-Code](http://www.ves-code.org)) ${TRAVIS_BRANCH},
 git revision [$hash](https://github.com/ves-code/plumed2-ves/commit/$hash).
 
 This manual has been compiled on [travis](http://travis-ci.org/ves-code/plumed2-ves) on $(date).
