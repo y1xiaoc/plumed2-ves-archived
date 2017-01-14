@@ -116,7 +116,7 @@ variable_str_("s")
   //
   log.printf("  Using the following functions (matheval function and derivative):\n");
   for(unsigned int i=0; i<getNumberOfBasisFunctions(); i++){
-    log.printf("   %i:  %s  ( %s / %s )\n",i,bf_str[i].c_str(),evaluator_get_string(evaluator_pntrs_[i]),evaluator_get_string(derivs_pntrs_[i]));
+    log.printf("   %u:  %s  ( %s / %s )\n",i,bf_str[i].c_str(),evaluator_get_string(evaluator_pntrs_[i]),evaluator_get_string(derivs_pntrs_[i]));
   }
   //
   setupBF();
