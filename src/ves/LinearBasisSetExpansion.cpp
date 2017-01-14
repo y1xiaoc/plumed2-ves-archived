@@ -262,8 +262,13 @@ void LinearBasisSetExpansion::updateBiasWithoutCutoffGrid() {
     // this should be done inside a grid function really,
     // need to define my grid class for that
     for(Grid::index_t l=0; l<bias_withoutcutoff_grid_pntr_->getSize(); l++){
-      double value = bias_withoutcutoff_grid_pntr_->getValue(l) + shift;
-      bias_withoutcutoff_grid_pntr_->setValue(l,value);
+      if(bias_withoutcutoff_grid_pntr_->hasDerivatives()){
+        std::vector<double> zeros(nargs_,0.0);
+        bias_withoutcutoff_grid_pntr_->addValueAndDerivatives(l,shift,zeros);
+      }
+      else{
+        bias_withoutcutoff_grid_pntr_->addValue(l,shift);
+      }
     }
   }
   if(vesbias_pntr_!=NULL){
