@@ -35,29 +35,29 @@ This is an auto redirect page.
 EOF
 
 git init
-git config user.email "giovanni.bussi+plumedbot@gmail.com"
-git config user.name "plumedbot"
+git config user.email "omar.valsson+vescodebot@gmail.com"
+git config user.name "vescodebot"
 git checkout -b gh-pages
 # this is not to show the GIT_TOKEN on Travis log
 set +x
-git remote add doc https://plumedbot:$GIT_TOKEN@github.com/plumed/doc-${TRAVIS_BRANCH}.git
+git remote add doc https://vescodebot:$GIT_TOKEN@github.com/ves-code/doc-${TRAVIS_BRANCH}.git
 set -x
 cat > README.md << EOF
-Precompiled manual for PLUMED ${TRAVIS_BRANCH}
+Precompiled manual for PLUMED with VES-Code ${TRAVIS_BRANCH}
 -----------------------------
 
-This repository hosts a precompiled manual for [PLUMED](http://www.plumed.org) ${TRAVIS_BRANCH},
-git revision [$hash](https://github.com/plumed/plumed2/commit/$hash).
+This repository hosts a precompiled manual for [PLUMED](http://www.plumed.org) with [VES-Code](http://www.ves-code.org)${TRAVIS_BRANCH},
+git revision [$hash](https://github.com/ves-code/plumed2-ves/commit/$hash).
 
-This manual has been compiled on [travis](http://travis-ci.org/plumed/plumed2) on $(date).
+This manual has been compiled on [travis](http://travis-ci.org/ves-code/plumed2-ves) on $(date).
 
-To browse the manual you should go [here](http://plumed.github.io/doc-${TRAVIS_BRANCH}).
+To browse the manual you should go [here](http://ves-code.github.io/doc-${TRAVIS_BRANCH}).
 
 You can also download a full copy of the manual for offline access
-at [this link](http://github.com/plumed/doc-${TRAVIS_BRANCH}/archive/gh-pages.zip).
+at [this link](http://github.com/ves-code/doc-${TRAVIS_BRANCH}/archive/gh-pages.zip).
 
 EOF
 git add --all .
-git commit -m "Update to plumed/plumed2@$hash"
+git commit -m "Update to ves-code/plumed2-ves@$hash"
 # -q and 2> is not to show the GIT_TOKEN on Travis log
 git push -q -f doc gh-pages 2> /dev/null 
