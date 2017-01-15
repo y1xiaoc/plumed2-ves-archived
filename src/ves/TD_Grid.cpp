@@ -54,6 +54,7 @@ class TD_Grid : public TargetDistribution {
 public:
   static void registerKeywords( Keywords&);
   explicit TD_Grid( const TargetDistributionOptions& to );
+  ~TD_Grid();
   double getValue(const std::vector<double>&) const ;
 };
 
@@ -66,6 +67,12 @@ void TD_Grid::registerKeywords(Keywords& keys) {
   keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
   keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the given grid are the same as at the boundary. This can be changed by using this flag which will make values outside the grid to be taken as zero.");
+}
+
+TD_Grid::~TD_Grid() {
+  if(distGrid_!=NULL){
+    delete distGrid_;
+  }
 }
 
 
@@ -130,6 +137,8 @@ zero_outside_(false)
     if(periodic_[i]){maxima_[i]-=distGrid_->getDx()[i];}
   }
 
+  for(unsigned int i=0; i < arguments.size(); i++){delete arguments[i];}
+  arguments.clear();
 }
 
 

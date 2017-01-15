@@ -48,6 +48,7 @@ class BF_Matheval : public BasisFunctions {
 public:
   static void registerKeywords( Keywords&);
   explicit BF_Matheval(const ActionOptions&);
+  ~BF_Matheval();
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
@@ -61,6 +62,20 @@ void BF_Matheval::registerKeywords(Keywords& keys){
   keys.addFlag("PERIODIC",false,"Indicate that the basis functions are periodic.");
   keys.remove("NUMERICAL_INTEGRALS");
 }
+
+
+BF_Matheval::~BF_Matheval() {
+  for(unsigned int i=0; i<evaluator_pntrs_.size(); i++){
+    evaluator_destroy(evaluator_pntrs_[i]);
+  }
+  evaluator_pntrs_.clear();
+  //
+  for(unsigned int i=0; i<derivs_pntrs_.size(); i++){
+    evaluator_destroy(derivs_pntrs_[i]);
+  }
+  derivs_pntrs_.clear();
+}
+
 
 BF_Matheval::BF_Matheval(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao),

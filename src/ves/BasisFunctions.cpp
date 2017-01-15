@@ -251,6 +251,7 @@ void BasisFunctions::numericalUniformIntegrals() {
     uniform_grid->setValue(l,inverse_normalization);
   }
   uniform_integrals_ = numericalTargetDistributionIntegralsFromGrid(uniform_grid);
+  delete arguments[0]; arguments.clear();
   delete uniform_grid;
 }
 
@@ -399,6 +400,8 @@ void BasisFunctions::writeBasisFunctionsToFile(OFile& ofile_values, OFile& ofile
   }
   ofile_values.fmtField();
   ofile_derivs.fmtField();
+
+  delete value_pntr[0]; value_pntr.clear();
 
 }
 

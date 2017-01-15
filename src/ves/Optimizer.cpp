@@ -737,6 +737,11 @@ Optimizer::~Optimizer() {
   }
   aver_gradient_pntrs_.clear();
   //
+  for(unsigned int i=0; i<coeffs_mask_pntrs_.size(); i++){
+    delete coeffs_mask_pntrs_[i];
+  }
+  coeffs_mask_pntrs_.clear();
+  //
   for(unsigned int i=0; i<coeffsOFiles_.size(); i++){
     coeffsOFiles_[i]->close();
     delete coeffsOFiles_[i];
