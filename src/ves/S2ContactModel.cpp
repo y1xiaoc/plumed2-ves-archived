@@ -30,7 +30,7 @@
 #include <cmath>
 
 namespace PLMD{
-namespace colvar{
+namespace ves{
 
 
 // Model taken from 10.1021/ja027847a and 10.1023/B:JNMR.0000032612.70767.35
