@@ -20,10 +20,10 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#include "Colvar.h"
+#include "colvar/Colvar.h"
 #include "tools/NeighborList.h"
 #include "tools/Communicator.h"
-#include "ActionRegister.h"
+#include "core/ActionRegister.h"
 
 
 #include <string>
