@@ -46,84 +46,84 @@ bf_intervals_bounded_(basisset_dim_),
 bf_intervals_periodic_(basisset_dim_),
 basisset_volume_(1.0)
 {
-  initialize();
+  // initialize();
 }
 
-
-void BasisSetInfo::initialize() {
-  plumed_assert(basisf_.size()>0);
-  //
-  basisset_size_=1;
-  basisset_volume_=1.0;
-  for(unsigned int k=0;k<basisset_dim_;k++){
-    bf_types_[k]=basisf_[k]->getType();
-    bf_orders_[k]=basisf_[k]->getOrder();
-    bf_sizes_[k]=basisf_[k]->getNumberOfBasisFunctions();
-    basisset_size_*=bf_sizes_[k];
-    bf_intervals_min_[k]=basisf_[k]->intervalMin();
-    bf_intervals_max_[k]=basisf_[k]->intervalMax();
-    bf_intervals_range_[k]=basisf_[k]->intervalRange();
-    bf_intervals_mean_[k]=basisf_[k]->intervalMean();
-    bf_intervals_bounded_[k]=basisf_[k]->intervalBounded();
-    basisset_volume_*=bf_intervals_range_[k];
-    bf_intervals_periodic_[k]=basisf_[k]->arePeriodic();
-    bf_keywords_[k]=basisf_[k]->getKeywordString();
-  }
-}
-
-
-unsigned int BasisSetInfo::getDimension() const {
-  return basisset_dim_;
-}
-
-
-size_t BasisSetInfo::getSize() const {
-  return basisset_size_;
-}
-
-
-double BasisSetInfo::getVolume() const {
-  return basisset_volume_;
-}
-
-
-std::vector<std::string> BasisSetInfo::getTypes() const {
-  return bf_types_;
-}
-
-
-std::vector<unsigned int> BasisSetInfo::getOrders() const {
-  return bf_orders_;
-}
-
-
-std::vector<unsigned int> BasisSetInfo::getSizes() const {
-  return bf_sizes_;
-}
-
-
-std::vector<double> BasisSetInfo::getMinima() const {
-  return bf_intervals_min_;
-}
-
-
-std::vector<double> BasisSetInfo::getMaxima() const {
-  return bf_intervals_max_;
-}
-
-
-std::vector<std::string> BasisSetInfo::getKeywords() const {
-  return bf_keywords_;
-}
-
-
-std::string BasisSetInfo::getBasisSetDescription(std::vector<unsigned int>& indices) const {
-  plumed_massert(indices.size()==basisset_dim_,"incorrect number of indicies");
-  std::string desc;
-  desc=basisf_[0]->getBasisFunctionLabel(indices[0]);
-  for(unsigned int k=1;k<basisset_dim_;k++){ desc+="*"+basisf_[k]->getBasisFunctionLabel(indices[k]); }
-  return desc;
-}
+//
+// void BasisSetInfo::initialize() {
+//   plumed_assert(basisf_.size()>0);
+//   //
+//   basisset_size_=1;
+//   basisset_volume_=1.0;
+//   for(unsigned int k=0;k<basisset_dim_;k++){
+//     bf_types_[k]=basisf_[k]->getType();
+//     bf_orders_[k]=basisf_[k]->getOrder();
+//     bf_sizes_[k]=basisf_[k]->getNumberOfBasisFunctions();
+//     basisset_size_*=bf_sizes_[k];
+//     bf_intervals_min_[k]=basisf_[k]->intervalMin();
+//     bf_intervals_max_[k]=basisf_[k]->intervalMax();
+//     bf_intervals_range_[k]=basisf_[k]->intervalRange();
+//     bf_intervals_mean_[k]=basisf_[k]->intervalMean();
+//     bf_intervals_bounded_[k]=basisf_[k]->intervalBounded();
+//     basisset_volume_*=bf_intervals_range_[k];
+//     bf_intervals_periodic_[k]=basisf_[k]->arePeriodic();
+//     bf_keywords_[k]=basisf_[k]->getKeywordString();
+//   }
+// }
+//
+//
+// unsigned int BasisSetInfo::getDimension() const {
+//   return basisset_dim_;
+// }
+//
+//
+// size_t BasisSetInfo::getSize() const {
+//   return basisset_size_;
+// }
+//
+//
+// double BasisSetInfo::getVolume() const {
+//   return basisset_volume_;
+// }
+//
+//
+// std::vector<std::string> BasisSetInfo::getTypes() const {
+//   return bf_types_;
+// }
+//
+//
+// std::vector<unsigned int> BasisSetInfo::getOrders() const {
+//   return bf_orders_;
+// }
+//
+//
+// std::vector<unsigned int> BasisSetInfo::getSizes() const {
+//   return bf_sizes_;
+// }
+//
+//
+// std::vector<double> BasisSetInfo::getMinima() const {
+//   return bf_intervals_min_;
+// }
+//
+//
+// std::vector<double> BasisSetInfo::getMaxima() const {
+//   return bf_intervals_max_;
+// }
+//
+//
+// std::vector<std::string> BasisSetInfo::getKeywords() const {
+//   return bf_keywords_;
+// }
+//
+//
+// std::string BasisSetInfo::getBasisSetDescription(std::vector<unsigned int>& indices) const {
+//   plumed_massert(indices.size()==basisset_dim_,"incorrect number of indicies");
+//   std::string desc;
+//   desc=basisf_[0]->getBasisFunctionLabel(indices[0]);
+//   for(unsigned int k=1;k<basisset_dim_;k++){ desc+="*"+basisf_[k]->getBasisFunctionLabel(indices[k]); }
+//   return desc;
+// }
 
 
 }

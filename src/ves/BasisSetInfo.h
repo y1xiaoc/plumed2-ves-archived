@@ -65,9 +65,10 @@ public:
   explicit BasisSetInfo(const std::string&, std::vector<BasisFunctions*>&);
   ~BasisSetInfo(){};
   //
+private:
   unsigned int getDimension() const;
   size_t getSize() const;
-  double getVolume() const;
+  double getVolume()const;
   std::vector<std::string> getTypes() const;
   std::vector<unsigned int> getOrders() const;
   std::vector<unsigned int> getSizes() const;
