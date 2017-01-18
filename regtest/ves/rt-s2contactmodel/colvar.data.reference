@@ -1,2 +1,2 @@
-#! FIELDS time S2nh_analytical S2nh_numerical
- 0.000000     0.2170     0.2170
+#! FIELDS time S2nh_analytical S2nh_numerical S2nh_nl_analytical S2nh_nl_numerical
+ 0.000000     0.2170     0.2170     0.2140     0.2140

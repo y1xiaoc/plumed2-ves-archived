@@ -32,8 +32,41 @@ S2_CONTACT_MODEL ...
 DUMPDERIVATIVES ARG=S2nh_numerical STRIDE=1 FILE=s2nh_derivn  FMT=%10.4f
 DUMPDERIVATIVES ARG=S2nh_analytical STRIDE=1 FILE=s2nh_deriva  FMT=%10.4f
 
+S2_CONTACT_MODEL ...
+  NH_ATOMS=87,85
+  HEAVY_ATOMS=heavy_atoms_nh
+  LABEL=S2nh_nl_analytical
+  R_EFF=0.10
+  PREFACTOR_A=0.80
+  EXPONENT_B=1.0
+  OFFSET_C=0.10
+  N_I=1
+  NLIST
+  NL_CUTOFF=0.8
+  NL_STRIDE=1
+... S2_CONTACT_MODEL
+
+S2_CONTACT_MODEL ...
+  NH_ATOMS=87,85
+  HEAVY_ATOMS=heavy_atoms_nh
+  LABEL=S2nh_nl_numerical
+  R_EFF=0.10
+  PREFACTOR_A=0.80
+  EXPONENT_B=1.0
+  OFFSET_C=0.10
+  N_I=1
+  NUMERICAL_DERIVATIVES
+  NLIST
+  NL_CUTOFF=0.8
+  NL_STRIDE=1
+... S2_CONTACT_MODEL
+
+DUMPDERIVATIVES ARG=S2nh_nl_numerical STRIDE=1 FILE=s2nh_nl_derivn  FMT=%10.3f
+DUMPDERIVATIVES ARG=S2nh_nl_analytical STRIDE=1 FILE=s2nh_nl_deriva  FMT=%10.3f
+
+
 PRINT ...
- ARG=S2nh_analytical,S2nh_numerical
+ ARG=S2nh_analytical,S2nh_numerical,S2nh_nl_analytical,S2nh_nl_numerical
  STRIDE=1
  FILE=colvar.data
  FMT=%10.4f
