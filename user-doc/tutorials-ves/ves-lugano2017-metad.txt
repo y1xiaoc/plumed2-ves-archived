@@ -1,0 +1,78 @@
+/**
+\page ves-lugano2017-metad MARVEL school 2017 tutorial: Metadynamics
+
+\section ves-lugano2017-metad-aims Aims
+
+\section ves-lugano2017-metad-lo Learning Outcomes
+
+Once this tutorial is completed students will:
+
+- Something 1
+- Something 2
+
+\section ves-lugano2017-metad-resources Resources
+
+The <a href="tutorial-resources-ves/ves-lugano2017-metad.tar.gz"
+download="ves-lugano2017-metad.tar.gz"> tarball </a> for this project contains the following files:
+
+- file1.ext : some file
+- file2.ext : some file
+
+\section ves-lugano2017-metad-somesection Some Section
+
+Reference to Figure \ref ves-school-2017-logo
+
+\anchor ves-school-2017-logo
+\image html ves-school-2017-logo.png "MARVEL VES School logo" width=800px
+
+Some text
+
+\section ves-lugano2017-metad-somesection-2 Some Other Section
+
+Bla bla blas
+
+\subsection ves-lugano2017-metad-subsection-1 Subsection 1
+
+Bla Bla
+
+\subsection ves-lugano2017-metad-subsection-2 Subsection 2
+
+- Bullet 1
+- Bullet 2
+
+Text text
+
+1. numbered list - item 1
+2. numbered list - item 2
+3. numbered list - item 3
+
+
+Standalone formula using latex syntax:
+
+\f[
+  F(\mathbf{s}) = \frac{1}{\beta} \log p(\mathbf{s})
+\f]
+
+Formula in text \f$P(\mathbf{s})\f$.
+
+Reference to actions in PLUMED, e.g. \ref METAD or \ref PRINT.
+
+\verbatim
+
+INPUT FILE 
+SOME_COMMANDS
+
+\endverbatim
+
+Some more text
+
+
+
+
+*/
+
+link: @subpage ves-lugano2017-metad
+
+description: Some good description of the tutorial
+
+additional-files: ves-lugano2017-metad
