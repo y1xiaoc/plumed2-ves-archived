@@ -5,10 +5,16 @@
 
 \section ves-lugano2017-metad-lo Learning Outcomes
 
-Once this tutorial is completed students will:
+Once this tutorial is completed students will learn to:
 
-- Something 1
-- Something 2
+- Perform metadynamics simulations using PLUMED 2 and LAMMPS
+- Construct a bias potential on 1 and 2 collective variables (CVs)
+- Assess the convergence of the free energy surface
+- Distinguish between good and bad CVs
+- Reweight the simulation on CVs different from the ones used for biasing
+- Reweight with more than one bias potential
+- Restart a simulation
+- Use multiple walkers to improve the exploration of CV space
 
 \section ves-lugano2017-metad-resources Resources
 
@@ -18,56 +24,58 @@ download="ves-lugano2017-metad.tar.gz"> tarball </a> for this project contains t
 - file1.ext : some file
 - file2.ext : some file
 
-\section ves-lugano2017-metad-somesection Some Section
+\section ves-lugano2017-metad-somesection Instructions
 
-Reference to Figure \ref ves-school-2017-logo
+\subsection ves-lugano2017-metad-subsection-1 The system
 
-\anchor ves-school-2017-logo
-\image html ves-school-2017-logo.png "MARVEL VES School logo" width=800px
+We consider the association/dissociation of NaCl in acqueous solution. We will
+use the potential developed in ref. ...  for NaCl and TIP3P water with
+parameters corrected to be used with long-range Coulomb solvers. 
 
-Some text
+\subsection ves-lugano2017-metad-subsection-2 Construct a bias potential on the distance Na-Cl
 
-\section ves-lugano2017-metad-somesection-2 Some Other Section
+We first construct a bias potential on the distance Na-Cl. We will limit the
+exploration of the CV space by introducing an upper wall.
 
-Bla bla blas
+Of course this will have to be corrected to calculate ensemble averages.
 
-\subsection ves-lugano2017-metad-subsection-1 Subsection 1
+It is possible to try different bias factor to check the effect that it has in
+the trajectory and the effective fes.
 
-Bla Bla
+\subsection ves-lugano2017-metad-subsection-3 Assess convergence
 
-\subsection ves-lugano2017-metad-subsection-2 Subsection 2
+One way to identify if a WT-MetaD simulation has converged is observing the
+estimated free energy surface at different times.   
 
-- Bullet 1
-- Bullet 2
+It is also possible to track convergence by controlling the evolution of some
+quantity connected to the free energy surface. In this case we will calculate
+the dissociation barrier.
 
-Text text
+Reweighting the simulation on the same CV that was used for biasing can also
+be used as a test of convergence. We will show that in the next section.
 
-1. numbered list - item 1
-2. numbered list - item 2
-3. numbered list - item 3
+\subsection ves-lugano2017-metad-subsection-4 Reweight the simulation
 
+We first reweight the simulation on the distance Na-Cl, the same CV used for
+biasing. We compare the estimations of the free energy surface obtained from
+sum_hills and from reweighting. The weights employed in the reweighting should
+take into account the upper wall bias.
 
-Standalone formula using latex syntax:
+We can obtain important information of the system by reweighting on 2 CVs: The
+distance Na-Cl and the coordination of Na with O.
 
-\f[
-  F(\mathbf{s}) = \frac{1}{\beta} \log p(\mathbf{s})
-\f]
+The plot provides important information of the association mechanism. In the
+dissociated state, Na can have a coordination of 5 or 6, though it is more
+likely to find a coordination number of 6. However, in order to associate Na
+must have a coordination with O of 5. In the associated state Na can have a
+coordination of 3, 4 or 5.
 
-Formula in text \f$P(\mathbf{s})\f$.
+\subsection ves-lugano2017-metad-subsection-5 Construct a bias potential on the coordination Na-O
 
-Reference to actions in PLUMED, e.g. \ref METAD or \ref PRINT.
+We construct a bias potential on the coordination Na-0.
 
-\verbatim
-
-INPUT FILE 
-SOME_COMMANDS
-
-\endverbatim
-
-Some more text
-
-
-
+The exploration of the CV space is not good since there is a slow degree of
+freedom that we are not biasing: the distance Na-Cl.
 
 */
 
