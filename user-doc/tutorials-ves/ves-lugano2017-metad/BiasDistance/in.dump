@@ -1,0 +1,4 @@
+dump           myDump all dcd ${out_freq2} out.${p_id}.dcd
+dump_modify    myDump unwrap yes
+
+

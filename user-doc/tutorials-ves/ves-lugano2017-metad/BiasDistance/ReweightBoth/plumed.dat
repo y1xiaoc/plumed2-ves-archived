@@ -1,0 +1,20 @@
+dist:       READ FILE=COLVAR.0  IGNORE_TIME VALUES=d1
+coord:       READ FILE=COLVAR.0  IGNORE_TIME VALUES=coord
+metad:       READ FILE=COLVAR.0 IGNORE_TIME VALUES=metad.rbias
+uwall:       READ FILE=COLVAR.0 IGNORE_TIME VALUES=uwall.bias
+#distance:       READ FILE=../COLVAR.0  UPDATE_FROM=1000. VALUES=d1
+#metad:       READ FILE=../COLVAR.0 UPDATE_FROM=1000. VALUES=metad.rbias
+
+weights2: REWEIGHT_BIAS TEMP=300 ARG=metad.rbias,uwall.bias
+
+HISTOGRAM ...
+  ARG=dist,coord
+  GRID_MIN=0.2,2.5
+  GRID_MAX=0.8,7.5
+  GRID_BIN=200,200
+  BANDWIDTH=0.004,0.04
+  LOGWEIGHTS=weights2
+  LABEL=hh2
+... HISTOGRAM
+
+DUMPGRID GRID=hh2 FILE=histo_wall FMT=%24.16e

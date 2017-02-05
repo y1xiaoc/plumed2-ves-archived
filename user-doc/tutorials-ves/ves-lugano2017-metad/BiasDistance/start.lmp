@@ -1,0 +1,41 @@
+echo both
+
+include		in.partitions
+
+include		in.temp
+include		in.pressure
+include 	in.seed
+units		real	
+atom_style	full
+#include		in.box
+include 	in.setup
+
+minimize 1.0e-2 1.0e-3 100 1000
+
+#write_data	data.min
+
+#reset_timestep 	0
+include		in.dump
+
+# NPT
+
+#reset_timestep 	0
+
+fix             1 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
+fix             2 all shake 0.0001 20 100000 t 1 2
+fix             3 all nph iso ${pressure} ${pressure} ${pressureDamp}
+fix 		4 all momentum 10000 linear 1 1 1
+fix             5 all plumed plumedfile plumed.dat outfile plumed.out
+
+velocity        all create ${temperature} ${seed} dist gaussian
+
+run             5000000
+
+unfix           1
+unfix           2
+unfix           3
+unfix           4
+unfix           5
+
+write_data	data.final
+
