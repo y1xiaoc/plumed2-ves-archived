@@ -29,18 +29,93 @@ download="ves-lugano2017-metad.tar.gz"> tarball </a> for this project contains t
 \subsection ves-lugano2017-metad-subsection-1 The system
 
 We consider the association/dissociation of NaCl in acqueous solution. We will
-use the potential developed in ref. ...  for NaCl and TIP3P water with
-parameters corrected to be used with long-range Coulomb solvers. 
+use the potential developed in ref. \cite Pettitt-JCP-1986 for NaCl and TIP3P water with
+parameters corrected to be used with long-range Coulomb solvers \cite Price-JCP-2004. 
+The system contains 1 Na, 1 Cl, and 106 water molecules (total 320 atoms).
+
+\anchor ves-school-2017-metad-NaCl
+\image html NaCl.png "NaCl in water" width=200px
+
 
 \subsection ves-lugano2017-metad-subsection-2 Construct a bias potential on the distance Na-Cl
 
 We first construct a bias potential on the distance Na-Cl. We will limit the
-exploration of the CV space by introducing an upper wall.
+exploration of the CV space by introducing an upper wall. Of course this will have to be corrected 
+later in order to calculate ensemble averages. The coordination number of Na and O in water will be calculated for later use.
 
-Of course this will have to be corrected to calculate ensemble averages.
+The input code for plumed is:
+\verbatim
 
-It is possible to try different bias factor to check the effect that it has in
-the trajectory and the effective fes.
+d1:  DISTANCE ATOMS=319,320
+
+COORDINATION ...
+ GROUPA=319
+ GROUPB=1-318:3
+ SWITCH={RATIONAL R_0=0.315 D_MAX=0.5 NN=12 MM=24}
+ NLIST
+ NL_CUTOFF=0.55
+ NL_STRIDE=10
+ LABEL=coord
+... COORDINATION
+
+METAD ...
+ LABEL=metad
+ ARG=d1
+ SIGMA=0.02
+ HEIGHT=1.
+ BIASFACTOR=5
+ TEMP=300.0
+ PACE=500
+ GRID_MIN=0.2
+ GRID_MAX=1.0
+ GRID_BIN=300
+ REWEIGHTING_NGRID=300
+... METAD
+
+UPPER_WALLS ...
+ ARG=d1
+ AT=0.6
+ KAPPA=2000.0
+ EXP=2
+ EPS=1
+ OFFSET=0.
+ LABEL=uwall
+... UPPER_WALLS
+
+PRINT ARG=* STRIDE=100 FILE=COLVAR
+
+\endverbatim
+
+To run LAMMPS you can use the run.sh script:
+\verbatim
+
+#!/bin/bash
+
+############################################################################
+# Definition of variables
+############################################################################
+EXE=lmp_mpi
+coresPerPart=4
+Partitions=1
+totalCores=4
+############################################################################
+
+mpirun -np ${totalCores} ${EXE} -p ${Partitions}x${coresPerPart} -in start.lmp
+
+\endverbatim
+
+This command runs LAMMPS with the option of using many partitions. 
+This will be useful when using multiple walkers.
+In the example above 1 partition with 4 MPI threads is used.  
+
+It is possible to try different bias factors to check the effect that it has in
+the trajectory and the effective FES.
+
+In principle the cost of a metadynamics simulation should increase as the
+simulation progresses due to the need of adding an increasing number of
+gaussians to calculate the bias. However, since a grid is used to build up the
+bias this effect is not observed. You can check what happens if you do not use the
+GRID_* keywords.
 
 \subsection ves-lugano2017-metad-subsection-3 Assess convergence
 
@@ -57,18 +132,37 @@ be used as a test of convergence. We will show that in the next section.
 \subsection ves-lugano2017-metad-subsection-4 Reweight the simulation
 
 We first reweight the simulation on the distance Na-Cl, the same CV used for
-biasing. We compare the estimations of the free energy surface obtained from
-sum_hills and from reweighting. The weights employed in the reweighting should
-take into account the upper wall bias.
+biasing. The weight assigned to a given configuration is:
+ 
+\f[
+  w(\mathbf{R}) \propto  e^{\beta ( V(\mathbf{s},t) - c(t) )}
+\f]
+
+By plotting c(t) versus time, the importance of taking c(t) into account
+becomes clear. c(t) keeps growing even after long times, reflecting the
+approximately rigid shift of the bias with time.
+
+Normally the first part of the trajectory is not used for reweighting since
+during this period the simulation has not reached the quasistationary limit.
+
+We compare the estimations of the free energy surface obtained from
+sum_hills and from reweighting. This is useful to check convergence and to
+have an estimate of the free energy that does not rely on using kernels. For
+instance if some features of the FES could not be captured by the kernels, the
+reweighting procedure will show them. This will become clearer in the VES
+tutorial.
+
+Since we have used a wall to limit the exploration of the CV space, the weights 
+employed in the reweighting should take into account the upper wall bias.
 
 We can obtain important information of the system by reweighting on 2 CVs: The
-distance Na-Cl and the coordination of Na with O.
-
-The plot provides important information of the association mechanism. In the
+distance Na-Cl and the coordination of Na with O. The plot provides important 
+information of the association mechanism. In the
 dissociated state, Na can have a coordination of 5 or 6, though it is more
 likely to find a coordination number of 6. However, in order to associate Na
 must have a coordination with O of 5. In the associated state Na can have a
-coordination of 3, 4 or 5.
+coordination of 3, 4 or 5. The transition state is characterized by a
+coordination number of ~5.
 
 \subsection ves-lugano2017-metad-subsection-5 Construct a bias potential on the coordination Na-O
 
