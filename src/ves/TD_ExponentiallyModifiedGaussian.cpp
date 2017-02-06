@@ -29,7 +29,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST EXPONENTIALLY_MODIFIED_GAUSSIAN
+//+PLUMEDOC VES_TARGETDIST EXPONENTIALLY_MODIFIED_GAUSSIAN HIDDEN
 /*
 Target distribution given by a sum of exponentially modified Gaussian distributions (static).
 

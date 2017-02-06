@@ -28,7 +28,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_BASISF BF_CHEBYSHEV_RATIONAL_SEMI_INFINITE
+//+PLUMEDOC VES_BASISF BF_CHEBYSHEV_RATIONAL_SEMI_INFINITE HIDDEN
 /*
 Rational Chebyshev basis functions on a semi-infinite interval
 
