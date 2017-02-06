@@ -29,9 +29,9 @@ awk 'BEGIN{gfile="automatic-ves/VES_GLOSSARY.list"; dfile="automatic-ves/VES_DIC
   }
   if($1=="//+PLUMEDOC"){
     if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_CLTOOLS" || $2=="VES_UTILS" || $2=="VES_BIASES" || $2=="VES_COLVAR" ){
+      if( $4=="HIDDEN" ){next}
       if(lfile!="") close(lfile)
       lfile="automatic-ves/"$2".list"
-
       printf "<tr> <td width=%s> \\subpage %s </td> <td>","5%", $3 >> lfile
 #       printf "<tr> <td width=5%> \\ref %s </td><td> %s </td><td>",$3, $2 > gfile
       printf "<tr> <td width=%s> \\ref %s </td><td> %s </td><td>","5%",$3, $2 > gfile
@@ -40,6 +40,7 @@ awk 'BEGIN{gfile="automatic-ves/VES_GLOSSARY.list"; dfile="automatic-ves/VES_DIC
       output="automatic-ves/"$3".tmp";
       print "/**" > output
       print "\\page "$3" "$3 > output
+      if( $4=="HIDDEN" ){printf "__Hidden option__ \n\n" > output}
 #      print "\\section "$3 >output
       inside=2;
     } else if ( $2=="VES_INTERNAL" ){
