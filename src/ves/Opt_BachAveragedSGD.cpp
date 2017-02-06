@@ -70,8 +70,10 @@ private:
   std::vector<CoeffsVector*> combinedgradient_pntrs_;
   unsigned int combinedgradient_wstride_;
   std::vector<OFile*> combinedgradientOFiles_;
+  double decaying_aver_tau_;
 private:
   CoeffsVector& CombinedGradient(const unsigned int c_id) const {return *combinedgradient_pntrs_[c_id];}
+  double getAverDecay() const;
 public:
   static void registerKeywords(Keywords&);
   explicit Opt_BachAveragedSGD(const ActionOptions&);
@@ -95,6 +97,7 @@ void Opt_BachAveragedSGD::registerKeywords(Keywords& keys){
   keys.add("hidden","COMBINED_GRADIENT_FILE","the name of output file for the combined gradient (gradient + Hessian term)");
   keys.add("hidden","COMBINED_GRADIENT_OUTPUT","how often the combined gradient should be written to file. This parameter is given as the number of bias iterations. It is by default 100 if COMBINED_GRADIENT_FILE is specficed");
   keys.add("hidden","COMBINED_GRADIENT_FMT","specify format for combined gradient file(s) (useful for decrease the number of digits in regtests)");
+  keys.add("optional","EXP_DECAYING_AVER","calculate coefficients using exponentially decaying averaging using a decaying constant given in the number of iterations");
 }
 
 
@@ -113,8 +116,16 @@ Opt_BachAveragedSGD::Opt_BachAveragedSGD(const ActionOptions&ao):
 PLUMED_OPTIMIZER_INIT(ao),
 combinedgradient_pntrs_(0),
 combinedgradient_wstride_(100),
-combinedgradientOFiles_(0)
+combinedgradientOFiles_(0),
+decaying_aver_tau_(0.0)
 {
+  unsigned int decaying_aver_tau_int=0;
+  parse("EXP_DECAYING_AVER",decaying_aver_tau_int);
+  if(decaying_aver_tau_int>0){
+    decaying_aver_tau_ = static_cast<double>(decaying_aver_tau_int);
+    log.printf("  Coefficients calculated using an exponentially decaying average with a decaying constant of %u iterations\n",decaying_aver_tau_int);
+  }
+  //
   std::vector<std::string> combinedgradient_fnames;
   parseFilenames("COMBINED_GRADIENT_FILE",combinedgradient_fnames);
   parse("COMBINED_GRADIENT_OUTPUT",combinedgradient_wstride_);
@@ -148,6 +159,8 @@ combinedgradientOFiles_(0)
       }
     }
   }
+  //
+
   turnOnHessian();
   checkRead();
 }
@@ -161,10 +174,20 @@ void Opt_BachAveragedSGD::coeffsUpdate(const unsigned int c_id) {
     combinedgradient_pntrs_[c_id]->writeToFile(*combinedgradientOFiles_[c_id]);
   }
   //
-  double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
+  double aver_decay = getAverDecay();
   AuxCoeffs(c_id) += - StepSize(c_id)*CoeffsMask(c_id) * ( Gradient(c_id) + Hessian(c_id)*(AuxCoeffs(c_id)-Coeffs(c_id)) );
   //AuxCoeffs() = AuxCoeffs() - StepSize() * ( Gradient() + Hessian()*(AuxCoeffs()-Coeffs()) );
   Coeffs(c_id) += aver_decay * ( AuxCoeffs(c_id)-Coeffs(c_id) );
+}
+
+
+inline
+double Opt_BachAveragedSGD::getAverDecay() const {
+  double aver_decay = 1.0 / ( getIterationCounterDbl() + 1.0 );
+  if(decaying_aver_tau_ > 0.0 && (getIterationCounterDbl() + 1.0) > decaying_aver_tau_){
+    aver_decay = 1.0 / decaying_aver_tau_;
+  }
+  return aver_decay;
 }
 
 
