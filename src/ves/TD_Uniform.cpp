@@ -29,7 +29,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST UNIFORM
+//+PLUMEDOC VES_TARGETDIST_HIDDEN UNIFORM
 /*
 Uniform target distribution (static).
 
