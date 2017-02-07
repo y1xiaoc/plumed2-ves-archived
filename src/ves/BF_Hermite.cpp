@@ -28,7 +28,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_BASISF BF_HERMITE HIDDEN
+//+PLUMEDOC VES_BASISF BF_HERMITE
 /*
 Hermite basis functions.
 

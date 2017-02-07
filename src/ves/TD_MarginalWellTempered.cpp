@@ -33,7 +33,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST MARGINAL_WELL_TEMPERED HIDDEN
+//+PLUMEDOC VES_TARGETDIST MARGINAL_WELL_TEMPERED
 /*
 One-dimensional marginal well-tempered target distribution (dynamic).
 
