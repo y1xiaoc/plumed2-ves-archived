@@ -56,8 +56,8 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_UniformWithSwitchingFunction,"UNIFORM")
 
 void TD_UniformWithSwitchingFunction::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","MINIMA","The minima of the intervals where the target distribution is uniform.");
-  keys.add("compulsory","MAXIMA","The maxima of the intervals where the target distribution is uniform.");
+  keys.add("optional","MINIMA","The minima of the intervals where the target distribution is uniform.");
+  keys.add("optional","MAXIMA","The maxima of the intervals where the target distribution is uniform.");
   keys.add("optional","SIGMA_MINIMA","The sigma values of the Gaussian switching functions for the minima of the intervals. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
   keys.add("optional","SIGMA_MAXIMA","The sigma values of the Gaussian switching functions for the maxima of the intervals. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
 }
@@ -70,12 +70,17 @@ maxima_(0),
 sigma_min_(0),
 sigma_max_(0)
 {
-  parseVector("MINIMA",minima_);
-  parseVector("MAXIMA",maxima_);
+  parseVector("MINIMA",minima_,true);
+  parseVector("MAXIMA",maxima_,true);
   if(minima_.size()!=maxima_.size()){
     plumed_merror(getName()+": MINIMA and MAXIMA do not have the same size");
   }
   setDimension(minima_.size());
+  for(unsigned int k=0; k<getDimension(); k++){
+    if(minima_[k]>maxima_[k]){
+      plumed_merror(getName()+": error in MINIMA and MAXIMA keywords, one of the MINIMA values is larger than the corresponding MAXIMA values");
+    }
+  }
   //
   parseVector("SIGMA_MINIMA",sigma_min_,true);
   parseVector("SIGMA_MAXIMA",sigma_max_,true);
@@ -90,6 +95,9 @@ sigma_max_(0)
 
 
 double TD_UniformWithSwitchingFunction::getValue(const std::vector<double>& argument) const {
+  //
+  if(minima_.size()==0){return 1.0;}
+  //
   double value = 1.0;
   for(unsigned int k=0; k<getDimension(); k++){
     double tmp;
