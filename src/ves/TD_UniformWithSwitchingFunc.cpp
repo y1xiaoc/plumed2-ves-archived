@@ -29,7 +29,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST UNIFORM_SWFUNC
+//+PLUMEDOC VES_TARGETDIST UNIFORM
 /*
 Uniform target distribution (static).
 
@@ -51,7 +51,7 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_UniformWithSwitchingFunction,"UNIFORM_SWFUNC")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_UniformWithSwitchingFunction,"UNIFORM")
 
 
 void TD_UniformWithSwitchingFunction::registerKeywords(Keywords& keys) {

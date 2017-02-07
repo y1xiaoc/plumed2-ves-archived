@@ -29,7 +29,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN UNIFORM
+//+PLUMEDOC VES_TARGETDIST_HIDDEN UNIFORM_OLD
 /*
 Uniform target distribution (static).
 
@@ -50,7 +50,7 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_Uniform,"UNIFORM")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_Uniform,"UNIFORM_OLD")
 
 
 void TD_Uniform::registerKeywords(Keywords& keys) {
