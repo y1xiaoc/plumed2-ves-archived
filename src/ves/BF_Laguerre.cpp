@@ -28,7 +28,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_BASISF BF_LAGUERRE
+//+PLUMEDOC VES_BASISF_HIDDEN BF_LAGUERRE
 /*
 Laguerre basis functions.
 

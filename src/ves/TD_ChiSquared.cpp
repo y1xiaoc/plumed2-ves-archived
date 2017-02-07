@@ -29,7 +29,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST CHI_SQUARED
+//+PLUMEDOC VES_TARGETDIST_HIDDEN CHI_SQUARED
 /*
 Chi-squared distribution (static).
 

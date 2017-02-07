@@ -29,7 +29,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST EXPONENTIAL
+//+PLUMEDOC VES_TARGETDIST_HIDDEN EXPONENTIAL
 /*
 Exponential distribution (static).
 

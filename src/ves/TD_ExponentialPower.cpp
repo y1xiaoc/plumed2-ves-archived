@@ -29,7 +29,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_TARGETDIST EXPONENTIAL_POWER
+//+PLUMEDOC VES_TARGETDIST_HIDDEN EXPONENTIAL_POWER
 /*
 Target distribution given by a sum of exponential power distributions (static).
 

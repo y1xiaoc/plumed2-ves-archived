@@ -7,9 +7,11 @@ rm -f errors-ves
 rm -rf automatic-ves
 mkdir automatic-ves
 
+ShowHiddenActions=false
+
 # Generate all the documentation pages from comments
 cat ../*/*/*cpp |
-awk 'BEGIN{gfile="automatic-ves/VES_GLOSSARY.list"; dfile="automatic-ves/VES_DICTIONARY.list"; }{
+awk -v showHiddenActions=${ShowHiddenActions} 'BEGIN{gfile="automatic-ves/VES_GLOSSARY.list"; dfile="automatic-ves/VES_DICTIONARY.list"; }{
   if($1=="//+ENDPLUMEDOC" && inside){
      inside=0;
      print "*/" >output
@@ -28,6 +30,12 @@ awk 'BEGIN{gfile="automatic-ves/VES_GLOSSARY.list"; dfile="automatic-ves/VES_DIC
      if(inside==3){ printf "%s", $0 > dfile; }
   }
   if($1=="//+PLUMEDOC"){
+    hidden="false"
+    if(tolower(showHiddenActions)=="true" && index($2,"_HIDDEN")!=0 ){
+      hidden="true"
+      sub("_HIDDEN","",$2)
+    }
+    #
     if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_CLTOOLS" || $2=="VES_UTILS" || $2=="VES_BIASES" || $2=="VES_COLVAR" ){
       if(lfile!="") close(lfile)
       lfile="automatic-ves/"$2".list"
@@ -40,6 +48,7 @@ awk 'BEGIN{gfile="automatic-ves/VES_GLOSSARY.list"; dfile="automatic-ves/VES_DIC
       output="automatic-ves/"$3".tmp";
       print "/**" > output
       print "\\page "$3" "$3 > output
+      if(tolower(showHiddenActions)=="true" && hidden=="true"){printf "__Hidden option__\n\n" > output}
 #      print "\\section "$3 >output
       inside=2;
     } else if ( $2=="VES_INTERNAL" ){
