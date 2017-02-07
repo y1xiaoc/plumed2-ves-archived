@@ -162,6 +162,7 @@ void TargetDistribution::setupBiasCutoff() {
   // as the p(s) includes the derivative factor so normalization
   // check can be misleading
   check_normalization_=false;
+  force_normalization_=false;
 }
 
 
@@ -279,12 +280,12 @@ void TargetDistribution::update() {
   //
   if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
   //
-  if(force_normalization_){normalizeGrid(targetdist_grid_pntr_);}
+  if(force_normalization_ && !(bias_cutoff_active_) ){normalizeGrid(targetdist_grid_pntr_);}
   //
   if(shift_targetdist_to_zero_){setMinimumOfTargetDistGridToZero();}
   //
   // if(check_normalization_ && !force_normalization_ && !shift_targetdist_to_zero_){
-  if(check_normalization_){
+  if(check_normalization_ && !(bias_cutoff_active_)){
     double normalization = integrateGrid(targetdist_grid_pntr_);
     const double normalization_thrshold = 0.1;
     if(normalization < 1.0-normalization_thrshold || normalization > 1.0+normalization_thrshold){
