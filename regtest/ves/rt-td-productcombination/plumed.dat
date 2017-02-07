@@ -1,0 +1,36 @@
+# vim:ft=plumed
+
+arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0
+ GRID_MAX=+4.0
+ GRID_BINS=200
+ TARGET_DISTRIBUTION={PRODUCT_COMBINATION
+                      DISTRIBUTION1={UNIFORM
+                                     MINIMA=-3.0
+                                     MAXIMA=+3.0}
+                      DISTRIBUTION2={GAUSSIAN
+                                     CENTER1=-2.9 SIGMA1=1.0
+                                     CENTER2=+2.9 SIGMA2=0.4}}
+ TARGETDIST_FILE=targetdist-1.data
+ LOG_TARGETDIST_FILE=targetdist-1.log.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0,-4.0
+ GRID_MAX=+4.0,+4.0
+ GRID_BINS=100,100
+ TARGET_DISTRIBUTION={PRODUCT_COMBINATION
+                      DISTRIBUTION1={UNIFORM
+                                     MINIMA=-3.0,-3.0
+                                     MAXIMA=+3.0,+3.0}
+                      DISTRIBUTION2={GAUSSIAN
+                                     CENTER=-2.9,-2.9
+                                     SIGMA=0.5,0.3}}
+ TARGETDIST_FILE=targetdist-2.data
+ LOG_TARGETDIST_FILE=targetdist-2.log.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
