@@ -157,6 +157,7 @@ bf_pntrs(1)
     TargetDistribution* targetdist_pntr = setupTargetDistPntr(targetdist_keywords[i]);
     if(targetdist_pntr!=NULL){
       targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
+      plumed_massert(targetdist_pntr->getDimension()==1,"the target distribution must be one dimensional");
       targetdist_pntr->update();
     }
     //
@@ -188,12 +189,11 @@ bf_pntrs(1)
 TargetDistribution* DumpBasisFunctions::setupTargetDistPntr(std::string keyword) const {
   std::vector<std::string> words = Tools::getWords(keyword);
   TargetDistribution* pntr = NULL;
-  if(words[0]=="UNIFORM" && words.size()==1){
+  if(words[0]=="DEFAULT_UNIFORM" && words.size()==1){
     pntr = NULL;
   }
   else{
     pntr = targetDistributionRegister().create(words);
-    plumed_massert(pntr->getDimension()==1,"the target distribution must be one dimensional");
   }
   return pntr;
 }
