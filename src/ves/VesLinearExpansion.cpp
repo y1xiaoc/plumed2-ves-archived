@@ -40,9 +40,38 @@ namespace ves{
 /*
 Linear basis set expansion bias.
 
+This bias action takes the bias potential to be a linear expansion in some basis set that is written as a product of one-dimensional basis functions. For example, for one CV the bias would be written as
+\f[
+V(s_{1};\boldsymbol{\alpha}) = \sum_{i_{1}} \alpha_{i_{1}} \, f_{i_{1}}(s_{1}),
+\f]
+while for two CVs it is written as
 \f[
 V(s_{1},s_{2};\boldsymbol{\alpha}) = \sum_{i_{1},i_{2}} \alpha_{i_{1},i_{2}} \, f_{i_{1}}(s_{1}) \, f_{i_{2}}(s_{2})
 \f]
+where \f$\boldsymbol{\alpha}\f$ is the set of expansion coefficients that are optimized within VES. With an appropriate choice of the basis functions it is possible to represent any generic free energy surface. The relationship between the bias and the free energy surface is given by
+\f[
+V(\mathbf{s}) = - F(\mathbf{s}) - \frac{1}{\beta} \log p(\mathbf{s}).
+\f]
+where \f$p(\mathbf{s})\f$ is the target distribution that is employed in the VES simulation.
+
+
+\par Basis Functions
+
+Various one-dimensional basis functions are available in the VES code, see the complete list \ref ves_basisf "here". At the current moment we recommend to use \ref BF_LEGENDRE "legendre polynomicals" for non-periodic CVs and \ref BF_FOURIER "fourier basis functions" for periodic CV (e.g. dihedral angles).
+
+
+\par Target Distributions
+
+Various target distributions \f$p(\mathbf{s})\f$ are available in the VES code, see the complete list \ref ves_targetdist "here".
+
+
+\Bias Cutoff
+
+
+
+
+
+
 
 \par Examples
 

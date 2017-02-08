@@ -32,7 +32,7 @@ namespace ves{
 
 //+PLUMEDOC VES_OPTIMIZER AVERAGED_SGD
 /*
-Averaged stochastic gradient decent.
+Averaged stochastic gradient decent with fixed step size.
 
 \par Algorithim
 
@@ -49,7 +49,7 @@ where \f$\mu\f$ is a fixed step size and the gradient \f$ \nabla\Omega(\bar{\bol
 \f[
 \bar{\boldsymbol{\alpha}}^{(n)} = \frac{1}{n+1} \sum_{k=0}^{n} \boldsymbol{\alpha}^{(k)}.
 \f]
-This means that the bias acting on the system depends on the averaged coefficents \f$\bar{\boldsymbol{\alpha}}^{(n)}\f$ which leads to a smooth convergence of the bias and the estimated free energy surface. Furthermore, this allows for a rather short sampling time for each iteration, for classical MD simulations typical sampling times are on the order of few ps (around 1000-2000 MD steps).
+This means that the bias acting on the system depends on the averaged coefficents \f$\bar{\boldsymbol{\alpha}}^{(n)}\f$ which leads to a smooth convergence of the bias and the estimated free energy surface. Furthermore, this allows for a rather short sampling time for each iteration, for classical MD simulations typical sampling times are on the order of few ps (around 1000-4000 MD steps).
 
 Currently it is only supported to employ the diagonal part of the Hessian which is generally sufficent. Support for employing the full Hessian will be added later on.
 

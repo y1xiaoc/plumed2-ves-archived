@@ -36,8 +36,8 @@ namespace ves{
 
 //+PLUMEDOC VES_CLTOOLS manual_ves
 /*
-manual is a tool that you can use to construct the manual page for
-a particular target distribution included in VES.
+manual_ves is a command line tool for constructing the manual page for
+a particular target distribution included in the VES code.
 
 The manual constructed by this action is in html. In all probability you will never need to use this
 tool. However, it is used within the scripts that generate plumed's html manual.  If you need to use this
@@ -45,9 +45,9 @@ tool outside those scripts the input is specified using the following command li
 
 \par Examples
 
-The following generates the html manual for the action TD_GAUSSIAN.
+The following generates the html manual for the target distribution \ref VON_MISES
 \verbatim
-plumed manual_ves --targetdist TD_GAUSSIAN
+plumed manual_ves --targetdist VON_MISES
 \endverbatim
 
 
@@ -70,7 +70,7 @@ PLUMED_REGISTER_CLTOOL(Manual_VES,"manual_ves")
 
 void Manual_VES::registerKeywords( Keywords& keys ){
   CLTool::registerKeywords( keys );
-  keys.add("compulsory","--targetdist","print the manual for this particular action");
+  keys.add("compulsory","--targetdist","print the manual for this particular target distribution");
   keys.addFlag("--vim",false,"print the keywords in vim syntax");
 }
 
