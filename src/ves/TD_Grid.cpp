@@ -37,9 +37,51 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST GRID_DIST
 /*
-Target distribution from a grid file (static).
+Target distribution from an external grid file (static).
+
+Using this keyword you can use a target distribution that is read from an
+external grid file that is in the proper PLUMED file format. You do not to
+give any information about the external grid file as all relevant information
+should be automatically detected.
+
+By default it is assumed that the distribution read-in from the grid is a proper
+probability distribution, i.e. normalized to 1 and always non-negative.
+If this is not the case the code will give a warning but still run.
+You can use the FORCE_NORMALIZATION keyword to make sure that it is normalized.
+To make sure that the distribution is always non-negative you use either the
+SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero or the
+SHIFT keyword to shift the distribution by a given value.
+
+Note that the number of grid bins used in the external grid file do not have
+to be the same as used in the bias or action where the target distribution is
+employed as the code will employ a spline interpolation in order to calculate
+values.
+
+By default the target distribution is continuous such that values outside
+the boundary of the external grid file are the same as at the boundary.
+This can be changed by using the ZERO_OUTSIDE keyword which will make
+values outside to be taken as zero.
 
 \par Examples
+
+In the following examples the target distribution is read-in from the given
+external grid file.
+
+If the external grid is normalized to 1 and always non-negative you only
+need to provide the filename
+\verbatim
+TARGET_DISTRIBUTION={GRID_DIST
+                     FILE=input-grid.data}
+\endverbatim
+
+If the external grid is not normalized you need to use the
+FORCE_NORMALIZATION keyword in order to normalize the target
+distribution to 1
+\verbatim
+TARGET_DISTRIBUTION={GRID_DIST
+                     FILE=input-grid.data
+                     FORCE_NORMALIZATION}
+\endverbatim
 
 */
 //+ENDPLUMEDOC
@@ -65,10 +107,10 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Grid,"GRID_DIST")
 
 void TD_Grid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
+  keys.add("compulsory","FILE","the name of the external grid file to used as a target distribution.");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
-  keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the given grid are the same as at the boundary. This can be changed by using this flag which will make values outside the grid to be taken as zero.");
   keys.add("optional","SHIFT","shift the grid read-in by some constant value. If you use this keyword you should also use the FORCE_NORMALIZATION keyword to make sure that the distribution is properly normalized.");
+  keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the boundary of the external grid file are the same as at the boundary. This can be changed by using this flag which will make values outside to be taken as zero.");
 }
 
 TD_Grid::~TD_Grid() {
