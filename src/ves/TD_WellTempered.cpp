@@ -35,6 +35,34 @@ namespace ves{
 /*
 Well-tempered target distribution (dynamic).
 
+Use as a target distribution the well-tempered distribution \cite Barducci:2008
+given by
+\f[
+p(\mathbf{s}) =
+\frac{e^{-(\beta/\gamma) F(\mathbf{s})}}
+{\int d\mathbf{s}\, e^{-(\beta/\gamma) F(\mathbf{s})}} =
+\frac{[P_{0}(\mathbf{s})]^{1/\gamma}}
+{\int d\mathbf{s}\, [P_{0}(\mathbf{s})]^{1/\gamma}}
+\f]
+where \f$\gamma\f$ is a so-called bias factor and \f$P_{0}(\mathbf{s})\f$ is the
+unbiased canonical distribution of the CVs. This target distribution thus
+correponds to a biased ensemble where, as compared to the unbiased one,
+the probability peaks have been broaden and the fluctations of the CVs are
+enhanced.
+The value of the bias factor \f$\gamma\f$ determines by how much the fluctations
+are enhanced. The well-tempered distribution can also be view as sampling on
+an effective free energy surface \f$\tilde{F}(\mathbf{s}) = (1/\gamma) F(\mathbf{s})\f$
+where the barriers have been reduced by a factor of \f$\gamma\f$.
+
+
+At convergence the relationship between the bias potential and the free
+energy surface is given by
+\f[
+F(\mathbf{s}) = - (\frac{1}{1-\gamma^{-1}} ) V(\mathbf{s})
+\f]
+
+
+
 \par Examples
 
 */
@@ -57,7 +85,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_WellTempered,"WELL_TEMPERED")
 
 void TD_WellTempered::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","BIASFACTOR","The bias factor to be used for the well tempered distribution");
+  keys.add("compulsory","BIASFACTOR","The bias factor used for the well-tempered distribution.");
 }
 
 
