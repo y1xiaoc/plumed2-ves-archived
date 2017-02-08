@@ -62,6 +62,8 @@ public:
   std::vector<std::string> list() const;
   //
   bool printManual(const std::string& type, const bool& vimout);
+
+  Keywords& getKeywords(const std::string type);
 };
 
 TargetDistributionRegister& targetDistributionRegister();

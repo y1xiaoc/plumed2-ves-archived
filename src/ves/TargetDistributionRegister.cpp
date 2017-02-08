@@ -107,6 +107,11 @@ bool TargetDistributionRegister::printManual( const std::string& type, const boo
 }
 
 
+Keywords& TargetDistributionRegister::getKeywords(const std::string type) {
+  return mk[type];
+}
+
+
 
 }
 }

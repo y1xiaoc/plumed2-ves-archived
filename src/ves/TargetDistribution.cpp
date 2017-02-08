@@ -40,7 +40,9 @@ namespace PLMD{
 namespace ves{
 
 TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
-words(input){}
+words(input),
+keys(targetDistributionRegister().getKeywords(input[0]))
+{}
 
 
 void TargetDistribution::registerKeywords( Keywords& keys ){
@@ -74,33 +76,44 @@ bias_withoutcutoff_grid_pntr_(NULL),
 fes_grid_pntr_(NULL),
 static_grid_calculated(false),
 bias_cutoff_active_(false),
-bias_cutoff_value_(0.0)
+bias_cutoff_value_(0.0),
+keywords(to.keys)
 {
   input.erase( input.begin() );
-  parse("BIAS_CUTOFF",bias_cutoff_value_,true);
-  if(bias_cutoff_value_<0.0){
-    plumed_merror("a negative value in BIAS_CUTOFF does not make sense");
-  }
-  if(bias_cutoff_value_>0.0){
-    setupBiasCutoff();
-  }
   //
-  double welltempered_factor=0.0;
-  parse("WELLTEMPERED_FACTOR",welltempered_factor,true);
-  //
-  if(welltempered_factor>0.0){
-    TargetDistModifer* pntr = new WellTemperedModifer(welltempered_factor);
-    targetdist_modifer_pntrs_.push_back(pntr);
-  }
-  else if(welltempered_factor<0.0){
-    plumed_merror("a negative value in WELLTEMPERED_FACTOR does not make sense");
+  if(keywords.exists("BIAS_CUTOFF")){
+    parse("BIAS_CUTOFF",bias_cutoff_value_,true);
+    if(bias_cutoff_value_<0.0){
+      plumed_merror("a negative value in BIAS_CUTOFF does not make sense");
+    }
+    if(bias_cutoff_value_>0.0){
+      setupBiasCutoff();
+    }
   }
   //
-  parseFlag("SHIFT_TO_ZERO",shift_targetdist_to_zero_);
-  if(shift_targetdist_to_zero_){check_nonnegative_=false;}
+  if(keywords.exists("WELLTEMPERED_FACTOR")){
+    double welltempered_factor=0.0;
+    parse("WELLTEMPERED_FACTOR",welltempered_factor,true);
+    //
+    if(welltempered_factor>0.0){
+      TargetDistModifer* pntr = new WellTemperedModifer(welltempered_factor);
+      targetdist_modifer_pntrs_.push_back(pntr);
+    }
+    else if(welltempered_factor<0.0){
+      plumed_merror("a negative value in WELLTEMPERED_FACTOR does not make sense");
+    }
+  }
   //
-  parseFlag("FORCE_NORMALIZATION",force_normalization_);
-  if(force_normalization_){check_normalization_=false;}
+  if(keywords.exists("SHIFT_TO_ZERO")){
+    parseFlag("SHIFT_TO_ZERO",shift_targetdist_to_zero_);
+    if(shift_targetdist_to_zero_){check_nonnegative_=false;}
+  }
+  //
+  if(keywords.exists("FORCE_NORMALIZATION")){
+    parseFlag("FORCE_NORMALIZATION",force_normalization_);
+    if(force_normalization_){check_normalization_=false;}
+  }
+
 }
 
 
