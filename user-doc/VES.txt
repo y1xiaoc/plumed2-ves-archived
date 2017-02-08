@@ -2,7 +2,7 @@
 
 \page ves_main Variationally Enhanced Sampling
 
-The VES code is a module outside the PLUMED core that implements enhanced sampling methods based on _Variationally Enhanced Sampling_ (VES) \cite Valsson-PRL-2014. The theory of VES is explained in more detail \ref ves_theory "here".
+The VES code is a module outside the core of PLUMED that implements enhanced sampling methods based on _Variationally Enhanced Sampling_ (VES) \cite Valsson-PRL-2014. The theory of VES is explained in more detail \ref ves_theory "here".
 
 [homepage of the VES code](http://www.ves-code.org)
 
@@ -38,13 +38,13 @@ V(\mathbf{s}) = - F(\mathbf{s}) - \frac{1}{\beta} \log p(\mathbf{s}).
 
 \page ves_biases Bias
 
-The following list contains the biases  available in VES.
+The following list contains the biases available in the VES code.
 
 @VES_BIASES@
 
 \page ves_basisf Basis functions
 
-The following list contains the basis functions available in VES.
+The following list contains the basis functions available in the VES code.
 
 @VES_BASISF@
 
@@ -54,28 +54,28 @@ The following list contains the basis functions available in VES.
 The
 Various target distributions are available for usage in the
 
-The following list contains the target distributions available in VES.
+The following list contains the target distributions available in the VES code.
 
 @VES_TARGETDIST@
 
 
 \page ves_optimizer Optimizers
 
-The following list contains the target distributions available in VES.
+The following list contains the target distributions available in the VES code.
 
 @VES_OPTIMIZER@
 
 
 \page ves_colvar Collective Variables
 
-The following list contains the CV available in VES.
+The following list contains the CV available in the VES code.
 
 @VES_COLVAR@
 
 
 \page ves_utils Utilities
 
-The following list contains various utilities available in VES.
+The following list contains various utilities available in the VES code.
 
 @VES_UTILS@
 
@@ -83,7 +83,7 @@ The following list contains various utilities available in VES.
 
 \page ves_cltools Command Line Tools
 
-The following list contains the target distributions currently available in VES.
+The following list contains the target distributions currently available in the VES code.
 
 @VES_CLTOOLS@
 
@@ -91,14 +91,14 @@ The following list contains the target distributions currently available in VES.
 
 \page ves_glossary VES Index of Actions
 
-The following list contains all actions available in VES
+The following list contains all actions available in the VES code
 
 @VES_GLOSSARY@
 
 
 \page ves_tutorials Tutorials
 
-The following tutorials are available for VES
+The following tutorials are available for the VES code
 
 @VES_TUTORIALS@
 
