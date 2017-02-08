@@ -124,6 +124,7 @@ zero_outside_(false)
     distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);
     if(use_spline){distGrid_->enableSpline();}
   }
+  gridfile.close();
 
   plumed_massert(distGrid_->getDimension()==getDimension(),"Target distribution of type GRID: mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
 
