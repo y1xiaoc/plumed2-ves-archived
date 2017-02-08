@@ -51,6 +51,7 @@ class TD_Grid : public TargetDistribution {
   std::vector<double> maxima_;
   std::vector<bool> periodic_;
   bool zero_outside_;
+  double shift_;
 public:
   static void registerKeywords( Keywords&);
   explicit TD_Grid( const TargetDistributionOptions& to );
@@ -67,6 +68,7 @@ void TD_Grid::registerKeywords(Keywords& keys) {
   keys.add("compulsory","FILE","the name of the grid file contaning the target distribution");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
   keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the given grid are the same as at the boundary. This can be changed by using this flag which will make values outside the grid to be taken as zero.");
+  keys.add("optional","SHIFT","shift the grid read-in by some constant value. If you use this keyword you should also use the FORCE_NORMALIZATION keyword to make sure that the distribution is properly normalized.");
 }
 
 TD_Grid::~TD_Grid() {
@@ -81,10 +83,12 @@ TargetDistribution(to),
 distGrid_(NULL),
 minima_(0),
 maxima_(0),
-zero_outside_(false)
+zero_outside_(false),
+shift_(0.0)
 {
   std::string filename;
   parse("FILE",filename);
+  parse("SHIFT",shift_,true);
   parseFlag("ZERO_OUTSIDE",zero_outside_);
   bool no_spline=false;
   // parseFlag("NOSPLINE",no_spline);
@@ -157,7 +161,7 @@ double TD_Grid::getValue(const std::vector<double>& argument) const {
       arg[k] =maxima_[k];
     }
   }
-  return distGrid_->getValue(arg);
+  return distGrid_->getValue(arg)+shift_;
 }
 
 
