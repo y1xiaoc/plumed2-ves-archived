@@ -30,9 +30,44 @@ namespace ves{
 
 //+PLUMEDOC VES_BASISF BF_FOURIER
 /*
-Fourier basis functions
+Fourier basis functions.
+
+Use as basis functions Fourier series defined on a periodic interval.
+You need to provide the periodic interval \f$[a,b]\f$
+on which the basis functions are to be used, and the order of the
+expansion \f$N\f$ (i.e. the highest Fourier mode used).
+The total number of basis functions is \f$2N+1\f$ as for each Fourier
+mode there is both the cosine and sine term,
+and the constant \f$f_{0}(x)=1\f$ is also included.
+These basis functions should only be used for periodic CVs.
+
+The Fourier series basis functions are given by
+\f{align}{
+f_{0}(x)    &= 1 \\
+f_{1}(x)    &= cos(\frac{2\pi }{P} x) \\
+f_{2}(x)    &= sin(\frac{2\pi }{P} x) \\
+f_{3}(x)    &= cos(2 \cdot \frac{2\pi}{P} x) \\
+f_{4}(x)    &= sin(2 \cdot \frac{2\pi \, 2}{P} x) \\
+& \vdots \\
+f_{2n-1}(x) &= cos(n \cdot \frac{2\pi}{P} x) \\
+f_{2n}(x)   &= sin(n \cdot \frac{2\pi}{P} x) \\
+& \vdots \\
+f_{2N-1}(x) &= cos(N \cdot \frac{2\pi}{P} x) \\
+f_{2N}(x)   &= sin(N \cdot \frac{2\pi}{P} x) \\
+\f}
+where \f$P=(b-a)\f$ is the periodicity of the interval.
 
 \par Examples
+
+Here we employ a Fourier expansion of order 10 over the periodic interval
+\f$-\pi\f$ to \f$+\pi\f$.
+This results in a total number of 21 basis functions.
+The label used to identify  the basis function action can then be
+referenenced later on in the input file.
+\verbatim
+BF_FOURIER INTERVAL_MIN=-pi INTERVAL_MAX=+pi ORDER=10 LABEL=bf_fourier
+\endverbatim
+
 
 */
 //+ENDPLUMEDOC

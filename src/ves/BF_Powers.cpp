@@ -30,11 +30,48 @@ namespace ves{
 
 //+PLUMEDOC VES_BASISF BF_POWERS
 /*
-Polynomial powers basis functions
+Polynomial power basis functions.
 
- __This basis set should not be used in conventional simulations__. Instead you should use a orthogonal basis functions like \ref BF_LEGENDRE or \ref BF_CHEBYSHEV.
+\attention
+__These basis functions should not be used in conventional biasing simulations__.
+Instead you should use orthogonal basis functions like Legendre or
+Chebyshev polynomials. They are only included for usage in \ref md_linearexpansion
+and some special cases.
+
+Basis functions given by polynomial powers defined on a bounded interval.
+You need to provide the interval \f$[a,b]\f$
+on which the basis functions are to be used, and the order of the
+expansion \f$N\f$ (i.e. the highest power used).
+The total number of basis functions is \f$N+1\f$ as the constant \f$f_{0}(x)=1\f$
+is also included.
+These basis functions should not be used for periodic CVs.
+
+The basis functions are given by
+\f{align}{
+f_{0}(x)    &= 1 \\
+f_{1}(x)    &= x \\
+f_{2}(x)    &= x^2 \\
+& \vdots \\
+f_{n}(x)    &= x^n \\
+& \vdots \\
+f_{N}(x)    &= x^N \\
+\f}
+
+Note that these basis functions are __not__ orthogonal. In fact the integral
+over the uniform target distribution blows up as the interval is increased.
+Therefore they should not be used in conventional biasing simulations.
+However, they can be useful in \ref md_linearexpansion.
 
 \par Examples
+
+Here we employ a polynomial power expansion of order 5
+over the interval -2.0 to 2.0.
+This results in a total number of 6 basis functions.
+The label used to identify  the basis function action can then be
+referenenced later on in the input file.
+\verbatim
+BF_POWERS INTERVAL_MIN=-2.0 INTERVAL_MAX=2.0 ORDER=5 LABEL=bf_pow
+\endverbatim
 
 
 */
@@ -56,7 +93,7 @@ PLUMED_REGISTER_ACTION(BF_Powers,"BF_POWERS")
 
 void BF_Powers::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
-  keys.add("optional","NORMALIZATION","the normalization factor that is used to normalize the basis functions by dividing the values. By default it is 1.0.");
+  keys.add("optional","NORMALIZATION","The normalization factor that is used to normalize the basis functions. By default it is 1.0.");
   keys.remove("NUMERICAL_INTEGRALS");
 }
 

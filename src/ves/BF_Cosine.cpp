@@ -30,9 +30,43 @@ namespace ves{
 
 //+PLUMEDOC VES_BASISF BF_COSINE
 /*
-Cosine basis functions
+Fourier cosine basis functions.
+
+Use as basis functions Fourier cosine series defined on a periodic interval.
+You need to provide the periodic interval \f$[a,b]\f$
+on which the basis functions are to be used, and the order of the
+expansion \f$N\f$ (i.e. the highest Fourier cosine mode used).
+The total number of basis functions is \f$N+1\f$ as
+the constant \f$f_{0}(x)=1\f$ is also included.
+These basis functions should only be used for periodic CVs.
+They can be useful if the periodic function being expanded is an
+even function, i.e. \f$F(-x)=F(x)\f$.
+
+The Fourier cosine basis functions are given by
+\f{align}{
+f_{0}(x)    &= 1 \\
+f_{1}(x)    &= cos(\frac{2\pi }{P} x) \\
+f_{2}(x)    &= cos(2 \cdot \frac{2\pi}{P} x) \\
+f_{3}(x)    &= cos(3 \cdot \frac{2\pi}{P} x) \\
+& \vdots \\
+f_{n}(x) &= cos(n \cdot \frac{2\pi}{P} x) \\
+& \vdots \\
+f_{N}(x)   &= cos(N \cdot \frac{2\pi}{P} x) \\
+\f}
+where \f$P=(b-a)\f$ is the periodicity of the interval.
 
 \par Examples
+
+Here we employ a Fourier cosine expansion of order 10 over the periodic interval
+\f$-\pi\f$ to \f$+\pi\f$.
+This results in a total number of 11 basis functions.
+The label used to identify  the basis function action can then be
+referenenced later on in the input file.
+\verbatim
+BF_COSINE INTERVAL_MIN=-pi INTERVAL_MAX=+pi ORDER=10 LABEL=bf1
+\endverbatim
+
+
 
 */
 //+ENDPLUMEDOC

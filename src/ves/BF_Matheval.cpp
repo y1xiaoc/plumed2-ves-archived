@@ -33,7 +33,14 @@ namespace ves{
 
 //+PLUMEDOC VES_BASISF BF_MATHEVAL
 /*
-Basis functions given by matheval
+Basis functions given by matheval expressions.
+
+This 
+
+
+\attention
+The BF_MATHEVAL only works if libmatheval is installed on the system and
+PLUMED has been linked to it.
 
 \par Examples
 

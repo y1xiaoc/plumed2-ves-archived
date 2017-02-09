@@ -33,13 +33,13 @@ namespace ves{
 Chebyshev polynomial basis functions.
 
 Use as basis functions [Chebyshev polynomials](https://en.wikipedia.org/wiki/Chebyshev_polynomials)
-of the first kind \f$T_{n}(x)\f$, that are defined on a bounded interval.
-
-To use these basis functions you need to provide the interval \f$[a,b]\f$
+of the first kind \f$T_{n}(x)\f$ defined on a bounded interval.
+You need to provide the interval \f$[a,b]\f$
 on which the basis functions are to be used, and the order of the
 expansion \f$N\f$ (i.e. the highest order polynomial used).
 The total number of basis functions is \f$N+1\f$ as the constant \f$T_{0}(x)=1\f$
 is also included.
+These basis functions should not be used for periodic CVs.
 
 Intrinsically the Chebyshev polynomials are defined on the interval \f$[-1,1]\f$.
 A variable \f$t\f$ in the interval \f$[a,b]\f$ is transformed to a variable \f$x\f$
@@ -75,9 +75,12 @@ the [Wikipedia page](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 
 \par Examples
 
-Here we employ an expansion of order 20 over the interval 0.0 to 10.0
+Here we employ a Chebyshev expansion of order 20 over the interval 0.0 to 10.0.
+This results in a total number of 21 basis functions.
+The label used to identify  the basis function action can then be
+referenenced later on in the input file.
 \verbatim
-BF_CHEBYSHEV INTERVAL_MIN=0.0 INTERVAL_MAX=10.0 ORDER=20
+bfC: BF_CHEBYSHEV INTERVAL_MIN=0.0 INTERVAL_MAX=10.0 ORDER=20
 \endverbatim
 
 */
