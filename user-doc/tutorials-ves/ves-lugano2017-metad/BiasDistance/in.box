@@ -1,8 +1,0 @@
-variable	side equal 20.0
-variable	numAtoms equal 216
-variable 	mass equal 1.
-region          box block 0 ${side} 0 ${side} 0 ${side}
-create_box      1 box
-create_atoms    1 random ${numAtoms} ${seed} box
-mass            1 ${mass}
-
