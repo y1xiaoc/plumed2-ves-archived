@@ -17,10 +17,11 @@ Once this tutorial is completed students will learn to:
 \section ves-lugano2017-metad-resources Resources
 
 The <a href="tutorial-resources-ves/ves-lugano2017-metad.tar.gz"
-download="ves-lugano2017-metad.tar.gz"> tarball </a> for this project contains the following files:
+download="ves-lugano2017-metad.tar.gz"> tarball </a> for this project contains
+the following folders:
 
-- Example1.tar : Contains the input file for the unbiased simulation.
-- Example2.tar : Contains the input files for one of the biased simulations.
+- Example1 : Contains the input file for the unbiased simulation.
+- Example2 : Contains the input files for one of the biased simulations.
   The rest of the biased simulations inputs should be created by modifying this one.
 
 \section ves-lugano2017-metad-somesection Instructions
@@ -123,12 +124,17 @@ We choose a gaussian height of 1 kJ/mol which is slightly less than 0.5 \f$k_B
 T \f$. The gaussian width is 0.02 nm, in the same order of the features in the
 FES. The bias factor is set to 5 since the largest barrier in the FES is
 expected to be roughly 5 \f$k_BT\f$. Once the metadynamics simulation is
-converged, the system will evolve under an effective free energy:
+converged, the bias will be (up to an arbitrary constant):
+\f[
+	V(\mathbf{s})= - \left ( 1- \frac{1}{\gamma} \right ) F(\mathbf{s})
+\f]
+and therefore the system will evolve under an effective free energy:
 \f[
 	\tilde{F}(\mathbf{s})=F(\mathbf{s})+V(\mathbf{s})=
 \frac{F(\mathbf{s})}{\gamma},
 \f]
-that is to say, the largest barrier will be of around 1 \f$k_BT\f$. The input is:
+that is to say, the largest barrier will be of around 1 \f$k_BT\f$. 
+The input is:
 \verbatim
 METAD ...
  LABEL=metad
@@ -145,7 +151,13 @@ METAD ...
 ... METAD
 \endverbatim
 
-We will also limit the exploration of the CV space by introducing an upper wall bias \f$ V_{wall}(\mathbf{s}) \f$.
+We will also limit the exploration of the CV space by introducing an upper
+wall bias \f$ V_{wall}(\mathbf{s}) \f$:
+\f[
+ V_{wall}(s) = \kappa (s-s_0)^2 \mathrm{\: if \:} s>s_0 \mathrm{ \: and \:  0
+\:  otherwise}.
+\f]
+
 The wall will focus the sampling in the most interesting region of the free
 energy surface. The effect of this bias potential will have to be corrected later in order to calculate
  ensemble averages. The syntax in Plumed 2 is:
@@ -179,9 +191,9 @@ size \f$ \sigma / 5 \f$ (with \f$ \sigma \f$ the gaussian width) is small enough
 
 One way to identify if a WT-MetaD simulation has converged is observing the
 estimated free energy surface at different times. The FES is estimated by
-using the relation (up to an arbitrary constant):
+using the relation (again up to an arbitrary constant):
 \f[
-	F(\mathbf{s}) = \left ( \frac{\gamma}{\gamma-1} \right ) V(\mathbf{s},t)
+	F(\mathbf{s}) = - \left ( \frac{\gamma}{\gamma-1} \right ) V(\mathbf{s},t)
 \f]
 and the bias potential is calculated as a sum of gaussians.
 This can be done with Plumed 2 using for instance:
@@ -199,9 +211,10 @@ After roughly 3 ns the free
  constant \f$ c(t) \f$ that grows in time. This is in line with well-tempered metadynamics 
 asymptotic behaviour:
 \f[
-	V(\mathbf{s},t)= \left ( 1- \frac{1}{\gamma} \right ) F(\mathbf{s}) +
+	V(\mathbf{s},t)= - \left ( 1- \frac{1}{\gamma} \right ) F(\mathbf{s}) +
 c(t).
 \f]
+The behavior of \f$ c(t) \f$ will be studied with greater detail later.
 \anchor ves-school-2017-metad-fesEvolution
 \image html Metad-fesEvolution.png "Evolution of the estimated free energy"
 
@@ -263,14 +276,21 @@ be used as a test of convergence. We will show that in the next section.
 
 We first reweight the simulation on the distance Na-Cl, the same CV used for
 biasing. 
+This reweighting is useful to check convergence and to
+have an estimate of the free energy that does not rely on using kernels. For
+instance if some features of the FES could not be captured by the kernels, the
+reweighting procedure will show them. This will become clearer in the VES
+tutorial. 
 The scripts to perform this calculation are found in the folder ReweightDistance.
-In the quasistationary limit the weight assigned to a given configuration is:
+In metadynamics quasistationary limit the weight assigned to a given
+configuration is \cite Tiwary_jp504920s :
 \f[
-  w(\mathbf{R}) \propto  e^{\beta ( V(\mathbf{s},t) - c(t) )}
+  w(\mathbf{R}) \propto  e^{\beta ( V(\mathbf{s},t) - c(t) )}.
 \f]
-By plotting c(t) (column 6) versus time (column 1) using the COLVAR file, the importance of taking c(t) into account
+By plotting time (column 1) versus \f$ c(t) \f$ (column 6) using the COLVAR
+file, the importance of taking \f$ c(t) \f$ into account
 becomes clear.
- c(t) keeps growing even after long times, reflecting the
+ \f$ c(t) \f$ keeps growing even after long times, reflecting the
 approximately rigid shift of the bias with time. 
 Normally the first part of the trajectory is not used for reweighting since
 during this period the simulation has not reached the quasistationary limit.
@@ -281,13 +301,11 @@ sed '2,15000d' ../COLVAR > COLVAR
 \endverbatim
 
 We then use Plumed to calculate two histograms, one taking into account the wall bias and the other one neglecting it.
-The weights for the reweighting involving only the metadynamics bias will be:
+The weights for the reweighting involving only the metadynamics bias have
+already been discussed while the weights considering both biases are:
 \f[
-  w(\mathbf{R}) \propto  e^{\beta ( V(\mathbf{s},t) - c(t) )},
-\f]
-while the weights considering both biases are:
-\f[
-  w(\mathbf{R}) \propto  e^{\beta ( V(\mathbf{s},t) - c(t) + V_{wall}(\mathbf{s}) )},
+  w(\mathbf{R}) \propto  e^{\beta ( V(\mathbf{s},t) - c(t) +
+V_{wall}(\mathbf{s}) )}.
 \f]
 The input script for Plumed is:
 \verbatim
@@ -326,7 +344,11 @@ DUMPGRID GRID=hh1 FILE=histo FMT=%24.16e
 DUMPGRID GRID=hh2 FILE=histo_wall FMT=%24.16e
 \endverbatim
 
-This example will generate the files histo and histo_wall. 
+This example can be run with:
+\verbatim
+plumed --no-mpi driver --plumed plumed.dat --noatoms > plumed.out
+\endverbatim
+and will generate the files histo and histo_wall. 
 The histograms represent the probability \f$p(\mathbf{s})\f$ of observing a
 given value of the CV \f$ \mathbf{s} \f$ .
 From the histograms the FES can be calulated using:
@@ -338,13 +360,9 @@ and therefore we plot the FES in gnuplot using for instance:
 pl  "./histo" u 1:(-log($2)) w lp
 \endverbatim
 
-We now compare the estimations of the free energy surface obtained from
-sum_hills and from reweighting. You will find a gnuplot script plot.gpi inside the ReweightDistance folder.
-This reweighting is useful to check convergence and to
-have an estimate of the free energy that does not rely on using kernels. For
-instance if some features of the FES could not be captured by the kernels, the
-reweighting procedure will show them. This will become clearer in the VES
-tutorial.
+The next plot compares the estimations of the FES from sum_hills,
+reweighting with metadynamics bias, and reweighting using both the metadynamics bias and the upper wall bias
+You will find a gnuplot script plot.gpi to make this plot inside the ReweightDistance folder.
 
 \anchor ves-school-2017-metad-reweightDist
 \image html Metad-reweightDist.png "FES estimated from sum_hills, reweighting using only the metadynamics bias, and reweighting using both the metadynamics bias and the upper wall bias"
