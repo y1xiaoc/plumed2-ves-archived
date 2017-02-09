@@ -122,7 +122,7 @@ void TD_ProductDistribution::setupAdditionalGrids(const std::vector<Value*>& arg
     distribution_pntrs_[i]->setupGrids(arg1d,min1d,max1d,nbins1d);
     grid_pntrs_[i]=distribution_pntrs_[i]->getTargetDistGridPntr();
     if(distribution_pntrs_[i]->getDimension()!=1 || grid_pntrs_[i]->getDimension()!=1){
-      plumed_merror("Error in PRODUCT_DISTRIBUTION: all target distribution need to be one dimensional");
+      plumed_merror(getName() + ": all target distributions must be one dimensional");
     }
   }
 }

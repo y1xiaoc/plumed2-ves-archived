@@ -151,7 +151,7 @@ shift_(0.0)
   bool has_deriv = false;
   unsigned int nargs = VesTools::getGridFileInfo(filename,gridlabel,arglabels,argmin,argmax,argperiodic,argnbins,has_deriv);
   if(nargs==0){
-    plumed_merror("Target distribution of type GRID: problem in parsing information from grid file");
+    plumed_merror(getName() + ": problem in parsing information from grid file");
   }
 
   setDimension(arglabels.size());
@@ -176,7 +176,6 @@ shift_(0.0)
   }
   gridfile.close();
 
-  plumed_massert(distGrid_->getDimension()==getDimension(),"Target distribution of type GRID: mismatch in the dimension of the read-in grid and tha arguments given in ARGS");
 
   minima_.resize(getDimension());
   maxima_.resize(getDimension());

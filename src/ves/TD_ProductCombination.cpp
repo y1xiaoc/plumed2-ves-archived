@@ -122,7 +122,7 @@ void TD_ProductCombination::setupAdditionalGrids(const std::vector<Value*>& argu
   for(unsigned int i=0; i<ndist_; i++){
     distribution_pntrs_[i]->setupGrids(arguments,min,max,nbins);
     if(distribution_pntrs_[i]->getDimension()!=this->getDimension()){
-      plumed_merror("Error in PRODUCT_COMBINATION: all target distribution need to have the same dimension");
+      plumed_merror(getName() + ": all target distribution must have the same dimension");
     }
     grid_pntrs_[i]=distribution_pntrs_[i]->getTargetDistGridPntr();
   }

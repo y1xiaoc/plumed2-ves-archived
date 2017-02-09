@@ -109,7 +109,7 @@ use_beta_(false)
   checkRead();
   //
   evaluator_pntr_=evaluator_create(const_cast<char*>(func_str.c_str()));
-  if(evaluator_pntr_==NULL) plumed_merror("There was some problem in parsing matheval formula "+func_str);
+  if(evaluator_pntr_==NULL) plumed_merror(getName()+": there was some problem in parsing matheval formula "+func_str);
   //
   char** var_names;
   int var_count;
@@ -133,7 +133,7 @@ use_beta_(false)
       use_beta_=true;
     }
     else {
-      plumed_merror("problem with parsing matheval formula: cannot recognise the variable "+curr_var);
+      plumed_merror(getName()+": problem with parsing matheval formula, cannot recognise the variable "+curr_var);
     }
   }
   //
@@ -148,7 +148,7 @@ use_beta_(false)
 
 void TD_Matheval::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins){
   if(cv_var_idx_.size()>0 && cv_var_idx_[cv_var_idx_.size()-1]>getDimension()){
-    plumed_merror("mismatch between CVs given in FUNC and the dimension of the target distribution");
+    plumed_merror(getName()+": mismatch between CVs given in FUNC and the dimension of the target distribution");
   }
 }
 
@@ -192,7 +192,7 @@ void TD_Matheval::updateGrid(){
     }
     double value = evaluator_evaluate(evaluator_pntr_,var_char.size(),&var_char[0],&var_values[0]);
 
-    if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror("the target distribution function used in MATHEVAL_DIST gives negative values. You can use the SHIFT_TO_ZERO keyword to avoid this problem.");}
+    if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror(getName()+": the target distribution function gives negative values, you can use the SHIFT_TO_ZERO keyword to avoid this problem.");}
     targetDistGrid().setValue(l,value);
     norm += integration_weights[l]*value;
     logTargetDistGrid().setValue(l,-std::log(value));
@@ -201,7 +201,7 @@ void TD_Matheval::updateGrid(){
     targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
   }
   else if(!isTargetDistGridShiftedToZero()){
-    plumed_merror("problem with target distribution function used in MATHEVAL_DIST, it cannot be normalized proberly.  You can use the SHIFT_TO_ZERO keyword to avoid this problem.");
+    plumed_merror(getName()+": the target distribution function cannot be normalized proberly, you can use the SHIFT_TO_ZERO keyword to avoid this problem.");
   }
   logTargetDistGrid().setMinToZero();
 }

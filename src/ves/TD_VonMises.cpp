@@ -109,7 +109,7 @@ ncenters_(0)
   }
   plumed_massert(centers_.size()==sigmas_.size(),"there has to be an equal amount of CENTER and SIGMA keywords");
   if(centers_.size()==0){
-    plumed_merror("VON_MISES: CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
+    plumed_merror(getName()+": CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
   }
   //
   setDimension(centers_[0].size());
@@ -117,8 +117,8 @@ ncenters_(0)
   //
   // check centers and sigmas
   for(unsigned int i=0; i<ncenters_; i++) {
-    plumed_massert(centers_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
-    plumed_massert(sigmas_[i].size()==getDimension(),"one of the CENTER keyword does not match the given dimension");
+    if(centers_[i].size()!=getDimension()){plumed_merror(getName()+": one of the CENTER keyword does not match the given dimension");}
+    if(sigmas_[i].size()!=getDimension()){plumed_merror(getName()+": one of the SIGMA keyword does not match the given dimension");}
   }
   //
   kappas_.resize(sigmas_.size());
@@ -130,10 +130,10 @@ ncenters_(0)
   }
   //
   if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(centers_.size(),1.0);}
-  plumed_massert(centers_.size()==weights_.size(),"there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
+  if(centers_.size()!=weights_.size()){plumed_merror(getName() + ": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");}
   //
   if(!parseVector("PERIODS",periods_,true)){periods_.assign(getDimension(),2*pi);}
-  plumed_massert(periods_.size()==getDimension(),"the number of values given in PERIODS does not match the dimension of the distribution");
+  if(periods_.size()!=getDimension()){plumed_merror(getName() + ": the number of values given in PERIODS does not match the dimension of the distribution");}
   //
   double sum_weights=0.0;
   for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
