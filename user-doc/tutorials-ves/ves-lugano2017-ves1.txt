@@ -1,0 +1,147 @@
+/**
+\page ves-lugano2017-ves1 MARVEL school 2017 tutorial: VES 1
+
+\section ves-lugano2017-ves1-aims Aims
+
+\section ves-lugano2017-ves1-lo Learning Outcomes
+
+Once this tutorial is completed students will learn to:
+
+- Use different target distributions and choose the most appropriate for their
+  problem.
+- Use different basis sets and order of the expansions. Select the appropriate
+  order for their problem.
+- Use the optimization algorithm and choose the parameters.
+- Construct biases in 1 and 2 dimensions.
+- Assess the convergence of the simulation.
+- Obtain biased and unbiased histograms.
+
+\section ves-lugano2017-ves1-resources Resources
+
+The <a href="tutorial-resources-ves/ves-lugano2017-ves1.tar.gz"
+download="ves-lugano2017-ves1.tar.gz"> tarball </a> for this project contains
+the following folders:
+
+- Example1 : Contains the input file for the unbiased simulation.
+
+\section ves-lugano2017-ves1-summary Summary of theory
+
+Variationally enhanced sampling is based on the the following functional of
+the bias potential:
+\f[
+\Omega [V]  =
+\frac{1}{\beta} \log
+\frac
+{\int d\mathbf{s} \, e^{-\beta \left[ F(\mathbf{s}) + V(\mathbf{s})\right]}}
+{\int d\mathbf{s} \, e^{-\beta F(\mathbf{s})}}
++
+\int d\mathbf{s} \, p(\mathbf{s}) V(\mathbf{s}),
+\f]
+where \f$ p(s) \f$ is a predefined probability distribution that we will refer
+to as the target distribution, and \f$ F(\mathbf{s}) \f$ is the free energy
+surface. This functional can be shown to be convex and to have a minimum at:
+\f[
+V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})}.
+\f]
+The last equation states that once that the functional \f$ \Omega (V) \f$ is
+minimized, the bias and the target distribution allow calculating the free
+energy. The target distribution \f$ p(s) \f$ can be chosen at will and it is
+the distribution of the CVs once that \f$ \Omega [V] \f$ has been minimized.
+
+The optimization algorithm has been discussed during the lectures and
+therefore in the tutorial we will only discuss practical aspects of its usage.
+
+\section ves-lugano2017-ves1-instructions Instructions
+
+\subsection ves-lugano2017-ves1-subsection-1 The system
+
+We will consider the same system employed for the metadynamics tutorial.
+
+\subsection ves-lugano2017-ves1-subsection-2 First VES simulation
+
+For the first VES simulation we will revisit the problem of the ion pair
+dissociation but replacing the metadynamics bias with a VES bias. The bias
+potential will be constructed on the distance Na-Cl as done before. We will
+still use the upper wall used in the metadynamics tutorial to make the actual
+example as similar as possible to the previous one. We will then see that VES
+has a more natural way to deal with barriers. All files needed for this
+example can be found in the Example1 folder.
+
+Every VES simulation has three key ingredients:
+
+- Basis set
+- Target distribution
+- Optimization algorithm
+
+For the basis set we will choose Legendre polynomials defined in the interval
+[0.2 nm,0.7 nm]. Legendre polynomials are a good choice for non-periodic CVs.
+A rule of thumb for choosing the order of the expansion is that an expansion
+of order N can capture features of the FES of approximately L/N where L is the
+length of the interval. In this case, we use an order of 10 is able to capture
+features of the order of 0.05 nm. The syntax in Plumed is:
+\verbatim
+BF_LEGENDRE ...
+ ORDER=10
+ INTERVAL_MIN=0.2
+ INTERVAL_MAX=0.8
+ LABEL=bf1
+... BF_LEGENDRE
+\endverbatim
+
+We will use a uniform target distribution:
+\f[
+p(\mathbf{s})= 1/C
+\f]
+with \f$ C \f$ a normalization constant. Once that \f$ \Omega [V] \f$ is
+minimized, the bias potential satisfies (up to an arbitrary constant):
+\f[
+V(\mathbf{s}) = - F(\mathbf{s})
+\f]
+This is the same relation that holds for non-tempered metadynamics.
+The syntax in Plumed is:
+\verbatim
+VES_LINEAR_EXPANSION ...
+ ARG=d1
+ BASIS_FUNCTIONS=bf1
+ GRID_BINS=300
+ TARGET_DISTRIBUTION={UNIFORM}
+ LABEL=b1
+... VES_LINEAR_EXPANSION
+\endverbatim
+
+Finally we have to choose the optimization algorithm. The standard is the
+averaged stochastic gradient descent. One has to define two parameters: the
+stride and the step size. The stride is the number of steps in which samples
+are collected to calculate the gradient and hessian of \f$ \Omega [V] \f$ and
+the step size is the step by which the coefficients are evolved at every
+optimization steps. Both of this parameters are connected. Increasing the
+stride will have a similar effect to reduce the step size. It has become
+traditional to choose a stride of around 500 steps. It must be noted that we
+are only looking for an accurate estimation of the gradient, since for this we
+would need to sample all the CV space. The step size in the
+optimization has a strong connection with the height of typical barriers in
+the system. The larger the barriers, the larger the step size needed such that
+the bias can grow fast enough to overcome them. For this example we have
+chosen a stride of 500 steps and a step size of 0.5 kJ/mol. The syntax in
+Plumed is:
+\verbatim
+AVERAGED_SGD ...
+  BIAS=b1
+  STRIDE=500
+  LABEL=o1
+  STEPSIZE=0.5
+  FES_OUTPUT=100
+  BIAS_OUTPUT=500
+  COEFFS_OUTPUT=10
+... AVERAGED_SGD
+\endverbatim
+
+
+
+*/
+
+link: @subpage ves-lugano2017-ves1
+
+description: Some good description of the tutorial
+
+additional-files: ves-lugano2017-ves1
