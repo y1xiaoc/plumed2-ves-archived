@@ -79,7 +79,7 @@ void TD_LinearCombination::registerKeywords(Keywords& keys){
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
-  keys.use("FORCE_NORMALIZATION");
+  keys.use("NORMALIZE");
 }
 
 

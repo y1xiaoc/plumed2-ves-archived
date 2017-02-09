@@ -46,9 +46,9 @@ words(input)
 
 void TargetDistribution::registerKeywords( Keywords& keys ){
   keys.reserve("hidden","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
-  keys.reserve("optional","WELLTEMPERED_FACTOR","Broaden the target distribution by using a well tempered factor.");
-  keys.reserveFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution.");
-  keys.reserveFlag("FORCE_NORMALIZATION",false,"Force normalization of the target distribution.");
+  keys.reserve("optional","WELLTEMPERED_FACTOR","Broaden the target distribution such that it is taken as [p(s)]^(1/g) where g is the well tempered factor given here. If this option is active the distribution will be automatically normalized.");
+  keys.reserveFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution. If this option is active the distribution will be automatically normalized.");
+  keys.reserveFlag("NORMALIZE",false,"Renormalized the target distribution over the intervals on which it is defined to make sure that it is properly normalized to 1. In most cases this should not be needed as the target distributions should be normalized. The code will issue a warning (but still run) if this is needed for some reason.");
 }
 
 
@@ -93,6 +93,7 @@ keywords(targetDistributionRegister().getKeywords(name_))
     parse("WELLTEMPERED_FACTOR",welltempered_factor,true);
     //
     if(welltempered_factor>0.0){
+      if(bias_cutoff_active_){plumed_merror(getName()+": using WELLTEMPERED_FACTOR with bias cutoff is not allowed.");}
       TargetDistModifer* pntr = new WellTemperedModifer(welltempered_factor);
       targetdist_modifer_pntrs_.push_back(pntr);
     }
@@ -103,12 +104,20 @@ keywords(targetDistributionRegister().getKeywords(name_))
   //
   if(keywords.exists("SHIFT_TO_ZERO")){
     parseFlag("SHIFT_TO_ZERO",shift_targetdist_to_zero_);
-    if(shift_targetdist_to_zero_){check_nonnegative_=false;}
+    if(shift_targetdist_to_zero_){
+      if(bias_cutoff_active_){plumed_merror(getName()+": using SHIFT_TO_ZERO with bias cutoff is not allowed.");}
+      check_nonnegative_=false;
+    }
   }
   //
-  if(keywords.exists("FORCE_NORMALIZATION")){
-    parseFlag("FORCE_NORMALIZATION",force_normalization_);
-    if(force_normalization_){check_normalization_=false;}
+  if(keywords.exists("NORMALIZE")){
+    bool force_normalization=false;
+    parseFlag("NORMALIZE",force_normalization);
+    if(force_normalization){
+      if(shift_targetdist_to_zero_){plumed_merror(getName()+": using NORMALIZE with SHIFT_TO_ZERO is not needed, the target distribution will be automatically normalized.");}
+      if(bias_cutoff_active_){plumed_merror(getName()+": using NORMALIZE with bias cutoff is not allowed, the target distribution will be automatically normalized.");}
+      setForcedNormalization();
+    }
   }
 
 }
@@ -293,16 +302,15 @@ void TargetDistribution::update() {
   //
   if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
   //
+  if(shift_targetdist_to_zero_ && !(bias_cutoff_active_)){setMinimumOfTargetDistGridToZero();}
   if(force_normalization_ && !(bias_cutoff_active_) ){normalizeGrid(targetdist_grid_pntr_);}
-  //
-  if(shift_targetdist_to_zero_){setMinimumOfTargetDistGridToZero();}
   //
   // if(check_normalization_ && !force_normalization_ && !shift_targetdist_to_zero_){
   if(check_normalization_ && !(bias_cutoff_active_)){
     double normalization = integrateGrid(targetdist_grid_pntr_);
     const double normalization_thrshold = 0.1;
     if(normalization < 1.0-normalization_thrshold || normalization > 1.0+normalization_thrshold){
-      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " is not proberly normalized, integrating over the grid gives: " << normalization << " - You can avoid this problem by using the FORCE_NORMALIZATION keyword\n";
+      std::cerr << "PLUMED WARNING - the target distribution grid in " + getName() + " is not proberly normalized, integrating over the grid gives: " << normalization << " - You can avoid this problem by using the NORMALIZE keyword\n";
     }
   }
   //

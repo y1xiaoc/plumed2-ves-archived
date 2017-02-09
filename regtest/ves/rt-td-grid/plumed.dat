@@ -44,7 +44,7 @@ DUMP_TARGET_DISTRIBUTION ...
  TARGET_DISTRIBUTION={GRID_DIST
                       FILE=targetdist-input-grid-2d.data
                       SHIFT=+2.0
-                      FORCE_NORMALIZATION}
+                      NORMALIZE}
  TARGETDIST_FILE=targetdist-4.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION

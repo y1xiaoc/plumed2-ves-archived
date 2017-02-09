@@ -19,7 +19,7 @@ DUMP_TARGET_DISTRIBUTION ...
  GRID_BINS=200
  TARGET_DISTRIBUTION={GAUSSIAN
                       CENTER=-3.5 SIGMA=0.8
-                      FORCE_NORMALIZATION}
+                      NORMALIZE}
  TARGETDIST_FILE=targetdist-2.data
  LOG_TARGETDIST_FILE=targetdist-2.log.data
  FMT_GRIDS=%11.5f

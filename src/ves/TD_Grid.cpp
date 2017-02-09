@@ -47,20 +47,22 @@ should be automatically detected.
 By default it is assumed that the distribution read-in from the grid is a proper
 probability distribution, i.e. normalized to 1 and always non-negative.
 If this is not the case the code will give a warning but still run.
-You can use the FORCE_NORMALIZATION keyword to make sure that it is normalized.
-To make sure that the distribution is always non-negative you use either the
-SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero or the
-SHIFT keyword to shift the distribution by a given value.
+You can use the NORMALIZE keyword to make sure that it is normalized.
+To make sure that the distribution is non-negative you can use the SHIFT
+keyword to shift the distribution by a given value. Another option is to use
+the SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero.
 
 Note that the number of grid bins used in the external grid file do not have
 to be the same as used in the bias or action where the target distribution is
-employed as the code will employ a spline interpolation in order to calculate
+employed as the code will employ a spline interpolation to calculate
 values.
 
-By default the target distribution is continuous such that values outside
-the boundary of the external grid file are the same as at the boundary.
-This can be changed by using the ZERO_OUTSIDE keyword which will make
-values outside to be taken as zero.
+It can happen that the intervals on which the target distribution is defined is
+larger than the intervals covered by the external grid file. In this case the
+default option is to consider the target distribution as continuous such that
+values outside the boundary of the external grid file are the same as at
+the boundary. This can be changed by using the ZERO_OUTSIDE keyword which
+will make values outside to be taken as zero.
 
 \par Examples
 
@@ -75,12 +77,12 @@ TARGET_DISTRIBUTION={GRID_DIST
 \endverbatim
 
 If the external grid is not normalized you need to use the
-FORCE_NORMALIZATION keyword in order to normalize the target
+NORMALIZE keyword in order to normalize the target
 distribution to 1
 \verbatim
 TARGET_DISTRIBUTION={GRID_DIST
                      FILE=input-grid.data
-                     FORCE_NORMALIZATION}
+                     NORMALIZE}
 \endverbatim
 
 */
@@ -107,14 +109,14 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Grid,"GRID_DIST")
 
 void TD_Grid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","FILE","the name of the external grid file to used as a target distribution.");
+  keys.add("compulsory","FILE","The name of the external grid file to be used as a target distribution.");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
-  keys.add("optional","SHIFT","shift the grid read-in by some constant value. If you use this keyword you should also use the FORCE_NORMALIZATION keyword to make sure that the distribution is properly normalized.");
-  keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the boundary of the external grid file are the same as at the boundary. This can be changed by using this flag which will make values outside to be taken as zero.");
+  keys.add("optional","SHIFT","Shift the grid read-in by some constant value. If this option is active the distribution will be automatically normalized. Due to this normalization the final shift in the target distribution will generally not be the same as the value given here");
+  keys.addFlag("ZERO_OUTSIDE",false,"By default the target distribution is continuous such that values outside the boundary of the external grid file are the same as at the boundary. This can be changed by using this flag which will make values outside to be taken as zero.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
-  keys.use("FORCE_NORMALIZATION");
+  keys.use("NORMALIZE");
 }
 
 TD_Grid::~TD_Grid() {
@@ -135,6 +137,10 @@ shift_(0.0)
   std::string filename;
   parse("FILE",filename);
   parse("SHIFT",shift_,true);
+  if(shift_!=0.0){
+    if(isTargetDistGridShiftedToZero()){plumed_merror(getName() + ": using both SHIFT and SHIFT_TO_ZERO is not allowed.");}
+    setForcedNormalization();
+  }
   parseFlag("ZERO_OUTSIDE",zero_outside_);
   bool no_spline=false;
   // parseFlag("NOSPLINE",no_spline);
