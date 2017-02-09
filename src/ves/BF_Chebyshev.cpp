@@ -53,7 +53,7 @@ The Chebyshev polynomials are given by the recurrence relation
 \f{align}{
 T_{0}(x)    &= 1 \\
 T_{1}(x)    &= x \\
-T_{n+1}(x)  &= 2 \, x \, T_{n} - T_{n-1}
+T_{n+1}(x)  &= 2 \, x \, T_{n}(x) - T_{n-1}(x)
 \f}
 
 The first 6 polynomials are shown below
