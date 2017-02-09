@@ -30,7 +30,51 @@ namespace ves{
 
 //+PLUMEDOC VES_BASISF BF_LEGENDRE
 /*
-Legendre basis functions
+Legendre polynomials basis functions
+
+Use as basis functions [Legendre polynomials](https://en.wikipedia.org/wiki/Legendre_polynomials)
+\f$P_{n}(x)\f$, that are defined on a bounded interval.
+
+To use these basis functions you need to provide the interval \f$[a,b]\f$
+on which the basis functions are to be used, and the order of the
+expansion \f$N\f$ (i.e. the highest order polynomial used).
+The total number of basis functions is \f$N+1\f$ as the constant \f$P_{0}(x)=1\f$
+is also included.
+
+Intrinsically the Legendre polynomials are defined on the interval \f$[-1,1]\f$.
+A variable \f$t\f$ in the interval \f$[a,b]\f$ is transformed to a variable \f$x\f$
+in the intrinsic interval \f$[-1,1]\f$ by using
+\f[
+x(t) = \frac{t-(a+b)/2}
+{(b-a)/2}
+\f]
+
+The Legendre polynomials are given by the recurrence relation
+\f{align}{
+P_{0}(x)    &= 1 \\
+P_{1}(x)    &= x \\
+P_{n+1}(x)  &= \frac{2n+1}{n+1} \, x \, P_{n}(x) -  \frac{n}{n+1} \, P_{n-1}(x)
+\f}
+
+The first 6 polynomials are shown below
+\image html basisf-legendre.png
+
+The Legendre polynomial are orthogonal over the interval \f$[-1,1]\f$
+\f[
+\int_{-1}^{1} dx \, P_{n}(x)\, P_{m}(x)  =  \frac{2}{2n+1} \delta_{n,m}
+\f]
+By using the SCALED keyword the polynomials are scaled by a factor of
+\f$ \sqrt{\frac{2n+1}{2}}\f$ such that they are orthonormal to 1.
+
+For further mathemtical properties of the Legendre polynomials see for example
+the [Wikipedia page](https://en.wikipedia.org/wiki/Legendre_polynomials).
+
+\par Examples
+
+Here we employ an expansion of order 20 over the interval 0.0 to 10.0
+\verbatim
+BF_LEGENDRE INTERVAL_MIN=0.0 INTERVAL_MAX=10.0 ORDER=20
+\endverbatim
 
 \par Examples
 
@@ -52,7 +96,7 @@ PLUMED_REGISTER_ACTION(BF_Legendre,"BF_LEGENDRE")
 
 void BF_Legendre::registerKeywords(Keywords& keys){
  BasisFunctions::registerKeywords(keys);
- keys.addFlag("SCALED",false,"scale the polynomials such that they are orthonormal to 1");
+ keys.addFlag("SCALED",false,"Scale the polynomials such that they are orthonormal to 1.");
 }
 
 BF_Legendre::BF_Legendre(const ActionOptions&ao):
