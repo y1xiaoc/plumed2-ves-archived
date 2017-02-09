@@ -82,7 +82,7 @@ keywords(targetDistributionRegister().getKeywords(name_))
   //
   parse("BIAS_CUTOFF",bias_cutoff_value_,true);
   if(bias_cutoff_value_<0.0){
-    plumed_merror("a negative value in BIAS_CUTOFF does not make sense");
+    plumed_merror(getName()+": negative value in BIAS_CUTOFF does not make sense");
   }
   if(bias_cutoff_value_>0.0){
     setupBiasCutoff();
@@ -97,7 +97,7 @@ keywords(targetDistributionRegister().getKeywords(name_))
       targetdist_modifer_pntrs_.push_back(pntr);
     }
     else if(welltempered_factor<0.0){
-      plumed_merror("a negative value in WELLTEMPERED_FACTOR does not make sense");
+      plumed_merror(getName()+": negative value in WELLTEMPERED_FACTOR does not make sense");
     }
   }
   //
@@ -167,7 +167,7 @@ void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in){
 
 void TargetDistribution::setupBiasCutoff() {
   if(!keywords.exists("BIAS_CUTOFF")){
-    plumed_merror(getName()+" target distribution does not support a bias cutoff");
+    plumed_merror(getName()+": this target distribution does not support a bias cutoff");
   }
   bias_cutoff_active_=true;
   setBiasWithoutCutoffGridNeeded();
@@ -385,12 +385,12 @@ void TargetDistribution::readInRestartTargetDistGrid(const std::string& grid_fna
   plumed_massert(isDynamic(),"this should only be used for dynamically updated target distributions!");
   IFile gridfile;
   if(!gridfile.FileExist(grid_fname)){
-    plumed_merror("Problem with reading previous target distribution when restarting: cannot find file " + grid_fname);
+    plumed_merror(getName()+": problem with reading previous target distribution when restarting, cannot find file " + grid_fname);
   }
   gridfile.open(grid_fname);
   Grid* restart_grid = Grid::create("targetdist",grid_args_,gridfile,false,false,false);
   if(restart_grid->getSize()!=targetdist_grid_pntr_->getSize()){
-    plumed_merror("Problem with reading previous target distribution when restarting: the grid is not of the correct size!");
+    plumed_merror(getName()+": problem with reading previous target distribution when restarting, the grid is not of the correct size!");
   }
   VesTools::copyGridValues(restart_grid,targetdist_grid_pntr_);
   updateLogTargetDistGrid();
