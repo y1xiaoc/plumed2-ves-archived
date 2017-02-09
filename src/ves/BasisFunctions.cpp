@@ -36,12 +36,12 @@ namespace ves{
 
 void BasisFunctions::registerKeywords(Keywords& keys){
   Action::registerKeywords(keys);
-  keys.add("compulsory","ORDER","The order of the basis functions.");
-  keys.add("compulsory","INTERVAL_MIN","the minimum of the interval on which the basis functions are defined");
-  keys.add("compulsory","INTERVAL_MAX","the maximum of the interval on which the basis functions are defined");
-  keys.add("optional","NGRID_POINTS","the number of grid points used for numerical integrals");
-  keys.addFlag("DEBUG_INFO",false,"print out more detailed information about the basis set, useful for debugging");
-  keys.addFlag("NUMERICAL_INTEGRALS",false,"calculate basis function integral for the uniform distribution numerically");
+  keys.add("compulsory","ORDER","The order of the basis function expansion.");
+  keys.add("compulsory","INTERVAL_MIN","The minimum of the interval on which the basis functions are defined.");
+  keys.add("compulsory","INTERVAL_MAX","The maximum of the interval on which the basis functions are defined.");
+  keys.add("hidden","NGRID_POINTS","The number of grid points used for numerical integrals");
+  keys.addFlag("DEBUG_INFO",false,"Print out more detailed information about the basis set. Useful for debugging.");
+  keys.addFlag("NUMERICAL_INTEGRALS",false,"Calculate basis function integral for the uniform distribution numerically. Useful for debugging.");
 }
 
 

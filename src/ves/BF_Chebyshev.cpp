@@ -30,9 +30,54 @@ namespace ves{
 
 //+PLUMEDOC VES_BASISF BF_CHEBYSHEV
 /*
-Chebyshev basis functions
+Chebyshev polynomial basis functions.
+
+Use as basis functions [Chebyshev polynomials](https://en.wikipedia.org/wiki/Chebyshev_polynomials)
+of the first kind \f$T_{n}(x)\f$, that are defined on a bounded interval.
+
+To use these basis functions you need to provide the interval \f$[a,b]\f$
+on which the basis functions are to be used, and the order of the
+expansion \f$N\f$ (i.e. the highest order polynomial used).
+The total number of basis functions is \f$N+1\f$ as the constant \f$T_{0}(x)=1\f$
+is also included.
+
+Intrinsically the Chebyshev polynomials are defined on the interval \f$[-1,1]\f$.
+A variable \f$t\f$ in the interval \f$[a,b]\f$ is transformed to a variable \f$x\f$
+in the intrinsic interval \f$[-1,1]\f$ by using
+\f[
+x(t) = \frac{t-(a+b)/2}
+{(b-a)/2}
+\f]
+
+The Chebyshev polynomials are given by the recurrence relation
+\f{align}{
+T_{0}(x)    &= 1 \\
+T_{1}(x)    &= x \\
+T_{n+1}(x)  &= 2 \, x \, T_{n} - T_{n-1}
+\f}
+
+The first 6 polynomials are shown below
+\image html basisf-chebyshev.png
+
+The Chebyshev polynomial are orthogonal with respect to the weight \f$\frac{1}{\sqrt{1-x^2}}\f$
+\f[
+\int_{-1}^{1} dx \, T_{n}(x)\, T_{m}(x) \, \frac{1}{\sqrt{1-x^2}} =
+\begin{cases}
+0 & n \neq m \\
+\pi & n = m = 0 \\
+\pi/2 & n = m \neq 0
+\end{cases}
+\f]
+
+For further mathemtical properties of the Chebyshev polynomials see for example
+the [Wikipedia page](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 
 \par Examples
+
+Here we employ an expansion of order 20 over the interval 0.0 to 10.0
+\verbatim
+BF_CHEBYSHEV INTERVAL_MIN=0.0 INTERVAL_MAX=10.0 ORDER=20
+\endverbatim
 
 */
 //+ENDPLUMEDOC
