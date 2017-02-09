@@ -40,8 +40,7 @@ namespace PLMD{
 namespace ves{
 
 TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
-words(input),
-keys(targetDistributionRegister().getKeywords(input[0]))
+words(input)
 {}
 
 
@@ -77,7 +76,7 @@ fes_grid_pntr_(NULL),
 static_grid_calculated(false),
 bias_cutoff_active_(false),
 bias_cutoff_value_(0.0),
-keywords(to.keys)
+keywords(targetDistributionRegister().getKeywords(name_))
 {
   input.erase( input.begin() );
   //

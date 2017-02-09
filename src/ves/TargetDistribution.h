@@ -50,7 +50,6 @@ friend class TargetDistributionRegister;
 friend class TargetDistribution;
 private:
   std::vector<std::string> words;
-  const Keywords& keys;
 public:
   TargetDistributionOptions( const std::vector<std::string>& input);
 };
