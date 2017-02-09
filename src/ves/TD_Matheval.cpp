@@ -76,6 +76,9 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Matheval,"MATHEVAL_DIST")
 void TD_Matheval::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FUNCTION","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
 }
 
 

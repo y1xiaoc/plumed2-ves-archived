@@ -55,6 +55,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_UniformBiasCutoff,"UNIFORM_BIAS_CUTOFF")
 
 void TD_UniformBiasCutoff::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
+  keys.use("BIAS_CUTOFF");
 }
 
 

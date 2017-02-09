@@ -55,6 +55,10 @@ void TD_Exponential::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMA","The minima of the exponential distribution.");
   keys.add("compulsory","LAMBDA","The lambda parameters for the chi-squared distribution.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 

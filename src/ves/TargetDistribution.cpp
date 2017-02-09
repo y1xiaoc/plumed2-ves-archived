@@ -45,10 +45,10 @@ words(input)
 
 
 void TargetDistribution::registerKeywords( Keywords& keys ){
-  keys.add("hidden","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
-  keys.add("optional","WELLTEMPERED_FACTOR","Broaden the target distribution by using a well tempered factor.");
-  keys.addFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution.");
-  keys.addFlag("FORCE_NORMALIZATION",false,"Force normalization of the target distribution.");
+  keys.reserve("hidden","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
+  keys.reserve("optional","WELLTEMPERED_FACTOR","Broaden the target distribution by using a well tempered factor.");
+  keys.reserveFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution.");
+  keys.reserveFlag("FORCE_NORMALIZATION",false,"Force normalization of the target distribution.");
 }
 
 

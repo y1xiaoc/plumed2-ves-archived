@@ -63,6 +63,10 @@ void TD_Gaussian::registerKeywords(Keywords& keys){
   keys.add("numbered","SIGMA","The sigma parameters for each Gaussian distribution.");
   keys.add("numbered","CORRELATION","The correlation between the arguments for each Gaussian distribution. Currently only works for two-dimensional Gaussians.");
   keys.add("optional","WEIGHTS","The weights of the Gaussian distribution. By default all are weighted equally.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 

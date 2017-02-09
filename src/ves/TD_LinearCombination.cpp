@@ -76,6 +76,10 @@ void TD_LinearCombination::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination.");
   keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally. The weights are always normalized such that WEIGHTS=1,1 and WEIGHTS=0.5,0.5 is equal.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 

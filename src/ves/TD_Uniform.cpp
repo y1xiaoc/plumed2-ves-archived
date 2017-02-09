@@ -57,6 +57,10 @@ void TD_Uniform::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMA","The minima of the intervals on which the target distribution is defined.");
   keys.add("compulsory","MAXIMA","The maxima of the intervals on which the target distribution is defined.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 

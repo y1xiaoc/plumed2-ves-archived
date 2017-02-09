@@ -65,6 +65,10 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductDistribution,"PRODUCT_DISTRIBUTION")
 void TD_ProductDistribution::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DIST_ARG","The one dimensional target distributions to be used in the product combination for each argument");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 

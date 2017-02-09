@@ -59,6 +59,10 @@ void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys){
   keys.add("compulsory","CENTER","The center of the generalized extreme value distribution.");
   keys.add("compulsory","SIGMA","The sigma (scale) parameters for the generalized extreme value distribution.");
   keys.add("compulsory","EPSILON","The epsilon (shape) parameters for the generalized extreme value distribution.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 

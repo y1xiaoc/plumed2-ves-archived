@@ -71,6 +71,10 @@ void TD_VonMises::registerKeywords(Keywords& keys){
   keys.add("numbered","SIGMA","The sigmas of the Von Mises distributions.");
   keys.add("optional","WEIGHTS","The weights of the Von Mises distributions.");
   keys.add("optional","PERIODS","The periods for each of the dimensions. By default they are 2*pi for each dimension.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 

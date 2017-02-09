@@ -111,6 +111,10 @@ void TD_Grid::registerKeywords(Keywords& keys) {
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
   keys.add("optional","SHIFT","shift the grid read-in by some constant value. If you use this keyword you should also use the FORCE_NORMALIZATION keyword to make sure that the distribution is properly normalized.");
   keys.addFlag("ZERO_OUTSIDE",false,"by default the target distribution is continuous such that values outside the boundary of the external grid file are the same as at the boundary. This can be changed by using this flag which will make values outside to be taken as zero.");
+  keys.use("BIAS_CUTOFF");
+  keys.use("WELLTEMPERED_FACTOR");
+  keys.use("SHIFT_TO_ZERO");
+  keys.use("FORCE_NORMALIZATION");
 }
 
 TD_Grid::~TD_Grid() {

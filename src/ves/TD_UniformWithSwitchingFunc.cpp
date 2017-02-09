@@ -60,6 +60,7 @@ void TD_UniformWithSwitchingFunction::registerKeywords(Keywords& keys) {
   keys.add("optional","MAXIMA","The maxima of the intervals where the target distribution is uniform.");
   keys.add("optional","SIGMA_MINIMA","The sigma values of the Gaussian switching functions for the minima of the intervals. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
   keys.add("optional","SIGMA_MAXIMA","The sigma values of the Gaussian switching functions for the maxima of the intervals. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
+  keys.use("BIAS_CUTOFF");
 }
 
 
