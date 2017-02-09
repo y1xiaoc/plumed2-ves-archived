@@ -80,14 +80,12 @@ keywords(targetDistributionRegister().getKeywords(name_))
 {
   input.erase( input.begin() );
   //
-  if(keywords.exists("BIAS_CUTOFF")){
-    parse("BIAS_CUTOFF",bias_cutoff_value_,true);
-    if(bias_cutoff_value_<0.0){
-      plumed_merror("a negative value in BIAS_CUTOFF does not make sense");
-    }
-    if(bias_cutoff_value_>0.0){
-      setupBiasCutoff();
-    }
+  parse("BIAS_CUTOFF",bias_cutoff_value_,true);
+  if(bias_cutoff_value_<0.0){
+    plumed_merror("a negative value in BIAS_CUTOFF does not make sense");
+  }
+  if(bias_cutoff_value_>0.0){
+    setupBiasCutoff();
   }
   //
   if(keywords.exists("WELLTEMPERED_FACTOR")){
@@ -168,6 +166,9 @@ void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in){
 
 
 void TargetDistribution::setupBiasCutoff() {
+  if(!keywords.exists("BIAS_CUTOFF")){
+    plumed_merror(getName()+" target distribution does not support a bias cutoff");
+  }
   bias_cutoff_active_=true;
   setBiasWithoutCutoffGridNeeded();
   setDynamic();
