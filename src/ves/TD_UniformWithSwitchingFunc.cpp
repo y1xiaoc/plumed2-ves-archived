@@ -44,6 +44,7 @@ class TD_UniformWithSwitchingFunction : public TargetDistribution {
   std::vector<double> sigma_min_;
   std::vector<double> sigma_max_;
   double GaussianSwitchingFunc(const double, const double, const double) const;
+  void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords( Keywords&);
   explicit TD_UniformWithSwitchingFunction( const TargetDistributionOptions& to );
@@ -73,31 +74,61 @@ sigma_max_(0)
 {
   parseVector("MINIMA",minima_,true);
   parseVector("MAXIMA",maxima_,true);
-  if(minima_.size()!=maxima_.size()){
-    plumed_merror(getName()+": MINIMA and MAXIMA do not have the same size");
-  }
-  setDimension(minima_.size());
-  for(unsigned int k=0; k<getDimension(); k++){
-    if(minima_[k]>maxima_[k]){
-      plumed_merror(getName()+": error in MINIMA and MAXIMA keywords, one of the MINIMA values is larger than the corresponding MAXIMA values");
-    }
-  }
-  //
+
   parseVector("SIGMA_MINIMA",sigma_min_,true);
   parseVector("SIGMA_MAXIMA",sigma_max_,true);
+  if(minima_.size()==0 && sigma_min_.size()>0){plumed_merror(getName()+": you cannot give SIGMA_MINIMA if MINIMA is not given");}
+  if(maxima_.size()==0 && sigma_max_.size()>0){plumed_merror(getName()+": you cannot give SIGMA_MAXIMA if MAXIMA is not given");}
+
+  if(minima_.size()>0 && maxima_.size()>0){
+    // both MINIMA and MAXIMA given, do all checks
+    if(minima_.size()!=maxima_.size()){plumed_merror(getName()+": MINIMA and MAXIMA do not have the same number of values.");}
+    setDimension(minima_.size());
+    for(unsigned int k=0; k<getDimension(); k++){
+      if(minima_[k]>maxima_[k]){
+        plumed_merror(getName()+": error in MINIMA and MAXIMA keywords, one of the MINIMA values is larger than the corresponding MAXIMA values");
+      }
+    }
+  }
+  else if(minima_.size()>0 && maxima_.size()==0){
+    // only MINIMA given, MAXIMA assigned later on.
+    setDimension(minima_.size());
+  }
+  else if(maxima_.size()>0 && minima_.size()==0){
+    // only MAXIMA given, MINIMA assigned later on.
+    setDimension(maxima_.size());
+  }
+  else if(maxima_.size()==0 && minima_.size()==0){
+    // neither MAXIMA nor MINIMA givenm, both assigned later on.
+    setDimension(0);
+  }
+
   if(sigma_min_.size()==0){sigma_min_.assign(getDimension(),0.0);}
   if(sigma_max_.size()==0){sigma_max_.assign(getDimension(),0.0);}
-  if(sigma_min_.size()!=getDimension()){plumed_merror(getName()+": SIGMA_MINIMA has the wrong size");}
-  if(sigma_max_.size()!=getDimension()){plumed_merror(getName()+": SIGMA_MAXIMA has the wrong size");}
+  if(sigma_min_.size()!=getDimension()){plumed_merror(getName()+": SIGMA_MINIMA has the wrong number of values");}
+  if(sigma_max_.size()!=getDimension()){plumed_merror(getName()+": SIGMA_MAXIMA has the wrong number of values");}
   //
   setForcedNormalization();
   checkRead();
 }
 
 
+void TD_UniformWithSwitchingFunction::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+
+  if(minima_.size()==0){
+    minima_.assign(getDimension(),0.0);
+    for(unsigned int k=0; k<getDimension(); k++){Tools::convert(min[k],minima_[k]);}
+  }
+
+  if(maxima_.size()==0){
+    maxima_.assign(getDimension(),0.0);
+    for(unsigned int k=0; k<getDimension(); k++){Tools::convert(max[k],maxima_[k]);}
+  }
+
+}
+
+
 double TD_UniformWithSwitchingFunction::getValue(const std::vector<double>& argument) const {
-  //
-  if(minima_.size()==0){return 1.0;}
   //
   double value = 1.0;
   for(unsigned int k=0; k<getDimension(); k++){
