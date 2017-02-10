@@ -63,7 +63,7 @@ the thermal energy \f$k_{\mathrm{B}}T\f$ can be included
 by using the _beta_ and _kBT_ variables.
 
 The target distribution will be automatically normalized over the region on
-which the target distribution is defined on. Therefore, the function given in
+which it is defined on. Therefore, the function given in
 FUNCTION needs to be non-negative and normalizable. The
 code will perform checks to make sure that is indeed the case.
 
