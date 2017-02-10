@@ -192,7 +192,7 @@ void TD_Matheval::updateGrid(){
     }
     double value = evaluator_evaluate(evaluator_pntr_,var_char.size(),&var_char[0],&var_values[0]);
 
-    if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror(getName()+": the target distribution function gives negative values, you can use the SHIFT_TO_ZERO keyword to avoid this problem.");}
+    if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror(getName()+": The target distribution function gives negative values. You should change the definition of the function used for the target distribution to avoid this. You can also use the SHIFT_TO_ZERO keyword to avoid this problem.");}
     targetDistGrid().setValue(l,value);
     norm += integration_weights[l]*value;
     logTargetDistGrid().setValue(l,-std::log(value));
@@ -201,7 +201,7 @@ void TD_Matheval::updateGrid(){
     targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
   }
   else if(!isTargetDistGridShiftedToZero()){
-    plumed_merror(getName()+": the target distribution function cannot be normalized proberly, you can use the SHIFT_TO_ZERO keyword to avoid this problem.");
+    plumed_merror(getName()+": The target distribution function cannot be normalized proberly. You should change the definition of the function used for the target distribution to avoid this. You can also use the SHIFT_TO_ZERO keyword to avoid this problem.");
   }
   logTargetDistGrid().setMinToZero();
 }
