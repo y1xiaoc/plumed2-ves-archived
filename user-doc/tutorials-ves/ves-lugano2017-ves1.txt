@@ -48,8 +48,35 @@ minimized, the bias and the target distribution allow calculating the free
 energy. The target distribution \f$ p(s) \f$ can be chosen at will and it is
 the distribution of the CVs once that \f$ \Omega [V] \f$ has been minimized.
 
-The optimization algorithm has been discussed during the lectures and
-therefore in the tutorial we will only discuss practical aspects of its usage.
+The variational principle is put to pratice by expanding \f$ V(\mathbf{s}) \f$
+in some basis set:
+\f[
+V(\mathbf{s}) = \sum\limits_{i} \alpha_i f_i(\mathbf{s}),
+\f]
+where \f$ f_i(\mathbf{s}) \f$ are the basis functions and the \f$
+\boldsymbol\alpha \f$ are the coefficients in the expansion.
+We then need to find the \f$ \boldsymbol\alpha \f$ that minimize \f$ \Omega
+[V] \f$. In principle one could use any optimization algorithm. In practice
+the algorithm that has become the default choice for VES is the averaged stochastic
+gradient descent. The \f$ \boldsymbol\alpha \f$ are evolved iteratively
+according to:
+\f[
+\boldsymbol\alpha^{(n+1)} = \boldsymbol\alpha^{(n)}-\mu
+ [
+\nabla\Omega(\bar{\boldsymbol\alpha}^{(n)})+
+H(\bar{\boldsymbol\alpha}^{(n)})[\boldsymbol\alpha^{(n)}-\bar{\boldsymbol\alpha}^{(n)}]
+]
+\f]
+where \f$\mu\f$ is the step size,
+\f$ \bar{\boldsymbol\alpha}^{(n)} \f$ is the running average of \f$
+\boldsymbol\alpha^{(n)} \f$ at iteration \f$ n \f$, and
+\f$ \nabla\Omega(\bar{\boldsymbol\alpha}^{(n)}) \f$ and 
+\f$ H(\bar{\boldsymbol\alpha}^{(n)}) \f$
+ are the gradient and Hessian of \f$ \Omega[V] \f$ evaluated at the running
+average at iteration \f$ n \f$, respectively.
+The behavior of the coefficients will become clear in the examples below.
+
+
 
 \section ves-lugano2017-ves1-instructions Instructions
 
@@ -77,8 +104,11 @@ For the basis set we will choose Legendre polynomials defined in the interval
 [0.2 nm,0.7 nm]. Legendre polynomials are a good choice for non-periodic CVs.
 A rule of thumb for choosing the order of the expansion is that an expansion
 of order N can capture features of the FES of approximately L/N where L is the
-length of the interval. In this case, we use an order of 10 is able to capture
-features of the order of 0.05 nm. The syntax in Plumed is:
+length of the interval. In this case, an order of 10 is able to capture
+features of the order of around 0.05 nm. We will see afterwards that the order
+of the expansion is not critical as long as we obtain good sampling at
+convergence. If this is the case, it is possible to obtain finer features of
+the FES thorugh reweighting. The syntax for this basis set in Plumed is:
 \verbatim
 BF_LEGENDRE ...
  ORDER=10
@@ -136,7 +166,104 @@ AVERAGED_SGD ...
 ... AVERAGED_SGD
 \endverbatim
 
+Now that we have set the scene, we can run our simulation using the run.sh
+script in the Example1 folder. The simulation will produce several files:
 
+- COLVAR: Just as in the metadynamics example.
+- coeffs.data : Values of the coefficients \f$ \boldsymbol\alpha \f$ and \f$
+  \bar{\boldsymbol\alpha} \f$  .
+- bias.<bias-name>.iter-<iteration-number> : Bias potential as a function of
+  \f$ \mathbf{s} \f$ at iteration <iteration-number>.
+- fes.<bias-name>.iter-<iteration-number> : FES iteration <iteration-number>.
+- targetdistribution.<bias-name>.data : Target distribution.
+
+You can first observe how the system moves in
+the CV space in a fashion similar to metadynamics. 
+Then we can see the evolution of \f$ \boldsymbol\alpha \f$ and \f$
+ \bar{\boldsymbol\alpha} \f$ . The first lines of the file coeffs.data are:
+
+\verbatim
+#! FIELDS idx_d1 b1.coeffs b1.aux_coeffs index
+#! SET time 0.000000
+#! SET iteration  0
+#! SET type LinearBasisSet
+#! SET ndimensions  1
+#! SET ncoeffs_total  11
+#! SET shape_d1  11
+       0         0.0000000000000000e+00         0.0000000000000000e+00       0
+       1         0.0000000000000000e+00         0.0000000000000000e+00       1
+       2         0.0000000000000000e+00         0.0000000000000000e+00       2
+       3         0.0000000000000000e+00         0.0000000000000000e+00       3
+       4         0.0000000000000000e+00         0.0000000000000000e+00       4
+       5         0.0000000000000000e+00         0.0000000000000000e+00       5
+       6         0.0000000000000000e+00         0.0000000000000000e+00       6
+       7         0.0000000000000000e+00         0.0000000000000000e+00       7
+       8         0.0000000000000000e+00         0.0000000000000000e+00       8
+       9         0.0000000000000000e+00         0.0000000000000000e+00       9
+      10         0.0000000000000000e+00         0.0000000000000000e+00      10
+#!-------------------
+
+
+
+
+#! FIELDS idx_d1 b1.coeffs b1.aux_coeffs index
+#! SET time 10.000000
+#! SET iteration  10
+#! SET type LinearBasisSet
+#! SET ndimensions  1
+#! SET ncoeffs_total  11
+#! SET shape_d1  11
+       0         0.0000000000000000e+00         0.0000000000000000e+00       0
+       1         5.1165453234702052e-01         1.1482045941475065e+00       1
+       2        -1.0356798763597277e+00        -1.7365051185667855e+00       2
+       3        -5.1830527698835660e-01        -1.1651638070736938e+00       3
+       4         4.1754103138162207e-01         4.8203393927719917e-01       4
+       5         3.2087945211009694e-01         6.6606116920677805e-01       5
+       6        -1.5499943980403830e-01        -4.7946750842365812e-03       6
+       7        -1.1433825688016251e-01        -1.5099503286093419e-01       7
+       8         9.8787914656136719e-02         1.3156529595420300e-02       8
+       9         4.4467081175713474e-03        -8.7160339645570323e-02       9
+      10        -1.1504176822089783e-01        -1.5789737594248379e-01      10
+#!-------------------
+\endverbatim
+
+The first column are the coefficient numbers, the second are the 
+\f$ \bar{\boldsymbol\alpha} \f$, and the third are the
+\f$ \boldsymbol\alpha \f$. Each block in the file corresponds to a different
+iteration, in this case iteration 0 and 10. We can plot the evolution of the
+coefficients using the gnuplot script plotCoeffs.gpi . The ouput should be similar to
+the next figure.
+
+
+The \f$ \boldsymbol\alpha \f$ change fast an oscilate around some mean
+value. The \f$ \bar{\boldsymbol\alpha} \f$ evolve smoothly until the stabilize
+around some equilibrium value. It is important to remember that the bias is a
+function of \f$ \bar{\boldsymbol\alpha} \f$ and since these evolve smoothly, so
+will the bias. Once that the \f$ \bar{\boldsymbol\alpha} \f$ have stabilized, the
+simulation can be considered converged.
+
+
+\anchor ves-school-2017-ves1-coeffs1
+\image html VES-coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
+
+It is also interesting to observe how the bias evolves in time. For this we
+will plot the bias using the files bias.b1.iter-<iteration-number>. There is a
+gnuplot script plotBias.gpi that you can use for this purpose. At variance
+with metadynamics, in this case there is no growing offset in the
+bias and therefore we will have to shift the FES ourselves to distinguish several
+FES at different times in the same plot.
+
+\anchor ves-school-2017-ves1-fesEvolution
+\image html VES-fesEvolution1.png "Evolution of the estimated free energy"
+
+
+We can also calculate the height of the barrier as we did in the metadynamics
+tutorial. The files for doing this can be found in the Barrier_calculation
+folder.
+
+
+
+Mention that one can create an arbitrary target distribution using matheval.
 
 */
 
