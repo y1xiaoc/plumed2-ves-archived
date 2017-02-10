@@ -37,9 +37,84 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST MATHEVAL_DIST
 /*
-Arbitrary target distribution given by a matheval parsed function (static or dynamic).
+Target distribution given by a matheval parsed function (static or dynamic).
+
+Use as a target distribution the distribution defined by
+\f[
+p(\mathbf{s}) =
+\frac{f(\mathbf{s})}{\int d\mathbf{s} \, f(\mathbf{s})}
+\f]
+where \f$f(\mathbf{s})\f$ is some arbitrary mathematical function that
+is parsed by the matheval libary.
+
+The function \f$f(\mathbf{s})\f$ is given by the FUNCTION keywords by
+using _s1_,_s2_,..., as variables for the arguments
+\f$\mathbf{s}=(s_1,s_2,\ldots,s_d)\f$.
+If one variable is not given the target distribution will be
+taken as uniform in that argument.
+
+It is also possible to include the free energy surface \f$F(\mathbf{s})\f$
+in the target distribution by using the _FE_ variable. In this case the
+target distribution is dynamic and needs to be updated with current
+best estimate of \f$F(\mathbf{s})\f$, simiarly as for the
+\ref WELL_TEMPERED "well-tempered target distribution".
+Furthermore, the inverse temperature \f$\beta = (k_{\mathrm{B}}T)^{-1}\f$ and
+the thermal energy \f$k_{\mathrm{B}}T\f$ can be included
+by using the _beta_ and _kBT_ variables.
+
+The target distribution will be automatically normalized over the region on
+which the target distribution is defined on. Therefore, the function given in
+FUNCTION needs to be non-negative and normalizable. The
+code will perform checks to make sure that is indeed the case.
+
+
+\attention
+The MATHEVAL_DIST only works if libmatheval is installed on the system and
+PLUMED has been linked to it.
 
 \par Examples
+
+Here we use as a one-dimensional target distribution a shifted
+[Maxwell-Boltzmann distribution](https://en.wikipedia.org/wiki/Maxwell%E2%80%93Boltzmann_distribution).
+Note that it is not need to include the normalization factor as the distribution will be
+automatically normalized.
+\verbatim
+TARGET_DISTRIBUTION={MATHEVAL_DIST
+                     FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))}
+\endverbatim
+
+[Generalized normal distribution](https://en.wikipedia.org/wiki/Generalized_normal_distribution)
+for argument \f$s_2\f$ while the distribution for \f$s_1\f$ is taken as
+uniform as the variable _s1_ is not included in the function.
+\verbatim
+TARGET_DISTRIBUTION={MATHEVAL_DIST
+                     FUNCTION=exp(-(abs(s2-20.0)/5.0)^4.0)}
+\endverbatim
+
+By using the _FE_ variable the target distribution can depend on
+the free energy surface \f$F(\mathbf{s})\f$. For example,
+the following input is identicaly to using \ref WELL_TEMPERED with
+BIASFACTOR=10.
+\verbatim
+TARGET_DISTRIBUTION={MATHEVAL_DIST
+                    FUNCTION=exp(-(beta/10.0)*FE)}
+\endverbatim
+Here the inverse temperature is automatically obtained by using the _beta_
+variable. It is also possible to use the _kBT_ variable. The following
+syntax will give the exact same results as the syntax above
+\verbatim
+TARGET_DISTRIBUTION={MATHEVAL_DIST
+                    FUNCTION=exp(-(1.0/(kBT*10.0))*FE)}
+\endverbatim
+
+
+
+
+
+
+
+
+
 
 */
 //+ENDPLUMEDOC
@@ -75,7 +150,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Matheval,"MATHEVAL_DIST")
 
 void TD_Matheval::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","FUNCTION","the function you wish to use for the distribution. Note that the distribution will be automatically normalized.");
+  keys.add("compulsory","FUNCTION","The function you wish to use for the target distribution where you should use the variables _s1_,_s2_,... for the arguments. You can also use the current estimate of the FES by using the variable _FE_ and the temperature by using the _kBT_ and _beta_ variables.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
