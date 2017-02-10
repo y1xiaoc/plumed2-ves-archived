@@ -33,7 +33,115 @@ namespace ves{
 /*
 Target distribution given by a sum of Gaussians (static).
 
+Employ a target distribution that is given by a sum of multivariate Gaussian (or normal)
+distributions, defined as
+\f[
+p(\mathbf{s}) = \sum_{i} \, w_{i} N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\Sigma}_{i})
+\f]
+where \f$\boldsymbol{\mu}_{i}=(\mu_{1,i},\mu_{2,i},\ldots,\mu_{d,i})\f$
+and \f$\boldsymbol{\Sigma}_{i}\f$ are
+the center and covariance matrix for the \f$i\f$-th Gaussian.
+The weights \f$w_{i}\f$ are normalized to 1, \f$\sum_{i}w_{i}=1\f$.
+
+By default the Gaussian distributions are considered as seperable into
+independent one-dimensional Gaussian distributions. In other words,
+the covariance matrix is taken as diagonal
+\f$\boldsymbol{\Sigma}_{i}=(\sigma^2_{1,i},\sigma^2_{2,i},\ldots,\sigma^{2}_{d,i})\f$.
+The Gaussian distribution is then written as
+\f[
+N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i}) =
+\prod^{d}_{k} \, \frac{1}{\sqrt{2\pi\sigma^2_{d,i}}} \,
+\exp\left(
+-\frac{(s_{d}-\mu_{d,i})^2}{2\sigma^2_{d,i}}
+\right)
+\f]
+where
+\f$\boldsymbol{\sigma}_{i}=(\sigma_{1,i},\sigma_{2,i},\ldots,\sigma_{d,i})\f$
+is the standard deviation.
+In this case you need to specify the centers \f$\boldsymbol{\mu}_{i}\f$ using the
+numbered CENTER keywords and the standard deviations \f$\boldsymbol{\sigma}_{i}\f$
+using the numbered SIGMA keywords.
+
+For two arguments it is possible to employ correlated bivariate Gaussians defined as
+\f[
+N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i},\rho) =
+\frac{1}{2 \pi \sigma_{1,i} \sigma_{2,i} \sqrt{1-\rho^2}}
+\exp\left(
+-\frac{1}{2(1-\rho^2)}
+\left[
+\frac{(s_{1}-\mu_{1,i})^2}{\sigma_{1,i}^2}+
+\frac{(s_{2}-\mu_{2,i})^2}{\sigma_{2,i}^2}+
+\frac{2 \rho (s_{1}-\mu_{1,i})(s_{2}-\mu_{2,i})}{\sigma_{1,i}\sigma_{2,i}}
+\right]
+\right)
+\f]
+where \f$\rho\f$ is the correlation between \f$s_{1}\f$ and \f$s_{2}\f$
+that goes from -1 to 1. A value of 0 means that the arguments are considered as
+un-correlated.
+In this case the covariance matrix is given as
+\f[
+\boldsymbol{\Sigma}=
+\left[
+\begin{array}{cc}
+\sigma^2_{1,i} & \rho \sigma_{1,i} \sigma_{2,i} \\
+\rho \sigma_{1,i} \sigma_{2,i} & \sigma^2_{2,i}
+\end{array}
+\right]
+\f]
+For the bivariate Gaussians the correlation \f$\rho\f$ is given using
+the numbered CORRELATION keywords.
+
+The Gaussian distributions are always defined with the conventional
+normalization factor such that they are normalized to 1 over an unbounded
+region. However, in calculation within VES we normally consider bounded
+region on which the target distribution is defined. Thus, if the center of
+a Gaussian is close to the boundary of the region it can happen that it
+tails go outside the region. In that case it might be needed to use the
+NORMALIZE keyword to make sure that the target distribution is proberly
+normalized to 1 over the bounded region. The code will issue a warning
+if that is needed.
+
+
 \par Examples
+
+One single Gaussians in one-dimension.
+\verbatim
+TARGET_DISTRIBUTION={GAUSSIAN
+                     CENTER=-1.5 SIGMA=0.8}
+\endverbatim
+
+Sum of three Gaussians in two-dimensions with equal weights as
+no weights are given.
+\verbatim
+TARGET_DISTRIBUTION={GAUSSIAN
+                     CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3
+                     CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8
+                     CENTER3=+1.5,+1.5 SIGMA3=0.4,0.4}
+\endverbatim
+
+Sum of three Gaussians in two-dimensions which
+are weighted unequally. Note that weights are automatically
+normalized to 1 so that WEIGHTS=1.0,2.0,1.0 is equal to
+specifying WEIGHTS=0.25,0.50,0.25.
+\verbatim
+TARGET_DISTRIBUTION={GAUSSIAN
+                     CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3
+                     CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8
+                     CENTER3=+1.5,+1.5 SIGMA3=0.4,0.4
+                     WEIGHTS=1.0,2.0,1.0}
+\endverbatim
+
+Sum of two bivariate Gaussians where there is correlation between the
+two arguments
+\verbatim
+TARGET_DISTRIBUTION={GAUSSIAN
+                     CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3 CORRELATION1=0.25
+                     CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8 CORRELATION2=0.75}
+\endverbatim
+
+
+
+
 
 */
 //+ENDPLUMEDOC
@@ -59,10 +167,10 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Gaussian,"GAUSSIAN")
 
 void TD_Gaussian::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","CENTER","The center of each Gaussian distribution.");
-  keys.add("numbered","SIGMA","The sigma parameters for each Gaussian distribution.");
-  keys.add("numbered","CORRELATION","The correlation between the arguments for each Gaussian distribution. Currently only works for two-dimensional Gaussians.");
-  keys.add("optional","WEIGHTS","The weights of the Gaussian distribution. By default all are weighted equally.");
+  keys.add("numbered","CENTER","The centers of the Gaussian distributions. For one Gaussians you can use either CENTER or CENTER1. For more Gaussians you need to use the numbered CENTER keywords, one for each Gaussian.");
+  keys.add("numbered","SIGMA","The standard deviations of the Gaussian distributions. For one Gaussians you can use either SIGMA or SIGMA1. For more Gaussians you need to use the numbered SIGMA keywords, one for each Gaussian.");
+  keys.add("numbered","CORRELATION","The correlation for two-dimensional bivariate Gaussian distributions. The value should be between -1 and 1. If no value is given the Gaussians is considered as un-correlated (i.e. value of 0.0). For one Gaussians you can use either CORRELATION or CORRELATION1. For more Gaussians you need to use the numbered CORRELATION keywords, one for each Gaussian.");
+  keys.add("optional","WEIGHTS","The weights of the Gaussian distributions. Have to be as many as the number of centers given with the numbered CENTER keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
