@@ -12,7 +12,6 @@ Once this tutorial is completed students will learn to:
 - Assess the convergence of the free energy surface
 - Distinguish between good and bad CVs
 - Reweight with more than one bias potential
-- Restart a simulation
 
 \section ves-lugano2017-metad-resources Resources
 
@@ -45,13 +44,13 @@ The system contains 1 Na, 1 Cl, and 106 water molecules (total 320 atoms).
 \subsection ves-lugano2017-metad-subsection-2 Perform an unbiased simulation and control the distance Na-Cl
 
 We first perform a standard MD simulation and control the distance Na-Cl. 
-All the files needed for this example are contain in Example1.tar .
+All the files needed for this example are contained in the folder Example1 .
 The distance Na-Cl can be calculated in Plumed 2 using:
 \verbatim
 d1:  DISTANCE ATOMS=319,320
 \endverbatim
 
-The coordination number of Na and O in water will also be calculated for later
+The coordination number of Na with respect to O in water will also be calculated for later
 use. This variable will represent the collective motion of the solvent.
 \verbatim
 COORDINATION ...
@@ -86,17 +85,17 @@ The use of partitions will be discussed when using multiple walkers
 
 Once the simulation is launched, the so called COLVAR file is written. In this case it contains the following:
 \verbatim
-#! FIELDS time d1 coord uwall.bias uwall.force2
- 0.200000 0.568067 5.506808 0.000000 0.000000
- 0.400000 0.500148 4.994588 0.000000 0.000000
- 0.600000 0.449778 4.931140 0.000000 0.000000
- 0.800000 0.528272 5.105816 0.000000 0.000000
- 1.000000 0.474371 5.089863 0.000000 0.000000
- 1.200000 0.430620 5.091551 0.000000 0.000000
- 1.400000 0.470374 4.993886 0.000000 0.000000
- 1.600000 0.458768 4.940097 0.000000 0.000000
- 1.800000 0.471886 4.952868 0.000000 0.000000
- 2.000000 0.489058 4.897593 0.000000 0.000000
+#! FIELDS time d1 coord
+ 0.200000 0.568067 5.506808
+ 0.400000 0.500148 4.994588
+ 0.600000 0.449778 4.931140
+ 0.800000 0.528272 5.105816
+ 1.000000 0.474371 5.089863
+ 1.200000 0.430620 5.091551
+ 1.400000 0.470374 4.993886
+ 1.600000 0.458768 4.940097
+ 1.800000 0.471886 4.952868
+ 2.000000 0.489058 4.897593
 .
 .
 .
@@ -108,21 +107,31 @@ pl  "./COLVAR" u 1:2 w lp,
 \endverbatim
 you will see that the ion pair is stuck in the dissociated state during the 1 ns simulation.
 It is unable to cross the \f$ \sim 5 k_BT\f$ barrier located at a distance of approximately
- 0.4 nm. You can also observe this behavior in the trajectory using vmd:
+ 0.4 nm. You can also observe this behavior in the trajectory using VMD:
 \verbatim
 vmd out.dcd -psf nacl.psf 
 \endverbatim
+The trajectory has been saved in unwrapped format in order to avoid bonds
+stretching from one side to the box to the other due to periodic bounday
+conditions. In VMD we can
+wrap the atoms without breaking the bonds and show the box using the commands:
+\verbatim
+pbc wrap -compound res -all
+pbc box
+\endverbatim
+You can play with different visualization styles and options that VMD has.
 Therefore, if we want the system to go back and forth between the associated and
 dissociated state, we will need enhanced sampling.
 
 \subsection ves-lugano2017-metad-subsection-3 Construct a bias potential on the distance Na-Cl
 
 We now construct a bias potential \f$ V(\mathbf{s}) \f$ on the distance Na-Cl using well-tempered metadynamics.
-The files for this example are contained in Example2.tar.
+The files for this example are contained in the directory Example2.
 As argument for the construction of the potential we will use the distance Na-Cl (label d1).
 We choose a gaussian height of 1 kJ/mol which is slightly less than 0.5 \f$k_B
 T \f$. The gaussian width is 0.02 nm, in the same order of the features in the
-FES. The bias factor is set to 5 since the largest barrier in the FES is
+FES. A rule of thumb for choosing the gaussian width is to use the standard
+deviation of the unbiased fluctuations of the CV. The bias factor is set to 5 since the largest barrier in the FES is
 expected to be roughly 5 \f$k_BT\f$. Once the metadynamics simulation is
 converged, the bias will be (up to an arbitrary constant):
 \f[
@@ -176,7 +185,7 @@ UPPER_WALLS ...
 You can run the simulation with the run.sh script as done in the previous
 example.
 
-It is possible to try different bias factors to check the effect that it has in
+It is possible to try different bias factors to check the effect that it has on
 the trajectory and the effective FES.
 
 In principle the cost of a metadynamics simulation should increase as the
@@ -218,7 +227,7 @@ The behavior of \f$ c(t) \f$ will be studied with greater detail later.
 \anchor ves-school-2017-metad-fesEvolution
 \image html Metad-fesEvolution.png "Evolution of the estimated free energy"
 
-One must recall that we are actually not calculating the free energy \f$ F(\mathbf{s}) \f$ but rather \f$ F(\mathbf{s})+V_{wall}(\mathbf{s}) \f$.
+It should be stressed that we are actually not calculating the free energy \f$ F(\mathbf{s}) \f$ but rather \f$ F(\mathbf{s})+V_{wall}(\mathbf{s}) \f$.
 For this reason for distances higher than 0.6 nm the free energy increases sharply.
 
 
@@ -237,10 +246,11 @@ This plot illustrates clearly how the bias is constructed to progressively "fill
 
 
 It is also possible to track convergence by controlling the evolution of some
-quantity connected to the free energy surface. 
+quantity connected to the free energy surface.
+In this case we will calculate the dissociation barrier, e.g. the height of
+the barrier that separates the associated state from the dissociated one. 
 The scripts for this example are found in the folder Barrier_calculation.
-In this case we will calculate the dissociation barrier. 
-Using the python script barrier_calculation.py  we can compute the barrier, for instance:
+Using the python script calculate_barrier.py  we can compute the barrier, for instance:
 \verbatim
 import numpy as np
 
@@ -291,7 +301,7 @@ By plotting time (column 1) versus \f$ c(t) \f$ (column 6) using the COLVAR
 file, the importance of taking \f$ c(t) \f$ into account
 becomes clear.
  \f$ c(t) \f$ keeps growing even after long times, reflecting the
-approximately rigid shift of the bias with time. 
+approximately rigid shift of the bias with time.
 Normally the first part of the trajectory is not used for reweighting since
 during this period the simulation has not reached the quasistationary limit.
 In this case we can discard the first 2 or 3 ns of simulation.
@@ -394,7 +404,7 @@ The reason is that there is a slow degree of freedom that it is not being biased
 Furthermore you can see in the 2 CV reweighting that the coordination Na-O
 shows significant overlap between the associated and dissociated states.
 
-Bear in mind that this is a rather trivial example since barriers are
+Bear in mind that this is a rather trivial example since the existing barriers are
 relatively low. Real problems in materials science usually involve large barriers
 and are not as forgiving as this example; a bad CV may lead to huge hysteresis
 and problems in convergence.
