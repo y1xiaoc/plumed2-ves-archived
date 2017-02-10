@@ -38,7 +38,76 @@ namespace ves{
 /*
 Target distribution given by linear combination of distributions (static or dynamic).
 
+Employ a target distribution that is a linear combination of the other
+distributions, defined as
+\f[
+p(\mathbf{s}) = \sum_{i} w_{i} p_{i}(\mathbf{s})
+\f]
+where the weights \f$w_{i}\f$ are normalized to 1, \f$\sum_{i}w_{i}=1\f$.
+
+The distributions \f$p_{i}(\mathbf{s})\f$ are given by using a seperate numbered
+DISTRIBUTION keyword for each distribution. The keywords for each distribution
+should be enclosed within curly brackets.
+
+The weights \f$w_{i}\f$ can be given using
+the WEIGHTS keyword. The distributions are weighted equally if no weights are given.
+
+It is assumed that all the distributions given with the numbered
+DISTRIBUTION keywords are normalized. If that is not the case you should
+normalize each distribution separately by using the NORMALIZE
+keyword within the curly brackets of each seperate DISTRIBUTION keyword.
+Note that normalizing the overall
+linear combination will generally lead to different results than normalizing
+each distribution separately.
+
+The linear combination will be a dynamic target distribution if one or more
+of the distributions used is a dynamic distribution. Otherwise it will be a
+static distribution.
+
 \par Examples
+
+Here we employ a linear combination of a uniform and a Gaussian distribution.
+No weights are given so the two distributions will be weighted equally.
+\verbatim
+TARGET_DISTRIBUTION={LINEAR_COMBINATION
+                     DISTRIBUTION1={UNIFORM}
+                     DISTRIBUTION2={GAUSSIAN
+                                    CENTER=-2.0
+                                    SIGMA=0.5}}
+\endverbatim
+
+Here we employ a linear combination of a uniform and two Gaussian distribution.
+The weights are automatically normalized to 1 such that giving
+WEIGHTS=1.0,1.0,2.0 as we do here is equal to giving WEIGHTS=0.25,0.25,0.50.
+\verbatim
+TARGET_DISTRIBUTION={LINEAR_COMBINATION
+                     DISTRIBUTION1={UNIFORM}
+                     DISTRIBUTION2={GAUSSIAN
+                                    CENTER=-2.0,-2.0
+                                    SIGMA=0.5,0.3}
+                     DISTRIBUTION3={GAUSSIAN
+                                    CENTER=+2.0,+2.0
+                                    SIGMA=0.3,0.5}
+                     WEIGHTS=1.0,1.0,2.0}
+\endverbatim
+
+In the above example the two Gaussians are given using two seperate
+DISTRIBUTION keywords. As the \ref GAUSSIAN target distribution allows multiple
+centers is it also possible to use just one DISTRIBUTION keyword for the two
+Gaussians. This is shown in the following example which will give the
+exact same result as the one above as the weights have been appropriately
+adjusted
+\verbatim
+TARGET_DISTRIBUTION={LINEAR_COMBINATION
+                     DISTRIBUTION1={UNIFORM}
+                     DISTRIBUTION2={GAUSSIAN
+                                    CENTER1=-2.0,-2.0
+                                    SIGMA1=0.5,0.3
+                                    CENTER2=+2.0,+2.0
+                                    SIGMA2=0.3,0.5
+                                    WEIGHTS=1.0,2.0}
+                     WEIGHTS=0.25,0.75}
+\endverbatim
 
 */
 //+ENDPLUMEDOC
@@ -74,11 +143,11 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_LinearCombination,"LINEAR_COMBINATION")
 
 void TD_LinearCombination::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination.");
-  keys.add("optional","WEIGHTS","The weights of target distributions. If no weights are given the distributions are weighted equally. The weights are always normalized such that WEIGHTS=1,1 and WEIGHTS=0.5,0.5 is equal.");
+  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination, each given within a seperate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
+  keys.add("optional","WEIGHTS","The weights of target distributions. Have to be as many as the number of target distributions given with the numbered DISTRIBUTION keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
-  keys.use("SHIFT_TO_ZERO");
+  //keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");
 }
 
@@ -100,8 +169,11 @@ ndist_(0)
     if(dist_pntr_tmp->biasGridNeeded()){setBiasGridNeeded();}
     distribution_pntrs_.push_back(dist_pntr_tmp);
   }
+
   ndist_ = distribution_pntrs_.size();
   grid_pntrs_.assign(ndist_,NULL);
+  if(ndist_==0){plumed_merror(getName()+ ": no distributions are given.");}
+  if(ndist_==1){plumed_merror(getName()+ ": giving only one distribution does not make sense.");}
   //
   if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(distribution_pntrs_.size(),1.0);}
   if(distribution_pntrs_.size()!=weights_.size()){

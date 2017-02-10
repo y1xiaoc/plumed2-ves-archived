@@ -39,7 +39,52 @@ namespace ves{
 /*
 Target distribution given by product combination of distributions (static or dynamic).
 
+Employ a target distribution that is a product combination of the other
+distributions, defined as
+\f[
+p(\mathbf{s}) =
+\frac{\prod_{i} p_{i}(\mathbf{s})}
+{\int d \mathbf{s} \prod_{i} p_{i}(\mathbf{s})}
+\f]
+where the distributions \f$p_{i}(\mathbf{s})\f$ are in full dimensional space
+of the arguments used.
+
+Note the difference between this target distribution and the one defined in
+\ref PRODUCT_DISTRIBUTION. Here we have a non-separable distribution given
+as a product of distribution \f$p_{i}(\mathbf{s})\f$ which are in full dimensional
+space of the arguments used.
+
+The distributions \f$p_{i}(\mathbf{s})\f$ are given by using a seperate numbered
+DISTRIBUTION keyword for each distribution. The keywords for each distribution
+should be enclosed within curly brackets.
+
+The target distribution resulting from the product combination will be
+automatically normalized. Therefore, the product combination needs to
+be a proper distribution that is non-negative and normalizable. The
+code will perform some checks to make sure that is indeed the case.
+
+The product combination will be a dynamic target distribution if one or more
+of the distributions used is a dynamic distribution. Otherwise it will be a
+static distribution.
+
 \par Examples
+
+In the following example the overall interval on which the
+target distribution is defined is from -4 to 4.
+We employ a product of a Gaussian distribution with two centers
+and distribution that is uniform on the interval -3 to 3 and
+then smoothly decays to zero outside that interval.
+The overall effect will then be to cut off the tails of the
+Gaussian distribution
+\verbatim
+TARGET_DISTRIBUTION={PRODUCT_COMBINATION
+                    DISTRIBUTION1={GAUSSIAN
+                                   CENTER1=-2.9 SIGMA1=1.0
+                                   CENTER2=+2.9 SIGMA2=0.4}
+                     DISTRIBUTION2={UNIFORM
+                                    MINIMA=-3.0 SIGMA_MINIMA=0.20
+                                    MAXIMA=+3.0 SIGMA_MAXIMA=0.15}}
+\endverbatim
 
 */
 //+ENDPLUMEDOC
@@ -74,11 +119,10 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductCombination,"PRODUCT_COMBINATION")
 
 void TD_ProductCombination::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the product combination.");
+  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the product combination, each given within a seperate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
-  keys.use("NORMALIZE");
 }
 
 

@@ -31,9 +31,47 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST PRODUCT_DISTRIBUTION
 /*
-Target distribution given by a product combination of one-dimensional distributions (static or dynamic).
+Target distribution given by a separable product
+of one-dimensional distributions (static or dynamic).
+
+Employ a target distribution that is a separable product
+of one-dimensional distributions, defined as
+\f[
+p(\mathbf{s}) =
+\prod_{k}^{d} p_{k}(s_{k})
+\f]
+where \f$d\f$ is the number of arguments used and \f$p_{k}(s_{k})\f$ is the
+one-dimensional distribution corresponding to the \f$k\f$-th argument.
+
+Note the difference between this target distribution and the one defined in
+\ref PRODUCT_COMBINATION. Here we have a separable distribution given as a
+product of one-dimensional distribution \f$p_{k}(s_{k})\f$. 
+
+The distributions \f$p_{k}(s_{k})\f$ are given by using a seperate numbered
+DIST_ARG keyword for each argument. The keywords for each distribution
+should be enclosed within curly brackets.
+
+It is assumed that all the distributions given with the
+DIST_ARG keywords are normalized. If that is not the case you need to
+normalize the distributions by using the NORMALIZE keyword.
+Here it does not matter if you normalize each distribution separately
+or the overall product, it will give the same results.
+
+The product distribution will be a dynamic target distribution if one or more
+of the distributions used is a dynamic distribution. Otherwise it will be a
+static distribution.
 
 \par Examples
+
+In the following example we employ a uniform distribution for
+argument 1 and a Gaussian distribution for argument 2.
+\verbatim
+TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
+                     DIST_ARG1={UNIFORM}
+                     DIST_ARG2={GAUSSIAN
+                                CENTER=-2.0
+                                SIGMA=0.5}}
+\endverbatim
 
 */
 //+ENDPLUMEDOC
@@ -64,7 +102,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductDistribution,"PRODUCT_DISTRIBUTION")
 
 void TD_ProductDistribution::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DIST_ARG","The one dimensional target distributions to be used in the product combination for each argument");
+  keys.add("numbered","DIST_ARG","The one-dimensional target distributions for each argument to be used in the product distribution, each given within a seperate numbered DIST_ARG keyword and enclosed in curly brackets {}.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
