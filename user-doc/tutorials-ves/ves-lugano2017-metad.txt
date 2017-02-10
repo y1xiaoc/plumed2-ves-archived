@@ -439,7 +439,7 @@ pl "fes.dat" u 1:2:3
 \section ves-lugano2017-metad-final Final remarks
 
 Some valuable tools for metadynamics simulations will be discussed in the VES
-tutorial. This include:
+tutorial. These include:
 
 - Restarting a simulation.
 - Using Plumed driver to calculate a CV that was not calculated during the
