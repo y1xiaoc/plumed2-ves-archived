@@ -140,11 +140,18 @@ void TD_ProductCombination::updateGrid(){
     for(unsigned int i=0; i<ndist_; i++){
       value *= grid_pntrs_[i]->getValue(l);
     }
+    if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror(getName()+": The target distribution function gives negative values. You should change the definition of the target distribution to avoid this. You can also use the SHIFT_TO_ZERO keyword to avoid this problem.");}
     norm += integration_weights[l]*value;
     targetDistGrid().setValue(l,value);
     logTargetDistGrid().setValue(l,-std::log(value));
   }
-  targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
+
+  if(norm>0.0){
+    targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
+  }
+  else if(!isTargetDistGridShiftedToZero()){
+    plumed_merror(getName()+": The target distribution function cannot be normalized proberly. You should change the definition of the target distribution to avoid this. You can also use the SHIFT_TO_ZERO keyword to avoid this problem.");
+  }
   logTargetDistGrid().setMinToZero();
 }
 
