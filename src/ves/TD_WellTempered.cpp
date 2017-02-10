@@ -53,17 +53,40 @@ The value of the bias factor \f$\gamma\f$ determines by how much the fluctations
 are enhanced. The well-tempered distribution can also be view as sampling on
 an effective free energy surface \f$\tilde{F}(\mathbf{s}) = (1/\gamma) F(\mathbf{s})\f$
 where the barriers have been reduced by a factor of \f$\gamma\f$.
-
+Therefore, a good value of \f$\gamma\f$ should be a value that results in
+barriers on the order of few \f$k_{\mathrm{B}T}$.
 
 At convergence the relationship between the bias potential and the free
 energy surface is given by
 \f[
-F(\mathbf{s}) = - (\frac{1}{1-\gamma^{-1}} ) V(\mathbf{s})
+F(\mathbf{s}) = - \left(\frac{1}{1-\gamma^{-1}} \right) V(\mathbf{s})
 \f]
 
-
+This target distribution depends directly on the free energy surface
+\f$F(\mathbf{s})\f$ which is quantity that we do not know a-priori and
+want to obtain. Therefore, this target distribution is iterativly
+updated \cite Valsson-JCTC-2015 according to
+\f[
+p^(m+1)(\mathbf{s}) =
+\frac{e^{-(\beta/\gamma) F^(m+1)(\mathbf{s})}}
+{\int d\mathbf{s}\, e^{-(\beta/\gamma) F^(m+1)(\mathbf{s})}}
+\f]
+where \f$F^(m+1)(\mathbf{s})\f$ is the current best estimate of the
+free energy surface obtained according to
+\f[
+F^(m+1)(\mathbf{s}) =
+- V^(m+1)(\mathbf{s}) - \frac{1}{\beta} \log p^(m)(\mathbf{s}) =
+- V^(m+1)(\mathbf{s}) + \frac{1}{\gamma} F^(m)(\mathbf{s}) =
+\f]
+The frequency of performing this update needs to be set in the
+optimizer used in the calculation. Normally it is sufficent
+to do it every 100-1000 bias update iterations.
 
 \par Examples
+Employ a well-tempered target distribution with a bias factor of 10
+\verbatim
+TARGET_DISTRIBUTION={WELL_TEMPERED BIASFACTOR=10}
+\endverbatim
 
 */
 //+ENDPLUMEDOC
