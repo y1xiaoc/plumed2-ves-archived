@@ -37,9 +37,53 @@ namespace ves{
 
 //+PLUMEDOC VES_TARGETDIST VON_MISES
 /*
-Von Mises target distribution (static).
+Target distribution given by a sum of Von Mises distributions (static).
+
+Employ a target distribution that is given by a sum where each
+term is a product of one-dimensional Von Mises distributions,
+\f[
+p(\mathbf{s}) = \sum_{i} \, w_{i}
+\prod_{k}^{d}
+\frac{exp\left(\kappa_{k,i} \, \cos (s_{k}-\mu_{k,i}) \right)}
+{2\pi I_{0}(\kappa_{k,i})}
+\f]
+where \f$\boldsymbol{\mu}_{i}=(\mu_{1,i},\mu_{2,i},\ldots,\mu_{d,i})\f$
+are the centers of the distributions,
+\f$\boldsymbol{\kappa}_{i}=(\kappa_{1,i},\kappa_{2,i},\ldots,\kappa_{d,i})\f$
+are parameters that determine the extend of each distribution,
+and \f$I_{0}(x)\f$ is the modified Bessel function of order 0.
+The weights \f$w_{i}\f$ are normalized to 1, \f$\sum_{i}w_{i}=1\f$.
+
+The Von Mises distribution is defined for periodic variables with a
+periodicity of \f$2\pi\f$ and is analogous to the Gaussian distribution.
+The parameter \f$ \sqrt{1/\kappa}\f$ is comparable to the standard deviation
+\f$\sigma\f$ for the Gaussian distribution.
+
+To use this target distribution you need to give the centers
+\f$\boldsymbol{\mu}_{i}=(\mu_{1,i},\mu_{2,i},\ldots,\mu_{d,i})\f$ by
+using the numbered CENTER keywords and the "standard deviations"
+\f$\boldsymbol{\sigma}_{i}=(\sqrt{1/\kappa_{1,i}},\sqrt{1/\kappa_{2,i}},\ldots,\sqrt{1/\kappa_{d,i}})\f$ using the numbered SIGMA keywords.
+
 
 \par Examples
+
+Sum of two Von Mises distribution in one dimension that have equal weights
+as no weights are given.
+\verbatim
+TARGET_DISTRIBUTION={VON_MISES
+                     CENTER1=+2.0 SIGMA1=0.6
+                     CENTER2=-2.0 SIGMA2=0.7}
+\endverbatim
+
+Sum of two Von Mises distribution in two dimensions that have different weights.
+Note that the weights are automatically normalized to such that
+specifying WEIGHTS=1.0,2.0 is equal to specifying WEIGHTS=0.33333,0.66667.
+\verbatim
+TARGET_DISTRIBUTION={VON_MISES
+                     CENTER1=+2.0,+2.0 SIGMA1=0.6,0.7
+                     CENTER2=-2.0,+2.0 SIGMA2=0.7,0.6
+                     WEIGHTS=1.0,2.0}
+\endverbatim
 
 */
 //+ENDPLUMEDOC
@@ -67,14 +111,14 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_VonMises,"VON_MISES")
 
 void TD_VonMises::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","CENTER","The centers of the Von Mises distributions.");
-  keys.add("numbered","SIGMA","The sigmas of the Von Mises distributions.");
-  keys.add("optional","WEIGHTS","The weights of the Von Mises distributions.");
-  keys.add("optional","PERIODS","The periods for each of the dimensions. By default they are 2*pi for each dimension.");
+  keys.add("numbered","CENTER","The centers of the Von Mises distributions. For one distribution you can use either CENTER or CENTER1. For more distributions you need to use the numbered CENTER keywords, one for each distribution.");
+  keys.add("numbered","SIGMA","The standard deviations of the Von Mises distributions. For one distribution you can use either CENTER or CENTER1. For more distributions you need to use the numbered CENTER keywords, one for each distribution.");
+  keys.add("optional","WEIGHTS","The weights of the Von Mises distributions. Have to be as many as the number of centers given with the numbered CENTER keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
+  keys.add("hidden","PERIODS","The periods for each of the dimensions. By default they are 2*pi for each dimension.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
-  keys.use("NORMALIZE");
+  //keys.use("NORMALIZE");
 }
 
 

@@ -101,6 +101,10 @@ NORMALIZE keyword to make sure that the target distribution is proberly
 normalized to 1 over the bounded region. The code will issue a warning
 if that is needed.
 
+For periodic CVs it is generally better to use \ref VON_MISES "Von Mises"
+distributions instead of Gaussians as these distributions proberly
+account for the periodicity of the CVs.
+
 
 \par Examples
 
