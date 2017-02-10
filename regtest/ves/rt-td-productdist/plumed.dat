@@ -47,3 +47,37 @@ DUMP_TARGET_DISTRIBUTION ...
  TARGETDIST_FILE=targetdist-2.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
+
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0,-4.0
+ GRID_MAX=+4.0,+4.0
+ GRID_BINS=100,100
+ TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
+                      DIST_ARG1={UNIFORM
+                                 MINIMA=-4.0
+                                 MAXIMA=+4.0}
+                      DIST_ARG2={GAUSSIAN
+                                 CENTER=-3.7
+                                 SIGMA=0.8
+                                 NORMALIZE}}
+ TARGETDIST_FILE=targetdist-3.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0,-4.0
+ GRID_MAX=+4.0,+4.0
+ GRID_BINS=100,100
+ TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
+                      NORMALIZE
+                      DIST_ARG1={UNIFORM
+                                 MINIMA=-4.0
+                                 MAXIMA=+4.0}
+                      DIST_ARG2={GAUSSIAN
+                                 CENTER=-3.7
+                                 SIGMA=0.8}}
+ TARGETDIST_FILE=targetdist-3b.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
