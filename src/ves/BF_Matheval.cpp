@@ -31,7 +31,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_BASISF BF_MATHEVAL
+//+PLUMEDOC VES_BASISF_HIDDEN BF_MATHEVAL
 /*
 Basis functions given by matheval expressions.
 
