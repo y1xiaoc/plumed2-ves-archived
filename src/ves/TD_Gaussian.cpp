@@ -62,29 +62,31 @@ In this case you need to specify the centers \f$\boldsymbol{\mu}_{i}\f$ using th
 numbered CENTER keywords and the standard deviations \f$\boldsymbol{\sigma}_{i}\f$
 using the numbered SIGMA keywords.
 
-For two arguments it is possible to employ correlated bivariate Gaussians defined as
+For two arguments it is possible to employ bivariate Gaussians with correlation
+between arguments, defined as
 \f[
-N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i},\rho) =
-\frac{1}{2 \pi \sigma_{1,i} \sigma_{2,i} \sqrt{1-\rho^2}}
+N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i},\rho_i) =
+\frac{1}{2 \pi \sigma_{1,i} \sigma_{2,i} \sqrt{1-\rho_i^2}}
+\, 
 \exp\left(
--\frac{1}{2(1-\rho^2)}
+-\frac{1}{2(1-\rho_i^2)}
 \left[
 \frac{(s_{1}-\mu_{1,i})^2}{\sigma_{1,i}^2}+
 \frac{(s_{2}-\mu_{2,i})^2}{\sigma_{2,i}^2}+
-\frac{2 \rho (s_{1}-\mu_{1,i})(s_{2}-\mu_{2,i})}{\sigma_{1,i}\sigma_{2,i}}
+\frac{2 \rho_i (s_{1}-\mu_{1,i})(s_{2}-\mu_{2,i})}{\sigma_{1,i}\sigma_{2,i}}
 \right]
 \right)
 \f]
-where \f$\rho\f$ is the correlation between \f$s_{1}\f$ and \f$s_{2}\f$
+where \f$\rho_i\f$ is the correlation between \f$s_{1}\f$ and \f$s_{2}\f$
 that goes from -1 to 1. A value of 0 means that the arguments are considered as
-un-correlated.
+un-correlated (the default behavior).
 In this case the covariance matrix is given as
 \f[
 \boldsymbol{\Sigma}=
 \left[
 \begin{array}{cc}
-\sigma^2_{1,i} & \rho \sigma_{1,i} \sigma_{2,i} \\
-\rho \sigma_{1,i} \sigma_{2,i} & \sigma^2_{2,i}
+\sigma^2_{1,i} & \rho_i \sigma_{1,i} \sigma_{2,i} \\
+\rho_i \sigma_{1,i} \sigma_{2,i} & \sigma^2_{2,i}
 \end{array}
 \right]
 \f]
@@ -135,11 +137,11 @@ TARGET_DISTRIBUTION={GAUSSIAN
                      WEIGHTS=1.0,2.0,1.0}
 \endverbatim
 
-Sum of two bivariate Gaussians where there is correlation between the
-two arguments
+Sum of two bivariate Gaussians where there is correlation of
+\f$\rho_{2}=0.75\f$ between the two arguments for the second Gaussian.
 \verbatim
 TARGET_DISTRIBUTION={GAUSSIAN
-                     CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3 CORRELATION1=0.25
+                     CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3
                      CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8 CORRELATION2=0.75}
 \endverbatim
 
@@ -173,7 +175,7 @@ void TD_Gaussian::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","CENTER","The centers of the Gaussian distributions. For one Gaussians you can use either CENTER or CENTER1. For more Gaussians you need to use the numbered CENTER keywords, one for each Gaussian.");
   keys.add("numbered","SIGMA","The standard deviations of the Gaussian distributions. For one Gaussians you can use either SIGMA or SIGMA1. For more Gaussians you need to use the numbered SIGMA keywords, one for each Gaussian.");
-  keys.add("numbered","CORRELATION","The correlation for two-dimensional bivariate Gaussian distributions. The value should be between -1 and 1. If no value is given the Gaussians is considered as un-correlated (i.e. value of 0.0). For one Gaussians you can use either CORRELATION or CORRELATION1. For more Gaussians you need to use the numbered CORRELATION keywords, one for each Gaussian.");
+  keys.add("numbered","CORRELATION","The correlation for two-dimensional bivariate Gaussian distributions. Only works for two arguments. The value should be between -1 and 1. If no value is given the Gaussians is considered as un-correlated (i.e. value of 0.0). For one Gaussians you can use either CORRELATION or CORRELATION1. For more Gaussians you need to use the numbered CORRELATION keywords, one for each Gaussian.");
   keys.add("optional","WEIGHTS","The weights of the Gaussian distributions. Have to be as many as the number of centers given with the numbered CENTER keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");

@@ -61,7 +61,7 @@ should be enclosed within curly brackets.
 The target distribution resulting from the product combination will be
 automatically normalized. Therefore, the product combination needs to
 be a proper distribution that is non-negative and normalizable. The
-code will perform checks to make sure that is indeed the case.
+code will perform checks to make sure that this is indeed the case.
 
 The product combination will be a dynamic target distribution if one or more
 of the distributions used is a dynamic distribution. Otherwise it will be a

@@ -44,7 +44,7 @@ term is a product of one-dimensional Von Mises distributions,
 \f[
 p(\mathbf{s}) = \sum_{i} \, w_{i}
 \prod_{k}^{d}
-\frac{exp\left(\kappa_{k,i} \, \cos (s_{k}-\mu_{k,i}) \right)}
+\frac{\exp\left(\kappa_{k,i} \, \cos (s_{k}-\mu_{k,i}) \right)}
 {2\pi I_{0}(\kappa_{k,i})}
 \f]
 where \f$\boldsymbol{\mu}_{i}=(\mu_{1,i},\mu_{2,i},\ldots,\mu_{d,i})\f$
@@ -76,7 +76,7 @@ TARGET_DISTRIBUTION={VON_MISES
 \endverbatim
 
 Sum of two Von Mises distribution in two dimensions that have different weights.
-Note that the weights are automatically normalized to such that
+Note that the weights are automatically normalized to 1 such that
 specifying WEIGHTS=1.0,2.0 is equal to specifying WEIGHTS=0.33333,0.66667.
 \verbatim
 TARGET_DISTRIBUTION={VON_MISES

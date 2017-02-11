@@ -50,11 +50,16 @@ correponds to a biased ensemble where, as compared to the unbiased one,
 the probability peaks have been broaden and the fluctations of the CVs are
 enhanced.
 The value of the bias factor \f$\gamma\f$ determines by how much the fluctations
-are enhanced. The well-tempered distribution can also be view as sampling on
+are enhanced.
+
+The well-tempered distribution can be view as sampling on
 an effective free energy surface \f$\tilde{F}(\mathbf{s}) = (1/\gamma) F(\mathbf{s})\f$
-where the barriers have been reduced by a factor of \f$\gamma\f$.
-Therefore, a good value of \f$\gamma\f$ should be a value that results in
-barriers on the order of few \f$k_{\mathrm{B}T}$.
+which has largely the same metastable states as the original \f$F(\mathbf{s})\f$
+but with barriers that have been reduced by a factor of \f$\gamma\f$.
+Generally one should use a value of \f$\gamma\f$ that results in
+effective barriers on the order of few \f$k_{\mathrm{B}}T\f$
+such that thermal fluctuations can easily induce transitions
+between different metastable states.
 
 At convergence the relationship between the bias potential and the free
 energy surface is given by
@@ -64,19 +69,19 @@ F(\mathbf{s}) = - \left(\frac{1}{1-\gamma^{-1}} \right) V(\mathbf{s})
 
 This target distribution depends directly on the free energy surface
 \f$F(\mathbf{s})\f$ which is quantity that we do not know a-priori and
-want to obtain. Therefore, this target distribution is iterativly
-updated \cite Valsson-JCTC-2015 according to
+want to obtain. Therefore, this target distribution
+is iterativly updated \cite Valsson-JCTC-2015 according to
 \f[
-p^(m+1)(\mathbf{s}) =
-\frac{e^{-(\beta/\gamma) F^(m+1)(\mathbf{s})}}
-{\int d\mathbf{s}\, e^{-(\beta/\gamma) F^(m+1)(\mathbf{s})}}
+p^{(m+1)}(\mathbf{s}) =
+\frac{e^{-(\beta/\gamma) F^{(m+1)}(\mathbf{s})}}
+{\int d\mathbf{s}\, e^{-(\beta/\gamma) F^{(m+1)}(\mathbf{s})}}
 \f]
-where \f$F^(m+1)(\mathbf{s})\f$ is the current best estimate of the
+where \f$F^{(m+1)}(\mathbf{s})\f$ is the current best estimate of the
 free energy surface obtained according to
 \f[
-F^(m+1)(\mathbf{s}) =
-- V^(m+1)(\mathbf{s}) - \frac{1}{\beta} \log p^(m)(\mathbf{s}) =
-- V^(m+1)(\mathbf{s}) + \frac{1}{\gamma} F^(m)(\mathbf{s}) =
+F^{(m+1)}(\mathbf{s}) =
+- V^{(m+1)}(\mathbf{s}) - \frac{1}{\beta} \log p^{(m)}(\mathbf{s}) =
+- V^{(m+1)}(\mathbf{s}) + \frac{1}{\gamma} F^{(m)}(\mathbf{s})
 \f]
 The frequency of performing this update needs to be set in the
 optimizer used in the calculation. Normally it is sufficent

@@ -65,7 +65,7 @@ by using the _beta_ and _kBT_ variables.
 The target distribution will be automatically normalized over the region on
 which it is defined on. Therefore, the function given in
 FUNCTION needs to be non-negative and normalizable. The
-code will perform checks to make sure that is indeed the case.
+code will perform checks to make sure that this is indeed the case.
 
 
 \attention
@@ -74,8 +74,8 @@ PLUMED has been linked to it.
 
 \par Examples
 
-Here we use as a one-dimensional target distribution a shifted
-[Maxwell-Boltzmann distribution](https://en.wikipedia.org/wiki/Maxwell%E2%80%93Boltzmann_distribution).
+Here we use as shifted [Maxwell-Boltzmann distribution](https://en.wikipedia.org/wiki/Maxwell%E2%80%93Boltzmann_distribution)
+as a target distribution in one-dimension.
 Note that it is not need to include the normalization factor as the distribution will be
 automatically normalized.
 \verbatim
@@ -83,7 +83,8 @@ TARGET_DISTRIBUTION={MATHEVAL_DIST
                      FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))}
 \endverbatim
 
-[Generalized normal distribution](https://en.wikipedia.org/wiki/Generalized_normal_distribution)
+Here we have a two dimensional target distribution where we
+use a [generalized normal distribution](https://en.wikipedia.org/wiki/Generalized_normal_distribution)
 for argument \f$s_2\f$ while the distribution for \f$s_1\f$ is taken as
 uniform as the variable _s1_ is not included in the function.
 \verbatim
