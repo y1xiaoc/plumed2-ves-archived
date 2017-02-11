@@ -303,7 +303,7 @@ void TargetDistribution::update() {
   if(bias_cutoff_active_){updateBiasCutoffForTargetDistGrid();}
   //
   if(shift_targetdist_to_zero_ && !(bias_cutoff_active_)){setMinimumOfTargetDistGridToZero();}
-  if(force_normalization_ && !(bias_cutoff_active_) ){normalizeGrid(targetdist_grid_pntr_);}
+  if(force_normalization_ && !(bias_cutoff_active_) ){normalizeTargetDistGrid();}
   //
   // if(check_normalization_ && !force_normalization_ && !shift_targetdist_to_zero_){
   if(check_normalization_ && !(bias_cutoff_active_)){

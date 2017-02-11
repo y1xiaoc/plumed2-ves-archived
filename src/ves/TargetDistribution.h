@@ -220,7 +220,8 @@ Action* TargetDistribution::getPntrToAction() const {
 
 inline
 void TargetDistribution::normalizeTargetDistGrid(){
-  normalizeGrid(targetdist_grid_pntr_);
+  double normalization = normalizeGrid(targetdist_grid_pntr_);
+  if(normalization<0.0){plumed_merror(getName()+": something went wrong trying to normalize the target distribution, integrating over it gives a negative value.");}
 }
 
 

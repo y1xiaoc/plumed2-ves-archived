@@ -44,12 +44,18 @@ external grid file that is in the proper PLUMED file format. You do not to
 give any information about the external grid file as all relevant information
 should be automatically detected.
 
-By default it is assumed that the distribution read-in from the grid is a proper
-probability distribution, i.e. normalized to 1 and always non-negative.
-If this is not the case the code will give a warning but still run.
-You can use the NORMALIZE keyword to make sure that it is normalized.
-To make sure that the distribution is non-negative you can use the SHIFT
-keyword to shift the distribution by a given value. Another option is to use
+It is assumed that the distribution read-in from the grid is a proper
+probability distribution, i.e. always non-negative and can be normalized to 1.
+
+By default the target distribution from the external grid is always normalized
+inside the code. You can disable this normalization by using DO_NOT_NORMALIZE
+keyword. However, be warned that this will generally lead to the wrong
+behavior if the distribution from the external grid is not properly
+normalized to 1.
+
+If the distribution from the external grid file for some reason has
+negative values can you use the SHIFT keyword to shift the distribution
+by a given value. Another option is to use
 the SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero.
 
 Note that the number of grid bins used in the external grid file do not have
@@ -66,23 +72,11 @@ will make values outside to be taken as zero.
 
 \par Examples
 
-In the following examples the target distribution is read-in from the given
-external grid file.
-
-If the external grid is normalized to 1 and always non-negative you only
-need to provide the filename
+Generally you only need to provide the the filename of the external grid
+file. The target distribution is then automatically normalized to 1 inside the code.
 \verbatim
 TARGET_DISTRIBUTION={GRID_DIST
                      FILE=input-grid.data}
-\endverbatim
-
-If the external grid is not normalized you need to use the
-NORMALIZE keyword in order to normalize the target
-distribution to 1
-\verbatim
-TARGET_DISTRIBUTION={GRID_DIST
-                     FILE=input-grid.data
-                     NORMALIZE}
 \endverbatim
 
 */
@@ -111,12 +105,12 @@ void TD_Grid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FILE","The name of the external grid file to be used as a target distribution.");
   // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
-  keys.add("optional","SHIFT","Shift the grid read-in by some constant value. If this option is active the distribution will be automatically normalized. Due to this normalization the final shift in the target distribution will generally not be the same as the value given here");
+  keys.add("optional","SHIFT","Shift the grid read-in by some constant value. Due to normalization the final shift in the target distribution will generally not be the same as the value given here");
   keys.addFlag("ZERO_OUTSIDE",false,"By default the target distribution is continuous such that values outside the boundary of the external grid file are the same as at the boundary. This can be changed by using this flag which will make values outside to be taken as zero.");
+  keys.addFlag("DO_NOT_NORMALIZE",false,"By default the target distribution from the external grid is always normalized inside the code. You can use this flag to disable this normalization. However, be warned that this will generally lead to the wrong behavior if the distribution from the external grid is not properly normalized to 1.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
-  keys.use("NORMALIZE");
 }
 
 TD_Grid::~TD_Grid() {
@@ -139,12 +133,16 @@ shift_(0.0)
   parse("SHIFT",shift_,true);
   if(shift_!=0.0){
     if(isTargetDistGridShiftedToZero()){plumed_merror(getName() + ": using both SHIFT and SHIFT_TO_ZERO is not allowed.");}
-    setForcedNormalization();
   }
   parseFlag("ZERO_OUTSIDE",zero_outside_);
   bool no_spline=false;
   // parseFlag("NOSPLINE",no_spline);
   bool use_spline = !no_spline;
+
+  bool do_not_normalize=false;
+  parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
+  if(do_not_normalize && shift_!=0.0){plumed_merror(getName() + ": using both SHIFT and DO_NOT_NORMALIZE is not allowed.");}
+  if(!do_not_normalize){setForcedNormalization();}
 
   checkRead();
 

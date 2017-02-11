@@ -12,6 +12,17 @@ DUMP_TARGET_DISTRIBUTION ...
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-6.0
+ GRID_MAX=+6.0
+ GRID_BINS=500
+ TARGET_DISTRIBUTION={GRID_DIST
+                      FILE=targetdist-input-grid-1d.data
+                      DO_NOT_NORMALIZE}
+ TARGETDIST_FILE=targetdist-1b.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
 
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-6.0
@@ -21,6 +32,18 @@ DUMP_TARGET_DISTRIBUTION ...
                       FILE=targetdist-input-grid-1d.data
                       ZERO_OUTSIDE}
  TARGETDIST_FILE=targetdist-2.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-6.0
+ GRID_MAX=+6.0
+ GRID_BINS=500
+ TARGET_DISTRIBUTION={GRID_DIST
+                      FILE=targetdist-input-grid-1d.data
+                      ZERO_OUTSIDE
+                      DO_NOT_NORMALIZE}
+ TARGETDIST_FILE=targetdist-2b.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
@@ -36,6 +59,18 @@ DUMP_TARGET_DISTRIBUTION ...
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
+DUMP_TARGET_DISTRIBUTION ...
+ GRID_MIN=-4.0,-4.0
+ GRID_MAX=+4.0,+4.0
+ GRID_BINS=110,110
+ TARGET_DISTRIBUTION={GRID_DIST
+                      FILE=targetdist-input-grid-2d.data
+                      ZERO_OUTSIDE
+                      DO_NOT_NORMALIZE}
+ TARGETDIST_FILE=targetdist-3b.data
+ FMT_GRIDS=%11.6f
+... DUMP_TARGET_DISTRIBUTION
+
 
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
@@ -43,8 +78,7 @@ DUMP_TARGET_DISTRIBUTION ...
  GRID_BINS=110,110
  TARGET_DISTRIBUTION={GRID_DIST
                       FILE=targetdist-input-grid-2d.data
-                      SHIFT=+2.0
-                      NORMALIZE}
+                      SHIFT=+2.0}
  TARGETDIST_FILE=targetdist-4.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
