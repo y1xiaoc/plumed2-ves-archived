@@ -42,10 +42,9 @@ Target distribution from an external grid file (static).
 Using this keyword you can use a target distribution that is read from an
 external grid file that is in the proper PLUMED file format. You do not to
 give any information about the external grid file as all relevant information
-should be automatically detected.
-
-It is assumed that the distribution read-in from the grid is a proper
-probability distribution, i.e. always non-negative and can be normalized to 1.
+should be automatically detected. It is assumed that the distribution read-in
+from the grid is a proper probability distribution, i.e. always non-negative
+and can be normalized.
 
 By default the target distribution from the external grid is always normalized
 inside the code. You can disable this normalization by using DO_NOT_NORMALIZE
@@ -53,7 +52,7 @@ keyword. However, be warned that this will generally lead to the wrong
 behavior if the distribution from the external grid is not properly
 normalized to 1.
 
-If the distribution from the external grid file for some reason has
+If the distribution from the external grid file has for some reason 
 negative values can you use the SHIFT keyword to shift the distribution
 by a given value. Another option is to use
 the SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero.
