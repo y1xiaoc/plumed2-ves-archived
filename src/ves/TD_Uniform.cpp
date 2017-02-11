@@ -38,7 +38,7 @@ Uniform target distribution (static).
 */
 //+ENDPLUMEDOC
 
-class TD_UniformWithSwitchingFunction : public TargetDistribution {
+class TD_Uniform : public TargetDistribution {
   std::vector<double> minima_;
   std::vector<double> maxima_;
   std::vector<double> sigma_min_;
@@ -47,15 +47,15 @@ class TD_UniformWithSwitchingFunction : public TargetDistribution {
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords( Keywords&);
-  explicit TD_UniformWithSwitchingFunction( const TargetDistributionOptions& to );
+  explicit TD_Uniform( const TargetDistributionOptions& to );
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_UniformWithSwitchingFunction,"UNIFORM")
+VES_REGISTER_TARGET_DISTRIBUTION(TD_Uniform,"UNIFORM")
 
 
-void TD_UniformWithSwitchingFunction::registerKeywords(Keywords& keys) {
+void TD_Uniform::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("optional","MINIMA","The minima of the intervals where the target distribution is uniform.");
   keys.add("optional","MAXIMA","The maxima of the intervals where the target distribution is uniform.");
@@ -65,7 +65,7 @@ void TD_UniformWithSwitchingFunction::registerKeywords(Keywords& keys) {
 }
 
 
-TD_UniformWithSwitchingFunction::TD_UniformWithSwitchingFunction(const TargetDistributionOptions& to):
+TD_Uniform::TD_Uniform(const TargetDistributionOptions& to):
 TargetDistribution(to),
 minima_(0),
 maxima_(0),
@@ -113,7 +113,7 @@ sigma_max_(0)
 }
 
 
-void TD_UniformWithSwitchingFunction::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+void TD_Uniform::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
 
   if(minima_.size()==0){
     minima_.assign(getDimension(),0.0);
@@ -128,7 +128,7 @@ void TD_UniformWithSwitchingFunction::setupAdditionalGrids(const std::vector<Val
 }
 
 
-double TD_UniformWithSwitchingFunction::getValue(const std::vector<double>& argument) const {
+double TD_Uniform::getValue(const std::vector<double>& argument) const {
   //
   double value = 1.0;
   for(unsigned int k=0; k<getDimension(); k++){
@@ -148,7 +148,7 @@ double TD_UniformWithSwitchingFunction::getValue(const std::vector<double>& argu
 }
 
 inline
-double TD_UniformWithSwitchingFunction::GaussianSwitchingFunc(const double argument, const double center, const double sigma) const {
+double TD_Uniform::GaussianSwitchingFunc(const double argument, const double center, const double sigma) const {
   if(sigma>0.0){
     double arg=(argument-center)/sigma;
     return exp(-0.5*arg*arg);
