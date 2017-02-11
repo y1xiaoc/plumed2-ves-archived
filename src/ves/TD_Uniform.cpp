@@ -33,7 +33,136 @@ namespace ves{
 /*
 Uniform target distribution (static).
 
+Using this keyword you can define a uniform target distribution which is a
+product of one-dimensional distributions \f$p_{k}(s_{k})\f$ that are uniform
+over a given interval \f$[a_{k},b_{k}]\f$
+\f[
+p_{k}(s_{k}) =
+\begin{cases}
+\frac{1}{(b_{k}-a_{k})}
+& \mathrm{if} \ a_{k} \leq s_{k} \leq b_{k} \\
+\\
+\ 0
+& \mathrm{otherwise}
+\end{cases}
+\f]
+
+The overall distribution is then given as
+\f[
+p(\mathbf{s}) =
+\prod^{d}_{k} p_{k}(s_{k}) =
+\begin{cases}
+\prod^{d}_{k} \frac{1}{(b_{k}-a_{k})}
+& \mathrm{if} \ a_{k} \leq s_{k} \leq b_{k} \ \mathrm{for\ all}\ k \\
+\\
+0 & \mathrm{otherwise}
+\end{cases}
+\f]
+The distribution is thus uniform inside a rectangular for two arguments
+and a cube for a three arguments.
+
+The limits of the intervals \f$ a_{k}\f$ and \f$ b_{k}\f$ are given
+with the MINIMA and MAXIMA keywords, respectively. If one or both of
+these keywords are missing the code should automatically detect the limits.
+
+
+It is also possible to use one-dimensional distributions
+that go smoothly to zero at the boundaries.
+This is done by employing a function with
+Gaussian switching functions at the boundaries \f$a_{k}\f$ and \f$b_{k}\f$
+\f[
+f_{k}(s_{k}) =
+\begin{cases}
+\exp\left(-\frac{(s_{k}-a_{k})^2}{2 \sigma^2_{a,k}}\right)
+& \mathrm{if}\, s_{k} < a_{k} \\
+\\
+1 & \mathrm{if}\, a_{k} \leq s_{k} \leq b_{k} \\
+\\
+\exp\left(-\frac{(s_{k}-b_{k})^2}{2 \sigma^2_{b,k}}\right)
+& \mathrm{if}\, s_{k} > b_{k}
+\end{cases}
+\f]
+where the standard deviation parameters \f$\sigma_{a,k}\f$
+and \f$\sigma_{b,k}\f$ determine how quickly the switching functions
+goes to zero.
+The overall distribution is then normalized
+\f[
+p(\mathbf{s}) =
+\prod^{d}_{k} p_{k}(s_{k}) =
+\prod^{d}_{k} \frac{f(s_{k})}{\int d s_{k} \, f(s_{k})}
+\f]
+To use this option you need to provide the standard deviation
+parameters \f$\sigma_{a,k}\f$ and \f$\sigma_{b,k}\f$ by using the
+SIGMA_MINIMA and SIGMA_MAXIMA keywords, respectively. Giving a value of
+0.0 means that the boundary is sharp, which is the default behavior.
+
+
+
+
+
+
 \par Examples
+
+If one or both of the MINIMA or MAXIMA keywords are missing
+the code should automatically detect the limits not given.
+Therefore, if we consider a target distribution that is
+defined over an interval from 0.0 to 10.0 for the first
+argument and from 0.2 to 1.0 for the second argument are
+all of the following examples equivalent
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM}
+\endverbatim
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM
+                     MINIMA=0.0,0,2
+                     MAXIMA=10.0,1.0}
+\endverbatim
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM
+                     MAXIMA=10.0,1.0}
+\endverbatim
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM
+                     MINIMA=0.0,0,2}
+\endverbatim
+
+
+We can also define a target distribution that goes smoothly to zero
+at the boundaries of the uniform distribution. In the following
+we consider an interval of 0 to 10 for the target distribution.
+The following input would result in a target distribution that
+would be uniform from 2 to 7 and then smoothly go to zero.
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM
+                     MINIMA=2.0
+                     MAXIMA=+7.0
+                     SIGMA_MINIMA=0.5
+                     SIGMA_MAXIMA=1.0}
+\endverbatim
+It is also possible to employ a smooth switching function for just one
+of the boundaries as shown here where the target distribution
+would be uniform from 0 to 7.
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM
+                     MAXIMA=+7.0
+                     SIGMA_MAXIMA=1.0}
+\endverbatim
+Furthermore, it is possible to employ a sharp boundary by
+using
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM
+                     MAXIMA=+7.0
+                     SIGMA_MAXIMA=0.0}
+\endverbatim
+or
+\verbatim
+TARGET_DISTRIBUTION={UNIFORM
+                     MAXIMA=+7.0}
+\endverbatim
+
+
+
+
 
 */
 //+ENDPLUMEDOC
@@ -57,10 +186,10 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_Uniform,"UNIFORM")
 
 void TD_Uniform::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("optional","MINIMA","The minima of the intervals where the target distribution is uniform.");
-  keys.add("optional","MAXIMA","The maxima of the intervals where the target distribution is uniform.");
-  keys.add("optional","SIGMA_MINIMA","The sigma values of the Gaussian switching functions for the minima of the intervals. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
-  keys.add("optional","SIGMA_MAXIMA","The sigma values of the Gaussian switching functions for the maxima of the intervals. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
+  keys.add("optional","MINIMA","The minima of the intervals where the target distribution is taken as uniform. You should give one value for each argument.");
+  keys.add("optional","MAXIMA","The maxima of the intervals where the target distribution is taken as uniform. You should give one value for each argument.");
+  keys.add("optional","SIGMA_MINIMA","The standard deviation parameters of the Gaussian switching functions for the minima of the intervals. You should give one value for each argument. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
+  keys.add("optional","SIGMA_MAXIMA","The standard deviation parameters of the Gaussian switching functions for the maxima of the intervals. You should give one value for each argument. Value of 0.0 means that switch is done without a smooth switching function, this is the default behaviour.");
   keys.use("BIAS_CUTOFF");
 }
 
