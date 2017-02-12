@@ -78,7 +78,7 @@ The overall effect will then be to cut off the tails of the
 Gaussian distribution
 \verbatim
 TARGET_DISTRIBUTION={PRODUCT_COMBINATION
-                    DISTRIBUTION1={GAUSSIAN
+                     DISTRIBUTION1={GAUSSIAN
                                    CENTER1=-2.9 SIGMA1=1.0
                                    CENTER2=+2.9 SIGMA2=0.4}
                      DISTRIBUTION2={UNIFORM

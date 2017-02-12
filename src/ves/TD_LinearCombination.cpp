@@ -41,7 +41,7 @@ Target distribution given by linear combination of distributions (static or dyna
 Employ a target distribution that is a linear combination of the other
 distributions, defined as
 \f[
-p(\mathbf{s}) = \sum_{i} w_{i} p_{i}(\mathbf{s})
+p(\mathbf{s}) = \sum_{i} w_{i} \, p_{i}(\mathbf{s})
 \f]
 where the weights \f$w_{i}\f$ are normalized to 1, \f$\sum_{i}w_{i}=1\f$.
 
@@ -52,7 +52,7 @@ should be enclosed within curly brackets.
 The weights \f$w_{i}\f$ can be given using
 the WEIGHTS keyword. The distributions are weighted equally if no weights are given.
 
-It is assumed that all the distributions given with the numbered
+It is assumed that all the distributions f$p_{i}(\mathbf{s})\f$ given with the numbered
 DISTRIBUTION keywords are normalized. If that is not the case you should
 normalize each distribution separately by using the NORMALIZE
 keyword within the curly brackets of each separate DISTRIBUTION keyword.

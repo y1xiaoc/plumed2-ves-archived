@@ -36,7 +36,7 @@ Target distribution given by a sum of Gaussians (static).
 Employ a target distribution that is given by a sum of multivariate Gaussian (or normal)
 distributions, defined as
 \f[
-p(\mathbf{s}) = \sum_{i} \, w_{i} N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\Sigma}_{i})
+p(\mathbf{s}) = \sum_{i} \, w_{i} \, N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\Sigma}_{i})
 \f]
 where \f$\boldsymbol{\mu}_{i}=(\mu_{1,i},\mu_{2,i},\ldots,\mu_{d,i})\f$
 and \f$\boldsymbol{\Sigma}_{i}\f$ are
@@ -79,7 +79,7 @@ N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i},\rho_i) =
 \f]
 where \f$\rho_i\f$ is the correlation between \f$s_{1}\f$ and \f$s_{2}\f$
 that goes from -1 to 1. A value of 0 means that the arguments are considered as
-un-correlated (the default behavior).
+un-correlated, which is the default behavior.
 In this case the covariance matrix is given as
 \f[
 \boldsymbol{\Sigma}=
@@ -97,7 +97,7 @@ The Gaussian distributions are always defined with the conventional
 normalization factor such that they are normalized to 1 over an unbounded
 region. However, in calculation within VES we normally consider bounded
 region on which the target distribution is defined. Thus, if the center of
-a Gaussian is close to the boundary of the region it can happen that it
+a Gaussian is close to the boundary of the region it can happen that the
 tails go outside the region. In that case it might be needed to use the
 NORMALIZE keyword to make sure that the target distribution is properly
 normalized to 1 over the bounded region. The code will issue a warning

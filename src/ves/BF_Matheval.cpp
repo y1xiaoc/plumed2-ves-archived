@@ -24,6 +24,8 @@
 
 #include "core/ActionRegister.h"
 
+#include <iostream>
+
 #ifdef __PLUMED_HAS_MATHEVAL
 #include <matheval.h>
 #endif
@@ -35,7 +37,7 @@ namespace ves{
 /*
 Basis functions given by matheval expressions.
 
-This 
+This
 
 
 \attention
@@ -51,6 +53,7 @@ PLUMED has been linked to it.
 class BF_Matheval : public BasisFunctions {
   std::vector<void*> evaluator_pntrs_;
   std::vector<void*> derivs_pntrs_;
+  void* transf_pntr_;
   std::string variable_str_;
 public:
   static void registerKeywords( Keywords&);
@@ -82,6 +85,9 @@ BF_Matheval::~BF_Matheval() {
     evaluator_destroy(derivs_pntrs_[i]);
   }
   derivs_pntrs_.clear();
+  if(transf_pntr_!=NULL){
+    evaluator_destroy(transf_pntr_);
+  }
 }
 
 
@@ -89,6 +95,7 @@ BF_Matheval::BF_Matheval(const ActionOptions&ao):
 PLUMED_BASISFUNCTIONS_INIT(ao),
 evaluator_pntrs_(0),
 derivs_pntrs_(0),
+transf_pntr_(NULL),
 variable_str_("s")
 {
   std::vector<std::string> bf_str;
@@ -135,6 +142,30 @@ variable_str_("s")
       plumed_merror("Problem with function "+bf_str[i]+" given in FUNC"+is+": you should use "+variable_str_+" as a variable");
     }
     derivs_pntrs_[i]=evaluator_derivative(evaluator_pntrs_[i],const_cast<char*>(variable_str_.c_str()));
+  }
+  //
+  std::string transf_str;
+  parse("TRANSFORM",transf_str);
+  if(transf_str.size()>0){
+    std::cerr << transf_str << "\n";
+    for(unsigned int k=0;; k++){
+      if(transf_str.find("min")!=std::string::npos){
+        transf_str.replace(transf_str.find("min"), std::string("min").length(),intervalMinStr());
+      }
+      else{
+        break;
+      }
+    }
+    std::cerr << transf_str << "\n";
+    for(unsigned int k=0;; k++){
+      if(transf_str.find("max")!=std::string::npos){
+        transf_str.replace(transf_str.find("max"), std::string("max").length(),intervalMaxStr());
+      }
+      else{
+        break;
+      }
+    }
+    std::cerr << transf_str << "\n";
   }
   //
   log.printf("  Using the following functions (matheval function and derivative):\n");
