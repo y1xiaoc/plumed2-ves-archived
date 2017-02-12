@@ -59,18 +59,18 @@ where \f$p(\mathbf{s})\f$ is the target distribution that is employed in the VES
 
 Various one-dimensional basis functions are available in the VES code, see the complete list \ref ves_basisf "here". At the current moment we recommend to use \ref BF_LEGENDRE "legendre polynomicals" for non-periodic CVs and \ref BF_FOURIER "fourier basis functions" for periodic CV (e.g. dihedral angles).
 
+To use these basis functions within VES_LINEAR_EXPANSION do you first need to
+define them in the input file before the VES_LINEAR_EXPANSION action and
+then give their labels using the BASIS_FUNCTIONS keyword.
 
 \par Target Distributions
 
-Various target distributions \f$p(\mathbf{s})\f$ are available in the VES code, see the complete list \ref ves_targetdist "here".
-
-
-\Bias Cutoff
-
-
-
-
-
+The default option is to employ a uniform target distribution.
+Various other target distributions \f$p(\mathbf{s})\f$ are available in the VES code,
+see the complete list \ref ves_targetdist "here".
+To use any of these target distribution you need to
+use the TARGET_DISTRIBUTION keyword where the keyword relevant to the
+target distribution are enclosed within curly brackets.
 
 
 \par Examples
