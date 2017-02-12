@@ -57,7 +57,7 @@ where \f$p(\mathbf{s})\f$ is the target distribution that is employed in the VES
 
 \par Basis Functions
 
-Various one-dimensional basis functions are available in the VES code, see the complete list \ref ves_basisf "here". At the current moment we recommend to use \ref BF_LEGENDRE "legendre polynomicals" for non-periodic CVs and \ref BF_FOURIER "fourier basis functions" for periodic CV (e.g. dihedral angles).
+Various one-dimensional basis functions are available in the VES code, see the complete list \ref ves_basisf "here". At the current moment we recommend to use \ref BF_LEGENDRE "legendre polynomicals" for non-periodic CVs and \ref BF_FOURIER "Fourier basis functions" for periodic CV (e.g. dihedral angles).
 
 To use these basis functions within VES_LINEAR_EXPANSION do you first need to
 define them in the input file before the VES_LINEAR_EXPANSION action and
