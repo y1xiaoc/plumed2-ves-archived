@@ -25,6 +25,8 @@
 #include "CoeffsMatrix.h"
 
 #include "core/ActionRegister.h"
+#include "core/PlumedMain.h"
+
 
 
 namespace PLMD{
@@ -130,6 +132,7 @@ combinedgradient_wstride_(100),
 combinedgradientOFiles_(0),
 decaying_aver_tau_(0.0)
 {
+  log << plumed.cite("Bach and Moulines, NIPS 26, 773-781 (2013)");
   unsigned int decaying_aver_tau_int=0;
   parse("EXP_DECAYING_AVER",decaying_aver_tau_int);
   if(decaying_aver_tau_int>0){

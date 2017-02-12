@@ -76,6 +76,8 @@ bias_cutoff_value_(0.0),
 bias_current_max_value(0.0),
 bias_cutoff_swfunc_pntr_(NULL)
 {
+  log << plumed.cite("Valsson and Parrinello, Phys. Rev. Lett. 113, 090601 (2014)");
+  
   double temp=0.0;
   parse("TEMP",temp);
   if(temp>0.0){
