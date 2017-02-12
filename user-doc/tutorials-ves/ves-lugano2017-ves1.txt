@@ -1,8 +1,6 @@
 /**
 \page ves-lugano2017-ves1 MARVEL school 2017 tutorial: VES 1
 
-\section ves-lugano2017-ves1-aims Aims
-
 \section ves-lugano2017-ves1-lo Learning Outcomes
 
 Once this tutorial is completed students will learn to:
@@ -22,7 +20,8 @@ The <a href="tutorial-resources-ves/ves-lugano2017-ves1.tar.gz"
 download="ves-lugano2017-ves1.tar.gz"> tarball </a> for this project contains
 the following folders:
 
-- Example1 : Contains the input file for the unbiased simulation.
+- Example1 : Contains the input file for the first example.
+- Example2 : Contains the input file for the second example.
 
 \section ves-lugano2017-ves1-summary Summary of theory
 
@@ -58,7 +57,7 @@ where \f$ f_i(\mathbf{s}) \f$ are the basis functions and the \f$
 We then need to find the \f$ \boldsymbol\alpha \f$ that minimize \f$ \Omega
 [V] \f$. In principle one could use any optimization algorithm. In practice
 the algorithm that has become the default choice for VES is the averaged stochastic
-gradient descent. The \f$ \boldsymbol\alpha \f$ are evolved iteratively
+gradient descent. In this algorithm the \f$ \boldsymbol\alpha \f$ are evolved iteratively
 according to:
 \f[
 \boldsymbol\alpha^{(n+1)} = \boldsymbol\alpha^{(n)}-\mu
@@ -101,14 +100,14 @@ Every VES simulation has three key ingredients:
 - Optimization algorithm
 
 For the basis set we will choose Legendre polynomials defined in the interval
-[0.2 nm,0.7 nm]. Legendre polynomials are a good choice for non-periodic CVs.
+[0.2,0.7] nm. Legendre polynomials are a good choice for non-periodic CVs.
 A rule of thumb for choosing the order of the expansion is that an expansion
 of order N can capture features of the FES of approximately L/N where L is the
 length of the interval. In this case, an order of 10 is able to capture
 features of the order of around 0.05 nm. We will see afterwards that the order
 of the expansion is not critical as long as we obtain good sampling at
 convergence. If this is the case, it is possible to obtain finer features of
-the FES thorugh reweighting. The syntax for this basis set in Plumed is:
+the FES through reweighting. The syntax for this basis set in Plumed is:
 \verbatim
 BF_LEGENDRE ...
  ORDER=10
@@ -145,7 +144,7 @@ stride and the step size. The stride is the number of steps in which samples
 are collected to calculate the gradient and hessian of \f$ \Omega [V] \f$ and
 the step size is the step by which the coefficients are evolved at every
 optimization steps. Both of this parameters are connected. Increasing the
-stride will have a similar effect to reduce the step size. It has become
+stride will have an effect similar to reducing the step size. It has become
 traditional to choose a stride of around 500 steps. It must be noted that we
 are only looking for an accurate estimation of the gradient, since for this we
 would need to sample all the CV space. The step size in the
@@ -174,7 +173,7 @@ script in the Example1 folder. The simulation will produce several files:
   \bar{\boldsymbol\alpha} \f$  .
 - bias.<bias-name>.iter-<iteration-number> : Bias potential as a function of
   \f$ \mathbf{s} \f$ at iteration <iteration-number>.
-- fes.<bias-name>.iter-<iteration-number> : FES iteration <iteration-number>.
+- fes.<bias-name>.iter-<iteration-number> : FES at iteration <iteration-number>.
 - targetdistribution.<bias-name>.data : Target distribution.
 
 You can first observe how the system moves in
@@ -234,21 +233,19 @@ iteration, in this case iteration 0 and 10. We can plot the evolution of the
 coefficients using the gnuplot script plotCoeffs.gpi . The ouput should be similar to
 the next figure.
 
+\anchor ves-school-2017-ves1-coeffs1
+\image html VES-coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
 
 The \f$ \boldsymbol\alpha \f$ change fast an oscilate around some mean
-value. The \f$ \bar{\boldsymbol\alpha} \f$ evolve smoothly until the stabilize
+value. The \f$ \bar{\boldsymbol\alpha} \f$ evolve smoothly until they stabilize
 around some equilibrium value. It is important to remember that the bias is a
 function of \f$ \bar{\boldsymbol\alpha} \f$ and since these evolve smoothly, so
 will the bias. Once that the \f$ \bar{\boldsymbol\alpha} \f$ have stabilized, the
 simulation can be considered converged.
 
-
-\anchor ves-school-2017-ves1-coeffs1
-\image html VES-coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
-
-It is also interesting to observe how the bias evolves in time. For this we
-will plot the bias using the files bias.b1.iter-<iteration-number>. There is a
-gnuplot script plotBias.gpi that you can use for this purpose. At variance
+It is also interesting to observe how the estimation of the FES evolves in time. For this we
+will plot the FES using the files fes.b1.iter-<iteration-number>. There is a
+gnuplot script plotFes.gpi that you can use for this purpose. At variance
 with metadynamics, in this case there is no growing offset in the
 bias and therefore we will have to shift the FES ourselves to distinguish several
 FES at different times in the same plot.
@@ -256,14 +253,186 @@ FES at different times in the same plot.
 \anchor ves-school-2017-ves1-fesEvolution
 \image html VES-fesEvolution1.png "Evolution of the estimated free energy"
 
-
 We can also calculate the height of the barrier as we did in the metadynamics
-tutorial. The files for doing this can be found in the Barrier_calculation
-folder.
+tutorial. The files for carrying out this task can be found in the Barrier_calculation
+folder. Remember that the accuracy of this calculation is limited by the fact
+that we have chosen a small order in the basis set expansion. We will discuss
+this aspect in greater detail in the next example.
+
+\subsection ves-lugano2017-ves1-subsection-3 Target distribution and basis sets
+
+In this example we will consider other choices of target distributions and we
+will understand the influence of the order of the basis set expansion. The
+files needed for this example are contained in the directory Example2. Instead
+of introducing a barrier as done in the example above, in this case we will
+use a uniform target distribution in the interval [0.23:0.6] nm and decaying to
+zero in the interval [0.6:0.8] nm. The expression is:
+\f[
+p(s)=
+        \begin{cases}
+                \frac{1}{C} \: &  \mathrm{if} \: s<s_0 \\
+                \frac{1}{C} e^{-\frac{(s-s_0)^2}{2\sigma^2}} \: &
+\mathrm{if} \: s>s_0\\
+        \end{cases}
+\f]
+where \f$ s_0=0.6\f$ nm and \f$ \sigma=0.05\f$.
+To define this \f$ p(s) \f$ in Plumed the input is:
+\verbatim 
+VES_LINEAR_EXPANSION ...
+ ARG=d1
+ BASIS_FUNCTIONS=bf1
+ LABEL=b1
+ TEMP=300.0
+ GRID_BINS=300
+ TARGET_DISTRIBUTION={UNIFORM MINIMA=0.23 MAXIMA=0.6 SIGMA_MAXIMA=0.05}
+... VES_LINEAR_EXPANSION
+\endverbatim 
+
+We will choose a basis set of order 20 to be able to capture the features of
+the FES with detail. If you are doing this example in a group, each member of
+the group can choose a different order in the expansion, for instance 5, 10,
+20, and 40. The syntax in Plumed is:
+\verbatim
+BF_LEGENDRE ...
+ ORDER=20
+ INTERVAL_MIN=0.23
+ INTERVAL_MAX=0.8
+ LABEL=bf1
+... BF_LEGENDRE
+\endverbatim
+
+Once that you start running the simulation, a file named targetdist.b1.data
+will be created. This file contains the chosen target distribution. We can
+plot it to confirm that it is what we are looking for. There is a gnuplot script
+plotTargetDistrib.gpi that creates the following plot.
+
+\anchor ves-school-2017-ves1-targetDistrib
+\image html VES-targetDistrib.png "Target distribution for Example 2"
+
+As the simulation runs, it is useful to control the evolution of the
+coefficients using the gnuplot script plotCoeffs.gpi.
+
+The FES is calculated from the expression:
+\f[
+F(\mathbf{s}) = -V(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} = 
+        \begin{cases}
+                -V(s) \: &  \mathrm{if} \: s<s_0 \\
+                -V(s) + \frac{(s-s_0)^2}{2\beta\sigma^2} \: &
+\mathrm{if} \: s>s_0\\
+        \end{cases}
+\f]
+In other words the bias potential is forced to create the upper barrier that
+we were explicitly introducing in the first example. When the FES is calculated the
+effect of the barrier is "subtracted" through \f$ p(s) \f$ and therefore the
+FES that we calculate does not include the barrier. This can be seen by
+plotting the fes.b1.iter-<iteration-number> files with gnuplot, for instance:
+\verbatim 
+pl "./fes.b1.iter-10000.data" u 1:2 w l
+\endverbatim 
+This plot should be similar to the next figure.
+
+\anchor ves-school-2017-ves1-fes
+\image html VES-fes.png "FES for Example 2"
 
 
+Only the interval [0.23:0.7] is plotted since there is little sampling in the
+region [0.7:0.8] due to the small value of \f$ p(s) \f$ in this region. As
+discussed before, if there is no sampling, it is not possible to obtain free
+energies.
 
-Mention that one can create an arbitrary target distribution using matheval.
+When the simulation ends, it is interesting to check if in fact the sampled
+biased distribution is equal to the chosen target distribution. The scripts to
+calculate the sampled biased distribution are located in the directory BiasedDistribution.
+As usual, we will disregard the initial part of the simulation since in this period the bias
+is changing a lot. As done before, we get rid of the first 2 ns of simulation
+using sed:
+\verbatim
+sed '2,10000d' ../COLVAR > COLVAR
+\endverbatim
+Once that the coefficients in the expansion have stabilized
+it is possible to calculate the biased distribution of CVs by constructing a
+histogram with equal weights for all points. This distribution should be equal
+to the target distribution \f$ p(s) \f$. The histogram can be calculated in
+plumed using the following input in the plumed.dat file:
+\verbatim
+distance: READ FILE=COLVAR  IGNORE_TIME VALUES=d1
+
+HISTOGRAM ...
+  ARG=distance
+  GRID_MIN=0.2
+  GRID_MAX=0.8
+  GRID_BIN=100
+  BANDWIDTH=0.004
+  LABEL=hh1
+... HISTOGRAM
+
+DUMPGRID GRID=hh1 FILE=histo FMT=%24.16e
+\endverbatim
+and running (or using the run.sh script):
+\verbatim
+plumed --no-mpi driver --plumed plumed.dat --noatoms > plumed.out
+\endverbatim
+The next plot shows that in fact the sampled distribution agrees with the
+target distribution.
+
+\anchor ves-school-2017-ves1-biasedDistrib
+\image html VES-biasedDistrib.png "Sampled biased distribution of the distance Na-Cl and target distribution"
+
+Once that the coefficients are stabilized it is possible to reweight using the
+standard umbrella sampling formula \cite torrie-valleau . In this case the weight assigned to each
+configuration is:
+\f[
+  w(\mathbf{R}) \propto  e^{\beta V(\mathbf{s})}.
+\f]
+The files needed for this reweighting are contained in the folder
+ReweightDistance. The procedure to the the reweighting and plot the results is
+similar to the ones in the cases above and therefore it is not described in
+detail. The reweighted FES is plotted in the next figure and compared to the
+FES calculated from the formula 
+\f$ V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} \f$
+.
+
+\anchor ves-school-2017-ves1-reweight
+\image html VES-reweight.png "Comparison of the FES estimated from the bias and p(s), and the reweighted FES"
+
+
+The two curves do not differ much since the order of the expansion was
+relatively large. What happens if you chose a lower or higher order in the expansion?
+
+
+\subsection ves-lugano2017-ves1-subsection-4 Restarting a simulation
+
+In this section we will restart the simulation that we have performed in our
+second example. In directory Example2, cd to the folder Restart. To restart 
+the simulation we will need:
+
+- LAMMPS restart file, since it stores the last configuration
+- COLVAR file, since new lines will be appended
+- coeff.data file, containing the iteration number and the values of the
+  coeffients.
+
+Therefore we execute in the command line the following commands:
+\verbatim
+cp ../restart .
+cp ../COLVAR .
+cp ../coeffs.data .
+\endverbatim
+
+In order to restart, the RESTART keyword must be added at the beginning of
+Plumed's input named plumed.restart.dat:
+\verbatim
+RESTART
+
+d1:  DISTANCE ATOMS=319,320
+.
+.
+.
+\endverbatim
+
+Then the simulation can be restarted using the script runRestart.sh .
+Check that the output of the new simulation is appended to the COLVAR file,
+that the starting time of the new simulation is the ending time of the new
+simulation, that CV values are coherent, and that coefficients evolve continuosly.
 
 */
 
