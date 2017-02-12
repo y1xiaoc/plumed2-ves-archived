@@ -773,7 +773,7 @@ void Optimizer::registerKeywords( Keywords& keys ) {
   keys.remove("NUMERICAL_DERIVATIVES");
   // Default always active keywords
   keys.add("compulsory","BIAS","the label of the VES bias to be optimized");
-  keys.add("compulsory","STRIDE","the frequency of updating the coefficients");
+  keys.add("compulsory","STRIDE","the frequency of updating the coefficients given in the number of MD steps.");
   keys.add("compulsory","COEFFS_FILE","coeffs.data","the name of output file for the coefficients");
   keys.add("compulsory","COEFFS_OUTPUT","100","how often the coefficients should be written to file. This parameter is given as the number of iterations.");
   keys.add("optional","COEFFS_FMT","specify format for coefficient file(s) (useful for decrease the number of digits in regtests)");
