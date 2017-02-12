@@ -652,7 +652,7 @@ void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
   std::string field_index = "index";
   //
   std::string int_fmt = "%8d";
-  std::string str_seperate = "#!-------------------";
+  std::string str_separate = "#!-------------------";
   //
   char* s1 = new char[20];
   std::vector<unsigned int> indices(numberOfDimensions());
@@ -673,7 +673,7 @@ void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
   }
   ofile.fmtField();
   // blank line between iterations to allow proper plotting with gnuplot
-  ofile.printf("%s\n",str_seperate.c_str());
+  ofile.printf("%s\n",str_separate.c_str());
   ofile.printf("\n");
   ofile.printf("\n");
   delete [] s1;
@@ -687,7 +687,7 @@ void CoeffsMatrix::writeDataFullToFile(OFile& ofile) {
   std::string field_coeffs = getDataLabel();
   //
   std::string int_fmt = "%8d";
-  std::string str_seperate = "#!-------------------";
+  std::string str_separate = "#!-------------------";
   //
   char* s1 = new char[20];
   //
@@ -703,7 +703,7 @@ void CoeffsMatrix::writeDataFullToFile(OFile& ofile) {
   }
   ofile.fmtField();
   // blank line between iterations to allow proper plotting with gnuplot
-  ofile.printf("%s\n",str_seperate.c_str());
+  ofile.printf("%s\n",str_separate.c_str());
   ofile.printf("\n");
   ofile.printf("\n");
   delete [] s1;

@@ -61,7 +61,7 @@ Here we employ a Fourier cosine expansion of order 10 over the periodic interval
 \f$-\pi\f$ to \f$+\pi\f$.
 This results in a total number of 11 basis functions.
 The label used to identify  the basis function action can then be
-referenenced later on in the input file.
+referenced later on in the input file.
 \verbatim
 BF_COSINE INTERVAL_MIN=-pi INTERVAL_MAX=+pi ORDER=10 LABEL=bf1
 \endverbatim

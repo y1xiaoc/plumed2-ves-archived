@@ -378,7 +378,7 @@ bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& va
   }
   if(values.size()>0 && values.size()!=nvalues){
     std::string s1; Tools::convert(nvalues,s1);
-    plumed_merror("Error in " + keyword + " keyword: either give 1 common parameter value or " + s1 + " seperate parameter values");
+    plumed_merror("Error in " + keyword + " keyword: either give 1 common parameter value or " + s1 + " separate parameter values");
   }
   return identical_values;
 }

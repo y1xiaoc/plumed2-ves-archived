@@ -70,7 +70,7 @@ with respect to the weight \f$\frac{1}{\sqrt{1-x^2}}\f$
 \end{cases}
 \f]
 
-For further mathemtical properties of the Chebyshev polynomials see for example
+For further mathematical properties of the Chebyshev polynomials see for example
 the [Wikipedia page](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 
 \par Examples
@@ -78,7 +78,7 @@ the [Wikipedia page](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
 Here we employ a Chebyshev expansion of order 20 over the interval 0.0 to 10.0.
 This results in a total number of 21 basis functions.
 The label used to identify  the basis function action can then be
-referenenced later on in the input file.
+referenced later on in the input file.
 \verbatim
 bfC: BF_CHEBYSHEV INTERVAL_MIN=0.0 INTERVAL_MAX=10.0 ORDER=20
 \endverbatim

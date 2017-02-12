@@ -73,15 +73,15 @@ over the uniform target distribution \f$p_{\mathrm{u}}(x)\f$ are given by
 and thus always zero except for the constant \f$P_{0}(x)=1\f$.
 
 
-For further mathemtical properties of the Legendre polynomials see for example
+For further mathematical properties of the Legendre polynomials see for example
 the [Wikipedia page](https://en.wikipedia.org/wiki/Legendre_polynomials).
 
 \par Examples
 
-Here we employ a Legendre xpansion of order 20 over the interval -4.0 to 8.0.
+Here we employ a Legendre expansion of order 20 over the interval -4.0 to 8.0.
 This results in a total number of 21 basis functions.
 The label used to identify  the basis function action can then be
-referenenced later on in the input file.
+referenced later on in the input file.
 \verbatim
 bf_leg: BF_LEGENDRE INTERVAL_MIN=-4.0 INTERVAL_MAX=8.0 ORDER=20
 \endverbatim

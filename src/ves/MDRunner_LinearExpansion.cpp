@@ -86,7 +86,7 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ){
     keys.add("compulsory","temperature","1.0","The temperature to perform the simulation at.");
     keys.add("compulsory","friction","10.","The friction of the langevin thermostat.");
     keys.add("compulsory","random_seed","5293818","Value of random number seed.");
-    keys.add("compulsory","plumed_input","plumed.dat","The name of the plumed input file(s). Either give one file or seperate files for each partition.");
+    keys.add("compulsory","plumed_input","plumed.dat","The name of the plumed input file(s). Either give one file or separate files for each partition.");
     keys.add("compulsory","dimension","1","Number of dimensions, supports 1 to 3.");
     keys.add("compulsory","initial_position","Initial position for each partition.");
     keys.add("compulsory","partitions","1","Number of partitions.");
@@ -177,7 +177,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   std::vector<std::string> plumed_inputfiles;
   parseVector("plumed_input",plumed_inputfiles);
   if(plumed_inputfiles.size()!=1 && plumed_inputfiles.size()!=partitions){
-    error("in plumed_input you should either give one file or seperate files for each partition.");
+    error("in plumed_input you should either give one file or separate files for each partition.");
   }
   plumedon=true;
 

@@ -45,7 +45,7 @@ p(\mathbf{s}) = \sum_{i} w_{i} p_{i}(\mathbf{s})
 \f]
 where the weights \f$w_{i}\f$ are normalized to 1, \f$\sum_{i}w_{i}=1\f$.
 
-The distributions \f$p_{i}(\mathbf{s})\f$ are given by using a seperate numbered
+The distributions \f$p_{i}(\mathbf{s})\f$ are given by using a separate numbered
 DISTRIBUTION keyword for each distribution. The keywords for each distribution
 should be enclosed within curly brackets.
 
@@ -55,7 +55,7 @@ the WEIGHTS keyword. The distributions are weighted equally if no weights are gi
 It is assumed that all the distributions given with the numbered
 DISTRIBUTION keywords are normalized. If that is not the case you should
 normalize each distribution separately by using the NORMALIZE
-keyword within the curly brackets of each seperate DISTRIBUTION keyword.
+keyword within the curly brackets of each separate DISTRIBUTION keyword.
 Note that normalizing the overall
 linear combination will generally lead to different results than normalizing
 each distribution separately.
@@ -91,7 +91,7 @@ TARGET_DISTRIBUTION={LINEAR_COMBINATION
                      WEIGHTS=1.0,1.0,2.0}
 \endverbatim
 
-In the above example the two Gaussians are given using two seperate
+In the above example the two Gaussians are given using two separate
 DISTRIBUTION keywords. As the \ref GAUSSIAN target distribution allows multiple
 centers is it also possible to use just one DISTRIBUTION keyword for the two
 Gaussians. This is shown in the following example which will give the
@@ -143,7 +143,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_LinearCombination,"LINEAR_COMBINATION")
 
 void TD_LinearCombination::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination, each given within a seperate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
+  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination, each given within a separate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
   keys.add("optional","WEIGHTS","The weights of target distributions. Have to be as many as the number of target distributions given with the numbered DISTRIBUTION keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");

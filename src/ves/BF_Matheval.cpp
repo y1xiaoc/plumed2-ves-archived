@@ -66,6 +66,7 @@ void BF_Matheval::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
   keys.remove("ORDER");
   keys.add("numbered","FUNC","The basis functions f_i(s) given in a matheval format using s as a variable.");
+  keys.add("optional","TRANSFORM","An optional function that can be used to transform the arguments before calculating the basis function values. You should use t as a variable.");
   keys.addFlag("PERIODIC",false,"Indicate that the basis functions are periodic.");
   keys.remove("NUMERICAL_INTEGRALS");
 }

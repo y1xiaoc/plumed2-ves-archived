@@ -54,7 +54,7 @@ Note the difference between this target distribution and the one defined in
 as a product of distribution \f$p_{i}(\mathbf{s})\f$ which are in full dimensional
 space of the arguments used.
 
-The distributions \f$p_{i}(\mathbf{s})\f$ are given by using a seperate numbered
+The distributions \f$p_{i}(\mathbf{s})\f$ are given by using a separate numbered
 DISTRIBUTION keyword for each distribution. The keywords for each distribution
 should be enclosed within curly brackets.
 
@@ -119,7 +119,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductCombination,"PRODUCT_COMBINATION")
 
 void TD_ProductCombination::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the product combination, each given within a seperate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
+  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the product combination, each given within a separate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");

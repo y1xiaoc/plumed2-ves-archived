@@ -45,9 +45,9 @@ one-dimensional distribution corresponding to the \f$k\f$-th argument.
 
 Note the difference between this target distribution and the one defined in
 \ref PRODUCT_COMBINATION. Here we have a separable distribution given as a
-product of one-dimensional distribution \f$p_{k}(s_{k})\f$. 
+product of one-dimensional distribution \f$p_{k}(s_{k})\f$.
 
-The distributions \f$p_{k}(s_{k})\f$ are given by using a seperate numbered
+The distributions \f$p_{k}(s_{k})\f$ are given by using a separate numbered
 DIST_ARG keyword for each argument. The keywords for each distribution
 should be enclosed within curly brackets.
 
@@ -102,7 +102,7 @@ VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductDistribution,"PRODUCT_DISTRIBUTION")
 
 void TD_ProductDistribution::registerKeywords(Keywords& keys){
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DIST_ARG","The one-dimensional target distributions for each argument to be used in the product distribution, each given within a seperate numbered DIST_ARG keyword and enclosed in curly brackets {}.");
+  keys.add("numbered","DIST_ARG","The one-dimensional target distributions for each argument to be used in the product distribution, each given within a separate numbered DIST_ARG keyword and enclosed in curly brackets {}.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");

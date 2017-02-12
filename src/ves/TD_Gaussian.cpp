@@ -43,7 +43,7 @@ and \f$\boldsymbol{\Sigma}_{i}\f$ are
 the center and covariance matrix for the \f$i\f$-th Gaussian.
 The weights \f$w_{i}\f$ are normalized to 1, \f$\sum_{i}w_{i}=1\f$.
 
-By default the Gaussian distributions are considered as seperable into
+By default the Gaussian distributions are considered as separable into
 independent one-dimensional Gaussian distributions. In other words,
 the covariance matrix is taken as diagonal
 \f$\boldsymbol{\Sigma}_{i}=(\sigma^2_{1,i},\sigma^2_{2,i},\ldots,\sigma^{2}_{d,i})\f$.
@@ -67,7 +67,7 @@ between arguments, defined as
 \f[
 N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i},\rho_i) =
 \frac{1}{2 \pi \sigma_{1,i} \sigma_{2,i} \sqrt{1-\rho_i^2}}
-\, 
+\,
 \exp\left(
 -\frac{1}{2(1-\rho_i^2)}
 \left[
@@ -99,12 +99,12 @@ region. However, in calculation within VES we normally consider bounded
 region on which the target distribution is defined. Thus, if the center of
 a Gaussian is close to the boundary of the region it can happen that it
 tails go outside the region. In that case it might be needed to use the
-NORMALIZE keyword to make sure that the target distribution is proberly
+NORMALIZE keyword to make sure that the target distribution is properly
 normalized to 1 over the bounded region. The code will issue a warning
 if that is needed.
 
 For periodic CVs it is generally better to use \ref VON_MISES "Von Mises"
-distributions instead of Gaussians as these distributions proberly
+distributions instead of Gaussians as these distributions properly
 account for the periodicity of the CVs.
 
 

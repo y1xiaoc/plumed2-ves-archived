@@ -312,7 +312,7 @@ bool Optimizer::parseMultipleValues(const std::string& keyword, std::vector<T>& 
   }
   if(values.size()>0 && values.size()!=ncoeffssets_){
     std::string s1; Tools::convert(ncoeffssets_,s1);
-    plumed_merror("Error in " + keyword + " keyword: either give 1 common value for all coefficient sets or " + s1 + " seperate value for each set");
+    plumed_merror("Error in " + keyword + " keyword: either give 1 common value for all coefficient sets or " + s1 + " separate value for each set");
   }
   return identical_values;
 }

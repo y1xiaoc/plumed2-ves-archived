@@ -730,7 +730,7 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
   std::string field_description = "description";
   //
   std::string int_fmt = "%8d";
-  std::string str_seperate = "#!-------------------";
+  std::string str_separate = "#!-------------------";
   //
   unsigned int numvec = coeffsvecSet.size();
   unsigned int numdim = coeffsvecSet[0]->numberOfDimensions();
@@ -764,7 +764,7 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
   }
   ofile.fmtField();
   // blank line between iterations to allow proper plotting with gnuplot
-  ofile.printf("%s\n",str_seperate.c_str());
+  ofile.printf("%s\n",str_separate.c_str());
   ofile.printf("\n");
   ofile.printf("\n");
   delete [] s1;

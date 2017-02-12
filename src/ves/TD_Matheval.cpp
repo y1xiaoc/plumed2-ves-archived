@@ -45,7 +45,7 @@ p(\mathbf{s}) =
 \frac{f(\mathbf{s})}{\int d\mathbf{s} \, f(\mathbf{s})}
 \f]
 where \f$f(\mathbf{s})\f$ is some arbitrary mathematical function that
-is parsed by the matheval libary.
+is parsed by the matheval library.
 
 The function \f$f(\mathbf{s})\f$ is given by the FUNCTION keywords by
 using _s1_,_s2_,..., as variables for the arguments
@@ -56,7 +56,7 @@ taken as uniform in that argument.
 It is also possible to include the free energy surface \f$F(\mathbf{s})\f$
 in the target distribution by using the _FE_ variable. In this case the
 target distribution is dynamic and needs to be updated with current
-best estimate of \f$F(\mathbf{s})\f$, simiarly as for the
+best estimate of \f$F(\mathbf{s})\f$, similarly as for the
 \ref WELL_TEMPERED "well-tempered target distribution".
 Furthermore, the inverse temperature \f$\beta = (k_{\mathrm{B}}T)^{-1}\f$ and
 the thermal energy \f$k_{\mathrm{B}}T\f$ can be included
@@ -94,7 +94,7 @@ TARGET_DISTRIBUTION={MATHEVAL_DIST
 
 By using the _FE_ variable the target distribution can depend on
 the free energy surface \f$F(\mathbf{s})\f$. For example,
-the following input is identicaly to using \ref WELL_TEMPERED with
+the following input is identical to using \ref WELL_TEMPERED with
 BIASFACTOR=10.
 \verbatim
 TARGET_DISTRIBUTION={MATHEVAL_DIST
