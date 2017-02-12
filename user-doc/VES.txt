@@ -2,13 +2,22 @@
 
 \page ves_main Variationally Enhanced Sampling
 
-The VES code is a module outside the core of PLUMED that implements enhanced sampling methods based on _Variationally Enhanced Sampling_ (VES) \cite Valsson-PRL-2014. The theory of VES is explained in more detail \ref ves_theory "here".
+The VES code is a module for PLUMED that implements enhanced sampling methods
+based on _Variationally Enhanced Sampling_ (VES) \cite Valsson-PRL-2014.
+The VES code is developed independently from the PLUMED code,
+see the [homepage of the VES code](http://www.ves-code.org) for further information.
 
-[homepage of the VES code](http://www.ves-code.org)
+The VES code is an optional module, to enable it you need to configure
+PLUMED using ./configure --enable-modules.
 
-- \subpage ves_theory
+__This manual is currently under construction.__
+All keywords should be listed for the available actions while
+more detailed descriptions of the actions can be missing.
+The manual will be updated frequently.
+Furthermore, some of the keywords and options might be changed without warning.
+
+- \subpage ves_tutorial_lugano_2017
 - \subpage ves_tutorials
-
 - \subpage ves_biases
 - \subpage ves_basisf
 - \subpage ves_targetdist
@@ -20,8 +29,10 @@ The VES code is a module outside the core of PLUMED that implements enhanced sam
 
 
 
-
+\if VES_MANUAL_OFF
 \page ves_theory Theory of VES
+
+The theory of VES is explained in more detail \ref ves_theory "here".
 
 In Variationally Enhanced Sampling \cite Valsson-PRL-2014 an external biasing potential \f$V(\mathbf{s})\f$ in some space of collective variables (CVs) \f$s\f$ is constructed by minimizing the following convex functional
 \f[
@@ -34,7 +45,7 @@ where \f$F(\mathbf{s})\f$ is the free energy surface (FES) associated to the CVs
 \f[
 V(\mathbf{s}) = - F(\mathbf{s}) - \frac{1}{\beta} \log p(\mathbf{s}).
 \f]
-
+\endif
 
 \page ves_biases Bias
 
@@ -44,15 +55,12 @@ The following list contains the biases available in the VES code.
 
 \page ves_basisf Basis functions
 
-The following list contains the basis functions available in the VES code.
+The following list contains the one-dimensional basis functions available in the VES code.
 
 @VES_BASISF@
 
 
 \page ves_targetdist Target Distributions
-
-The
-Various target distributions are available for usage in the
 
 The following list contains the target distributions available in the VES code.
 
@@ -61,7 +69,7 @@ The following list contains the target distributions available in the VES code.
 
 \page ves_optimizer Optimizers
 
-The following list contains the target distributions available in the VES code.
+The following list contains the optimizers available in the VES code.
 
 @VES_OPTIMIZER@
 
@@ -83,7 +91,7 @@ The following list contains various utilities available in the VES code.
 
 \page ves_cltools Command Line Tools
 
-The following list contains the target distributions currently available in the VES code.
+The following list contains the command line tools available in the VES code.
 
 @VES_CLTOOLS@
 
@@ -101,6 +109,56 @@ The following list contains all actions available in the VES code
 The following tutorials are available for the VES code
 
 @VES_TUTORIALS@
+
+
+\page ves_tutorial_lugano_2017 MARVEL-VES School February 2017
+
+\image html ves-school-2017-logo.png  width=800px
+
+Tutorials for the [MARVEL School on Variationally Enhanced Sampling]
+(https://sites.google.com/site/vesschool2017/home) in Lugano,
+February 14-17, 2017.
+
+
+\par Tuesday February 14
+
+
+\ref lugano-1 "Tutorial 1": Introduction to PLUMED and analyzing molecular simulations - Gareth Tribello
+
+
+\par Wednesday February 15
+
+
+\ref ves-lugano2017-metad "Tutorial 2": Biasing with metadynamics - Pablo Piaggi
+
+
+\ref ves-lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling - Pablo Piaggi, Omar Valsson, and Michele Invernizzi
+
+
+\par Thursday February 16
+
+
+\ref ves-lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling - Pablo Piaggi, Omar Valsson, and Michele Invernizzi
+
+
+Tutorial 5: Advanced collective variables - Gareth Tribello
+- \ref lugano-2 "Path CVs"
+- \ref belfast-10 "Multicolvar"
+- \ref belfast-3 "Dimensionality reduction"
+
+
+\par Friday February 17
+
+Tutorial 6: Obtaining kinetics from molecular simulations - James McCarty and Ferruccio Palazzesi
+
+
+
+
+
+
+
+
+
 
 
 
