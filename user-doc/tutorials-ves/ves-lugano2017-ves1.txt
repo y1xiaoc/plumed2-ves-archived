@@ -42,7 +42,7 @@ surface. This functional can be shown to be convex and to have a minimum at:
 \f[
 V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})}.
 \f]
-The last equation states that once that the functional \f$ \Omega (V) \f$ is
+The last equation states that once that the functional \f$ \Omega [V] \f$ is
 minimized, the bias and the target distribution allow calculating the free
 energy. The target distribution \f$ p(s) \f$ can be chosen at will and it is
 the distribution of the CVs once that \f$ \Omega [V] \f$ has been minimized.
