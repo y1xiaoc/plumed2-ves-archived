@@ -65,6 +65,8 @@ The Legendre polynomial are orthogonal over the interval \f$[-1,1]\f$
 \f]
 By using the SCALED keyword the polynomials are scaled by a factor of
 \f$ \sqrt{\frac{2n+1}{2}}\f$ such that they are orthonormal to 1.
+
+
 From the above equation it follows that integral of the basis functions
 over the uniform target distribution \f$p_{\mathrm{u}}(x)\f$ are given by
 \f[

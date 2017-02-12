@@ -60,7 +60,7 @@ f_{N}(x)    &= x^N \\
 Note that these basis functions are __not__ orthogonal. In fact the integral
 over the uniform target distribution blows up as the interval is increased.
 Therefore they should not be used in conventional biasing simulations.
-However, they can be useful in \ref md_linearexpansion.
+However, they can be useful for usage with \ref md_linearexpansion.
 
 \par Examples
 

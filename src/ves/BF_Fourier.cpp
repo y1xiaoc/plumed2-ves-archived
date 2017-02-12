@@ -47,7 +47,7 @@ f_{0}(x)    &= 1 \\
 f_{1}(x)    &= cos(\frac{2\pi }{P} x) \\
 f_{2}(x)    &= sin(\frac{2\pi }{P} x) \\
 f_{3}(x)    &= cos(2 \cdot \frac{2\pi}{P} x) \\
-f_{4}(x)    &= sin(2 \cdot \frac{2\pi \, 2}{P} x) \\
+f_{4}(x)    &= sin(2 \cdot \frac{2\pi}{P} x) \\
 & \vdots \\
 f_{2n-1}(x) &= cos(n \cdot \frac{2\pi}{P} x) \\
 f_{2n}(x)   &= sin(n \cdot \frac{2\pi}{P} x) \\
