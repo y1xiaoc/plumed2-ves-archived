@@ -8,7 +8,7 @@ set xlabel "Distance (nm)"
 set ylabel "Free energy (kT)"
 
 # Set plot range and tic options
-set yr [-15:10]
+set yr [-21:10]
 set xtics 5
 set xr [0.23:0.7]
 set xtics 0.1
@@ -25,11 +25,11 @@ set style line 7 lt 1 lw 3 lc rgb "#a65628"
 
 set key top right horizontal sample 1.
 
-Offset=3.5
+Offset=5
 
-pl "fes.b1.iter-200.data" u 1:($2/2.494) w l ls 1 title "200 ps", \
+pl "fes.b1.iter-100.data" u 1:($2/2.494) w l ls 1 title "100 ps", \
    "fes.b1.iter-300.data" u 1:($2/2.494-1*Offset) w l ls 2 title "300 ps", \
-   "fes.b1.iter-500.data" u 1:($2/2.494-2*Offset) w l ls 3 title "500 ps", \
+   "fes.b1.iter-600.data" u 1:($2/2.494-2*Offset) w l ls 3 title "600 ps", \
    "fes.b1.iter-1000.data" u 1:($2/2.494-3*Offset) w l ls 4 title "1 ns", \
    "fes.b1.iter-10000.data" u 1:($2/2.494-4*Offset) w l ls 5 title "10 ns"
 

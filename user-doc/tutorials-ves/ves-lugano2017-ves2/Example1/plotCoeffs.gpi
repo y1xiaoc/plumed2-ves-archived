@@ -8,7 +8,7 @@ set xlabel "Time (ns)"
 set ylabel "Coefficients (kJ/mol)"
 
 # Set plot range and tic options
-set yr [-30:30]
+set yr [-30:45]
 
 # Define colors
 set style line 1 lt 1 lw 3 lc rgb "#e41a1c"
@@ -25,7 +25,7 @@ set style line 6 lt 1 lw 3 lc rgb "#ffff33"
 set style line 62 lt 1 lw 1 lc rgb "#ffff33"
 set style line 7 lt 1 lw 3 lc rgb "#a65628"
 
-set key bottom right horizontal
+set key bottom left horizontal
 
 coeffs_stride=10
 ns_per_iteration=0.001

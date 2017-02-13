@@ -468,6 +468,8 @@ tutorial. These include:
 
 link: @subpage ves-lugano2017-metad
 
-description: Some good description of the tutorial
+description: Brief introduction to metadynamics including the construction of
+1 and 2 dimensional biases, reweighting the simulation in variables different
+from the ones biased, and assessing the convergence of the simulation.
 
 additional-files: ves-lugano2017-metad
