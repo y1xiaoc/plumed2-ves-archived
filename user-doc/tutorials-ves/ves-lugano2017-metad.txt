@@ -367,7 +367,7 @@ plumed --no-mpi driver --plumed plumed.dat --noatoms > plumed.out
 and will generate the files histo and histo_wall.
 The histograms represent the probability \f$p(\mathbf{s})\f$ of observing a
 given value of the CV \f$ \mathbf{s} \f$ .
-From the histograms the FES can be calulated using:
+From the histograms the FES can be calculated using:
 \f[
 \beta F(\mathbf{s})= - \log p(\mathbf{s})
 \f]
