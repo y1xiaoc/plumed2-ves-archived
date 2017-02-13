@@ -157,6 +157,10 @@ METAD ...
  REWEIGHTING_NGRID=300
 ... METAD
 \endverbatim
+Here the REWEIGHTING_NGRID keyword turns on the calculation of the
+time dependent constant \f$ c(t) \f$ that we will use below when
+reweighting the simulations.
+
 
 We will also limit the exploration of the CV space by introducing an upper
 wall bias \f$ V_{wall}(\mathbf{s}) \f$:
