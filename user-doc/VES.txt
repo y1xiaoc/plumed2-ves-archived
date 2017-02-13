@@ -149,7 +149,7 @@ Tutorial 5: Advanced collective variables - Gareth Tribello
 
 \par Friday February 17
 
-Tutorial 6: Obtaining kinetics from molecular simulations - James McCarty and Ferruccio Palazzesi
+\ref ves-lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations - James McCarty and Ferruccio Palazzesi
 
 
 

@@ -134,7 +134,7 @@ and rerun the simulation from Exercise 1A. [Note: In practice one can use multip
 
 Plot some of the bias files (bias.variational.iter-n.data) that are printed during the simulation using gnuplot. At the end of the simulation, you should be able to reproduce something like Figure \ref Figure1B. Is the bias converging? If so, how many iterations does it require to converge?
 
-Figure \ref Figure1B shows the bias potential after 70,80, and 90 iteration steps. Note that the bias has reached the cutoff and goes to zero at around 1 \f$\AA\f$ .
+Figure \ref Figure1B shows the bias potential after 70,80, and 90 iteration steps. Note that the bias has reached the cutoff and goes to zero at around 1 Angstrom.
 
 \anchor Figure1B
 \image html Kinetics-figure-1B.png "Figure-1B"
