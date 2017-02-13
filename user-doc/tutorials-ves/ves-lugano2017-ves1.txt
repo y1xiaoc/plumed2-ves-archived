@@ -462,7 +462,8 @@ the sampling on the small but relevant folded state \cite Shaffer16.
 
 We suggest an exercise to gain experience in choosing the parameters of the
 optimization algorithm. The averaged stochastic gradient descent algorithm has
-two parameters: the stride and the step size. Normally a stride of 500 steps is used. However it is
+two parameters: the stride and the step size. Normally a stride of around
+500-2000 steps is used. However it is
 not always easy to choose the step size. Luckily, the algorithm is quite
 robust and will work for different step sizes.
 
