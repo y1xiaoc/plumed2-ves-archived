@@ -10,7 +10,7 @@ Once this tutorial is completed students will learn to:
 - Use different basis sets and order of the expansions. Select the appropriate
   order for their problem.
 - Use the optimization algorithm and choose the parameters.
-- Construct biases in 1 and 2 dimensions.
+- Construct biases in 1 dimension.
 - Assess the convergence of the simulation.
 - Obtain biased and unbiased histograms.
 
@@ -83,7 +83,7 @@ The behavior of the coefficients will become clear in the examples below.
 
 We will consider the same system employed for the metadynamics tutorial.
 
-\subsection ves-lugano2017-ves1-subsection-2 First VES simulation
+\subsection ves-lugano2017-ves1-subsection-2 Example 1: First VES simulation
 
 For the first VES simulation we will revisit the problem of the ion pair
 dissociation but replacing the metadynamics bias with a VES bias. The bias
@@ -100,7 +100,7 @@ Every VES simulation has three key ingredients:
 - Optimization algorithm
 
 For the basis set we will choose Legendre polynomials defined in the interval
-[0.2,0.7] nm. Legendre polynomials are a good choice for non-periodic CVs.
+[0.23,0.7] nm. Legendre polynomials are a good choice for non-periodic CVs.
 A rule of thumb for choosing the order of the expansion is that an expansion
 of order N can capture features of the FES of approximately L/N where L is the
 length of the interval. In this case, an order of 10 is able to capture
@@ -111,7 +111,7 @@ the FES through reweighting. The syntax for this basis set in Plumed is:
 \verbatim
 BF_LEGENDRE ...
  ORDER=10
- INTERVAL_MIN=0.2
+ INTERVAL_MIN=0.23
  INTERVAL_MAX=0.8
  LABEL=bf1
 ... BF_LEGENDRE
@@ -259,7 +259,7 @@ folder. Remember that the accuracy of this calculation is limited by the fact
 that we have chosen a small order in the basis set expansion. We will discuss
 this aspect in greater detail in the next example.
 
-\subsection ves-lugano2017-ves1-subsection-3 Target distribution and basis sets
+\subsection ves-lugano2017-ves1-subsection-3 Example 2: Target distributions and basis sets
 
 In this example we will consider other choices of target distributions and we
 will understand the influence of the order of the basis set expansion. The
@@ -431,13 +431,60 @@ d1:  DISTANCE ATOMS=319,320
 
 Then the simulation can be restarted using the script runRestart.sh .
 Check that the output of the new simulation is appended to the COLVAR file,
-that the starting time of the new simulation is the ending time of the new
-simulation, that CV values are coherent, and that coefficients evolve continuosly.
+that the starting time of the new simulation is the ending time of the old
+simulation, that CV values are coherent, and that coefficients evolve
+continuously.
+
+\subsection ves-lugano2017-ves1-subsection-5 Gaussian target distribution
+
+As an exercise, you can use a target distribution consisting in a gaussian
+centered at the dissociation barrier. The syntax in Plumed is:
+\verbatim
+VES_LINEAR_EXPANSION ...
+ ARG=d1
+ BASIS_FUNCTIONS=bf1
+ LABEL=b1
+ TEMP=300.0
+ GRID_BINS=300
+ TARGET_DISTRIBUTION={GAUSSIAN CENTER=0.325 SIGMA=0.03}
+... VES_LINEAR_EXPANSION
+\endverbatim
+
+Gaussian target distributions are useful to focus the sampling on a particular
+region of CV space. This has been used in protein folding problems to focus
+the sampling on the small but relevant folded state \cite Shaffer16.
+
+\subsection ves-lugano2017-ves1-subsection-6 Optimization algorithm
+
+We suggest an exercise to gain experience in choosing the parameters of the
+optimization algorithm. The averaged stochastic gradient descent algorithm has
+two parameters: the stride and the step size. Normally a stride of 500 steps is used. However it is
+not always easy to choose the step size. Luckily, the algorithm is quite
+robust and will work for different step sizes. 
+
+Run different simulation using step
+sizes \f$ \mu = 0.001 \f$ and \f$ \mu = 10 \f$ and try to rationalize the
+behavior. Normally, when the step size is too large, the system gets stuck in
+CV space and coefficients oscillate wildly. When the step size is too small,
+the algorithm runs out of "steam" too fast and the simulation converges
+slowly. These two extreme cases should be avoided.
+
+\section ves-lugano2017-ves1-final Final remarks
+
+The purpose of this first tutorial was to introduce the student to VES. At
+this point one can see that VES is a powerful and versatile enhanced sampling
+method. We suggest to explore different possibilities of basis sets and target
+distributions. It is also interesting to experiment with different optimization
+algorithms and parameters of these.
+
+The next tutorial will deal with the use of the well-tempered target
+distribution and the construction of biases on 2 CVs.
 
 */
 
 link: @subpage ves-lugano2017-ves1
 
-description: Some good description of the tutorial
+description: This tutorial introduces the students to VES, and the use of
+different target distributions and basis sets.
 
 additional-files: ves-lugano2017-ves1

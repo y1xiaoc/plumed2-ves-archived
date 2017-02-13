@@ -3,10 +3,10 @@ import numpy as np
 # Total number of fes files in folder
 total_files=101
 # Min and max initial guesses
-min_min=31
-min_max=61
-max_min=62
-max_max=121
+min_min=14
+min_max=46
+max_min=46
+max_max=110
 
 step=100
 
