@@ -52,7 +52,7 @@ should be enclosed within curly brackets.
 The weights \f$w_{i}\f$ can be given using
 the WEIGHTS keyword. The distributions are weighted equally if no weights are given.
 
-It is assumed that all the distributions f$p_{i}(\mathbf{s})\f$ given with the numbered
+It is assumed that all the distributions \f$p_{i}(\mathbf{s})\f$ given with the numbered
 DISTRIBUTION keywords are normalized. If that is not the case you should
 normalize each distribution separately by using the NORMALIZE
 keyword within the curly brackets of each separate DISTRIBUTION keyword.
