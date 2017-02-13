@@ -35,7 +35,7 @@ The <a href="tutorial-resources-ves/ves-lugano2017-kinetics.tar.gz" download="ve
 \section ves-lugano2017-kinetics-Instructions Instructions
 
 \anchor stone-wales
-\image html Stone-Wales.png "Stone Wales Tranformation" width=500px
+\image html Stone-Wales.png "Stone Wales Transformation" width=500px
 
 \subsection ves-lugano2017-kinetics-exercise-1A Exercise 1A. Preliminary investigation using VES
 
@@ -53,7 +53,7 @@ COORDINATION GROUPA=229,219 GROUPB=207,238 R_0=1.8 NN=9 MM=16 PAIR LABEL=CV2
 COMBINE ARG=CV1,CV2 COEFFICIENTS=1,-1 POWERS=1,1 LABEL=d1 PERIODIC=NO
 \endverbatim
 
-In the above, the first line sets the energy units. The second and third line define the two CVs for the C-C covalent bonds. (We have chosen atoms 238,207,229 and 219; however this choice is arbitrary and other atoms could equally well have been chosen.) Lastly, we define a simple approximate reaction coordinate given by the difference betwen CV1 and CV2 that we can use to monitor the transition.
+In the above, the first line sets the energy units. The second and third line define the two CVs for the C-C covalent bonds. (We have chosen atoms 238,207,229 and 219; however this choice is arbitrary and other atoms could equally well have been chosen.) Lastly, we define a simple approximate reaction coordinate given by the difference between CV1 and CV2 that we can use to monitor the transition.
 
 Next we will use VES to drive the transformation at 1700 K. We bias the formation of bonds DB and AC shown in Figure \ref stone-wales using CV2 which changes from 0 to 2 during the transformation. (Although a more rigorous treatment would bias both CVs, for this tutorial we will simplify things and work in only one dimension). We choose a Chebyshev polynomial basis set up to order 36
 
@@ -80,7 +80,7 @@ Here we are biasing CV2 with the basis set defined above. The final two lines im
 \f[
   \frac{1}{1+e^{\lambda [F(s)-F_c]}}
 \f]
-where \f$\lambda\f$ (inverse energy units) controls how sharply the function goes to zero. Above we have set \f$\lambda=10.0\f$ to ensure the cutoff goes to zero.
+where \f$\lambda\f$ (inverse energy units) controls how sharply the function goes to zero. Above we have set \f$\lambda=10.0\f$ to ensure the cutoff goes sharply enough to zero.
 
 The following input updates the VES bias every 200 steps, writing out the bias every 10 iterations. To enforce the energy cutoff we also need to update the target distribution which we do every 40 iterations with the TARGETDIST_STRIDE flag.
 \verbatim
