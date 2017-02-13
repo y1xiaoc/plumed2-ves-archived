@@ -109,7 +109,7 @@ stationary, in this case it evolves in time. The \f$ p(s) \f$ is dumped every
 500 steps in a file named targetdist.b1.iter-<iteration-number>.data.
 You can plot these files manually or using the script plotTargetDistrib.gpi.
 The result should be similar to the following plot where the distribution at
-different times has been shifted to see more clearly the difference
+different times has been shifted to see more clearly the difference.
 
 \anchor ves-school-2017-ves2-targetDistrib
 \image html VES2-targetDistrib.png "Evolution of the target distribution as the simulation progresses"
