@@ -209,7 +209,7 @@ and the coodrination number of Na with respect to O.
 The files to run this example are included in the Example2 folder.
 Two dimensional biases in VES can be written:
 \f[
-V(s_1,s_2;\boldsymbol\alpha)=\sum\limits_{i_1,i_2} \alpha_{i_1,i_2}
+V(s_1,s_2;\boldsymbol\alpha)=\sum\limits_{i_1,i_2} \alpha_{i_1,i_2} \,
 f_{i_1}(s_1)\,  f_{i_2}(s_2) ,
 \f]
 where \f$ f_{i_1}(s_1)\f$ and \f$ f_{i_2}(s_2) \f$ are the basis functions.
@@ -235,6 +235,8 @@ BF_LEGENDRE ...
 We have chosen the interval [0.23,0.8] nm for the distance and [2.5,7.5] for
 the coordination number.
 The total number of non-zero coefficients will be 400.
+In the coefficients file the indices \f$i_{1}\f$ and \f$i_{2}\f$
+are given by the first two columns.
 We use the well-tempered target distribution together with a barrier at 0.6 nm
 on the distance Na-Cl.
 \verbatim
@@ -255,11 +257,12 @@ VES_LINEAR_EXPANSION ...
 \endverbatim
 We can now run the simulation and control its progress.
 Since there are 400 coefficients we choose the largest (in absolute value) to control the
-convergence of the simulation. You can plot the evolution of the coefficients
-using the gnuplot script plotCoeffs.gpi. This plot should look similar to the
-following one.
-
-In this case we have chosen coefficients 42, 22, 23, 21, and 1. The bias
+convergence of the simulation. In this case we have chosen coefficients with
+indices \f$(i_{1},i_{2})\f$ as (1,0), (0,1), (1,1), (2,1), and (0,2).
+You can plot the evolution of the coefficients
+using the gnuplot script plotCoeffs.gpi.
+This plot should look similar to the
+following one. The bias
 therefore converges smoothly as in one dimensional problems.
 
 \anchor ves-school-2017-ves2-2d-coeffs

@@ -230,7 +230,7 @@ Then we can see the evolution of \f$ \boldsymbol\alpha \f$ and \f$
 #!-------------------
 \endverbatim
 
-The first column are the coefficient numbers, the second are the
+The first column are the coefficient indices, the second are the
 \f$ \bar{\boldsymbol\alpha} \f$, and the third are the
 \f$ \boldsymbol\alpha \f$. Each block in the file corresponds to a different
 iteration, in this case iteration 0 and 10. We can plot the evolution of the
