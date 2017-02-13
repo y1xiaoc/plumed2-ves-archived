@@ -39,7 +39,7 @@ The <a href="tutorial-resources-ves/ves-lugano2017-kinetics.tar.gz" download="ve
 
 \subsection ves-lugano2017-kinetics-exercise-1A Exercise 1A. Preliminary investigation using VES
 
-As an example of an activated process in materials science, we will work with the Stone-Wales transformation in a carbon nanotube. The  <a href="tutorial-resources-ves/ves-lugano2017-2.tar.gz" download="ves-lugano2017-2.tar.gz"> tarball </a> for this project contains the inputs neccessary to run a simulation in LAMMPS for a 480 atom carbon nanotube. We use the AIREBO (Adaptive Intermolecular Reactive Empirical Bond Order) force field parameters which can approximately describe C-C bond breakage and formation at reasonable computational cost. For CVs we can use the coordination number in PLUMED to measure the number of covalent bonds among different groups of atoms. The transformation involves breaking two C-C bonds and forming two alternative C-C bonds.A definition of these CVs as well as the relevant C-C bonds are depicted in Figure \ref stone-wales. We prepare a PLUMED input file as follows.
+As an example of an activated process in materials science, we will work with the Stone-Wales transformation in a carbon nanotube. The  <a href="tutorial-resources-ves/ves-lugano2017-kinetics.tar.gz" download="ves-lugano2017-kinetics.tar.gz"> tarball </a> for this project contains the inputs neccessary to run a simulation in LAMMPS for a 480 atom carbon nanotube. We use the AIREBO (Adaptive Intermolecular Reactive Empirical Bond Order) force field parameters which can approximately describe C-C bond breakage and formation at reasonable computational cost. For CVs we can use the coordination number in PLUMED to measure the number of covalent bonds among different groups of atoms. The transformation involves breaking two C-C bonds and forming two alternative C-C bonds.A definition of these CVs as well as the relevant C-C bonds are depicted in Figure \ref stone-wales. We prepare a PLUMED input file as follows.
 
 \verbatim
 # set distance units to angstrom, time to ps, and energy to eV
@@ -55,7 +55,7 @@ COMBINE ARG=CV1,CV2 COEFFICIENTS=1,-1 POWERS=1,1 LABEL=d1 PERIODIC=NO
 
 In the above, the first line sets the energy units. The second and third line define the two CVs for the C-C covalent bonds. (We have chosen atoms 238,207,229 and 219; however this choice is arbitrary and other atoms could equally well have been chosen.) Lastly, we define a simple approximate reaction coordinate given by the difference betwen CV1 and CV2 that we can use to monitor the transition.
 
-Next we will use VES to drive the transformation at 1700 K. We bias the formation of bonds DB and AC shown in Figure \ref stone-wales using CV2 which changes from 0 to 2 during the transformation. (Although a more rigorous treament would bias both CVs, for this tutorial we will simplify things and work in only one dimension). We choose a Chebyshev polynomial basis set up to order 36
+Next we will use VES to drive the transformation at 1700 K. We bias the formation of bonds DB and AC shown in Figure \ref stone-wales using CV2 which changes from 0 to 2 during the transformation. (Although a more rigorous treatment would bias both CVs, for this tutorial we will simplify things and work in only one dimension). We choose a Chebyshev polynomial basis set up to order 36
 
 \verbatim
 # The basis set to use
@@ -140,7 +140,7 @@ Figure \ref Figure1B shows the bias potential after 70,80, and 90 iteration step
 \image html Kinetics-figure-1B.png "Figure-1B"
 
 \subsection ves-lugano2017-kinetics-exercise-2 Exercise 2. Using a fixed bias as a flooding potential to obtain rates
-In this exercise we will use the bias obtained above as a static umbrella potential. We will set up and run a new trajectory to measure the first passge time of escape from the well.
+In this exercise we will use the bias obtained above as a static umbrella potential. We will set up and run a new trajectory to measure the first passage time of escape from the well.
 
 We can extract the coefficients that we need from the final iteration in Exercise-1B above.
 
@@ -191,7 +191,7 @@ Now run a trajectory with the fixed bias. What is the time (biased) to escape? P
 
 Also look at the metadynamics bias in the column labeled metad.bias. How does the magnitude compare to the bias from VES in column variational.bias?
 
-The crossing time for a single event doesn't tell us much because we don't have any statistics on the transition events. To obtain the mean first passage time, we have to repeat the calculation many times. To generate statistically independend samples, we have to change the seed for the random velocities that are generated in the LAMMPS input file. In a new directory, copy the neccessary files and edit the following line in the input file
+The crossing time for a single event doesn't tell us much because we don't have any statistics on the transition events. To obtain the mean first passage time, we have to repeat the calculation many times. To generate statistically independent samples, we have to change the seed for the random velocities that are generated in the LAMMPS input file. In a new directory, copy the necessary files and edit the following line in the input file
 
 \verbatim
 velocity      all create 1700.  495920
@@ -200,7 +200,7 @@ velocity      all create 1700.  495920
 Choose a different 6 digit random number and repeat Exercise 2. How does the escape time compare to what you obtained before? Repeat the procedure several times with different velocity seeds to get a distribution of first passage times. Make sure you launch each simulation from a separate directory and keep all COLVAR files as you will need them in the next section where we will analyze the transition times.
 
 \subsection ves-lugano2017-kinetics-exercise-3 Exercise 3. Post processing to obtain unbiased estimate for the transition rate
-In the previous section you genererated several trajectories with different first passage times. However, these times need to be re-weighted to correct for the bias potential. We can rescale the time according to the hyperdynamics formula
+In the previous section you generated several trajectories with different first passage times. However, these times need to be re-weighted to correct for the bias potential. We can rescale the time according to the hyperdynamics formula
 
 \f[
   t^{*} = \Delta t_{MD} \sum_i^{n} e^{\beta V(s)}
@@ -217,7 +217,7 @@ Note that the output first passage time is converted to seconds. What is the acc
 
 Rerun the script for each of the trajectories you have run with the fixed bias and compute the mean first passage time from your data. The Stone-Wales transformation at 1700 K is estimated in fullerene to be ~10 days. How does your average time compare to this value?
 
-The distibution of first passage times for an activated processes typically follows an exponential distribution. Instead of directly making a histogram of the first passage times, we can look at the cumulative distribution function which maps a value x to the fraction of values less than or equal to x. Since we are computing the cumulative distribution from a data set, this is called the empricical cumulative distribution (ECDF). On the other hand, the theoretical cumulative distribution (CDF) of an exponetially distributed random process is
+The distribution of first passage times for an activated processes typically follows an exponential distribution. Instead of directly making a histogram of the first passage times, we can look at the cumulative distribution function which maps a value x to the fraction of values less than or equal to x. Since we are computing the cumulative distribution from a data set, this is called the empirical cumulative distribution (ECDF). On the other hand, the theoretical cumulative distribution (CDF) of an exponentially distributed random process is
 
 \f[
   P(t) = 1-e^{-t/\tau}
