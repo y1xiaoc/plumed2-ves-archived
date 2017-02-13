@@ -25,7 +25,7 @@ the following folders:
 
 \section ves-lugano2017-ves1-summary Summary of theory
 
-Variationally enhanced sampling is based on the the following functional of
+Variationally enhanced sampling \cite Valsson-PRL-2014 is based on the the following functional of
 the bias potential:
 \f[
 \Omega [V]  =
@@ -36,7 +36,8 @@ the bias potential:
 +
 \int d\mathbf{s} \, p(\mathbf{s}) V(\mathbf{s}),
 \f]
-where \f$ p(s) \f$ is a predefined probability distribution that we will refer
+where \f$\mathbf{s}\f$ are the CVs to be biased,
+\f$ p(\mathbf{s}) \f$ is a predefined probability distribution that we will refer
 to as the target distribution, and \f$ F(\mathbf{s}) \f$ is the free energy
 surface. This functional can be shown to be convex and to have a minimum at:
 \f[
@@ -44,27 +45,28 @@ V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})}.
 \f]
 The last equation states that once that the functional \f$ \Omega [V] \f$ is
 minimized, the bias and the target distribution allow calculating the free
-energy. The target distribution \f$ p(s) \f$ can be chosen at will and it is
+energy. The target distribution \f$ p(\mathbf{s}) \f$ can be chosen at will and it is
 the distribution of the CVs once that \f$ \Omega [V] \f$ has been minimized.
 
-The variational principle is put to pratice by expanding \f$ V(\mathbf{s}) \f$
+The variational principle is put to practice by expanding \f$ V(\mathbf{s}) \f$
 in some basis set:
 \f[
-V(\mathbf{s}) = \sum\limits_{i} \alpha_i f_i(\mathbf{s}),
+V(\mathbf{s}) = \sum\limits_{i} \alpha_i \, f_i(\mathbf{s}),
 \f]
 where \f$ f_i(\mathbf{s}) \f$ are the basis functions and the \f$
 \boldsymbol\alpha \f$ are the coefficients in the expansion.
 We then need to find the \f$ \boldsymbol\alpha \f$ that minimize \f$ \Omega
 [V] \f$. In principle one could use any optimization algorithm. In practice
-the algorithm that has become the default choice for VES is the averaged stochastic
-gradient descent. In this algorithm the \f$ \boldsymbol\alpha \f$ are evolved iteratively
+the algorithm that has become the default choice for VES is the so-called
+averaged stochastic gradient descent algorithm \cite Bach-NIPS-2013.
+In this algorithm the \f$ \boldsymbol\alpha \f$ are evolved iteratively
 according to:
 \f[
 \boldsymbol\alpha^{(n+1)} = \boldsymbol\alpha^{(n)}-\mu
- [
+ \left[
 \nabla\Omega(\bar{\boldsymbol\alpha}^{(n)})+
 H(\bar{\boldsymbol\alpha}^{(n)})[\boldsymbol\alpha^{(n)}-\bar{\boldsymbol\alpha}^{(n)}]
-]
+\right]
 \f]
 where \f$\mu\f$ is the step size,
 \f$ \bar{\boldsymbol\alpha}^{(n)} \f$ is the running average of \f$
@@ -127,7 +129,9 @@ minimized, the bias potential satisfies (up to an arbitrary constant):
 V(\mathbf{s}) = - F(\mathbf{s})
 \f]
 This is the same relation that holds for non-tempered metadynamics.
-The syntax in Plumed is:
+
+
+The syntax for the bias potential in Plumed is:
 \verbatim
 VES_LINEAR_EXPANSION ...
  ARG=d1
@@ -145,8 +149,8 @@ are collected to calculate the gradient and hessian of \f$ \Omega [V] \f$ and
 the step size is the step by which the coefficients are evolved at every
 optimization steps. Both of this parameters are connected. Increasing the
 stride will have an effect similar to reducing the step size. It has become
-traditional to choose a stride of around 500 steps. It must be noted that we
-are only looking for an accurate estimation of the gradient, since for this we
+traditional to choose a stride of around 500-2000 steps. It must be noted that we
+are not looking for an accurate estimation of the gradient, since for this we
 would need to sample all the CV space. The step size in the
 optimization has a strong connection with the height of typical barriers in
 the system. The larger the barriers, the larger the step size needed such that
@@ -230,13 +234,13 @@ The first column are the coefficient numbers, the second are the
 \f$ \bar{\boldsymbol\alpha} \f$, and the third are the
 \f$ \boldsymbol\alpha \f$. Each block in the file corresponds to a different
 iteration, in this case iteration 0 and 10. We can plot the evolution of the
-coefficients using the gnuplot script plotCoeffs.gpi . The ouput should be similar to
+coefficients using the gnuplot script plotCoeffs.gpi . The output should be similar to
 the next figure.
 
 \anchor ves-school-2017-ves1-coeffs1
 \image html VES-coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
 
-The \f$ \boldsymbol\alpha \f$ change fast an oscilate around some mean
+The \f$ \boldsymbol\alpha \f$ change fast and oscillate around some mean
 value. The \f$ \bar{\boldsymbol\alpha} \f$ evolve smoothly until they stabilize
 around some equilibrium value. It is important to remember that the bias is a
 function of \f$ \bar{\boldsymbol\alpha} \f$ and since these evolve smoothly, so
@@ -409,7 +413,7 @@ the simulation we will need:
 - LAMMPS restart file, since it stores the last configuration
 - COLVAR file, since new lines will be appended
 - coeff.data file, containing the iteration number and the values of the
-  coeffients.
+  coefficients.
 
 Therefore we execute in the command line the following commands:
 \verbatim

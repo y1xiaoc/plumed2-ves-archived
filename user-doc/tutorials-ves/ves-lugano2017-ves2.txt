@@ -22,28 +22,32 @@ the following folders:
 One of the most useful target distribution is the well-tempered one.
 The well-tempered target distribution is \cite Valsson-JCTC-2015 :
 \f[
-p(\mathbf{s})=\frac{e^{-\beta'F(\mathbf{s})}}{\int d\mathbf{s} e^{-\beta'F(\mathbf{s})}}
+p(\mathbf{s})=\frac{e^{-(\beta/\gamma) F(\mathbf{s})}}{\int d\mathbf{s} \, e^{- (\beta/\gamma) F(\mathbf{s})}}
 \f]
-with \f$ \beta'=\beta / \gamma \f$ and \f$ \gamma \f$ the so called bias
+where \f$ \gamma \f$ is the so-called bias
 factor. It is possible to show that:
 \f[
-p(\mathbf{s})=[ P(\mathbf{s}) ]^{1/\gamma}
+p(\mathbf{s}) =
+\frac{[ P(\mathbf{s}) ]^{1/\gamma}}
+{\int d\mathbf{s}\, [ P(\mathbf{s}) ]^{1/\gamma}}
+
+
 \f]
 where \f$ P(\mathbf{s}) \f$ is the unbiased distribution of CVs. Therefore the
 target distribution is the unbiased distribution with enhanced fluctuations
-and lowered barriers. This is the same distribution sampled in well-tempered
-metdaynamics. The advantages of this distribution are that the features of the
+and lowered barriers. This is the same distribution as sampled in well-tempered
+metadynamics. The advantages of this distribution are that the features of the
 FES (metastable states) are preserved and that the system is not forced to sample regions of high
 free energy as it would if we had chosen the uniform target distribution. This
 is specially important when biasing 2 CVs and there are large regions of very
 high free energy and therefore they represent unphysical configurations.
 
-There is a caveat though. \f$ p(\mathbf{s}) \f$ depends on \f$
+There is a caveat though, \f$ p(\mathbf{s}) \f$ depends on \f$
 F(\mathbf{s})\f$ that is the function that we are trying to calculate.
-One way to approach this problem is \cite Valsson-JCTC-2015 to calculate \f$ p(\mathbf{s}) \f$
-self-consistently, for instance at iteration \f$ k \f$:
+One way to approach this problem is to calculate \f$ p(\mathbf{s}) \f$
+self-consistently \cite Valsson-JCTC-2015, for instance at iteration \f$ k \f$:
 \f[
-p^{(k+1)}(\mathbf{s})=\frac{e^{-\beta'F^{(k+1)}(\mathbf{s})}}{\int d\mathbf{s} e^{-\beta'F^{(k+1)}(\mathbf{s})}}
+p^{(k+1)}(\mathbf{s})=\frac{e^{-(\beta/\gamma) F^{(k+1)}(\mathbf{s})}}{\int d\mathbf{s} \, e^{-(\beta/\gamma) F^{(k+1)}(\mathbf{s})}}
 \f]
 where:
 \f[
@@ -53,7 +57,7 @@ Normally \f$ p^{(0)}(\mathbf{s}) \f$ is taken to be uniform.
 Therefore the target distribution evolves in time until it becomes stationary
 when the simulation has converged. It has been shown that in some cases the
 convergence is faster using the well-tempered target distribution than using
-the uniform \f$ p(s) \f$ \cite Valsson-JCTC-2015 .
+the uniform \f$ p(\mathbf{s}) \f$ \cite Valsson-JCTC-2015.
 
 \section ves-lugano2017-ves2-instructions Instructions
 
@@ -67,11 +71,12 @@ We consider Example 2 of the VES 1 tutorial. In that case we used a uniform
 target distribution that at some value decayed to zero. In this case we will
 use a product of two distributions:
 \f[
-p(s)=p_{WT}(s)*p_{barrier}(s)
+p(s)=\frac{p_{\mathrm{WT}}(s) \, p_{\mathrm{barrier}}(s)}
+{\int ds \, p_{\mathrm{WT}}(s) \, p_{\mathrm{barrier}}(s)}
 \f]
-where \f$ p_{WT}(s) \f$ is the well-tempered target distribution and :
+where \f$ p_{\mathrm{WT}}(s) \f$ is the well-tempered target distribution and:
 \f[
-p_{barrier}(s)=
+p_{\mathrm{barrier}}(s)=
         \begin{cases}
                 \frac{1}{C} \: &  \mathrm{if} \: s<s_0 \\
                 \frac{1}{C} e^{-\frac{(s-s_0)^2}{2\sigma^2}} \: &
@@ -101,9 +106,10 @@ As usual, we run the example using the run.sh script.
 As the simulation progresses we can track the evolution of the target
 distribution. At variance with previous simulations where \f$ p(s) \f$ was
 stationary, in this case it evolves in time. The \f$ p(s) \f$ is dumped every
-500 steps in a file named targetdist.b1.iter-<iteration-number>.data .
+500 steps in a file named targetdist.b1.iter-<iteration-number>.data.
 You can plot these files manually or using the script plotTargetDistrib.gpi.
-The result should be similar to the following plot.
+The result should be similar to the following plot where the distribution at
+different times has been shifted to see more clearly the difference
 
 \anchor ves-school-2017-ves2-targetDistrib
 \image html VES2-targetDistrib.png "Evolution of the target distribution as the simulation progresses"
@@ -162,14 +168,14 @@ again the previous tutorials.
 The histograms histo_biased and histo_unbiased correspond to \f$ p'(s) \f$ and
 \f$ P(s) \f$ , respectively.
 We are interested in comparing the unbiased distribution of CVs \f$ P(s) \f$
-and the well-tempered distribution \f$ p_{WT}(s)\f$. We know from the
+and the well-tempered distribution \f$ p_{\mathrm{WT}}(s)\f$. We know from the
 equations above that:
 \f[
- p_{WT}(s) = [ P(\mathbf{s}) ]^{1/\gamma},
+ p_{\mathrm{WT}}(s) \propto [ P(\mathbf{s}) ]^{1/\gamma},
 \f]
 and also,
 \f[
- p_{WT}(s) = p(s)/p_{barrier}(s) = p'(s)/p_{barrier}(s) .
+ p_{\mathrm{WT}}(s) \propto p(s)/p_{\mathrm{barrier}}(s) \propto p'(s)/p_{\mathrm{barrier}}(s) .
 \f]
 Therefore we have two ways to calculate the well-tempered target distribution.
 We can compare \f$ P(s) \f$ and the well-tempered target distribution
@@ -185,10 +191,10 @@ There is also a gnuplot script plot.gpi that should do everything for you.
 The output should be similar to the next plot.
 
 \anchor ves-school-2017-ves2-well-tempered
-\image html VES2-well-tempered.png "Unbiased distribution of CVs \f$ P(s) \f$ and well-tempered distribution calculated in two ways"
+\image html VES2-well-tempered.png "Unbiased distribution of CVs P(s) and well-tempered distribution calculated in two ways"
 
-Notice that as expected both equations to calculate \f$ p_{WT}(s)\f$ agree.
-Also the association barrier of \f$ 5 \: k_B T \f$ becomes of \f$ 1 \: k_B T
+Notice that as expected both equations to calculate \f$ p_{\mathrm{WT}}(s)\f$ agree.
+Also the association barrier of \f$ 5 \: k_{\mathrm{B}} T \f$ becomes of \f$ 1 \: k_{\mathrm{B}} T
 \f$ when the well-tempered target distribution is sampled.
 
 The take home message of this tutorial is that when the well-tempered
@@ -204,7 +210,7 @@ The files to run this example are included in the Example2 folder.
 Two dimensional biases in VES can be written:
 \f[
 V(s_1,s_2;\boldsymbol\alpha)=\sum\limits_{i_1,i_2} \alpha_{i_1,i_2}
-f_{i_1}(s_1) f_{i_2}(s_2) ,
+f_{i_1}(s_1)\,  f_{i_2}(s_2) ,
 \f]
 where \f$ f_{i_1}(s_1)\f$ and \f$ f_{i_2}(s_2) \f$ are the basis functions.
 We will choose to expand the bias potential in Legendre polynomials up to

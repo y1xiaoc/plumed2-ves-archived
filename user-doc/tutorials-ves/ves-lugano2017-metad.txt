@@ -26,7 +26,7 @@ the following folders:
 \subsection ves-lugano2017-metad-subsection-1 The system
 
 We consider the association/dissociation of NaCl in acqueous solution.
-The dissociation barrier is expected to be around 2.5 \f$k_B T\f$.
+The dissociation barrier is expected to be around 2.5 \f$k_\mathrm{B} T\f$.
 One interesting aspect of the ion dissociation problem is that collective
 solvent motions play an important role in the transition.
 This problem has been considered in the original metadynamics paper \cite
@@ -104,7 +104,7 @@ gnuplot:
 pl  "./COLVAR" u 1:2 w lp,
 \endverbatim
 you will see that the ion pair is stuck in the dissociated state during the 1 ns simulation.
-It is unable to cross the \f$ \sim 5 k_BT\f$ barrier located at a distance of approximately
+It is unable to cross the \f$ \sim 5 k_\mathrm{B} T\f$ barrier located at a distance of approximately
  0.4 nm. You can also observe this behavior in the trajectory using VMD:
 \verbatim
 vmd out.dcd -psf nacl.psf
@@ -126,11 +126,11 @@ dissociated state, we will need enhanced sampling.
 We now construct a bias potential \f$ V(\mathbf{s}) \f$ on the distance Na-Cl using well-tempered metadynamics.
 The files for this example are contained in the directory Example2.
 As argument for the construction of the potential we will use the distance Na-Cl (label d1).
-We choose a gaussian height of 1 kJ/mol which is slightly less than 0.5 \f$k_B
+We choose a gaussian height of 1 kJ/mol which is slightly less than 0.5 \f$k_\mathrm{B}
 T \f$. The gaussian width is 0.02 nm, in the same order of the features in the
 FES. A rule of thumb for choosing the gaussian width is to use the standard
 deviation of the unbiased fluctuations of the CV. The bias factor is set to 5 since the largest barrier in the FES is
-expected to be roughly 5 \f$k_BT\f$. Once the metadynamics simulation is
+expected to be roughly 5 \f$k_\mathrm{B}T\f$. Once the metadynamics simulation is
 converged, the bias will be (up to an arbitrary constant):
 \f[
 	V(\mathbf{s})= - \left ( 1- \frac{1}{\gamma} \right ) F(\mathbf{s})
@@ -140,7 +140,7 @@ and therefore the system will evolve under an effective free energy:
 	\tilde{F}(\mathbf{s})=F(\mathbf{s})+V(\mathbf{s})=
 \frac{F(\mathbf{s})}{\gamma},
 \f]
-that is to say, the largest barrier will be of around 1 \f$k_BT\f$.
+that is to say, the largest barrier will be of around 1 \f$k_\mathrm{B} T\f$.
 The input is:
 \verbatim
 METAD ...
@@ -273,7 +273,7 @@ The script can be executed using:
 python barrier_calculation.py > barrier.txt
 \endverbatim
 and the results can be plotted using the gnuplot script plot.gpi.
-After roughly 4 ns the barrier stabilizes around 3 and 3.5 \f$k_BT\f$.
+After roughly 4 ns the barrier stabilizes around 3 and 3.5 \f$k_\mathrm{B} T\f$.
 \anchor ves-school-2017-metad-barrier
 \image html Metad-barrier.png "Dissociation barrier as a function of simulation time"
 
