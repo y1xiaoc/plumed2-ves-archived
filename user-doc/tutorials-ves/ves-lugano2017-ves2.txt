@@ -188,7 +188,8 @@ repl "./histo_unbiased" u 1:(-log($2**invBiasFactor)) w l title "[P(s)]^(1/gamma
 repl "< paste ./histo_biased ../targetdist.b1.iter-0.data" u 1:(-log($2/$5)) w l title "Sampled p(s)"
 \endverbatim
 There is also a gnuplot script plot.gpi that should do everything for you.
-The output should be similar to the next plot.
+The output should be similar to the next plot where we plot the negative
+logarithm of the distributions.
 
 \anchor ves-school-2017-ves2-well-tempered
 \image html VES2-well-tempered.png "Unbiased distribution of CVs P(s) and well-tempered distribution calculated in two ways"
