@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.stats import ks_2samp
 from scipy.optimize import curve_fit
-import statsmodels as sm
+from statsmodels.distributions.empirical_distribution import ECDF 
 import matplotlib.pyplot as plt
 
 f=open('fpt.dat','r')
@@ -26,7 +26,7 @@ mu=x.mean()
 x=x/mu
 
 # now compute emirical CDF
-ecdf = sm.distributions.ECDF(x)
+ecdf = ECDF(x)
 
 # plot ECDF
 x1 = np.linspace(min(x), max(x))
