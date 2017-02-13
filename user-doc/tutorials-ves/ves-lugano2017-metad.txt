@@ -1,5 +1,5 @@
 /**
-\page ves-lugano2017-metad MARVEL school 2017 tutorial: Metadynamics
+\page ves-lugano2017-metad MARVEL-VES tutorial (Lugano 2017): Metadynamics
 
 \section ves-lugano2017-metad-lo Learning Outcomes
 
@@ -25,14 +25,14 @@ the following folders:
 
 \subsection ves-lugano2017-metad-subsection-1 The system
 
-We consider the association/dissociation of NaCl in acqueous solution. 
+We consider the association/dissociation of NaCl in acqueous solution.
 The dissociation barrier is expected to be around 2.5 \f$k_B T\f$.
 One interesting aspect of the ion dissociation problem is that collective
 solvent motions play an important role in the transition.
 This problem has been considered in the original metadynamics paper \cite
 metad and also in reference \cite tps2 .
 We will use the potential developed in ref.\ \cite Pettitt-JCP-1986 for NaCl and TIP3P water with
-parameters corrected to be used with long-range Coulomb solvers \cite Price-JCP-2004. 
+parameters corrected to be used with long-range Coulomb solvers \cite Price-JCP-2004.
 The system contains 1 Na, 1 Cl, and 106 water molecules (total 320 atoms).
 
 \anchor ves-school-2017-metad-NaCl
@@ -41,7 +41,7 @@ The system contains 1 Na, 1 Cl, and 106 water molecules (total 320 atoms).
 
 \subsection ves-lugano2017-metad-subsection-2 Perform an unbiased simulation and control the distance Na-Cl
 
-We first perform a standard MD simulation and control the distance Na-Cl. 
+We first perform a standard MD simulation and control the distance Na-Cl.
 All the files needed for this example are contained in the folder Example1 .
 The distance Na-Cl can be calculated in Plumed 2 using:
 \verbatim
@@ -78,7 +78,7 @@ mpirun -np ${totalCores} ${EXE} < start.lmp > out.lmp
 
 \endverbatim
 
-This command runs LAMMPS using 2 MPI threads.  
+This command runs LAMMPS using 2 MPI threads.
 The use of partitions will be discussed when using multiple walkers
 
 Once the simulation is launched, the so called COLVAR file is written. In this case it contains the following:
@@ -107,7 +107,7 @@ you will see that the ion pair is stuck in the dissociated state during the 1 ns
 It is unable to cross the \f$ \sim 5 k_BT\f$ barrier located at a distance of approximately
  0.4 nm. You can also observe this behavior in the trajectory using VMD:
 \verbatim
-vmd out.dcd -psf nacl.psf 
+vmd out.dcd -psf nacl.psf
 \endverbatim
 The trajectory has been saved in unwrapped format in order to avoid bonds
 stretching from one side to the box to the other due to periodic bounday
@@ -140,7 +140,7 @@ and therefore the system will evolve under an effective free energy:
 	\tilde{F}(\mathbf{s})=F(\mathbf{s})+V(\mathbf{s})=
 \frac{F(\mathbf{s})}{\gamma},
 \f]
-that is to say, the largest barrier will be of around 1 \f$k_BT\f$. 
+that is to say, the largest barrier will be of around 1 \f$k_BT\f$.
 The input is:
 \verbatim
 METAD ...
@@ -208,14 +208,14 @@ This can be done with Plumed 2 using for instance:
 plumed sum_hills --hills ../HILLS --min 0.1 --max 0.8 --bin 300 --stride 100
 \endverbatim
 Most of the flags are self explanatory. The flag --stride 100 will result in
-the FES been written every 100 gaussians, i.e. 100 ps. 
+the FES been written every 100 gaussians, i.e. 100 ps.
 Inside the folder FES_calculation you will find a script run.sh that executes the sum_hills command and a gnuplot script plot.gpi that can be used typing:.
 \verbatim
 gnuplot plot.gpi
 \endverbatim
 After roughly 3 ns the free
  energy surface does not change significantly with time except for an immaterial
- constant \f$ c(t) \f$ that grows in time. This is in line with well-tempered metadynamics 
+ constant \f$ c(t) \f$ that grows in time. This is in line with well-tempered metadynamics
 asymptotic behaviour:
 \f[
 	V(\mathbf{s},t)= - \left ( 1- \frac{1}{\gamma} \right ) F(\mathbf{s}) +
@@ -230,9 +230,9 @@ For this reason for distances higher than 0.6 nm the free energy increases sharp
 
 
 An alternative way to observe the evolution of the bias is plotting the final
-free energy plus the instantaneous bias. 
+free energy plus the instantaneous bias.
 The scripts for this example can be found in the folder Bias_calculation.
-In this case we observe only the first 200 ps of the simulation. 
+In this case we observe only the first 200 ps of the simulation.
 The (negative) bias can be calculated using:
 \verbatim
 plumed sum_hills --hills ../HILLS --min 0.1 --max 0.8 --bin 300 --stride 100 --negbias
@@ -246,7 +246,7 @@ This plot illustrates clearly how the bias is constructed to progressively "fill
 It is also possible to track convergence by controlling the evolution of some
 quantity connected to the free energy surface.
 In this case we will calculate the dissociation barrier, e.g. the height of
-the barrier that separates the associated state from the dissociated one. 
+the barrier that separates the associated state from the dissociated one.
 The scripts for this example are found in the folder Barrier_calculation.
 Using the python script calculate_barrier.py  we can compute the barrier, for instance:
 \verbatim
@@ -277,7 +277,7 @@ After roughly 4 ns the barrier stabilizes around 3 and 3.5 \f$k_BT\f$.
 \anchor ves-school-2017-metad-barrier
 \image html Metad-barrier.png "Dissociation barrier as a function of simulation time"
 
-It is important to stress that it is only possible to calculate the free energy difference 
+It is important to stress that it is only possible to calculate the free energy difference
 between two points if the system has gone back and forth
 between these points several times. This applies both for the calculation of a
 barrier and the difference in free energy between two basins. It is also
@@ -291,12 +291,12 @@ be used as a test of convergence. We will show that in the next section.
 \subsection ves-lugano2017-metad-subsection-5 Reweight the simulation
 
 We first reweight the simulation on the distance Na-Cl, the same CV used for
-biasing. 
+biasing.
 This reweighting is useful to check convergence and to
 have an estimate of the free energy that does not rely on using kernels. For
 instance if some features of the FES could not be captured by the kernels, the
 reweighting procedure will show them. This will become clearer in the VES
-tutorial. 
+tutorial.
 The scripts to perform this calculation are found in the folder ReweightDistance.
 In metadynamics quasistationary limit the weight assigned to a given
 configuration is \cite Tiwary_jp504920s :
@@ -364,7 +364,7 @@ This example can be run with:
 \verbatim
 plumed --no-mpi driver --plumed plumed.dat --noatoms > plumed.out
 \endverbatim
-and will generate the files histo and histo_wall. 
+and will generate the files histo and histo_wall.
 The histograms represent the probability \f$p(\mathbf{s})\f$ of observing a
 given value of the CV \f$ \mathbf{s} \f$ .
 From the histograms the FES can be calulated using:
@@ -384,9 +384,9 @@ You will find a gnuplot script plot.gpi to make this plot inside the ReweightDis
 \image html Metad-reweightDist.png "FES estimated from sum_hills, reweighting using only the metadynamics bias, and reweighting using both the metadynamics bias and the upper wall bias"
 
 We can obtain important information of the system by reweighting on 2 CVs: The
-distance Na-Cl and the coordination of Na with O. 
+distance Na-Cl and the coordination of Na with O.
 This reweighting is similar to the one already done and the files that you will need are located in the ReweightBoth folder.
-The plot of the FES as a function of these 2 CVs provides important 
+The plot of the FES as a function of these 2 CVs provides important
 information of the association/dissociation mechanism. In the
 dissociated state, Na can have a coordination of 5 or 6, though it is more
 likely to find a coordination number of 6. However, in order to associate Na
@@ -403,7 +403,7 @@ coordination number of ~5.
 As an exercise, you can write the input files for a simulation in which a bias
 potential is constructed on the coordination Na-0, i.e. the solvent degree of
 freedom. You can use the same gaussian height as before and \f$ \sigma = 0.1
-\f$. 
+\f$.
 
 You will find that the exploration of the CV space is not efficient.
 The reason is that there is a slow degree of freedom that it is not being biased: the distance Na-Cl.
@@ -419,7 +419,7 @@ and problems in convergence.
 
 We will now construct a bias potential on both CVs.
 We have already calculated the FES as a function of both CVs through
-reweighting. 
+reweighting.
 In this example the FES will be calculated using the metadynamics bias
 potential.
 You can use the input files from Example2.tar and changed the plumed.dat file.
@@ -468,8 +468,6 @@ tutorial. These include:
 
 link: @subpage ves-lugano2017-metad
 
-description: Brief introduction to metadynamics including the construction of
-1 and 2 dimensional biases, reweighting the simulation in variables different
-from the ones biased, and assessing the convergence of the simulation.
+description: Brief introduction to metadynamics.
 
 additional-files: ves-lugano2017-metad

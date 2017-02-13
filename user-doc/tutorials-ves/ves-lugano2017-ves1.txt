@@ -1,5 +1,5 @@
 /**
-\page ves-lugano2017-ves1 MARVEL school 2017 tutorial: VES 1
+\page ves-lugano2017-ves1 MARVEL-VES tutorial (Lugano 2017): VES 1
 
 \section ves-lugano2017-ves1-lo Learning Outcomes
 
@@ -69,7 +69,7 @@ H(\bar{\boldsymbol\alpha}^{(n)})[\boldsymbol\alpha^{(n)}-\bar{\boldsymbol\alpha}
 where \f$\mu\f$ is the step size,
 \f$ \bar{\boldsymbol\alpha}^{(n)} \f$ is the running average of \f$
 \boldsymbol\alpha^{(n)} \f$ at iteration \f$ n \f$, and
-\f$ \nabla\Omega(\bar{\boldsymbol\alpha}^{(n)}) \f$ and 
+\f$ \nabla\Omega(\bar{\boldsymbol\alpha}^{(n)}) \f$ and
 \f$ H(\bar{\boldsymbol\alpha}^{(n)}) \f$
  are the gradient and Hessian of \f$ \Omega[V] \f$ evaluated at the running
 average at iteration \f$ n \f$, respectively.
@@ -177,7 +177,7 @@ script in the Example1 folder. The simulation will produce several files:
 - targetdistribution.<bias-name>.data : Target distribution.
 
 You can first observe how the system moves in
-the CV space in a fashion similar to metadynamics. 
+the CV space in a fashion similar to metadynamics.
 Then we can see the evolution of \f$ \boldsymbol\alpha \f$ and \f$
  \bar{\boldsymbol\alpha} \f$ . The first lines of the file coeffs.data are:
 
@@ -226,7 +226,7 @@ Then we can see the evolution of \f$ \boldsymbol\alpha \f$ and \f$
 #!-------------------
 \endverbatim
 
-The first column are the coefficient numbers, the second are the 
+The first column are the coefficient numbers, the second are the
 \f$ \bar{\boldsymbol\alpha} \f$, and the third are the
 \f$ \boldsymbol\alpha \f$. Each block in the file corresponds to a different
 iteration, in this case iteration 0 and 10. We can plot the evolution of the
@@ -277,7 +277,7 @@ p(s)=
 \f]
 where \f$ s_0=0.6\f$ nm and \f$ \sigma=0.05\f$.
 To define this \f$ p(s) \f$ in Plumed the input is:
-\verbatim 
+\verbatim
 VES_LINEAR_EXPANSION ...
  ARG=d1
  BASIS_FUNCTIONS=bf1
@@ -286,7 +286,7 @@ VES_LINEAR_EXPANSION ...
  GRID_BINS=300
  TARGET_DISTRIBUTION={UNIFORM MINIMA=0.23 MAXIMA=0.6 SIGMA_MAXIMA=0.05}
 ... VES_LINEAR_EXPANSION
-\endverbatim 
+\endverbatim
 
 We will choose a basis set of order 20 to be able to capture the features of
 the FES with detail. If you are doing this example in a group, each member of
@@ -314,7 +314,7 @@ coefficients using the gnuplot script plotCoeffs.gpi.
 
 The FES is calculated from the expression:
 \f[
-F(\mathbf{s}) = -V(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} = 
+F(\mathbf{s}) = -V(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} =
         \begin{cases}
                 -V(s) \: &  \mathrm{if} \: s<s_0 \\
                 -V(s) + \frac{(s-s_0)^2}{2\beta\sigma^2} \: &
@@ -326,9 +326,9 @@ we were explicitly introducing in the first example. When the FES is calculated 
 effect of the barrier is "subtracted" through \f$ p(s) \f$ and therefore the
 FES that we calculate does not include the barrier. This can be seen by
 plotting the fes.b1.iter-<iteration-number> files with gnuplot, for instance:
-\verbatim 
+\verbatim
 pl "./fes.b1.iter-10000.data" u 1:2 w l
-\endverbatim 
+\endverbatim
 This plot should be similar to the next figure.
 
 \anchor ves-school-2017-ves1-fes
@@ -388,7 +388,7 @@ The files needed for this reweighting are contained in the folder
 ReweightDistance. The procedure to the the reweighting and plot the results is
 similar to the ones in the cases above and therefore it is not described in
 detail. The reweighted FES is plotted in the next figure and compared to the
-FES calculated from the formula 
+FES calculated from the formula
 \f$ V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} \f$
 .
 
@@ -403,7 +403,7 @@ relatively large. What happens if you chose a lower or higher order in the expan
 \subsection ves-lugano2017-ves1-subsection-4 Restarting a simulation
 
 In this section we will restart the simulation that we have performed in our
-second example. In directory Example2, cd to the folder Restart. To restart 
+second example. In directory Example2, cd to the folder Restart. To restart
 the simulation we will need:
 
 - LAMMPS restart file, since it stores the last configuration
@@ -460,7 +460,7 @@ We suggest an exercise to gain experience in choosing the parameters of the
 optimization algorithm. The averaged stochastic gradient descent algorithm has
 two parameters: the stride and the step size. Normally a stride of 500 steps is used. However it is
 not always easy to choose the step size. Luckily, the algorithm is quite
-robust and will work for different step sizes. 
+robust and will work for different step sizes.
 
 Run different simulation using step
 sizes \f$ \mu = 0.001 \f$ and \f$ \mu = 10 \f$ and try to rationalize the
@@ -484,7 +484,6 @@ distribution and the construction of biases on 2 CVs.
 
 link: @subpage ves-lugano2017-ves1
 
-description: This tutorial introduces the students to VES, and the use of
-different target distributions and basis sets.
+description: Introduction to VES, using different target distributions and basis sets.
 
 additional-files: ves-lugano2017-ves1

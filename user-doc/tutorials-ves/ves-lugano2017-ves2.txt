@@ -1,5 +1,5 @@
 /**
-\page ves-lugano2017-ves2 MARVEL school 2017 tutorial: VES 2
+\page ves-lugano2017-ves2 MARVEL-VES tutorial (Lugano 2017): VES 2
 
 \section ves-lugano2017-ves2-lo Learning Outcomes
 
@@ -27,7 +27,7 @@ p(\mathbf{s})=\frac{e^{-\beta'F(\mathbf{s})}}{\int d\mathbf{s} e^{-\beta'F(\math
 with \f$ \beta'=\beta / \gamma \f$ and \f$ \gamma \f$ the so called bias
 factor. It is possible to show that:
 \f[
-p(\mathbf{s})=[ P(\mathbf{s}) ]^{1/\gamma} 
+p(\mathbf{s})=[ P(\mathbf{s}) ]^{1/\gamma}
 \f]
 where \f$ P(\mathbf{s}) \f$ is the unbiased distribution of CVs. Therefore the
 target distribution is the unbiased distribution with enhanced fluctuations
@@ -107,7 +107,7 @@ The result should be similar to the following plot.
 
 \anchor ves-school-2017-ves2-targetDistrib
 \image html VES2-targetDistrib.png "Evolution of the target distribution as the simulation progresses"
-  
+
 
 To shed some light on the nature of the well-tempered target distribution, we
 will compare the unbiased and biased distribution of CVs.
@@ -170,7 +170,7 @@ equations above that:
 and also,
 \f[
  p_{WT}(s) = p(s)/p_{barrier}(s) = p'(s)/p_{barrier}(s) .
-\f] 
+\f]
 Therefore we have two ways to calculate the well-tempered target distribution.
 We can compare \f$ P(s) \f$ and the well-tempered target distribution
 calculated in two ways with the following gnuplot lines:
@@ -199,7 +199,7 @@ Equivalently one may say that fluctuations are enhanced.
 \subsection ves-lugano2017-ves2-subsection-4 Example 2: Constructing a 2 dimensional bias
 
 In this example we will construct a 2 dimensional bias on the distance Na-Cl
-and the coodrination number of Na with respect to O. 
+and the coodrination number of Na with respect to O.
 The files to run this example are included in the Example2 folder.
 Two dimensional biases in VES can be written:
 \f[
@@ -297,7 +297,6 @@ This tool will be the subject of another tutorial.
 
 link: @subpage ves-lugano2017-ves2
 
-description: In this tutorial students will learn to use the well-tempered
-target distribution and to construct 2 dimensional biased using VES.
+description: VES, well-tempered target distribution and 2 dimensional biases.
 
 additional-files: ves-lugano2017-ves2
