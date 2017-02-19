@@ -116,10 +116,6 @@ case "$type" in
   echo "Run driver"
   $mpi $valgrind $plumed driver $arg > out 2> err
   ;;
-(cltool)
-  echo "Run cltool"
-  $mpi $valgrind $plumed $arg > out 2> err
-  ;;
 (sum_hills)
   echo "Run driver"
   $mpi $valgrind $plumed sum_hills $arg > out 2> err

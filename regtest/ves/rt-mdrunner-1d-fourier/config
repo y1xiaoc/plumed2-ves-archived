@@ -1,4 +1,4 @@
 plumed_modules=ves
-type=cltool
+type=plumed
 arg="md_linearexpansion input"
 
