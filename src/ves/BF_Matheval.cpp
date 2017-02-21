@@ -168,9 +168,9 @@ variable_str_("x")
     std::cerr << transf_str << "\n";
   }
   //
-  log.printf("  Using the following functions (matheval function and derivative):\n");
+  log.printf("  Using the following functions [matheval parsed function and derivative]:\n");
   for(unsigned int i=0; i<getNumberOfBasisFunctions(); i++){
-    log.printf("   %u:  %s  ( %s / %s )\n",i,bf_str[i].c_str(),evaluator_get_string(evaluator_pntrs_[i]),evaluator_get_string(derivs_pntrs_[i]));
+    log.printf("   %u:  %s   [   %s   |   %s   ] \n",i,bf_str[i].c_str(),evaluator_get_string(evaluator_pntrs_[i]),evaluator_get_string(derivs_pntrs_[i]));
   }
   //
   setupBF();
