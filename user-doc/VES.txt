@@ -8,7 +8,7 @@ The VES code is developed independently from the PLUMED code,
 see the [homepage of the VES code](http://www.ves-code.org) for further information.
 
 The VES code is an optional module, to enable it you need to configure
-PLUMED using ./configure --enable-modules.
+PLUMED using ./configure --enable-modules=all. 
 
 __This manual is currently under construction.__
 All keywords should be listed for the available actions while
