@@ -54,7 +54,9 @@ class BF_Matheval : public BasisFunctions {
   std::vector<void*> evaluator_pntrs_;
   std::vector<void*> derivs_pntrs_;
   void* transf_pntr_;
+  void* transf_deriv_pntr_;
   std::string variable_str_;
+  std::string transf_variable_str_;
 public:
   static void registerKeywords( Keywords&);
   explicit BF_Matheval(const ActionOptions&);
@@ -96,7 +98,9 @@ PLUMED_BASISFUNCTIONS_INIT(ao),
 evaluator_pntrs_(0),
 derivs_pntrs_(0),
 transf_pntr_(NULL),
-variable_str_("x")
+transf_deriv_pntr_(NULL),
+variable_str_("x"),
+transf_variable_str_("t")
 {
   std::vector<std::string> bf_str;
   std::string str_t1="1";
@@ -142,35 +146,52 @@ variable_str_("x")
       plumed_merror("Problem with function "+bf_str[i]+" given in FUNC"+is+": you should use "+variable_str_+" as a variable");
     }
     derivs_pntrs_[i]=evaluator_derivative(evaluator_pntrs_[i],const_cast<char*>(variable_str_.c_str()));
+    if(derivs_pntrs_[i]==NULL){
+      plumed_merror("There was some problem in parsing the derivative of the matheval formula "+bf_str[i]+" given in FUNC"+is);
+    }
   }
   //
   std::string transf_str;
   parse("TRANSFORM",transf_str);
   if(transf_str.size()>0){
-    std::cerr << transf_str << "\n";
     for(unsigned int k=0;; k++){
-      if(transf_str.find("min")!=std::string::npos){
-        transf_str.replace(transf_str.find("min"), std::string("min").length(),intervalMinStr());
-      }
-      else{
-        break;
-      }
+      if(transf_str.find("min")!=std::string::npos){transf_str.replace(transf_str.find("min"), std::string("min").length(),intervalMinStr());}
+      else{break;}
     }
-    std::cerr << transf_str << "\n";
     for(unsigned int k=0;; k++){
-      if(transf_str.find("max")!=std::string::npos){
-        transf_str.replace(transf_str.find("max"), std::string("max").length(),intervalMaxStr());
-      }
-      else{
-        break;
-      }
+      if(transf_str.find("max")!=std::string::npos){transf_str.replace(transf_str.find("max"), std::string("max").length(),intervalMaxStr());}
+      else{break;}
     }
-    std::cerr << transf_str << "\n";
+    transf_pntr_=evaluator_create(const_cast<char*>(transf_str.c_str()));
+    if(transf_pntr_==NULL){
+      plumed_merror("There was some problem in parsing matheval formula "+transf_str+" given in TRANSFORM");
+    }
+    char** var_names;
+    int var_count;
+    evaluator_get_variables(transf_pntr_,&var_names,&var_count);
+    if(var_count!=1){
+      plumed_merror("Problem with function "+transf_str+" given in TRANSFORM: there should only be one variable");
+    }
+    if(var_names[0]!=transf_variable_str_){
+      plumed_merror("Problem with function "+transf_str+" given in TRANSFORM: you should use "+transf_variable_str_+" as a variable");
+    }
+    transf_deriv_pntr_=evaluator_derivative(transf_pntr_,const_cast<char*>(transf_variable_str_.c_str()));
+    if(transf_deriv_pntr_==NULL){
+      plumed_merror("There was some problem in parsing the derivative of the matheval formula "+transf_str+" given in TRANSFORM");
+    }
   }
   //
   log.printf("  Using the following functions [matheval parsed function and derivative]:\n");
   for(unsigned int i=0; i<getNumberOfBasisFunctions(); i++){
     log.printf("   %u:  %s   [   %s   |   %s   ] \n",i,bf_str[i].c_str(),evaluator_get_string(evaluator_pntrs_[i]),evaluator_get_string(derivs_pntrs_[i]));
+  }
+  //
+  if(transf_pntr_!=NULL){
+    log.printf("  Arguments are transformed using the following function [matheval parsed function and derivative]:\n");
+    log.printf("   %s   [   %s   |   %s   ] \n",transf_str.c_str(),evaluator_get_string(transf_pntr_),evaluator_get_string(transf_deriv_pntr_));
+  }
+  else{
+    // log.printf("  Arguments are not transformed\n");
   }
   //
   setupBF();
@@ -181,15 +202,26 @@ variable_str_("x")
 void BF_Matheval::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   inside_range=true;
   argT=checkIfArgumentInsideInterval(arg,inside_range);
+  double transf_derivf=1.0;
+  //
+  if(transf_pntr_!=NULL){
+    std::vector<char*> transf_char(1);
+    std::vector<double> transf_values(1);
+    transf_char[0] = const_cast<char*>(transf_variable_str_.c_str());
+    transf_values[0] = argT;
+    argT = evaluator_evaluate(transf_pntr_,1,&transf_char[0],&transf_values[0]);
+    transf_derivf = evaluator_evaluate(transf_deriv_pntr_,1,&transf_char[0],&transf_values[0]);
+  }
   //
   std::vector<char*> var_char(1);
   std::vector<double> var_values(1);
   var_char[0] = const_cast<char*>(variable_str_.c_str());
   var_values[0] = argT;
-
+  //
   for(unsigned int i=0; i < getNumberOfBasisFunctions(); i++){
     values[i] = evaluator_evaluate(evaluator_pntrs_[i],1,&var_char[0],&var_values[0]);
     derivs[i] = evaluator_evaluate(derivs_pntrs_[i],1,&var_char[0],&var_values[0]);
+    if(transf_pntr_!=NULL){derivs[i]*=transf_derivf;}
   }
   if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
 }
