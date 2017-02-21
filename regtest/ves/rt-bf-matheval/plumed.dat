@@ -3,10 +3,10 @@
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
 BF_MATHEVAL ...
- FUNC1=s
- FUNC2=s^2
- FUNC3=s^3
- FUNC4=s^4
+ FUNC1=x
+ FUNC2=x^2
+ FUNC3=x^3
+ FUNC4=x^4
  INTERVAL_MIN=-4.0
  INTERVAL_MAX=4.0
  LABEL=bf
@@ -50,10 +50,10 @@ DUMP_BASISFUNCTIONS ...
 
 
 BF_MATHEVAL ...
- FUNC1=s
- FUNC2=s^2
- FUNC3=s^3
- FUNC4=s^4
+ FUNC1=x
+ FUNC2=x^2
+ FUNC3=x^3
+ FUNC4=x^4
  INTERVAL_MIN=-6.5
  INTERVAL_MAX=1.5
  LABEL=bf2
@@ -75,12 +75,12 @@ DUMP_BASISFUNCTIONS ...
 
 
 BF_MATHEVAL ...
- FUNC1=cos(s)
- FUNC2=sin(s)
- FUNC3=cos(2*s)
- FUNC4=sin(2*s)
- FUNC5=cos(3*s)
- FUNC6=sin(3*s)
+ FUNC1=cos(x)
+ FUNC2=sin(x)
+ FUNC3=cos(2*x)
+ FUNC4=sin(2*x)
+ FUNC5=cos(3*x)
+ FUNC6=sin(3*x)
  INTERVAL_MIN=-pi
  INTERVAL_MAX=+pi
  LABEL=bf3

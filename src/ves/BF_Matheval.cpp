@@ -96,7 +96,7 @@ PLUMED_BASISFUNCTIONS_INIT(ao),
 evaluator_pntrs_(0),
 derivs_pntrs_(0),
 transf_pntr_(NULL),
-variable_str_("s")
+variable_str_("x")
 {
   std::vector<std::string> bf_str;
   std::string str_t1="1";
