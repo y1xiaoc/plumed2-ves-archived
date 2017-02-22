@@ -156,6 +156,7 @@ transf_variable_str_("t")
   std::string transf_str;
   parse("TRANSFORM",transf_str);
   if(transf_str.size()>0){
+    addKeywordToList("TRANSFORM",transf_str);
     for(unsigned int k=0;; k++){
       if(transf_str.find("min")!=std::string::npos){transf_str.replace(transf_str.find("min"), std::string("min").length(),intervalMinStr());}
       else{break;}
