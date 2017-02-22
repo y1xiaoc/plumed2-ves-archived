@@ -24,8 +24,6 @@
 
 #include "core/ActionRegister.h"
 
-#include <iostream>
-
 #ifdef __PLUMED_HAS_MATHEVAL
 #include <matheval.h>
 #endif
