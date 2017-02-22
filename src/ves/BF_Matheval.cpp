@@ -113,6 +113,8 @@ transf_variable_str_("t")
     bf_str.push_back(str_t2);
   }
   //
+  if(bf_str.size()==1){plumed_merror("No FUNC keywords given in "+getName()+" with label "+getLabel());}
+
   setOrder(bf_str.size()-1);
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval(intervalMin(),intervalMax());
