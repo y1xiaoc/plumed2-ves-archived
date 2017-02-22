@@ -33,7 +33,7 @@
 namespace PLMD{
 namespace ves{
 
-//+PLUMEDOC VES_BASISF_HIDDEN BF_MATHEVAL
+//+PLUMEDOC VES_BASISF BF_MATHEVAL
 /*
 Basis functions given by matheval expressions.
 
@@ -71,7 +71,7 @@ void BF_Matheval::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
   keys.remove("ORDER");
   keys.add("numbered","FUNC","The basis functions f_i(x) given in a matheval format using x as a variable.");
-  keys.add("optional","TRANSFORM","An optional function that can be used to transform the arguments before calculating the basis function values. You should use t as a variable.");
+  keys.add("optional","TRANSFORM","An optional function that can be used to transform the arguments before calculating the basis function values. You should use t as a variable. You can use the variables _min_ and _max_ to give the minimum and the maximum of the interval.");
   keys.addFlag("PERIODIC",false,"Indicate that the basis functions are periodic.");
   keys.remove("NUMERICAL_INTEGRALS");
 }
