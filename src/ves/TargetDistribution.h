@@ -68,6 +68,7 @@ private:
   bool force_normalization_;
   bool check_normalization_;
   bool check_nonnegative_;
+  bool check_nan_inf_;
   bool shift_targetdist_to_zero_;
   // dimension of the distribution
   unsigned int dimension_;
@@ -97,6 +98,7 @@ private:
   //
   void calculateStaticDistributionGrid();
   void updateBiasCutoffForTargetDistGrid();
+  void checkNanAndInf();
 protected:
   const Keywords& keywords;
   // Read a keywords from the input

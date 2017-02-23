@@ -59,6 +59,7 @@ type_(static_targetdist),
 force_normalization_(false),
 check_normalization_(true),
 check_nonnegative_(true),
+check_nan_inf_(false),
 shift_targetdist_to_zero_(false),
 dimension_(0),
 grid_args_(0),
@@ -322,6 +323,8 @@ void TargetDistribution::update() {
     }
   }
   //
+  if(check_nan_inf_){checkNanAndInf();}
+  //
 }
 
 
@@ -407,6 +410,26 @@ void TargetDistribution::readInRestartTargetDistGrid(const std::string& grid_fna
 
 void TargetDistribution::clearLogTargetDistGrid(){
   log_targetdist_grid_pntr_->clear();
+}
+
+
+void TargetDistribution::checkNanAndInf(){
+  for(Grid::index_t l=0; l<targetdist_grid_pntr_->getSize(); l++)
+  {
+    double value = targetdist_grid_pntr_->getValue(l);
+    if(std::isnan(value) || std::isinf(value)){
+      std::string vs; Tools::convert(value,vs);
+      std::vector<double> p = targetdist_grid_pntr_->getPoint(l);
+      std::string ps; Tools::convert(p[0],ps);
+      ps = "(" + ps;
+      for(unsigned int k=1; k<p.size(); k++){
+        std::string t1; Tools::convert(p[k],t1);
+        ps = ps + "," + t1;
+      }
+      ps = ps + ")";
+      plumed_merror(getName()+": problem with target distribution, the value at " + ps + " is " + vs);
+    }
+  }
 }
 
 }
