@@ -262,7 +262,7 @@ void BF_Matheval::getAllValues(const double arg, double& argT, bool& inside_rang
   argT=checkIfArgumentInsideInterval(arg,inside_range);
   double transf_derivf=1.0;
   //
-  bool check_nan = true;
+  bool check_nan_inf = true;
   //
   if(transf_pntr_!=NULL){
     std::vector<char*> transf_char(1);
@@ -270,12 +270,12 @@ void BF_Matheval::getAllValues(const double arg, double& argT, bool& inside_rang
     transf_char[0] = const_cast<char*>(transf_variable_str_.c_str());
     transf_values[0] = argT;
     argT = evaluator_evaluate(transf_pntr_,1,&transf_char[0],&transf_values[0]);
-    if(check_nan && (std::isnan(argT) || std::isinf(argT)) ){
+    if(check_nan_inf && (std::isnan(argT) || std::isinf(argT)) ){
       std::string vs; Tools::convert(argT,vs);
       plumed_merror(getName()+" with label "+getLabel()+": problem with the transform function, it gives " + vs);
     }
     transf_derivf = evaluator_evaluate(transf_deriv_pntr_,1,&transf_char[0],&transf_values[0]);
-    if(check_nan && (std::isnan(transf_derivf) || std::isinf(transf_derivf)) ){
+    if(check_nan_inf && (std::isnan(transf_derivf) || std::isinf(transf_derivf)) ){
       std::string vs; Tools::convert(transf_derivf,vs);
       plumed_merror(getName()+" with label "+getLabel()+": problem with the transform function, its derivative gives " + vs);
     }
@@ -291,13 +291,13 @@ void BF_Matheval::getAllValues(const double arg, double& argT, bool& inside_rang
     derivs[i] = evaluator_evaluate(derivs_pntrs_[i],1,&var_char[0],&var_values[0]);
     if(transf_pntr_!=NULL){derivs[i]*=transf_derivf;}
     // NaN checks
-    if(check_nan && (std::isnan(values[i]) || std::isinf(values[i])) ){
+    if(check_nan_inf && (std::isnan(values[i]) || std::isinf(values[i])) ){
       std::string vs; Tools::convert(values[i],vs);
       std::string is; Tools::convert(i,is);
       plumed_merror(getName()+" with label "+getLabel()+": problem with the basis function given in FUNC"+is+", it gives "+vs);
     }
     //
-    if(check_nan && (std::isnan(derivs[i])|| std::isinf(derivs[i])) ){
+    if(check_nan_inf && (std::isnan(derivs[i])|| std::isinf(derivs[i])) ){
       std::string vs; Tools::convert(derivs[i],vs);
       std::string is; Tools::convert(i,is);
       plumed_merror(getName()+" with label "+getLabel()+": problem with derivative of the basis function given in FUNC"+is+", it gives "+vs);
