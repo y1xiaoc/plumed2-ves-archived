@@ -36,7 +36,8 @@ namespace ves{
 Basis functions given by matheval expressions.
 
 This allows you to define basis functions using matheval. The basis functions
-\f$f_{i}(x)\f$ are given using the numbered FUNC keywords that start from
+\f$f_{i}(x)\f$ are given in a matheval format with _x_ as a variable using
+the numbered FUNC keywords that start from
 FUNC1. Consistent with other basis functions is \f$f_{0}(x)=1\f$ defined as
 the constant. The interval on which the basis funcrtions are defined is
 given using the INTERVAL_MIN and INTERVAL_MAX keywords.
@@ -60,6 +61,7 @@ The BF_MATHEVAL only works if libmatheval is installed on the system and
 PLUMED has been linked to it.
 
 \par Examples
+
 Defining Legendre polynomial basis functions of order 6 using BF_MATHEVAL
 where the appropriate transform function is given by the TRANSFORM keyword.
 This is just an example of what can be done, in practice you should use
