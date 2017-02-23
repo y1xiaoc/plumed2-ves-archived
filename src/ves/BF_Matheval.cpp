@@ -35,14 +35,69 @@ namespace ves{
 /*
 Basis functions given by matheval expressions.
 
-This
+This allows you to define basis functions using matheval. The basis functions
+\f$f_{i}(x)\f$ are given using the numbered FUNC keywords that start from
+FUNC1. Consistent with other basis functions is \f$f_{0}(x)=1\f$ defined as
+the constant. The interval on which the basis funcrtions are defined is
+given using the INTERVAL_MIN and INTERVAL_MAX keywords.
 
+Using the TRANSFORM keyword it is possible to define a function \f$x(t)\f$ that
+js used to transform the argument before calculating the basis functions
+values. The variables _min_ and _max_ can be used to indicate the minimum
+and the maximum of the interval. By default the arguments are not transformed,
+i.e. \f$x(t)=t\f$.
+
+For periodic basis functions you should use the PERIODIC flag to indicate
+that they are periodic.
+
+The basis functions \f$f_{i}(x)\f$ and the transform function \f$x(t)\f$ need
+to be well behaved in the interval on which the basis functions are defined,
+e.g. not result in a not a number (nan) or infinity (inf).
+The code will perform checks to make sure that this is the case.
 
 \attention
 The BF_MATHEVAL only works if libmatheval is installed on the system and
 PLUMED has been linked to it.
 
 \par Examples
+Defining Legendre polynomial basis functions of order 6 using BF_MATHEVAL
+where the appropriate transform function is given by the TRANSFORM keyword.
+This is just an example of what can be done, in practice you should use
+\ref BF_LEGENDRE for Legendre polynomial basis functions.
+\verbatim
+BF_MATHEVAL ...
+ TRANSFORM=(t-(min+max)/2)/((max-min)/2)
+ FUNC1=x
+ FUNC2=(1/2)*(3*x^2-1)
+ FUNC3=(1/2)*(5*x^3-3*x)
+ FUNC4=(1/8)*(35*x^4-30*x^2+3)
+ FUNC5=(1/8)*(63*x^5-70*x^3+15*x)
+ FUNC6=(1/16)*(231*x^6-315*x^4+105*x^2-5)
+ INTERVAL_MIN=-4.0
+ INTERVAL_MAX=4.0
+ LABEL=bf1
+... BF_MATHEVAL
+\endverbatim
+
+
+Defining Fourier basis functions of order 3 using BF_MATHEVAL where the
+periodicity is indicated using the PERIODIC flag. This is just an example
+of what can be done, in practice you should use \ref BF_FOURIER
+for Fourier basis functions.
+\verbatim
+BF_MATHEVAL ...
+ FUNC1=cos(x)
+ FUNC2=sin(x)
+ FUNC3=cos(2*x)
+ FUNC4=sin(2*x)
+ FUNC5=cos(3*x)
+ FUNC6=sin(3*x)
+ INTERVAL_MIN=-pi
+ INTERVAL_MAX=+pi
+ LABEL=bf1
+ PERIODIC
+... BF_MATHEVAL
+\endverbatim
 
 
 */
@@ -69,7 +124,7 @@ void BF_Matheval::registerKeywords(Keywords& keys){
   BasisFunctions::registerKeywords(keys);
   keys.remove("ORDER");
   keys.add("numbered","FUNC","The basis functions f_i(x) given in a matheval format using _x_ as a variable.");
-  keys.add("optional","TRANSFORM","An optional function that can be used to transform the arguments before calculating the basis function values. You should use _t_ as a variable. You can use the variables _min_ and _max_ to give the minimum and the maximum of the interval.");
+  keys.add("optional","TRANSFORM","An optional function that can be used to transform the argument before calculating the basis function values. You should use _t_ as a variable. You can use the variables _min_ and _max_ to give the minimum and the maximum of the interval.");
   keys.addFlag("PERIODIC",false,"Indicate that the basis functions are periodic.");
   keys.remove("NUMERICAL_INTEGRALS");
 }
