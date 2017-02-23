@@ -43,7 +43,7 @@ These basis functions should not be used for periodic CVs.
 
 Intrinsically the Legendre polynomials are defined on the interval \f$[-1,1]\f$.
 A variable \f$t\f$ in the interval \f$[a,b]\f$ is transformed to a variable \f$x\f$
-in the intrinsic interval \f$[-1,1]\f$ by using
+in the intrinsic interval \f$[-1,1]\f$ by using the transform function 
 \f[
 x(t) = \frac{t-(a+b)/2}
 {(b-a)/2}
