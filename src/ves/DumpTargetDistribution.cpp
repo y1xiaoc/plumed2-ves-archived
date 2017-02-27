@@ -31,8 +31,8 @@
 #include "tools/Grid.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_UTILS DUMP_TARGET_DISTRIBUTION
 /*
@@ -48,15 +48,15 @@ class DumpTargetDistribution :
 {
 public:
   explicit DumpTargetDistribution(const ActionOptions&);
-  void calculate(){}
-  void apply(){}
+  void calculate() {}
+  void apply() {}
   static void registerKeywords(Keywords& keys);
 };
 
 
 PLUMED_REGISTER_ACTION(DumpTargetDistribution,"DUMP_TARGET_DISTRIBUTION")
 
-void DumpTargetDistribution::registerKeywords(Keywords& keys){
+void DumpTargetDistribution::registerKeywords(Keywords& keys) {
   Action::registerKeywords(keys);
   keys.add("compulsory","GRID_MIN","the lower bounds for the grid");
   keys.add("compulsory","GRID_MAX","the upper bounds for the grid");
@@ -70,14 +70,14 @@ void DumpTargetDistribution::registerKeywords(Keywords& keys){
 }
 
 DumpTargetDistribution::DumpTargetDistribution(const ActionOptions&ao):
-Action(ao)
+  Action(ao)
 {
 
   std::string targetdist_fname;
   parse("TARGETDIST_FILE",targetdist_fname);
   std::string log_targetdist_fname;
   parse("LOG_TARGETDIST_FILE",log_targetdist_fname);
-  if(targetdist_fname==log_targetdist_fname){
+  if(targetdist_fname==log_targetdist_fname) {
     plumed_merror("error in DUMP_TARGET_DISTRIBUTION: TARGETDIST_FILE and LOG_TARGETDIST_FILE cannot be the same");
   }
 
@@ -92,14 +92,14 @@ Action(ao)
 
   std::vector<std::string> grid_periodicity(nargs);
   parseVector("GRID_PERIODICITY",grid_periodicity);
-  if(grid_periodicity.size()==0){grid_periodicity.assign(nargs,"NO");}
+  if(grid_periodicity.size()==0) {grid_periodicity.assign(nargs,"NO");}
 
   std::string fmt_grids="%14.9f";
   parse("FMT_GRIDS",fmt_grids);
 
   bool do_1d_proj = false;
   parseFlag("DO_1D_PROJECTIONS",do_1d_proj);
-  if(do_1d_proj && nargs==1){
+  if(do_1d_proj && nargs==1) {
     plumed_merror("doesn't make sense to use the DO_1D_PROJECTIONS keyword for a one-dimensional distribution");
   }
 
@@ -114,22 +114,22 @@ Action(ao)
   std::vector<Value*> arguments(nargs);
   for(unsigned int i=0; i < nargs; i++) {
     std::string is; Tools::convert(i+1,is);
-    if(nargs==1){is="";}
+    if(nargs==1) {is="";}
     arguments[i]= new Value(NULL,"arg"+is,false);
-    if(grid_periodicity[i]=="YES"){
+    if(grid_periodicity[i]=="YES") {
       arguments[i]->setDomain(grid_min[i],grid_max[i]);
     }
-    else if(grid_periodicity[i]=="NO"){
+    else if(grid_periodicity[i]=="NO") {
       arguments[i]->setNotPeriodic();
     }
-    else{
+    else {
       plumed_merror("wrong value given in GRID_PERIODICITY, either specfiy YES or NO");
     }
   }
 
   std::vector<std::string> words = Tools::getWords(targetdist_keyword);
   TargetDistribution* targetdist_pntr = targetDistributionRegister().create(words);
-  if(targetdist_pntr->isDynamic()){
+  if(targetdist_pntr->isDynamic()) {
     plumed_merror("DUMP_TARGET_DISTRIBUTION only works for static target distributions");
   }
   targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
@@ -149,7 +149,7 @@ Action(ao)
   targetdist_grid_pntr->setOutputFmt(fmt_grids);
   targetdist_grid_pntr->writeToFile(ofile);
   ofile.close();
-  if(log_targetdist_fname.size()>0){
+  if(log_targetdist_fname.size()>0) {
     OFile ofile2;
     ofile2.link(*this);
     ofile2.enforceBackup();
@@ -159,8 +159,8 @@ Action(ao)
     ofile2.close();
   }
 
-  if(do_1d_proj){
-    for(unsigned int i=0; i<nargs; i++){
+  if(do_1d_proj) {
+    for(unsigned int i=0; i<nargs; i++) {
       std::vector<std::string> arg1d(1);
       arg1d[0] = arguments[i]->getName();
       Grid marginal_grid = targetdist_pntr->getMarginal(arg1d);

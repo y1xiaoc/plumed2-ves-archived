@@ -32,22 +32,22 @@
 
 
 
-namespace PLMD{
+namespace PLMD {
 
 class Grid;
 class Value;
 class Keywords;
 class Action;
 
-namespace ves{
+namespace ves {
 
 class TargetDistModifer;
 class VesBias;
 
 
-class TargetDistributionOptions{
-friend class TargetDistributionRegister;
-friend class TargetDistribution;
+class TargetDistributionOptions {
+  friend class TargetDistributionRegister;
+  friend class TargetDistribution;
 private:
   std::vector<std::string> words;
 public:
@@ -103,26 +103,26 @@ protected:
   const Keywords& keywords;
   // Read a keywords from the input
   template <class T>
-  bool parse(const std::string& ,T& , bool optional=false);
+  bool parse(const std::string&,T&, bool optional=false);
   template <class T>
-  bool parseNumbered(const std::string& ,const unsigned int, T&);
+  bool parseNumbered(const std::string&,const unsigned int, T&);
   // Read a keywords vector from the input
   template <class T>
-  bool parseVector(const std::string& ,std::vector<T>& , bool optional=false);
+  bool parseVector(const std::string&,std::vector<T>&, bool optional=false);
   template <class T>
-  bool parseNumberedVector(const std::string& ,const unsigned int, std::vector<T>&);
+  bool parseNumberedVector(const std::string&,const unsigned int, std::vector<T>&);
   // Read a flag from the input
   void parseFlag(const std::string& key, bool& t);
   //
-  void setStatic(){type_=static_targetdist;}
-  void setDynamic(){type_=dynamic_targetdist;}
+  void setStatic() {type_=static_targetdist;}
+  void setDynamic() {type_=dynamic_targetdist;}
   // set the that target distribution is normalized
-  void setForcedNormalization(){force_normalization_=true; check_normalization_=false;}
-  void unsetForcedNormalization(){force_normalization_=false; check_normalization_=true;};
+  void setForcedNormalization() {force_normalization_=true; check_normalization_=false;}
+  void unsetForcedNormalization() {force_normalization_=false; check_normalization_=true;};
   //
-  void setBiasGridNeeded(){needs_bias_grid_=true;}
-  void setBiasWithoutCutoffGridNeeded(){needs_bias_withoutcutoff_grid_=true;}
-  void setFesGridNeeded(){needs_fes_grid_=true;}
+  void setBiasGridNeeded() {needs_bias_grid_=true;}
+  void setBiasWithoutCutoffGridNeeded() {needs_bias_withoutcutoff_grid_=true;}
+  void setFesGridNeeded() {needs_fes_grid_=true;}
   //
   VesBias* getPntrToVesBias() const;
   Action* getPntrToAction() const;
@@ -145,7 +145,7 @@ protected:
   void setMinimumOfTargetDistGridToZero();
   void updateLogTargetDistGrid();
   //
-  virtual void updateGrid(){calculateStaticDistributionGrid();}
+  virtual void updateGrid() {calculateStaticDistributionGrid();}
 public:
   // keywords
   static void registerKeywords( Keywords&);
@@ -156,7 +156,7 @@ public:
   // Return a description
   std::string description();
   // Overwrite this to have a more descriptive output
-  virtual std::string rest_of_description(){ return ""; };
+  virtual std::string rest_of_description() { return ""; };
   //
   bool isStatic() const {return type_==static_targetdist;}
   bool isDynamic() const {return type_==dynamic_targetdist;}
@@ -174,7 +174,7 @@ public:
   void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}
   // get type of distribution
-  std::string getName()const{return name_;};
+  std::string getName()const {return name_;};
   //
   virtual void linkVesBias(VesBias*);
   virtual void linkAction(Action*);
@@ -221,14 +221,14 @@ Action* TargetDistribution::getPntrToAction() const {
 
 
 inline
-void TargetDistribution::normalizeTargetDistGrid(){
+void TargetDistribution::normalizeTargetDistGrid() {
   double normalization = normalizeGrid(targetdist_grid_pntr_);
-  if(normalization<0.0){plumed_merror(getName()+": something went wrong trying to normalize the target distribution, integrating over it gives a negative value.");}
+  if(normalization<0.0) {plumed_merror(getName()+": something went wrong trying to normalize the target distribution, integrating over it gives a negative value.");}
 }
 
 
 template <class T>
-bool TargetDistribution::parse( const std::string& key, T& t, bool optional){
+bool TargetDistribution::parse( const std::string& key, T& t, bool optional) {
   bool found=Tools::parse(input,key,t);
   if(!optional && !found) plumed_merror("target distribution " + name_ + " requires " + key + " keyword");
   return found;
@@ -243,7 +243,7 @@ bool TargetDistribution::parseNumbered(const std::string&key, const unsigned int
 
 
 template <class T>
-bool TargetDistribution::parseVector( const std::string& key, std::vector<T>& t , bool optional){
+bool TargetDistribution::parseVector( const std::string& key, std::vector<T>& t, bool optional) {
   bool found=Tools::parseVector(input,key,t);
   if(!optional && !found) plumed_merror("target distribution " + name_ + " requires " + key + " keyword");
   return found;

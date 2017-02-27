@@ -32,7 +32,7 @@
 
 #define PLUMED_BASISFUNCTIONS_INIT(ao) BasisFunctions(ao)
 
-namespace PLMD{
+namespace PLMD {
 
 /**
 \ingroup INHERIT
@@ -42,7 +42,7 @@ Abstract base class for implenting new 1D basis sets.
 class Action;
 class Grid;
 
-namespace ves{
+namespace ves {
 
 class VesBias;
 class TargetDistribution;
@@ -123,7 +123,7 @@ protected:
   void setDescription(const std::string& description_in) {description_=description_in;}
   //
   void setNumberOfBasisFunctions(const unsigned int);
-  void setOrder(const unsigned int norder_in){norder_=norder_in;}
+  void setOrder(const unsigned int norder_in) {norder_=norder_in;}
   void setIntrinsicInterval(const double, const double);
   void setIntrinsicInterval(const std::string&, const std::string&);
   void setInterval(const double, const double);
@@ -163,7 +163,7 @@ public:
   std::string intervalMaxStr() const {return interval_max_str_;}
   std::vector<double> getUniformIntegrals() const {return uniform_integrals_;}
   std::vector<double> getTargetDistributionIntegrals(const TargetDistribution*) const;
-  unsigned getNumberOfDerivatives(){return 0;}
+  unsigned getNumberOfDerivatives() {return 0;}
   //
   std::vector<std::string> getKeywordList() const {return bf_keywords_;}
   std::string getKeywordString() const;
@@ -179,8 +179,8 @@ public:
   double translateArgument(const double, bool&) const;
   double checkIfArgumentInsideInterval(const double, bool&) const;
   //
-  void apply(){};
-  void calculate(){};
+  void apply() {};
+  void calculate() {};
   // calculate the value for the n-th basis function
   double getValue(const double, const unsigned int, double&, bool&) const;
   // calcuate the values for all basis functions
@@ -256,11 +256,11 @@ double BasisFunctions::translateArgument(const double arg, bool& inside_interval
   // NOTE: only works for symmetric intrinsic intervals
   inside_interval=true;
   double argT = (arg-interval_mean_)*argT_derivf_;
-  if(argT < interval_intrinsic_min_){
+  if(argT < interval_intrinsic_min_) {
     inside_interval=false;
     argT=interval_intrinsic_min_;
   }
-  else if(argT > interval_intrinsic_max_){
+  else if(argT > interval_intrinsic_max_) {
     inside_interval=false;
     argT=interval_intrinsic_max_;
   }
@@ -272,11 +272,11 @@ inline
 double BasisFunctions::checkIfArgumentInsideInterval(const double arg, bool& inside_interval) const {
   inside_interval=true;
   double argT = arg;
-  if(arg < interval_min_){
+  if(arg < interval_min_) {
     inside_interval=false;
     argT=interval_min_;
   }
-  else if(arg > interval_max_){
+  else if(arg > interval_max_) {
     inside_interval=false;
     argT=interval_max_;
   }
@@ -286,7 +286,7 @@ double BasisFunctions::checkIfArgumentInsideInterval(const double arg, bool& ins
 
 
 template<typename T>
-void BasisFunctions::addKeywordToList(const std::string& keyword, const T value){
+void BasisFunctions::addKeywordToList(const std::string& keyword, const T value) {
   std::string str_value;
   Tools::convert(value,str_value);
   bf_keywords_.push_back(keyword+"="+str_value);
@@ -294,12 +294,12 @@ void BasisFunctions::addKeywordToList(const std::string& keyword, const T value)
 
 
 template<typename T>
-void BasisFunctions::addKeywordToList(const std::string& keyword, const std::vector<T>& values){
+void BasisFunctions::addKeywordToList(const std::string& keyword, const std::vector<T>& values) {
   std::string str_value;
   std::string str_keywordvalues;
   Tools::convert(values[0],str_value);
   str_keywordvalues = keyword + "=" + str_value;
-  for(unsigned int i=1; i<values.size(); i++){
+  for(unsigned int i=1; i<values.size(); i++) {
     Tools::convert(values[i],str_value);
     str_keywordvalues += "," + str_value;
   }
@@ -308,8 +308,8 @@ void BasisFunctions::addKeywordToList(const std::string& keyword, const std::vec
 
 
 inline
-void BasisFunctions::addKeywordToList(const std::string& keyword, const bool value){
-  if(value){bf_keywords_.push_back(keyword);}
+void BasisFunctions::addKeywordToList(const std::string& keyword, const bool value) {
+  if(value) {bf_keywords_.push_back(keyword);}
 }
 
 

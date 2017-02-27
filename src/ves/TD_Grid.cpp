@@ -31,8 +31,8 @@
 #include "tools/File.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 
 //+PLUMEDOC VES_TARGETDIST GRID_DIST
@@ -52,7 +52,7 @@ keyword. However, be warned that this will generally lead to the wrong
 behavior if the distribution from the external grid is not properly
 normalized to 1.
 
-If the distribution from the external grid file has for some reason 
+If the distribution from the external grid file has for some reason
 negative values can you use the SHIFT keyword to shift the distribution
 by a given value. Another option is to use
 the SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero.
@@ -113,25 +113,25 @@ void TD_Grid::registerKeywords(Keywords& keys) {
 }
 
 TD_Grid::~TD_Grid() {
-  if(distGrid_!=NULL){
+  if(distGrid_!=NULL) {
     delete distGrid_;
   }
 }
 
 
 TD_Grid::TD_Grid(const TargetDistributionOptions& to):
-TargetDistribution(to),
-distGrid_(NULL),
-minima_(0),
-maxima_(0),
-zero_outside_(false),
-shift_(0.0)
+  TargetDistribution(to),
+  distGrid_(NULL),
+  minima_(0),
+  maxima_(0),
+  zero_outside_(false),
+  shift_(0.0)
 {
   std::string filename;
   parse("FILE",filename);
   parse("SHIFT",shift_,true);
-  if(shift_!=0.0){
-    if(isTargetDistGridShiftedToZero()){plumed_merror(getName() + ": using both SHIFT and SHIFT_TO_ZERO is not allowed.");}
+  if(shift_!=0.0) {
+    if(isTargetDistGridShiftedToZero()) {plumed_merror(getName() + ": using both SHIFT and SHIFT_TO_ZERO is not allowed.");}
   }
   parseFlag("ZERO_OUTSIDE",zero_outside_);
   bool no_spline=false;
@@ -140,8 +140,8 @@ shift_(0.0)
 
   bool do_not_normalize=false;
   parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
-  if(do_not_normalize && shift_!=0.0){plumed_merror(getName() + ": using both SHIFT and DO_NOT_NORMALIZE is not allowed.");}
-  if(!do_not_normalize){setForcedNormalization();}
+  if(do_not_normalize && shift_!=0.0) {plumed_merror(getName() + ": using both SHIFT and DO_NOT_NORMALIZE is not allowed.");}
+  if(!do_not_normalize) {setForcedNormalization();}
 
   checkRead();
 
@@ -153,7 +153,7 @@ shift_(0.0)
   std::vector<unsigned int> argnbins;
   bool has_deriv = false;
   unsigned int nargs = VesTools::getGridFileInfo(filename,gridlabel,arglabels,argmin,argmax,argperiodic,argnbins,has_deriv);
-  if(nargs==0){
+  if(nargs==0) {
     plumed_merror(getName() + ": problem in parsing information from grid file");
   }
 
@@ -161,7 +161,7 @@ shift_(0.0)
   std::vector<Value*> arguments(arglabels.size());
   for(unsigned int i=0; i < arglabels.size(); i++) {
     arguments[i]= new Value(NULL,arglabels[i],false);
-    if(argperiodic[i]){
+    if(argperiodic[i]) {
       arguments[i]->setDomain(argmin[i],argmax[i]);
     }
     else {
@@ -170,12 +170,12 @@ shift_(0.0)
   }
 
   IFile gridfile; gridfile.open(filename);
-  if(has_deriv){
+  if(has_deriv) {
     distGrid_=Grid::create(gridlabel,arguments,gridfile,false,use_spline,true);
   }
   else {
     distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);
-    if(use_spline){distGrid_->enableSpline();}
+    if(use_spline) {distGrid_->enableSpline();}
   }
   gridfile.close();
 
@@ -187,10 +187,10 @@ shift_(0.0)
     Tools::convert(distGrid_->getMin()[i],minima_[i]);
     Tools::convert(distGrid_->getMax()[i],maxima_[i]);
     periodic_[i] = argperiodic[i];
-    if(periodic_[i]){maxima_[i]-=distGrid_->getDx()[i];}
+    if(periodic_[i]) {maxima_[i]-=distGrid_->getDx()[i];}
   }
 
-  for(unsigned int i=0; i < arguments.size(); i++){delete arguments[i];}
+  for(unsigned int i=0; i < arguments.size(); i++) {delete arguments[i];}
   arguments.clear();
 }
 
@@ -198,14 +198,14 @@ shift_(0.0)
 double TD_Grid::getValue(const std::vector<double>& argument) const {
   double outside = 0.0;
   std::vector<double> arg = argument;
-  for(unsigned int k=0; k<getDimension(); k++){
-    if(zero_outside_ && (argument[k] < minima_[k] || argument[k] > maxima_[k])){
+  for(unsigned int k=0; k<getDimension(); k++) {
+    if(zero_outside_ && (argument[k] < minima_[k] || argument[k] > maxima_[k])) {
       return outside;
     }
-    else if(argument[k] < minima_[k]){
+    else if(argument[k] < minima_[k]) {
       arg[k] = minima_[k];
     }
-    else if(argument[k] > maxima_[k]){
+    else if(argument[k] > maxima_[k]) {
       arg[k] =maxima_[k];
     }
   }

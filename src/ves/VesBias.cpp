@@ -34,168 +34,168 @@
 #include "tools/File.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 VesBias::VesBias(const ActionOptions&ao):
-Action(ao),
-Bias(ao),
-ncoeffssets_(0),
-coeffs_pntrs_(0),
-targetdist_averages_pntrs_(0),
-gradient_pntrs_(0),
-hessian_pntrs_(0),
-sampled_averages(0),
-sampled_cross_averages(0),
-use_multiple_coeffssets_(false),
-coeffs_fnames(0),
-ncoeffs_total_(0),
-optimizer_pntr_(NULL),
-optimize_coeffs_(false),
-compute_hessian_(false),
-diagonal_hessian_(true),
-aver_counters(0),
-kbt_(0.0),
-targetdist_keywords_(0),
-targetdist_pntrs_(0),
-dynamic_targetdist_(false),
-grid_bins_(0),
-grid_min_(0),
-grid_max_(0),
-bias_filename_(""),
-fes_filename_(""),
-targetdist_filename_(""),
-coeffs_id_prefix_("c-"),
-bias_fileoutput_active_(false),
-fes_fileoutput_active_(false),
-fesproj_fileoutput_active_(false),
-dynamic_targetdist_fileoutput_active_(false),
-static_targetdist_fileoutput_active_(true),
-bias_cutoff_active_(false),
-bias_cutoff_value_(0.0),
-bias_current_max_value(0.0),
-bias_cutoff_swfunc_pntr_(NULL)
+  Action(ao),
+  Bias(ao),
+  ncoeffssets_(0),
+  coeffs_pntrs_(0),
+  targetdist_averages_pntrs_(0),
+  gradient_pntrs_(0),
+  hessian_pntrs_(0),
+  sampled_averages(0),
+  sampled_cross_averages(0),
+  use_multiple_coeffssets_(false),
+  coeffs_fnames(0),
+  ncoeffs_total_(0),
+  optimizer_pntr_(NULL),
+  optimize_coeffs_(false),
+  compute_hessian_(false),
+  diagonal_hessian_(true),
+  aver_counters(0),
+  kbt_(0.0),
+  targetdist_keywords_(0),
+  targetdist_pntrs_(0),
+  dynamic_targetdist_(false),
+  grid_bins_(0),
+  grid_min_(0),
+  grid_max_(0),
+  bias_filename_(""),
+  fes_filename_(""),
+  targetdist_filename_(""),
+  coeffs_id_prefix_("c-"),
+  bias_fileoutput_active_(false),
+  fes_fileoutput_active_(false),
+  fesproj_fileoutput_active_(false),
+  dynamic_targetdist_fileoutput_active_(false),
+  static_targetdist_fileoutput_active_(true),
+  bias_cutoff_active_(false),
+  bias_cutoff_value_(0.0),
+  bias_current_max_value(0.0),
+  bias_cutoff_swfunc_pntr_(NULL)
 {
   log << plumed.cite("Valsson and Parrinello, Phys. Rev. Lett. 113, 090601 (2014)");
-  
+
   double temp=0.0;
   parse("TEMP",temp);
-  if(temp>0.0){
+  if(temp>0.0) {
     kbt_=plumed.getAtoms().getKBoltzmann()*temp;
   }
   else {
     kbt_=plumed.getAtoms().getKbT();
   }
-  if(kbt_>0.0){
+  if(kbt_>0.0) {
     log.printf("  KbT: %f\n",kbt_);
   }
   // NOTE: the check for that the temperature is given is done when linking the optimizer later on.
 
-  if(keywords.exists("COEFFS")){
+  if(keywords.exists("COEFFS")) {
     parseVector("COEFFS",coeffs_fnames);
   }
 
-  if(keywords.exists("GRID_BINS")){
+  if(keywords.exists("GRID_BINS")) {
     parseMultipleValues<unsigned int>("GRID_BINS",grid_bins_,getNumberOfArguments(),100);
   }
 
-  if(keywords.exists("GRID_MIN") && keywords.exists("GRID_MAX")){
+  if(keywords.exists("GRID_MIN") && keywords.exists("GRID_MAX")) {
     parseMultipleValues("GRID_MIN",grid_min_,getNumberOfArguments());
     parseMultipleValues("GRID_MAX",grid_max_,getNumberOfArguments());
   }
 
-  if(keywords.exists("TARGET_DISTRIBUTION")){
+  if(keywords.exists("TARGET_DISTRIBUTION")) {
     plumed_massert(targetdist_keywords_.size()==0,"the target distribution keywords should be empty before the reading of the TARGET_DISTRIBUTION keywords");
     // Single keyword
-    if(!keywords.numbered("TARGET_DISTRIBUTION")){
+    if(!keywords.numbered("TARGET_DISTRIBUTION")) {
       std::string targetdist_str="";
       parse("TARGET_DISTRIBUTION",targetdist_str);
-      if(targetdist_str.size()>0){
+      if(targetdist_str.size()>0) {
         targetdist_keywords_.push_back(targetdist_str);
         plumed_assert(targetdist_keywords_.size()==1);
       }
     }
     // Multiple numbered keywords
-    else{
-      for(int i=1;;i++){
+    else {
+      for(int i=1;; i++) {
         std::string targetdist_str="";
-        if(!parseNumbered("TARGET_DISTRIBUTION",i,targetdist_str)){break;}
+        if(!parseNumbered("TARGET_DISTRIBUTION",i,targetdist_str)) {break;}
         targetdist_keywords_.push_back(targetdist_str);
       }
       std::string str_tmp1="";
       parse("TARGET_DISTRIBUTION",str_tmp1);
-      if(str_tmp1.size()>0){
+      if(str_tmp1.size()>0) {
         plumed_merror("Using the TARGET_DISTRIBUTION keyword is not allowed. You need to give multiple numbered keywords using TARGET_DISTRIBUTION1, TARGET_DISTRIBUTION2, etc.");
       }
     }
   }
 
 
-  if(getNumberOfArguments()>2){
+  if(getNumberOfArguments()>2) {
     disableStaticTargetDistFileOutput();
   }
 
 
-  if(keywords.exists("BIAS_FILE")){
+  if(keywords.exists("BIAS_FILE")) {
     parse("BIAS_FILE",bias_filename_);
-    if(bias_filename_.size()==0){
+    if(bias_filename_.size()==0) {
       bias_filename_ = "bias." + getLabel() + ".data";
     }
   }
-  if(keywords.exists("FES_FILE")){
+  if(keywords.exists("FES_FILE")) {
     parse("FES_FILE",fes_filename_);
-    if(fes_filename_.size()==0){
+    if(fes_filename_.size()==0) {
       fes_filename_ = "fes." + getLabel() + ".data";
     }
   }
-  if(keywords.exists("TARGETDIST_FILE")){
+  if(keywords.exists("TARGETDIST_FILE")) {
     parse("TARGETDIST_FILE",targetdist_filename_);
-    if(targetdist_filename_.size()==0){
+    if(targetdist_filename_.size()==0) {
       targetdist_filename_ = "targetdist." + getLabel() + ".data";
     }
   }
 
-  if(keywords.exists("BIAS_CUTOFF")){
+  if(keywords.exists("BIAS_CUTOFF")) {
     double cutoff_value=0.0;
     parse("BIAS_CUTOFF",cutoff_value);
-    if(cutoff_value<0.0){
+    if(cutoff_value<0.0) {
       plumed_merror("the value given in BIAS_CUTOFF doesn't make sense, it should be larger than 0.0");
     }
     //
-    if(cutoff_value>0.0){
+    if(cutoff_value>0.0) {
       double fermi_lambda=1.0;
       parse("BIAS_CUTOFF_FERMI_LAMBDA",fermi_lambda);
       setupBiasCutoff(cutoff_value,fermi_lambda);
     }
   }
 
-  if(keywords.exists("BIAS_FACTOR")){
+  if(keywords.exists("BIAS_FACTOR")) {
     std::string bias_factor;
     parse("BIAS_FACTOR",bias_factor);
-    if(bias_factor.size()>0){
+    if(bias_factor.size()>0) {
       plumed_merror("the BIAS_FACTOR keyword has be discontinued, use TARGET_DISTRIBUTION={WELL_TEMPERED BIASFACTOR="+bias_factor+"} instead.");
     }
   }
 
 
-  if(keywords.exists("PROJ_ARG")){
+  if(keywords.exists("PROJ_ARG")) {
     std::vector<std::string> proj_arg;
-    for(int i=1;;i++){
-      if(!parseNumberedVector("PROJ_ARG",i,proj_arg)){break;}
+    for(int i=1;; i++) {
+      if(!parseNumberedVector("PROJ_ARG",i,proj_arg)) {break;}
       // checks
-      if(proj_arg.size() > (getNumberOfArguments()-1) ){
+      if(proj_arg.size() > (getNumberOfArguments()-1) ) {
         plumed_merror("PROJ_ARG must be a subset of ARG");
       }
       //
-      for(unsigned int k=0; k<proj_arg.size(); k++){
+      for(unsigned int k=0; k<proj_arg.size(); k++) {
         bool found = false;
-        for(unsigned int l=0; l<getNumberOfArguments(); l++){
-          if(proj_arg[k]==getPntrToArgument(l)->getName()){
+        for(unsigned int l=0; l<getNumberOfArguments(); l++) {
+          if(proj_arg[k]==getPntrToArgument(l)->getName()) {
             found = true;
             break;
           }
         }
-        if(!found){
+        if(!found) {
           std::string s1; Tools::convert(i,s1);
           std::string error = "PROJ_ARG" + s1 + ": label " + proj_arg[k] + " is not among the arguments given in ARG";
           plumed_merror(error);
@@ -210,20 +210,20 @@ bias_cutoff_swfunc_pntr_(NULL)
 }
 
 
-VesBias::~VesBias(){
-  for(unsigned int i=0; i<coeffs_pntrs_.size(); i++){
+VesBias::~VesBias() {
+  for(unsigned int i=0; i<coeffs_pntrs_.size(); i++) {
     delete coeffs_pntrs_[i];
   }
-  for(unsigned int i=0; i<targetdist_averages_pntrs_.size(); i++){
+  for(unsigned int i=0; i<targetdist_averages_pntrs_.size(); i++) {
     delete targetdist_averages_pntrs_[i];
   }
-  for(unsigned int i=0; i<gradient_pntrs_.size(); i++){
+  for(unsigned int i=0; i<gradient_pntrs_.size(); i++) {
     delete gradient_pntrs_[i];
   }
-  for(unsigned int i=0; i<hessian_pntrs_.size(); i++){
+  for(unsigned int i=0; i<hessian_pntrs_.size(); i++) {
     delete hessian_pntrs_[i];
   }
-  if(bias_cutoff_swfunc_pntr_!=NULL){
+  if(bias_cutoff_swfunc_pntr_!=NULL) {
     delete bias_cutoff_swfunc_pntr_;
   }
 }
@@ -316,7 +316,7 @@ void VesBias::initializeCoeffs(CoeffsVector* coeffs_pntr_in) {
   coeffs_pntr_in->linkVesBias(this);
   //
   std::string label;
-  if(!use_multiple_coeffssets_ && ncoeffssets_==1){
+  if(!use_multiple_coeffssets_ && ncoeffssets_==1) {
     plumed_merror("you are not allowed to use multiple coefficient sets");
   }
   //
@@ -357,28 +357,28 @@ bool VesBias::readCoeffsFromFiles() {
   plumed_assert(ncoeffssets_>0);
   plumed_massert(keywords.exists("COEFFS"),"you are not allowed to use this function as the COEFFS keyword is not enabled");
   bool read_coeffs = false;
-  if(coeffs_fnames.size()>0){
+  if(coeffs_fnames.size()>0) {
     plumed_massert(coeffs_fnames.size()==ncoeffssets_,"COEFFS keyword is of the wrong size");
-    if(ncoeffssets_==1){
+    if(ncoeffssets_==1) {
       log.printf("  Read in coefficents from file ");
     }
-    else{
+    else {
       log.printf("  Read in coefficents from files:\n");
     }
-    for(unsigned int i=0; i<ncoeffssets_; i++){
+    for(unsigned int i=0; i<ncoeffssets_; i++) {
       IFile ifile;
       ifile.link(*this);
       ifile.open(coeffs_fnames[i]);
-      if(!ifile.FieldExist(coeffs_pntrs_[i]->getDataLabel())){
+      if(!ifile.FieldExist(coeffs_pntrs_[i]->getDataLabel())) {
         std::string error_msg = "Problem with reading coefficents from file " + ifile.getPath() + ": no field with name " + coeffs_pntrs_[i]->getDataLabel() + "\n";
         plumed_merror(error_msg);
       }
       size_t ncoeffs_read = coeffs_pntrs_[i]->readFromFile(ifile,false,false);
       coeffs_pntrs_[i]->setIterationCounterAndTime(0,getTime());
-      if(ncoeffssets_==1){
+      if(ncoeffssets_==1) {
         log.printf("%s (read %zu of %zu values)\n", ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs_[i]->numberOfCoeffs());
       }
-      else{
+      else {
         log.printf("   coefficent %u: %s (read %zu of %zu values)\n",i,ifile.getPath().c_str(),ncoeffs_read,coeffs_pntrs_[i]->numberOfCoeffs());
       }
       ifile.close();
@@ -390,13 +390,13 @@ bool VesBias::readCoeffsFromFiles() {
 
 
 void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
-  for(unsigned int k=0; k<ncoeffssets_; k++){
+  for(unsigned int k=0; k<ncoeffssets_; k++) {
     //
     comm.Sum(sampled_averages[k]);
     comm.Sum(sampled_cross_averages[k]);
-    if(use_mwalkers_mpi){
+    if(use_mwalkers_mpi) {
       double walker_weight=1.0;
-      if(aver_counters[k]==0){walker_weight=0.0;}
+      if(aver_counters[k]==0) {walker_weight=0.0;}
       multiSimSumAverages(k,walker_weight);
     }
     // NOTE: this assumes that all walkers have the same TargetDist, might change later on!!
@@ -410,11 +410,11 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
     // Check the total number of samples (from all walkers) and deactivate the Gradient and Hessian if it
     // is zero
     unsigned int total_samples = aver_counters[k];
-    if(use_mwalkers_mpi){
-      if(comm.Get_rank()==0){multi_sim_comm.Sum(total_samples);}
+    if(use_mwalkers_mpi) {
+      if(comm.Get_rank()==0) {multi_sim_comm.Sum(total_samples);}
       comm.Bcast(total_samples,0);
     }
-    if(total_samples==0){
+    if(total_samples==0) {
       Gradient(k).deactivate();
       Gradient(k).clear();
       Hessian(k).deactivate();
@@ -430,25 +430,25 @@ void VesBias::updateGradientAndHessian(const bool use_mwalkers_mpi) {
 
 void VesBias::multiSimSumAverages(const unsigned int c_id, const double walker_weight) {
   plumed_massert(walker_weight>=0.0,"the weight of the walker cannot be negative!");
-  if(walker_weight!=1.0){
-    for(size_t i=0; i<sampled_averages[c_id].size(); i++){
+  if(walker_weight!=1.0) {
+    for(size_t i=0; i<sampled_averages[c_id].size(); i++) {
       sampled_averages[c_id][i] *= walker_weight;
     }
-    for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++){
+    for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++) {
       sampled_cross_averages[c_id][i] *= walker_weight;
     }
   }
   //
-  if(comm.Get_rank()==0){
+  if(comm.Get_rank()==0) {
     multi_sim_comm.Sum(sampled_averages[c_id]);
     multi_sim_comm.Sum(sampled_cross_averages[c_id]);
     double norm_weights = walker_weight;
     multi_sim_comm.Sum(norm_weights);
-    if(norm_weights>0.0){norm_weights=1.0/norm_weights;}
-    for(size_t i=0; i<sampled_averages[c_id].size(); i++){
+    if(norm_weights>0.0) {norm_weights=1.0/norm_weights;}
+    for(size_t i=0; i<sampled_averages[c_id].size(); i++) {
       sampled_averages[c_id][i] *= norm_weights;
     }
-    for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++){
+    for(size_t i=0; i<sampled_cross_averages[c_id].size(); i++) {
       sampled_cross_averages[c_id][i] *= norm_weights;
     }
   }
@@ -469,7 +469,7 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
   size_t stride = comm.Get_size();
   size_t rank = comm.Get_rank();
   // update average and diagonal part of Hessian
-  for(size_t i=rank; i<ncoeffs;i+=stride){
+  for(size_t i=rank; i<ncoeffs; i+=stride) {
     size_t midx = getHessianIndex(i,i,c_id);
     deltas[i] = (values[i]-sampled_averages[c_id][i])/(counter_dbl+1); // (x[n+1]-xm[n])/(n+1)
     sampled_averages[c_id][i] += deltas[i];
@@ -477,9 +477,9 @@ void VesBias::addToSampledAverages(const std::vector<double>& values, const unsi
   }
   comm.Sum(deltas);
   // update off-diagonal part of the Hessian
-  if(!diagonal_hessian_){
-    for(size_t i=rank; i<ncoeffs;i+=stride){
-      for(size_t j=(i+1); j<ncoeffs;j++){
+  if(!diagonal_hessian_) {
+    for(size_t i=rank; i<ncoeffs; i+=stride) {
+      for(size_t j=(i+1); j<ncoeffs; j++) {
         size_t midx = getHessianIndex(i,j,c_id);
         sampled_cross_averages[c_id][midx] += (values[i]*values[j]-sampled_cross_averages[c_id][midx])/(counter_dbl+1);
       }
@@ -509,7 +509,7 @@ void VesBias::setTargetDistAveragesToZero(const unsigned int coeffs_id) {
 
 
 void VesBias::checkThatTemperatureIsGiven() {
-  if(kbt_==0.0){
+  if(kbt_==0.0) {
     std::string err_msg = "VES bias " + getLabel() + " of type " + getName() + ": the temperature is needed so you need to give it using the TEMP keyword as the MD engine does not pass it to PLUMED.";
     plumed_merror(err_msg);
   }
@@ -518,7 +518,7 @@ void VesBias::checkThatTemperatureIsGiven() {
 
 unsigned int VesBias::getIterationCounter() const {
   unsigned int iteration = 0;
-  if(optimizeCoeffs()){
+  if(optimizeCoeffs()) {
     iteration = getOptimizerPntr()->getIterationCounter();
   }
   return iteration;
@@ -527,7 +527,7 @@ unsigned int VesBias::getIterationCounter() const {
 
 void VesBias::linkOptimizer(Optimizer* optimizer_pntr_in) {
   //
-  if(optimizer_pntr_==NULL){
+  if(optimizer_pntr_==NULL) {
     optimizer_pntr_ = optimizer_pntr_in;
   }
   else {
@@ -543,7 +543,7 @@ void VesBias::enableHessian(const bool diagonal_hessian) {
   compute_hessian_=true;
   diagonal_hessian_=diagonal_hessian;
   sampled_cross_averages.clear();
-  for (unsigned int i=0; i<ncoeffssets_; i++){
+  for (unsigned int i=0; i<ncoeffssets_; i++) {
     delete hessian_pntrs_[i];
     std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
@@ -559,7 +559,7 @@ void VesBias::disableHessian() {
   compute_hessian_=false;
   diagonal_hessian_=true;
   sampled_cross_averages.clear();
-  for (unsigned int i=0; i<ncoeffssets_; i++){
+  for (unsigned int i=0; i<ncoeffssets_; i++) {
     delete hessian_pntrs_[i];
     std::string label = getCoeffsSetLabelString("hessian",i);
     hessian_pntrs_[i] = new CoeffsMatrix(label,coeffs_pntrs_[i],comm,diagonal_hessian_);
@@ -579,7 +579,7 @@ void VesBias::apply() {
 std::string VesBias::getCoeffsSetLabelString(const std::string& type, const unsigned int coeffs_id) const {
   std::string label_prefix = getLabel() + ".";
   std::string label_postfix = "";
-  if(use_multiple_coeffssets_){
+  if(use_multiple_coeffssets_) {
     Tools::convert(coeffs_id,label_postfix);
     label_postfix = "-" + label_postfix;
   }
@@ -591,12 +591,12 @@ OFile* VesBias::getOFile(const std::string& filepath, const bool multi_sim_singl
   OFile* ofile_pntr = new OFile();
   std::string fp = filepath;
   ofile_pntr->link(*static_cast<Action*>(this));
-  if(enforce_backup){ofile_pntr->enforceBackup();}
-  if(multi_sim_single_file){
+  if(enforce_backup) {ofile_pntr->enforceBackup();}
+  if(multi_sim_single_file) {
     unsigned int r=0;
-    if(comm.Get_rank()==0){r=multi_sim_comm.Get_rank();}
+    if(comm.Get_rank()==0) {r=multi_sim_comm.Get_rank();}
     comm.Bcast(r,0);
-    if(r>0){fp="/dev/null";}
+    if(r>0) {fp="/dev/null";}
     ofile_pntr->enforceSuffix("");
   }
   ofile_pntr->open(fp);
@@ -630,10 +630,10 @@ void VesBias::setGridMax(const std::vector<double>& grid_max_in) {
 
 std::string VesBias::getCurrentOutputFilename(const std::string& base_filename, const std::string& suffix) const {
   std::string filename = base_filename;
-  if(suffix.size()>0){
+  if(suffix.size()>0) {
     filename = FileBase::appendSuffix(filename,"."+suffix);
   }
-  if(optimizeCoeffs()){
+  if(optimizeCoeffs()) {
     filename = FileBase::appendSuffix(filename,"."+getIterationFilenameSuffix());
   }
   return filename;
@@ -642,10 +642,10 @@ std::string VesBias::getCurrentOutputFilename(const std::string& base_filename, 
 
 std::string VesBias::getCurrentTargetDistOutputFilename(const std::string& suffix) const {
   std::string filename = targetdist_filename_;
-  if(suffix.size()>0){
+  if(suffix.size()>0) {
     filename = FileBase::appendSuffix(filename,"."+suffix);
   }
-  if(optimizeCoeffs() && dynamicTargetDistribution()){
+  if(optimizeCoeffs() && dynamicTargetDistribution()) {
     filename = FileBase::appendSuffix(filename,"."+getIterationFilenameSuffix());
   }
   return filename;
@@ -662,7 +662,7 @@ std::string VesBias::getIterationFilenameSuffix() const {
 
 std::string VesBias::getCoeffsSetFilenameSuffix(const unsigned int coeffs_id) const {
   std::string suffix = "";
-  if(use_multiple_coeffssets_){
+  if(use_multiple_coeffssets_) {
     Tools::convert(coeffs_id,suffix);
     suffix = coeffs_id_prefix_ + suffix;
   }
@@ -679,11 +679,11 @@ void VesBias::setupBiasCutoff(const double bias_cutoff_value, const double fermi
   std::string str_fermi_exp_max; VesTools::convertDbl2Str(fermi_exp_max,str_fermi_exp_max);
   std::string swfunc_keywords = "FERMI R_0=" + str_bias_cutoff_value + " FERMI_LAMBDA=" + str_fermi_lambda + " FERMI_EXP_MAX=" + str_fermi_exp_max;
   //
-  if(bias_cutoff_swfunc_pntr_!=NULL){delete bias_cutoff_swfunc_pntr_;}
+  if(bias_cutoff_swfunc_pntr_!=NULL) {delete bias_cutoff_swfunc_pntr_;}
   std::string swfunc_errors="";
   bias_cutoff_swfunc_pntr_ = new FermiSwitchingFunction();
   bias_cutoff_swfunc_pntr_->set(swfunc_keywords,swfunc_errors);
-  if(swfunc_errors.size()>0){
+  if(swfunc_errors.size()>0) {
     plumed_merror("problem with setting up Fermi switching function: " + swfunc_errors);
   }
   //
@@ -708,7 +708,7 @@ double VesBias::getBiasCutoffSwitchingFunction(const double bias, double& deriv_
 
 bool VesBias::useMultipleWalkers() const {
   bool use_mwalkers_mpi=false;
-  if(optimizeCoeffs() && getOptimizerPntr()->useMultipleWalkers()){
+  if(optimizeCoeffs() && getOptimizerPntr()->useMultipleWalkers()) {
     use_mwalkers_mpi=true;
   }
   return use_mwalkers_mpi;

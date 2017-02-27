@@ -28,77 +28,77 @@
 #include <algorithm>
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
-TargetDistributionRegister::~TargetDistributionRegister(){
-  if(m.size()>0){
+TargetDistributionRegister::~TargetDistributionRegister() {
+  if(m.size()>0) {
     std::string names="";
-    for(std::map<std::string,creator_pointer>::iterator p=m.begin();p!=m.end();++p) names+=p->first+" ";
+    for(std::map<std::string,creator_pointer>::iterator p=m.begin(); p!=m.end(); ++p) names+=p->first+" ";
     std::cerr<<"WARNING: One dimensional target distribution "+ names +" has not been properly unregistered. This might lead to memory leak!!\n";
   }
 }
 
-TargetDistributionRegister& targetDistributionRegister(){
+TargetDistributionRegister& targetDistributionRegister() {
   static TargetDistributionRegister ans;
   return ans;
 }
 
-void TargetDistributionRegister::remove(creator_pointer f){
-  for(std::map<std::string,creator_pointer>::iterator p=m.begin();p!=m.end();++p){
-    if((*p).second==f){
+void TargetDistributionRegister::remove(creator_pointer f) {
+  for(std::map<std::string,creator_pointer>::iterator p=m.begin(); p!=m.end(); ++p) {
+    if((*p).second==f) {
       m.erase(p); break;
     }
   }
 }
 
-void TargetDistributionRegister::add( std::string type, creator_pointer f , keywords_pointer kf){
+void TargetDistributionRegister::add( std::string type, creator_pointer f, keywords_pointer kf) {
   plumed_massert(m.count(type)==0,"type has already been registered");
   m.insert(std::pair<std::string,creator_pointer>(type,f));
   Keywords keys; kf(keys);
   mk.insert(std::pair<std::string,Keywords>(type,keys));
 }
 
-bool TargetDistributionRegister::check(std::string type){
+bool TargetDistributionRegister::check(std::string type) {
   if( m.count(type)>0 ) return true;
   return false;
 }
 
-TargetDistribution* TargetDistributionRegister::create( const TargetDistributionOptions& to ){
+TargetDistribution* TargetDistributionRegister::create( const TargetDistributionOptions& to ) {
   TargetDistribution* lselect;
-  if( check(to.words[0]) ){
-     lselect=m[to.words[0]](to);
-     lselect->checkRead();
+  if( check(to.words[0]) ) {
+    lselect=m[to.words[0]](to);
+    lselect->checkRead();
   }
-  else{
+  else {
     plumed_merror("problem with setting up a target distribution, distribution of the type " + to.words[0] + " does not exist");
   }
   return lselect;
 }
 
 
-std::vector<std::string> TargetDistributionRegister::list()const{
+std::vector<std::string> TargetDistributionRegister::list()const {
   std::vector<std::string> s;
-  for(const_mIterator it=m.begin();it!=m.end();++it)
+  for(const_mIterator it=m.begin(); it!=m.end(); ++it)
     s.push_back((*it).first);
   sort(s.begin(),s.end());
   return s;
 }
 
 
-std::ostream & operator<<(std::ostream &log,const TargetDistributionRegister&ar){
+std::ostream & operator<<(std::ostream &log,const TargetDistributionRegister&ar) {
   std::vector<std::string> s(ar.list());
-  for(unsigned int i=0;i<s.size();i++) log<<"  "<<s[i]<<"\n";
+  for(unsigned int i=0; i<s.size(); i++) log<<"  "<<s[i]<<"\n";
   return log;
 }
 
 
-bool TargetDistributionRegister::printManual( const std::string& type, const bool& vimout){
-  if(check(type)){
-    if(vimout){
-       printf("%s",type.c_str()); mk[type].print_vim(); printf("\n");
+bool TargetDistributionRegister::printManual( const std::string& type, const bool& vimout) {
+  if(check(type)) {
+    if(vimout) {
+      printf("%s",type.c_str()); mk[type].print_vim(); printf("\n");
     } else {
-       mk[type].print_html();
+      mk[type].print_html();
     }
     return true;
   } else {

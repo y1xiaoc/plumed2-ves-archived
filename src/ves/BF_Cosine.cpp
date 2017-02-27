@@ -25,8 +25,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_BASISF BF_COSINE
 /*
@@ -85,13 +85,13 @@ public:
 PLUMED_REGISTER_ACTION(BF_Cosine,"BF_COSINE")
 
 
-void BF_Cosine::registerKeywords(Keywords& keys){
+void BF_Cosine::registerKeywords(Keywords& keys) {
   BasisFunctions::registerKeywords(keys);
 }
 
 
 BF_Cosine::BF_Cosine(const ActionOptions&ao):
-PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-pi","+pi");
@@ -111,22 +111,22 @@ void BF_Cosine::getAllValues(const double arg, double& argT, bool& inside_range,
   argT=translateArgument(arg, inside_range);
   values[0]=1.0;
   derivs[0]=0.0;
-  for(unsigned int i=1; i < getOrder()+1;i++){
+  for(unsigned int i=1; i < getOrder()+1; i++) {
     double io = i;
     double cos_tmp = cos(io*argT);
     double sin_tmp = sin(io*argT);
     values[i] = cos_tmp;
     derivs[i] = -io*sin_tmp*intervalDerivf();
   }
-  if(!inside_range){
-    for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}
+  if(!inside_range) {
+    for(unsigned int i=0; i<derivs.size(); i++) {derivs[i]=0.0;}
   }
 }
 
 
 void BF_Cosine::setupLabels() {
   setLabel(0,"1");
-  for(unsigned int i=1; i < getOrder()+1;i++){
+  for(unsigned int i=1; i < getOrder()+1; i++) {
     std::string is; Tools::convert(i,is);
     setLabel(i,"cos("+is+"*s)");
   }

@@ -35,7 +35,7 @@
 
 #define PLUMED_OPTIMIZER_INIT(ao) Action(ao),Optimizer(ao)
 
-namespace PLMD{
+namespace PLMD {
 
 /**
 \ingroup INHERIT
@@ -44,15 +44,15 @@ Abstract base class for implenting new optimization methods
 
 class OFile;
 
-namespace ves{
+namespace ves {
 
 class CoeffsVector;
 class VesBias;
 
 
 class Optimizer :
- public ActionPilot,
- public ActionWithValue
+  public ActionPilot,
+  public ActionWithValue
 {
 private:
   const std::string description_;
@@ -183,10 +183,10 @@ public:
   void setIterationCounter(const unsigned int);
   void increaseIterationCounter();
   //
-  void apply(){};
-  void calculate(){};
+  void apply() {};
+  void calculate() {};
   void update();
-  unsigned int getNumberOfDerivatives(){return 0;}
+  unsigned int getNumberOfDerivatives() {return 0;}
   //
   bool fixedStepSize() const {return fixed_stepsize_;}
   bool dynamicStepSize() const {return !fixed_stepsize_;}
@@ -306,11 +306,11 @@ bool Optimizer::parseMultipleValues(const std::string& keyword, std::vector<T>& 
   bool identical_values=false;
   //
   parseVector(keyword,values);
-  if(values.size()==1 && ncoeffssets_>1){
+  if(values.size()==1 && ncoeffssets_>1) {
     values.resize(ncoeffssets_,values[0]);
     identical_values=true;
   }
-  if(values.size()>0 && values.size()!=ncoeffssets_){
+  if(values.size()>0 && values.size()!=ncoeffssets_) {
     std::string s1; Tools::convert(ncoeffssets_,s1);
     plumed_merror("Error in " + keyword + " keyword: either give 1 common value for all coefficient sets or " + s1 + " separate value for each set");
   }
@@ -320,7 +320,7 @@ bool Optimizer::parseMultipleValues(const std::string& keyword, std::vector<T>& 
 template<class T>
 bool Optimizer::parseMultipleValues(const std::string& keyword, std::vector<T>& values, const T& default_value) {
   bool identical_values = parseMultipleValues(keyword,values);
-  if(values.size()==0){
+  if(values.size()==0) {
     values.resize(ncoeffssets_,default_value);
     identical_values=true;
   }
@@ -329,14 +329,14 @@ bool Optimizer::parseMultipleValues(const std::string& keyword, std::vector<T>& 
 
 inline
 void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames, const std::string& default_fname) {
-  if(parseMultipleValues<std::string>(keyword,fnames,default_fname)){
+  if(parseMultipleValues<std::string>(keyword,fnames,default_fname)) {
     addCoeffsSetIDsToFilenames(fnames,coeffssetid_prefix_);
   }
 }
 
 inline
 void Optimizer::parseFilenames(const std::string& keyword, std::vector<std::string>& fnames) {
-  if(parseMultipleValues<std::string>(keyword,fnames)){
+  if(parseMultipleValues<std::string>(keyword,fnames)) {
     addCoeffsSetIDsToFilenames(fnames,coeffssetid_prefix_);
   }
 }

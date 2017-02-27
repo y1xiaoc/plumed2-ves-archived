@@ -24,27 +24,27 @@
 #include "BasisFunctions.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 BasisSetInfo::BasisSetInfo(
   const std::string& basisset_label,
   std::vector<BasisFunctions*>& basisf):
-basisset_label_(basisset_label),
-basisf_(basisf),
-basisset_dim_(basisf.size()),
-basisset_size_(1),
-bf_keywords_(basisset_dim_),
-bf_types_(basisset_dim_),
-bf_orders_(basisset_dim_),
-bf_sizes_(basisset_dim_),
-bf_intervals_min_(basisset_dim_),
-bf_intervals_max_(basisset_dim_),
-bf_intervals_range_(basisset_dim_),
-bf_intervals_mean_(basisset_dim_),
-bf_intervals_bounded_(basisset_dim_),
-bf_intervals_periodic_(basisset_dim_),
-basisset_volume_(1.0)
+  basisset_label_(basisset_label),
+  basisf_(basisf),
+  basisset_dim_(basisf.size()),
+  basisset_size_(1),
+  bf_keywords_(basisset_dim_),
+  bf_types_(basisset_dim_),
+  bf_orders_(basisset_dim_),
+  bf_sizes_(basisset_dim_),
+  bf_intervals_min_(basisset_dim_),
+  bf_intervals_max_(basisset_dim_),
+  bf_intervals_range_(basisset_dim_),
+  bf_intervals_mean_(basisset_dim_),
+  bf_intervals_bounded_(basisset_dim_),
+  bf_intervals_periodic_(basisset_dim_),
+  basisset_volume_(1.0)
 {
   // initialize();
 }

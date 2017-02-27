@@ -30,7 +30,7 @@
 #include <cmath>
 
 
-namespace PLMD{
+namespace PLMD {
 
 class Action;
 class Value;
@@ -38,7 +38,7 @@ class IFile;
 class OFile;
 class Communicator;
 
-namespace ves{
+namespace ves {
 
 class BasisFunctions;
 class CoeffsVector;
@@ -97,7 +97,7 @@ public:
     Communicator& cc,
     const bool diagonal=true);
   //
-  ~CoeffsMatrix(){}
+  ~CoeffsMatrix() {}
   //
   size_t getSize() const;
   //
@@ -186,8 +186,8 @@ public:
   void randomizeValuesGaussian(int);
   //
   void resetAveragingCounter() {averaging_counter=0;}
-  void setupExponentiallyDecayingAveraging(const unsigned int averaging_exp_decay_in){averaging_exp_decay_=averaging_exp_decay_in;}
-  void turnOffExponentiallyDecayingAveraging(){ averaging_exp_decay_=0;}
+  void setupExponentiallyDecayingAveraging(const unsigned int averaging_exp_decay_in) {averaging_exp_decay_=averaging_exp_decay_in;}
+  void turnOffExponentiallyDecayingAveraging() { averaging_exp_decay_=0;}
   void resetAveraging();
   void addToAverage(const CoeffsMatrix&);
   void addToAverage(const CoeffsMatrix&, const unsigned int);

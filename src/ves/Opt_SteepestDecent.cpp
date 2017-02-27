@@ -26,8 +26,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_OPTIMIZER_HIDDEN STEEPEST_DECENT
 /*
@@ -50,7 +50,7 @@ public:
 PLUMED_REGISTER_ACTION(Opt_SteepestDecent,"STEEPEST_DECENT")
 
 
-void Opt_SteepestDecent::registerKeywords(Keywords& keys){
+void Opt_SteepestDecent::registerKeywords(Keywords& keys) {
   Optimizer::registerKeywords(keys);
   Optimizer::useFixedStepSizeKeywords(keys);
   Optimizer::useMultipleWalkersKeywords(keys);
@@ -59,7 +59,7 @@ void Opt_SteepestDecent::registerKeywords(Keywords& keys){
 
 
 Opt_SteepestDecent::Opt_SteepestDecent(const ActionOptions&ao):
-PLUMED_OPTIMIZER_INIT(ao)
+  PLUMED_OPTIMIZER_INIT(ao)
 {
   checkRead();
 }

@@ -26,8 +26,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_OPTIMIZER ROBBINS_MONRO_SGD
 /*
@@ -51,7 +51,7 @@ public:
 PLUMED_REGISTER_ACTION(Opt_RobbinsMonroSGD,"ROBBINS_MONRO_SGD")
 
 
-void Opt_RobbinsMonroSGD::registerKeywords(Keywords& keys){
+void Opt_RobbinsMonroSGD::registerKeywords(Keywords& keys) {
   Optimizer::registerKeywords(keys);
   Optimizer::useDynamicStepSizeKeywords(keys);
   Optimizer::useMultipleWalkersKeywords(keys);
@@ -60,18 +60,18 @@ void Opt_RobbinsMonroSGD::registerKeywords(Keywords& keys){
   // Optimizer::useMonitorAveragesKeywords(keys);
   Optimizer::useDynamicTargetDistributionKeywords(keys);
   keys.add("optional","DECAY_CONSTANT","the decay constant used for the step size.");
-  }
+}
 
 
 Opt_RobbinsMonroSGD::Opt_RobbinsMonroSGD(const ActionOptions&ao):
-PLUMED_OPTIMIZER_INIT(ao),
-decay_constant_(1.0)
+  PLUMED_OPTIMIZER_INIT(ao),
+  decay_constant_(1.0)
 {
   parse("DECAY_CONSTANT",decay_constant_);
-  if(decay_constant_<1.0){
+  if(decay_constant_<1.0) {
     plumed_merror("the value given in DECAY_CONSTANT doesn't make sense, it should be larger than 1.0");
   }
-  if(decay_constant_>1.0){
+  if(decay_constant_>1.0) {
     log.printf("  using a decay constant of %f\n",decay_constant_);
   }
   checkRead();

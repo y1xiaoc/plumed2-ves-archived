@@ -28,8 +28,8 @@
 #include "core/PlumedMain.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_OPTIMIZER_HIDDEN FES_DUMPER
 /*
@@ -53,7 +53,7 @@ public:
 PLUMED_REGISTER_ACTION(Opt_FesDumper,"FES_DUMPER")
 
 
-void Opt_FesDumper::registerKeywords(Keywords& keys){
+void Opt_FesDumper::registerKeywords(Keywords& keys) {
   Optimizer::registerKeywords(keys);
   keys.remove("COEFFS_FILE");
   keys.remove("COEFFS_OUTPUT");
@@ -74,7 +74,7 @@ void Opt_FesDumper::registerKeywords(Keywords& keys){
 
 
 Opt_FesDumper::Opt_FesDumper(const ActionOptions&ao):
-PLUMED_OPTIMIZER_INIT(ao)
+  PLUMED_OPTIMIZER_INIT(ao)
 {
   turnOffHessian();
   turnOffCoeffsOutputFiles();
@@ -86,20 +86,20 @@ PLUMED_OPTIMIZER_INIT(ao)
   checkRead();
   IFile ifile;
   ifile.open(fname);
-  while(ifile){
+  while(ifile) {
     getBiasPntrs()[0]->resetBiasFileOutput();
     getBiasPntrs()[0]->resetFesFileOutput();
 
     getCoeffsPntrs()[0]->readOneSetFromFile(ifile);
 
     setIterationCounter(getCoeffsPntrs()[0]->getIterationCounter());
-    if(isBiasOutputActive() && getIterationCounter()%getBiasOutputStride()==0){
+    if(isBiasOutputActive() && getIterationCounter()%getBiasOutputStride()==0) {
       writeBiasOutputFiles();
     }
-    if(isFesOutputActive() && getIterationCounter()%getFesOutputStride()==0){
+    if(isFesOutputActive() && getIterationCounter()%getFesOutputStride()==0) {
       writeFesOutputFiles();
     }
-    if(isFesProjOutputActive() && getIterationCounter()%getFesProjOutputStride()==0){
+    if(isFesProjOutputActive() && getIterationCounter()%getFesProjOutputStride()==0) {
       writeFesProjOutputFiles();
     }
   }

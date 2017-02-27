@@ -27,8 +27,8 @@
 #include <cmath>
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 class MDRunner_Position : public Colvar {
 public:
@@ -48,7 +48,7 @@ Use as CVs the postions from dynamics of \ref md_linearexpansion
 
 PLUMED_REGISTER_ACTION(MDRunner_Position,"MDRUNNER_POSITION")
 
-void MDRunner_Position::registerKeywords( Keywords& keys ){
+void MDRunner_Position::registerKeywords( Keywords& keys ) {
   Colvar::registerKeywords( keys );
   keys.addOutputComponent("x","default","x-postion of the walker");
   keys.addOutputComponent("y","default","y-postion of the walker");
@@ -56,7 +56,7 @@ void MDRunner_Position::registerKeywords( Keywords& keys ){
 }
 
 MDRunner_Position::MDRunner_Position(const ActionOptions& ao):
-PLUMED_COLVAR_INIT(ao)
+  PLUMED_COLVAR_INIT(ao)
 {
   checkRead();
   log.printf("  using x,y,z coordinates of a MD Runner\n");
@@ -68,7 +68,7 @@ PLUMED_COLVAR_INIT(ao)
   requestAtoms(atoms);
 }
 
-void MDRunner_Position::calculate(){
+void MDRunner_Position::calculate() {
   Vector pos = getPosition(0);
   Value* valuex=getPntrToComponent("x");
   Value* valuey=getPntrToComponent("y");

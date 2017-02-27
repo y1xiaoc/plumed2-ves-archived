@@ -30,8 +30,8 @@
 #include "GridProjWeights.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST_HIDDEN MARGINAL_WELL_TEMPERED
 /*
@@ -51,14 +51,14 @@ public:
   explicit TD_MarginalWellTempered(const TargetDistributionOptions& to);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~TD_MarginalWellTempered(){}
+  ~TD_MarginalWellTempered() {}
 };
 
 
 VES_REGISTER_TARGET_DISTRIBUTION(TD_MarginalWellTempered,"MARGINAL_WELL_TEMPERED")
 
 
-void TD_MarginalWellTempered::registerKeywords(Keywords& keys){
+void TD_MarginalWellTempered::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","BIAS_FACTOR","The bias factor to be used for the well tempered distribution");
   keys.add("compulsory","PROJ_ARGS","The argument to be used for the marginal.");
@@ -66,16 +66,16 @@ void TD_MarginalWellTempered::registerKeywords(Keywords& keys){
 
 
 TD_MarginalWellTempered::TD_MarginalWellTempered( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-bias_factor_(0.0),
-proj_args(0)
+  TargetDistribution(to),
+  bias_factor_(0.0),
+  proj_args(0)
 {
   parse("BIAS_FACTOR",bias_factor_);
-  if(bias_factor_<=1.0){
+  if(bias_factor_<=1.0) {
     plumed_merror(getName()+" target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   }
   parseVector("MARGINAL_ARG",proj_args);
-  if(proj_args.size()!=1){
+  if(proj_args.size()!=1) {
     plumed_merror(getName()+" target distribution: currently only supports one marginal argument in MARGINAL_ARG");
   }
   setDynamic();
@@ -90,7 +90,7 @@ double TD_MarginalWellTempered::getValue(const std::vector<double>& argument) co
 }
 
 
-void TD_MarginalWellTempered::updateGrid(){
+void TD_MarginalWellTempered::updateGrid() {
   double beta_prime = getBeta()/bias_factor_;
   plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to use TD_MarginalWellTempered!");
   //
@@ -102,7 +102,7 @@ void TD_MarginalWellTempered::updateGrid(){
   //
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(getTargetDistGridPntr());
   double norm = 0.0;
-  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
+  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++) {
     double value = beta_prime * fes_proj.getValue(l);
     logTargetDistGrid().setValue(l,value);
     value = exp(-value);

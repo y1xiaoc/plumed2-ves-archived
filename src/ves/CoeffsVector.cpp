@@ -39,8 +39,8 @@
 #include <cfloat>
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 CoeffsVector::CoeffsVector(
   const std::string& label,
@@ -48,11 +48,11 @@ CoeffsVector::CoeffsVector(
   const std::vector<unsigned int>& indices_shape,
   Communicator& cc,
   const bool use_iteration_counter):
-CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
-data(0),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
+  data(0),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   clear();
 }
@@ -64,11 +64,11 @@ CoeffsVector::CoeffsVector(
   std::vector<BasisFunctions*>& basisf,
   Communicator& cc,
   const bool use_iteration_counter):
-CoeffsBase(label,args,basisf,use_iteration_counter),
-data(0),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase(label,args,basisf,use_iteration_counter),
+  data(0),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   clear();
 }
@@ -81,11 +81,11 @@ CoeffsVector::CoeffsVector(
   Communicator& cc,
   const bool use_iteration_counter,
   const std::string& multicoeffs_label):
-CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
-data(0),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
+  data(0),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   clear();
 }
@@ -95,11 +95,11 @@ CoeffsVector::CoeffsVector(
   const std::string& label,
   CoeffsMatrix* coeffsMat,
   Communicator& cc):
-CoeffsBase( *(static_cast<CoeffsBase*>(coeffsMat)) ),
-data(0),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase( *(static_cast<CoeffsBase*>(coeffsMat)) ),
+  data(0),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   clear();
 }
@@ -107,14 +107,14 @@ mycomm(cc)
 
 void CoeffsVector::clear() {
   data.resize(getSize());
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=0.0;
   }
 }
 
 
 void CoeffsVector::setAllValuesToZero() {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=0.0;
   }
 }
@@ -162,7 +162,7 @@ void CoeffsVector::sumCommMPI(Communicator& cc) {
 
 
 void CoeffsVector::sumMultiSimCommMPI(Communicator& multi_sim_cc) {
-  if(mycomm.Get_rank()==0){
+  if(mycomm.Get_rank()==0) {
     double nwalkers = static_cast<double>(multi_sim_cc.Get_size());
     multi_sim_cc.Sum(data);
     scaleAllValues(1.0/nwalkers);
@@ -238,7 +238,7 @@ void CoeffsVector::addToValue(const std::vector<unsigned int>& indices, const do
 
 
 void CoeffsVector::scaleAllValues(const double scalef) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]*=scalef;
   }
 }
@@ -262,7 +262,7 @@ CoeffsVector operator*(const CoeffsVector& coeffsvector, const double scalef) {
 
 CoeffsVector& CoeffsVector::operator*=(const CoeffsVector& other_coeffsvector) {
   plumed_massert(data.size()==other_coeffsvector.getSize(),"Coeffs vectors do not have the same size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]*=other_coeffsvector.data[i];
   }
   return *this;
@@ -275,7 +275,7 @@ CoeffsVector CoeffsVector::operator*(const CoeffsVector& other_coeffsvector) con
 
 
 void CoeffsVector::setValues(const double value) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=value;
   }
 }
@@ -283,7 +283,7 @@ void CoeffsVector::setValues(const double value) {
 
 void CoeffsVector::setValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=values[i];
   }
 }
@@ -291,7 +291,7 @@ void CoeffsVector::setValues(const std::vector<double>& values) {
 
 void CoeffsVector::setValues(const CoeffsVector& other_coeffsvector) {
   plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=other_coeffsvector.data[i];
   }
 }
@@ -326,7 +326,7 @@ CoeffsVector CoeffsVector::operator-() const {
 
 
 void CoeffsVector::addToValues(const double value) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=value;
   }
 }
@@ -334,7 +334,7 @@ void CoeffsVector::addToValues(const double value) {
 
 void CoeffsVector::addToValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=values[i];
   }
 }
@@ -342,14 +342,14 @@ void CoeffsVector::addToValues(const std::vector<double>& values) {
 
 void CoeffsVector::addToValues(const CoeffsVector& other_coeffsvector) {
   plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=other_coeffsvector.data[i];
   }
 }
 
 
 void CoeffsVector::subtractFromValues(const double value) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]-=value;
   }
 }
@@ -357,7 +357,7 @@ void CoeffsVector::subtractFromValues(const double value) {
 
 void CoeffsVector::subtractFromValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]-=values[i];
   }
 }
@@ -365,7 +365,7 @@ void CoeffsVector::subtractFromValues(const std::vector<double>& values) {
 
 void CoeffsVector::subtractFromValues(const CoeffsVector& other_coeffsvector) {
   plumed_massert( data.size()==other_coeffsvector.getSize(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]-=other_coeffsvector.data[i];
   }
 }
@@ -459,9 +459,9 @@ CoeffsVector CoeffsVector::operator-(const CoeffsVector& other_coeffsvector) con
 
 void CoeffsVector::setValuesFromDifferentShape(const CoeffsVector& other_coeffsvector) {
   plumed_massert(numberOfDimensions()==other_coeffsvector.numberOfDimensions(),"both coeffs vector need to have the same dimension");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     std::vector<unsigned int> indices=getIndices(i);
-    if(other_coeffsvector.indicesExist(indices)){
+    if(other_coeffsvector.indicesExist(indices)) {
       size_t oidx = other_coeffsvector.getIndex(indices);
       data[i] = other_coeffsvector.data[oidx];
     }
@@ -471,7 +471,7 @@ void CoeffsVector::setValuesFromDifferentShape(const CoeffsVector& other_coeffsv
 
 void CoeffsVector::averageVectors(CoeffsVector& coeffsvec0, CoeffsVector& coeffsvec1) {
   plumed_massert(sameShape(coeffsvec0,coeffsvec1),"both CoeffsVector objects need to have the same shape");
-  for(size_t i=0; i<coeffsvec0.getSize(); i++){
+  for(size_t i=0; i<coeffsvec0.getSize(); i++) {
     coeffsvec0.data[i] = coeffsvec1.data[i] = 0.5 * (coeffsvec0.data[i]+coeffsvec1.data[i]);
   }
 }
@@ -479,16 +479,16 @@ void CoeffsVector::averageVectors(CoeffsVector& coeffsvec0, CoeffsVector& coeffs
 
 void CoeffsVector::averageVectors(const std::vector<CoeffsVector*>& coeffsvecSet) {
   const double norm_factor = 1.0/static_cast<double>(coeffsvecSet.size());
-  for(unsigned int k=1; k<coeffsvecSet.size(); k++){
+  for(unsigned int k=1; k<coeffsvecSet.size(); k++) {
     plumed_massert(coeffsvecSet[0]->sameShape(*coeffsvecSet[k]),"All CoeffsVector objects need to have the same shape");
   }
-  for(size_t i=0; i<coeffsvecSet[0]->getSize(); i++){
+  for(size_t i=0; i<coeffsvecSet[0]->getSize(); i++) {
     double value = 0.0;
-    for(unsigned int k=0; k<coeffsvecSet.size(); k++){
+    for(unsigned int k=0; k<coeffsvecSet.size(); k++) {
       value += coeffsvecSet[k]->data[i];
     }
     value *= norm_factor;
-    for(unsigned int k=0; k<coeffsvecSet.size(); k++){
+    for(unsigned int k=0; k<coeffsvecSet.size(); k++) {
       coeffsvecSet[k]->data[i] = value;
     }
   }
@@ -504,8 +504,8 @@ double CoeffsVector::getMinValue() const {
 double CoeffsVector::getMinValue(size_t& min_index) const {
   min_index=0;
   double min_value=DBL_MAX;
-  for(size_t i=0; i<data.size(); i++){
-	  if(data[i]<min_value){
+  for(size_t i=0; i<data.size(); i++) {
+    if(data[i]<min_value) {
       min_value=data[i];
       min_index=i;
     }
@@ -523,8 +523,8 @@ double CoeffsVector::getMinAbsValue() const {
 double CoeffsVector::getMinAbsValue(size_t& min_index) const {
   min_index=0;
   double min_value=DBL_MAX;
-  for(size_t i=0; i<data.size(); i++){
-	  if(std::abs(data[i])<min_value){
+  for(size_t i=0; i<data.size(); i++) {
+    if(std::abs(data[i])<min_value) {
       min_value=std::abs(data[i]);
       min_index=i;
     }
@@ -542,8 +542,8 @@ double CoeffsVector::getMaxValue() const {
 double CoeffsVector::getMaxValue(size_t& max_index) const {
   max_index=0;
   double max_value=DBL_MIN;
-  for(size_t i=0; i<data.size(); i++){
-	  if(data[i]>max_value){
+  for(size_t i=0; i<data.size(); i++) {
+    if(data[i]>max_value) {
       max_value=data[i];
       max_index=i;
     }
@@ -561,8 +561,8 @@ double CoeffsVector::getMaxAbsValue() const {
 double CoeffsVector::getMaxAbsValue(size_t& max_index) const {
   max_index=0;
   double max_value=0.0;
-  for(size_t i=0; i<data.size(); i++){
-	  if(std::abs(data[i])>max_value){
+  for(size_t i=0; i<data.size(); i++) {
+    if(std::abs(data[i])>max_value) {
       max_value=std::abs(data[i]);
       max_index=i;
     }
@@ -578,7 +578,7 @@ double CoeffsVector::getNorm() const {
 
 double CoeffsVector::getL1Norm() const {
   double norm=0.0;
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     norm+=std::abs(data[i]);
   }
   return norm;
@@ -587,7 +587,7 @@ double CoeffsVector::getL1Norm() const {
 
 double CoeffsVector::getL2Norm() const {
   double norm=0.0;
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     norm+=data[i]*data[i];
   }
   norm=sqrt(norm);
@@ -597,7 +597,7 @@ double CoeffsVector::getL2Norm() const {
 
 double CoeffsVector::getLpNorm(const double p) const {
   double norm=0.0;
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     norm+=pow(data[i],p);
   }
   norm=pow(norm,(1.0/p));
@@ -618,9 +618,9 @@ void CoeffsVector::normalizeCoeffs() {
 
 void CoeffsVector::randomizeValuesGaussian(int randomSeed) {
   Random rnd;
-  if (randomSeed<0){randomSeed = -randomSeed;}
+  if (randomSeed<0) {randomSeed = -randomSeed;}
   rnd.setSeed(-randomSeed);
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=rnd.Gaussian();
   }
 }
@@ -636,11 +636,11 @@ void CoeffsVector::addToAverage(const CoeffsVector& coeffsvec) {
   plumed_massert( data.size()==coeffsvec.getSize(), "Incorrect size");
   //
   double aver_decay = 1.0 / ( static_cast<double>(averaging_counter) + 1.0 );
-  if(averaging_exp_decay_>0 &&  (averaging_counter+1 > averaging_exp_decay_) ){
+  if(averaging_exp_decay_>0 &&  (averaging_counter+1 > averaging_exp_decay_) ) {
     aver_decay = 1.0 / static_cast<double>(averaging_exp_decay_);
   }
   //
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=(coeffsvec.data[i]-data[i])*aver_decay;
   }
   averaging_counter++;
@@ -649,8 +649,8 @@ void CoeffsVector::addToAverage(const CoeffsVector& coeffsvec) {
 
 size_t CoeffsVector::countValues(const double value) const {
   size_t numvalues=0;
-  for(size_t i=0; i<data.size(); i++){
-    if(data[i]==value){
+  for(size_t i=0; i<data.size(); i++) {
+    if(data[i]==value) {
       numvalues++;
     }
   }
@@ -660,13 +660,13 @@ size_t CoeffsVector::countValues(const double value) const {
 
 void CoeffsVector::writeToFile(const std::string& filepath, const bool print_coeffs_descriptions, const bool append_file, Action* action_pntr) {
   OFile file;
-  if(action_pntr!=NULL){
+  if(action_pntr!=NULL) {
     file.link(*action_pntr);
   }
-  else{
+  else {
     file.link(mycomm);
   }
-  if(append_file){ file.enforceRestart(); }
+  if(append_file) { file.enforceRestart(); }
   file.open(filepath);
   writeToFile(file,print_coeffs_descriptions);
   file.close();
@@ -692,13 +692,13 @@ void CoeffsVector::writeToFile(OFile& ofile, CoeffsVector* aux_coeffsvector, con
 
 void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions, const bool append_file, Action* action_pntr) {
   OFile file;
-  if(action_pntr!=NULL){
+  if(action_pntr!=NULL) {
     file.link(*action_pntr);
   }
-  else{
+  else {
     file.link(coeffsvecSet[0]->getCommunicator());
   }
-  if(append_file){ file.enforceRestart(); }
+  if(append_file) { file.enforceRestart(); }
   file.open(filepath);
   writeToFile(file,coeffsvecSet,print_coeffs_descriptions);
   file.close();
@@ -706,7 +706,7 @@ void CoeffsVector::writeToFile(const std::string& filepath, const std::vector<Co
 
 
 void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector*>& coeffsvecSet, const bool print_coeffs_descriptions) {
-  for(unsigned int k=1; k<coeffsvecSet.size(); k++){
+  for(unsigned int k=1; k<coeffsvecSet.size(); k++) {
     plumed_massert(coeffsvecSet[k]->sameShape(*coeffsvecSet[0]),"Error in writing a set of coeffs to file: The coeffs do not have the same shape and size");
   }
   coeffsvecSet[0]->writeHeaderToFile(ofile);
@@ -716,7 +716,7 @@ void CoeffsVector::writeToFile(OFile& ofile, const std::vector<CoeffsVector*>& c
 
 void CoeffsVector::writeHeaderToFile(OFile& ofile) const {
   ofile.clearFields();
-  if(isIterationCounterActive()){
+  if(isIterationCounterActive()) {
     writeIterationCounterAndTimeToFile(ofile);
   }
   writeCoeffsInfoToFile(ofile);
@@ -738,28 +738,28 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
   std::vector<std::string> coeffs_descriptions = coeffsvecSet[0]->getAllCoeffsDescriptions();
   std::string output_fmt = coeffsvecSet[0]->getOutputFmt();
   std::vector<std::string> coeffs_datalabels(numvec);
-  for(unsigned int k=0; k<numvec; k++){
+  for(unsigned int k=0; k<numvec; k++) {
     coeffs_datalabels[k] = coeffsvecSet[k]->getDataLabel();
   }
   //
   char* s1 = new char[20];
   std::vector<unsigned int> indices(numdim);
   std::vector<std::string> ilabels(numdim);
-  for(unsigned int k=0; k<numdim; k++){
+  for(unsigned int k=0; k<numdim; k++) {
     ilabels[k]=field_indices_prefix+coeffsvecSet[0]->getDimensionLabel(k);
   }
   //
-  for(size_t i=0; i<numcoeffs; i++){
+  for(size_t i=0; i<numcoeffs; i++) {
     indices=coeffsvecSet[0]->getIndices(i);
-    for(unsigned int k=0; k<numdim; k++){
+    for(unsigned int k=0; k<numdim; k++) {
       sprintf(s1,int_fmt.c_str(),indices[k]);
       ofile.printField(ilabels[k],s1);
     }
-    for(unsigned int l=0; l<numvec; l++){
+    for(unsigned int l=0; l<numvec; l++) {
       ofile.fmtField(" "+output_fmt).printField(coeffs_datalabels[l],coeffsvecSet[l]->getValue(i));
     }
     sprintf(s1,int_fmt.c_str(),i); ofile.printField(field_index,s1);
-    if(print_coeffs_descriptions){ ofile.printField(field_description,"  "+coeffs_descriptions[i]);}
+    if(print_coeffs_descriptions) { ofile.printField(field_description,"  "+coeffs_descriptions[i]);}
     ofile.printField();
   }
   ofile.fmtField();
@@ -774,9 +774,9 @@ void CoeffsVector::writeDataToFile(OFile& ofile, const std::vector<CoeffsVector*
 size_t CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs, const bool ignore_header) {
   ifile.allowIgnoredFields();
   size_t ncoeffs_read=0;
-  while(ifile){
-    if(!ignore_header){readHeaderFromFile(ifile);}
-    if(ifile){
+  while(ifile) {
+    if(!ignore_header) {readHeaderFromFile(ifile);}
+    if(ifile) {
       ncoeffs_read=readDataFromFile(ifile,ignore_missing_coeffs);
     }
   }
@@ -787,9 +787,9 @@ size_t CoeffsVector::readFromFile(IFile& ifile, const bool ignore_missing_coeffs
 size_t CoeffsVector::readOneSetFromFile(IFile& ifile, const bool ignore_header) {
   ifile.allowIgnoredFields();
   size_t ncoeffs_read=0;
-  if(ifile){
-    if(!ignore_header){readHeaderFromFile(ifile);}
-    if(ifile){ncoeffs_read=readDataFromFile(ifile,false);}
+  if(ifile) {
+    if(!ignore_header) {readHeaderFromFile(ifile);}
+    if(ifile) {ncoeffs_read=readDataFromFile(ifile,false);}
   }
   return ncoeffs_read;
 }
@@ -806,10 +806,10 @@ size_t CoeffsVector::readFromFile(const std::string& filepath, const bool ignore
 
 
 void CoeffsVector::readHeaderFromFile(IFile& ifile, const bool ignore_coeffs_info) {
-  if(ifile && isIterationCounterActive()){
+  if(ifile && isIterationCounterActive()) {
     getIterationCounterAndTimeFromFile(ifile);
   }
-  if(ifile){
+  if(ifile) {
     getCoeffsInfoFromFile(ifile,ignore_coeffs_info);
   }
 }
@@ -823,7 +823,7 @@ size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_co
   std::string field_description = "description";
   //
   std::vector<std::string> ilabels(numberOfDimensions());
-  for(unsigned int k=0; k<numberOfDimensions(); k++){
+  for(unsigned int k=0; k<numberOfDimensions(); k++) {
     ilabels[k]=field_indices_prefix+getDimensionLabel(k);
   }
   //
@@ -832,30 +832,30 @@ size_t CoeffsVector::readDataFromFile(IFile& ifile, const bool ignore_missing_co
   std::string str_tmp;
   size_t ncoeffs_read=0;
   //
-  while(ifile.scanField(field_coeffs,coeff_tmp)){
+  while(ifile.scanField(field_coeffs,coeff_tmp)) {
     int idx_tmp;
-    for(unsigned int k=0; k<numberOfDimensions(); k++){
+    for(unsigned int k=0; k<numberOfDimensions(); k++) {
       ifile.scanField(ilabels[k],idx_tmp);
       indices[k] = static_cast<unsigned int>(idx_tmp);
     }
     data[getIndex(indices)] = coeff_tmp;
     ifile.scanField(field_index,idx_tmp);
-    if(getIndex(indices)!=static_cast<unsigned int>(idx_tmp)){
+    if(getIndex(indices)!=static_cast<unsigned int>(idx_tmp)) {
       std::string is1; Tools::convert(idx_tmp,is1);
       std::string msg="ERROR: problem with indices at index " + is1 + " when reading coefficients from file";
       plumed_merror(msg);
     }
-    if(ifile.FieldExist(field_description)){ ifile.scanField(field_description,str_tmp); }
+    if(ifile.FieldExist(field_description)) { ifile.scanField(field_description,str_tmp); }
     //
     ifile.scanField();
     ncoeffs_read++;
-    if(ncoeffs_read==numberOfCoeffs()){
+    if(ncoeffs_read==numberOfCoeffs()) {
       plumed_massert((static_cast<unsigned int>(idx_tmp)+1)==numberOfCoeffs(),"something strange about the coefficent file, perhaps multiple entries and missing values");
       break;
     }
   }
   // checks on the coeffs read
-  if(ncoeffs_read>0 &&!ignore_missing_coeffs && ncoeffs_read < numberOfCoeffs()){
+  if(ncoeffs_read>0 &&!ignore_missing_coeffs && ncoeffs_read < numberOfCoeffs()) {
     plumed_merror("ERROR: missing coefficients when reading from file");
   }
   //

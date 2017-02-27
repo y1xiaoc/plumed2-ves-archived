@@ -26,8 +26,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_OPTIMIZER FAKE_OPTIMIZER
 /*
@@ -52,7 +52,7 @@ public:
 PLUMED_REGISTER_ACTION(Opt_FakeOptimizer,"FAKE_OPTIMIZER")
 
 
-void Opt_FakeOptimizer::registerKeywords(Keywords& keys){
+void Opt_FakeOptimizer::registerKeywords(Keywords& keys) {
   Optimizer::registerKeywords(keys);
   //
   Optimizer::useMultipleWalkersKeywords(keys);
@@ -62,17 +62,17 @@ void Opt_FakeOptimizer::registerKeywords(Keywords& keys){
 
 
 Opt_FakeOptimizer::Opt_FakeOptimizer(const ActionOptions&ao):
-PLUMED_OPTIMIZER_INIT(ao)
+  PLUMED_OPTIMIZER_INIT(ao)
 {
   log.printf("  fake optimizer that does not update coefficients\n");
   log.printf("  can be used to monitor gradient and Hessian for debugging purposes\n");
   bool monitor_hessian = false;
   parseFlag("MONITOR_HESSIAN",monitor_hessian);
-  if(monitor_hessian){
+  if(monitor_hessian) {
     turnOnHessian();
     log.printf("  the Hessian will also be monitored\n");
   }
-  else{
+  else {
     turnOffHessian();
   }
   turnOffCoeffsOutputFiles();

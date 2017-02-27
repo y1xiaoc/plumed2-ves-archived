@@ -39,8 +39,8 @@
 #include <cfloat>
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 CoeffsMatrix::CoeffsMatrix(
   const std::string& label,
@@ -49,15 +49,15 @@ CoeffsMatrix::CoeffsMatrix(
   Communicator& cc,
   const bool diagonal,
   const bool use_iteration_counter):
-CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
-data(0),
-size_(0),
-nrows_(0),
-ncolumns_(0),
-diagonal_(diagonal),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase(label,dimension_labels,indices_shape,use_iteration_counter),
+  data(0),
+  size_(0),
+  nrows_(0),
+  ncolumns_(0),
+  diagonal_(diagonal),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   setupMatrix();
 }
@@ -70,15 +70,15 @@ CoeffsMatrix::CoeffsMatrix(
   Communicator& cc,
   const bool diagonal,
   const bool use_iteration_counter):
-CoeffsBase(label,args,basisf,use_iteration_counter),
-data(0),
-size_(0),
-nrows_(0),
-ncolumns_(0),
-diagonal_(diagonal),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase(label,args,basisf,use_iteration_counter),
+  data(0),
+  size_(0),
+  nrows_(0),
+  ncolumns_(0),
+  diagonal_(diagonal),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   setupMatrix();
 }
@@ -92,15 +92,15 @@ CoeffsMatrix::CoeffsMatrix(
   const bool diagonal,
   const bool use_iteration_counter,
   const std::string& multicoeffs_label):
-CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
-data(0),
-size_(0),
-nrows_(0),
-ncolumns_(0),
-diagonal_(diagonal),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase(label,argsv,basisfv,use_iteration_counter,multicoeffs_label),
+  data(0),
+  size_(0),
+  nrows_(0),
+  ncolumns_(0),
+  diagonal_(diagonal),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   setupMatrix();
 }
@@ -111,15 +111,15 @@ CoeffsMatrix::CoeffsMatrix(
   CoeffsVector* coeffsVec,
   Communicator& cc,
   const bool diagonal):
-CoeffsBase( *(static_cast<CoeffsBase*>(coeffsVec)) ),
-data(0),
-size_(0),
-nrows_(0),
-ncolumns_(0),
-diagonal_(diagonal),
-averaging_counter(0),
-averaging_exp_decay_(0),
-mycomm(cc)
+  CoeffsBase( *(static_cast<CoeffsBase*>(coeffsVec)) ),
+  data(0),
+  size_(0),
+  nrows_(0),
+  ncolumns_(0),
+  diagonal_(diagonal),
+  averaging_counter(0),
+  averaging_exp_decay_(0),
+  mycomm(cc)
 {
   setLabels(label);
   setupMatrix();
@@ -129,10 +129,10 @@ mycomm(cc)
 void CoeffsMatrix::setupMatrix() {
   nrows_=numberOfCoeffs();
   ncolumns_=nrows_;
-  if(diagonal_){
+  if(diagonal_) {
     size_=nrows_;
   }
-  else{
+  else {
     size_=(nrows_*nrows_-nrows_)/2+nrows_;
   }
   clear();
@@ -185,7 +185,7 @@ void CoeffsMatrix::sumCommMPI(Communicator& cc) {
 
 
 void CoeffsMatrix::sumMultiSimCommMPI(Communicator& multi_sim_cc) {
-  if(mycomm.Get_rank()==0){
+  if(mycomm.Get_rank()==0) {
     double nwalkers = static_cast<double>(multi_sim_cc.Get_size());
     multi_sim_cc.Sum(data);
     scaleAllValues(1.0/nwalkers);
@@ -198,11 +198,11 @@ size_t CoeffsMatrix::getMatrixIndex(const size_t index1, const size_t index2) co
   size_t matrix_idx;
   plumed_dbg_assert(index1<nrows_);
   plumed_dbg_assert(index2<ncolumns_);
-  if(diagonal_){
+  if(diagonal_) {
     // plumed_massert(index1==index2,"CoeffsMatrix: you trying to access a off-diagonal element of a diagonal coeffs matrix");
     matrix_idx=index1;
   }
-  else if (index1<=index2){
+  else if (index1<=index2) {
     matrix_idx=index2+index1*(nrows_-1)-index1*(index1-1)/2;
   }
   else {
@@ -214,14 +214,14 @@ size_t CoeffsMatrix::getMatrixIndex(const size_t index1, const size_t index2) co
 
 void CoeffsMatrix::clear() {
   data.resize(getSize());
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=0.0;
   }
 }
 
 
 void CoeffsMatrix::setAllValuesToZero() {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=0.0;
   }
 }
@@ -272,14 +272,14 @@ CoeffsVector operator*(const CoeffsMatrix& coeffs_matrix, const CoeffsVector& co
   new_coeffs_vector.clear();
   plumed_massert(coeffs_vector.numberOfCoeffs()==coeffs_matrix.numberOfCoeffs(),"CoeffsMatrix and CoeffsVector are of the wrong size");
   size_t numcoeffs = coeffs_vector.numberOfCoeffs();
-  if(coeffs_matrix.isDiagonal()){
-    for(size_t i=0; i<numcoeffs; i++){
+  if(coeffs_matrix.isDiagonal()) {
+    for(size_t i=0; i<numcoeffs; i++) {
       new_coeffs_vector(i) = coeffs_matrix(i,i)*coeffs_vector(i);
     }
   }
-  else{
-    for(size_t i=0; i<numcoeffs; i++){
-      for(size_t j=0; j<numcoeffs; j++){
+  else {
+    for(size_t i=0; i<numcoeffs; i++) {
+      for(size_t j=0; j<numcoeffs; j++) {
         new_coeffs_vector(i) += coeffs_matrix(i,j)*coeffs_vector(j);
       }
     }
@@ -299,7 +299,7 @@ void CoeffsMatrix::addToValue(const std::vector<unsigned int>& indices1, const s
 
 
 void CoeffsMatrix::scaleAllValues(const double scalef) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]*=scalef;
   }
 }
@@ -323,7 +323,7 @@ CoeffsMatrix operator*(const CoeffsMatrix& coeffsmatrix, const double scalef) {
 
 CoeffsMatrix& CoeffsMatrix::operator*=(const CoeffsMatrix& other_coeffsmatrix) {
   plumed_massert(data.size()==other_coeffsmatrix.getSize(),"Coeffs matrices do not have the same size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]*=other_coeffsmatrix.data[i];
   }
   return *this;
@@ -336,7 +336,7 @@ CoeffsMatrix CoeffsMatrix::operator*(const CoeffsMatrix& other_coeffsmatrix) con
 
 
 void CoeffsMatrix::setValues(const double value) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=value;
   }
 }
@@ -344,7 +344,7 @@ void CoeffsMatrix::setValues(const double value) {
 
 void CoeffsMatrix::setValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=values[i];
   }
 }
@@ -352,7 +352,7 @@ void CoeffsMatrix::setValues(const std::vector<double>& values) {
 
 void CoeffsMatrix::setValues(const CoeffsMatrix& other_coeffsmatrix) {
   plumed_massert( data.size()==other_coeffsmatrix.getSize(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=other_coeffsmatrix.data[i];
   }
 }
@@ -387,7 +387,7 @@ CoeffsMatrix CoeffsMatrix::operator-() const {
 
 
 void CoeffsMatrix::addToValues(const double value) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=value;
   }
 }
@@ -395,7 +395,7 @@ void CoeffsMatrix::addToValues(const double value) {
 
 void CoeffsMatrix::addToValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=values[i];
   }
 }
@@ -403,14 +403,14 @@ void CoeffsMatrix::addToValues(const std::vector<double>& values) {
 
 void CoeffsMatrix::addToValues(const CoeffsMatrix& other_coeffsmatrix) {
   plumed_massert( data.size()==other_coeffsmatrix.getSize(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=other_coeffsmatrix.data[i];
   }
 }
 
 
 void CoeffsMatrix::subtractFromValues(const double value) {
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]-=value;
   }
 }
@@ -418,7 +418,7 @@ void CoeffsMatrix::subtractFromValues(const double value) {
 
 void CoeffsMatrix::subtractFromValues(const std::vector<double>& values) {
   plumed_massert( data.size()==values.size(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]-=values[i];
   }
 }
@@ -426,7 +426,7 @@ void CoeffsMatrix::subtractFromValues(const std::vector<double>& values) {
 
 void CoeffsMatrix::subtractFromValues(const CoeffsMatrix& other_coeffsmatrix) {
   plumed_massert( data.size()==other_coeffsmatrix.getSize(), "Incorrect size");
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]-=other_coeffsmatrix.data[i];
   }
 }
@@ -520,7 +520,7 @@ CoeffsMatrix CoeffsMatrix::operator-(const CoeffsMatrix& other_coeffsmatrix) con
 
 void CoeffsMatrix::averageMatrices(CoeffsMatrix& coeffsmat0, CoeffsMatrix& coeffsmat1) {
   plumed_massert(sameShape(coeffsmat0,coeffsmat1),"both CoeffsMatrix objects need to have the same shape");
-  for(size_t i=0; i<coeffsmat0.getSize(); i++){
+  for(size_t i=0; i<coeffsmat0.getSize(); i++) {
     coeffsmat0.data[i] = coeffsmat1.data[i] = 0.5 * (coeffsmat0.data[i]+coeffsmat1.data[i]);
   }
 }
@@ -528,16 +528,16 @@ void CoeffsMatrix::averageMatrices(CoeffsMatrix& coeffsmat0, CoeffsMatrix& coeff
 
 void CoeffsMatrix::averageMatrices(const std::vector<CoeffsMatrix*>& coeffsmatSet) {
   double norm_factor = 1.0/static_cast<double>(coeffsmatSet.size());
-  for(unsigned int k=1; k<coeffsmatSet.size(); k++){
+  for(unsigned int k=1; k<coeffsmatSet.size(); k++) {
     plumed_massert(coeffsmatSet[0]->sameShape(*coeffsmatSet[k]),"All CoeffsMatrix objects need to have the same shape");
   }
-  for(size_t i=0; i<coeffsmatSet[0]->getSize(); i++){
+  for(size_t i=0; i<coeffsmatSet[0]->getSize(); i++) {
     double value = 0.0;
-    for(unsigned int k=0; k<coeffsmatSet.size(); k++){
+    for(unsigned int k=0; k<coeffsmatSet.size(); k++) {
       value += coeffsmatSet[k]->data[i];
     }
     value *= norm_factor;
-    for(unsigned int k=0; k<coeffsmatSet.size(); k++){
+    for(unsigned int k=0; k<coeffsmatSet.size(); k++) {
       coeffsmatSet[k]->data[i] = value;
     }
   }
@@ -547,8 +547,8 @@ void CoeffsMatrix::averageMatrices(const std::vector<CoeffsMatrix*>& coeffsmatSe
 
 double CoeffsMatrix::getMinValue() const {
   double min_value=DBL_MAX;
-  for(size_t i=0; i<data.size(); i++){
-	  if(data[i]<min_value){
+  for(size_t i=0; i<data.size(); i++) {
+    if(data[i]<min_value) {
       min_value=data[i];
     }
   }
@@ -558,8 +558,8 @@ double CoeffsMatrix::getMinValue() const {
 
 double CoeffsMatrix::getMaxValue() const {
   double max_value=DBL_MIN;
-  for(size_t i=0; i<data.size(); i++){
-	  if(data[i]>max_value){
+  for(size_t i=0; i<data.size(); i++) {
+    if(data[i]>max_value) {
       max_value=data[i];
     }
   }
@@ -569,9 +569,9 @@ double CoeffsMatrix::getMaxValue() const {
 
 void CoeffsMatrix::randomizeValuesGaussian(int randomSeed) {
   Random rnd;
-  if (randomSeed<0){randomSeed = -randomSeed;}
+  if (randomSeed<0) {randomSeed = -randomSeed;}
   rnd.setSeed(-randomSeed);
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]=rnd.Gaussian();
   }
 }
@@ -587,11 +587,11 @@ void CoeffsMatrix::addToAverage(const CoeffsMatrix& coeffsmat) {
   plumed_massert( data.size()==coeffsmat.getSize(), "Incorrect size");
   //
   double aver_decay = 1.0 / ( static_cast<double>(averaging_counter) + 1.0 );
-  if(averaging_exp_decay_>0 &&  (averaging_counter+1 > averaging_exp_decay_) ){
+  if(averaging_exp_decay_>0 &&  (averaging_counter+1 > averaging_exp_decay_) ) {
     aver_decay = 1.0 / static_cast<double>(averaging_exp_decay_);
   }
   //
-  for(size_t i=0; i<data.size(); i++){
+  for(size_t i=0; i<data.size(); i++) {
     data[i]+=(coeffsmat.data[i]-data[i])*aver_decay;
   }
   averaging_counter++;
@@ -606,13 +606,13 @@ void CoeffsMatrix::writeToFile(OFile& ofile) {
 
 void CoeffsMatrix::writeToFile(const std::string& filepath, const bool append_file, Action* action_pntr) {
   OFile file;
-  if(action_pntr!=NULL){
+  if(action_pntr!=NULL) {
     file.link(*action_pntr);
   }
-  else{
+  else {
     file.link(mycomm);
   }
-  if(append_file){ file.enforceRestart(); }
+  if(append_file) { file.enforceRestart(); }
   file.open(filepath);
   writeToFile(file);
   file.close();
@@ -627,7 +627,7 @@ void CoeffsMatrix::writeMatrixInfoToFile(OFile& ofile) {
 
 void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
   ofile.clearFields();
-  if(isIterationCounterActive()){
+  if(isIterationCounterActive()) {
     writeIterationCounterAndTimeToFile(ofile);
   }
   writeCoeffsInfoToFile(ofile);
@@ -636,10 +636,10 @@ void CoeffsMatrix::writeHeaderToFile(OFile& ofile) {
 
 
 void CoeffsMatrix::writeDataToFile(OFile& ofile) {
-  if(diagonal_){
+  if(diagonal_) {
     writeDataDiagonalToFile(ofile);
   }
-  else{
+  else {
     writeDataFullToFile(ofile);
   }
 }
@@ -657,13 +657,13 @@ void CoeffsMatrix::writeDataDiagonalToFile(OFile& ofile) {
   char* s1 = new char[20];
   std::vector<unsigned int> indices(numberOfDimensions());
   std::vector<std::string> ilabels(numberOfDimensions());
-  for(unsigned int k=0; k<numberOfDimensions(); k++){
+  for(unsigned int k=0; k<numberOfDimensions(); k++) {
     ilabels[k]=field_indices_prefix+getDimensionLabel(k);
   }
   //
-  for(size_t i=0; i<numberOfCoeffs(); i++){
+  for(size_t i=0; i<numberOfCoeffs(); i++) {
     indices=getIndices(i);
-    for(unsigned int k=0; k<numberOfDimensions(); k++){
+    for(unsigned int k=0; k<numberOfDimensions(); k++) {
       sprintf(s1,int_fmt.c_str(),indices[k]);
       ofile.printField(ilabels[k],s1);
     }
@@ -691,8 +691,8 @@ void CoeffsMatrix::writeDataFullToFile(OFile& ofile) {
   //
   char* s1 = new char[20];
   //
-  for(size_t i=0; i<nrows_; i++){
-    for(size_t j=0; j<ncolumns_; j++){
+  for(size_t i=0; i<nrows_; i++) {
+    for(size_t j=0; j<ncolumns_; j++) {
       sprintf(s1,int_fmt.c_str(),i);
       ofile.printField(field_index_row,s1);
       sprintf(s1,int_fmt.c_str(),j);

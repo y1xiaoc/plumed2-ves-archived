@@ -28,12 +28,12 @@
 #include "GridIntegrationWeights.h"
 
 
-namespace PLMD{
+namespace PLMD {
 
 // class Grid;
 class Action;
 
-namespace ves{
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST PRODUCT_COMBINATION
 /*
@@ -117,7 +117,7 @@ public:
 VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductCombination,"PRODUCT_COMBINATION")
 
 
-void TD_ProductCombination::registerKeywords(Keywords& keys){
+void TD_ProductCombination::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","DISTRIBUTION","The target distributions to be used in the product combination, each given within a separate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
   keys.use("BIAS_CUTOFF");
@@ -127,19 +127,19 @@ void TD_ProductCombination::registerKeywords(Keywords& keys){
 
 
 TD_ProductCombination::TD_ProductCombination( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-distribution_pntrs_(0),
-grid_pntrs_(0),
-ndist_(0)
+  TargetDistribution(to),
+  distribution_pntrs_(0),
+  grid_pntrs_(0),
+  ndist_(0)
 {
   for(unsigned int i=1;; i++) {
     std::string keywords;
-    if(!parseNumbered("DISTRIBUTION",i,keywords) ){break;}
+    if(!parseNumbered("DISTRIBUTION",i,keywords) ) {break;}
     std::vector<std::string> words = Tools::getWords(keywords);
     TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
-    if(dist_pntr_tmp->isDynamic()){setDynamic();}
-    if(dist_pntr_tmp->fesGridNeeded()){setFesGridNeeded();}
-    if(dist_pntr_tmp->biasGridNeeded()){setBiasGridNeeded();}
+    if(dist_pntr_tmp->isDynamic()) {setDynamic();}
+    if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}
+    if(dist_pntr_tmp->biasGridNeeded()) {setBiasGridNeeded();}
     distribution_pntrs_.push_back(dist_pntr_tmp);
   }
   ndist_ = distribution_pntrs_.size();
@@ -149,8 +149,8 @@ ndist_(0)
 }
 
 
-TD_ProductCombination::~TD_ProductCombination(){
-  for(unsigned int i=0; i<ndist_; i++){
+TD_ProductCombination::~TD_ProductCombination() {
+  for(unsigned int i=0; i<ndist_; i++) {
     delete distribution_pntrs_[i];
   }
 }
@@ -163,9 +163,9 @@ double TD_ProductCombination::getValue(const std::vector<double>& argument) cons
 
 
 void TD_ProductCombination::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
-  for(unsigned int i=0; i<ndist_; i++){
+  for(unsigned int i=0; i<ndist_; i++) {
     distribution_pntrs_[i]->setupGrids(arguments,min,max,nbins);
-    if(distribution_pntrs_[i]->getDimension()!=this->getDimension()){
+    if(distribution_pntrs_[i]->getDimension()!=this->getDimension()) {
       plumed_merror(getName() + ": all target distribution must have the same dimension");
     }
     grid_pntrs_[i]=distribution_pntrs_[i]->getTargetDistGridPntr();
@@ -173,68 +173,68 @@ void TD_ProductCombination::setupAdditionalGrids(const std::vector<Value*>& argu
 }
 
 
-void TD_ProductCombination::updateGrid(){
-  for(unsigned int i=0; i<ndist_; i++){
+void TD_ProductCombination::updateGrid() {
+  for(unsigned int i=0; i<ndist_; i++) {
     distribution_pntrs_[i]->update();
   }
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(getTargetDistGridPntr());
   double norm = 0.0;
-  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
+  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++) {
     double value = 1.0;
-    for(unsigned int i=0; i<ndist_; i++){
+    for(unsigned int i=0; i<ndist_; i++) {
       value *= grid_pntrs_[i]->getValue(l);
     }
-    if(value<0.0 && !isTargetDistGridShiftedToZero()){plumed_merror(getName()+": The target distribution function gives negative values. You should change the definition of the target distribution to avoid this. You can also use the SHIFT_TO_ZERO keyword to avoid this problem.");}
+    if(value<0.0 && !isTargetDistGridShiftedToZero()) {plumed_merror(getName()+": The target distribution function gives negative values. You should change the definition of the target distribution to avoid this. You can also use the SHIFT_TO_ZERO keyword to avoid this problem.");}
     norm += integration_weights[l]*value;
     targetDistGrid().setValue(l,value);
     logTargetDistGrid().setValue(l,-std::log(value));
   }
 
-  if(norm>0.0){
+  if(norm>0.0) {
     targetDistGrid().scaleAllValuesAndDerivatives(1.0/norm);
   }
-  else if(!isTargetDistGridShiftedToZero()){
+  else if(!isTargetDistGridShiftedToZero()) {
     plumed_merror(getName()+": The target distribution function cannot be normalized proberly. You should change the definition of the target distribution to avoid this. You can also use the SHIFT_TO_ZERO keyword to avoid this problem.");
   }
   logTargetDistGrid().setMinToZero();
 }
 
 
-void TD_ProductCombination::linkVesBias(VesBias* vesbias_pntr_in){
+void TD_ProductCombination::linkVesBias(VesBias* vesbias_pntr_in) {
   TargetDistribution::linkVesBias(vesbias_pntr_in);
-  for(unsigned int i=0; i<ndist_; i++){
+  for(unsigned int i=0; i<ndist_; i++) {
     distribution_pntrs_[i]->linkVesBias(vesbias_pntr_in);
   }
 }
 
 
-void TD_ProductCombination::linkAction(Action* action_pntr_in){
+void TD_ProductCombination::linkAction(Action* action_pntr_in) {
   TargetDistribution::linkAction(action_pntr_in);
-  for(unsigned int i=0; i<ndist_; i++){
+  for(unsigned int i=0; i<ndist_; i++) {
     distribution_pntrs_[i]->linkAction(action_pntr_in);
   }
 }
 
 
-void TD_ProductCombination::linkBiasGrid(Grid* bias_grid_pntr_in){
+void TD_ProductCombination::linkBiasGrid(Grid* bias_grid_pntr_in) {
   TargetDistribution::linkBiasGrid(bias_grid_pntr_in);
-  for(unsigned int i=0; i<ndist_; i++){
+  for(unsigned int i=0; i<ndist_; i++) {
     distribution_pntrs_[i]->linkBiasGrid(bias_grid_pntr_in);
   }
 }
 
 
-void TD_ProductCombination::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in){
+void TD_ProductCombination::linkBiasWithoutCutoffGrid(Grid* bias_withoutcutoff_grid_pntr_in) {
   TargetDistribution::linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
-  for(unsigned int i=0; i<ndist_; i++){
+  for(unsigned int i=0; i<ndist_; i++) {
     distribution_pntrs_[i]->linkBiasWithoutCutoffGrid(bias_withoutcutoff_grid_pntr_in);
   }
 }
 
 
-void TD_ProductCombination::linkFesGrid(Grid* fes_grid_pntr_in){
+void TD_ProductCombination::linkFesGrid(Grid* fes_grid_pntr_in) {
   TargetDistribution::linkFesGrid(fes_grid_pntr_in);
-  for(unsigned int i=0; i<ndist_; i++){
+  for(unsigned int i=0; i<ndist_; i++) {
     distribution_pntrs_[i]->linkFesGrid(fes_grid_pntr_in);
   }
 }

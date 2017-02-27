@@ -25,8 +25,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_BASISF BF_POWERS
 /*
@@ -91,20 +91,20 @@ public:
 PLUMED_REGISTER_ACTION(BF_Powers,"BF_POWERS")
 
 
-void BF_Powers::registerKeywords(Keywords& keys){
+void BF_Powers::registerKeywords(Keywords& keys) {
   BasisFunctions::registerKeywords(keys);
   keys.add("optional","NORMALIZATION","The normalization factor that is used to normalize the basis functions. By default it is 1.0.");
   keys.remove("NUMERICAL_INTEGRALS");
 }
 
 BF_Powers::BF_Powers(const ActionOptions&ao):
-PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval(intervalMin(),intervalMax());
   double normfactor_=1.0;
   parse("NORMALIZATION",normfactor_);
-  if(normfactor_!=1.0){addKeywordToList("NORMALIZATION",normfactor_);}
+  if(normfactor_!=1.0) {addKeywordToList("NORMALIZATION",normfactor_);}
   inv_normfactor_=1.0/normfactor_;
   setNonPeriodic();
   setIntervalBounded();
@@ -123,20 +123,20 @@ void BF_Powers::getAllValues(const double arg, double& argT, bool& inside_range,
   values[0]=1.0;
   derivs[0]=0.0;
   //
-  for(unsigned int i=1; i < getNumberOfBasisFunctions(); i++){
+  for(unsigned int i=1; i < getNumberOfBasisFunctions(); i++) {
     // double io = static_cast<double>(i);
     // values[i] = pow(argT,io);
     // derivs[i] = io*pow(argT,io-1.0);
     values[i] = argT*values[i-1];
     derivs[i]=values[i-1]+argT*derivs[i-1];
   }
-  if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
+  if(!inside_range) {for(unsigned int i=0; i<derivs.size(); i++) {derivs[i]=0.0;}}
 }
 
 
 void BF_Powers::setupLabels() {
   setLabel(0,"1");
-  for(unsigned int i=1; i < getOrder()+1;i++){
+  for(unsigned int i=1; i < getOrder()+1; i++) {
     std::string is; Tools::convert(i,is);
     setLabel(i,"s^"+is);
   }

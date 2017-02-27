@@ -29,8 +29,8 @@
 #include <string>
 #include <cmath>
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 
 //
@@ -82,7 +82,7 @@ public:
 
 PLUMED_REGISTER_ACTION(S2ContactModel,"S2_CONTACT_MODEL")
 
-void S2ContactModel::registerKeywords( Keywords& keys ){
+void S2ContactModel::registerKeywords( Keywords& keys ) {
   Colvar::registerKeywords(keys);
   keys.addFlag("SERIAL",false,"Perform the calculation in serial - for debug purpose");
   keys.addFlag("NLIST",false,"Use a neighbour list to speed up the calculation");
@@ -100,20 +100,20 @@ void S2ContactModel::registerKeywords( Keywords& keys ){
 }
 
 S2ContactModel::S2ContactModel(const ActionOptions&ao):
-PLUMED_COLVAR_INIT(ao),
-pbc_(true),
-serial_(false),
-nl(NULL),
-invalidateList(true),
-firsttime(true),
-r_eff_(0.0),
-inv_r_eff_(0.0),
-prefactor_a_(0.0),
-exp_b_(0.0),
-offset_c_(0.0),
-n_i_(0.0),
-total_prefactor_(0.0),
-modeltype_(methyl)
+  PLUMED_COLVAR_INIT(ao),
+  pbc_(true),
+  serial_(false),
+  nl(NULL),
+  invalidateList(true),
+  firsttime(true),
+  r_eff_(0.0),
+  inv_r_eff_(0.0),
+  prefactor_a_(0.0),
+  exp_b_(0.0),
+  offset_c_(0.0),
+  n_i_(0.0),
+  total_prefactor_(0.0),
+  modeltype_(methyl)
 {
 
   parseFlag("SERIAL",serial_);
@@ -123,30 +123,30 @@ modeltype_(methyl)
   std::vector<AtomNumber> nh_atoms;
   parseAtomList("NH_ATOMS",nh_atoms);
 
-  if(methyl_atom.size()==0 && nh_atoms.size()==0){
+  if(methyl_atom.size()==0 && nh_atoms.size()==0) {
     error("you have to give either METHYL_ATOM or NH_ATOMS");
   }
-  if(methyl_atom.size()>0 && nh_atoms.size()>0){
+  if(methyl_atom.size()>0 && nh_atoms.size()>0) {
     error("you cannot give both METHYL_ATOM or NH_ATOMS");
   }
-  if(methyl_atom.size()>0 && methyl_atom.size()!=1){
+  if(methyl_atom.size()>0 && methyl_atom.size()!=1) {
     error("you should give one atom in METHYL_ATOM, the methyl carbon atom of the residue");
   }
-  if(nh_atoms.size()>0 && nh_atoms.size()!=2){
+  if(nh_atoms.size()>0 && nh_atoms.size()!=2) {
     error("you should give two atoms in NH_ATOMS, the hydrogen atom of the NH group of the residue (i) and carbonyl oxygen of the preceding residue (i-1)");
   }
 
   std::vector<AtomNumber> heavy_atoms;
   parseAtomList("HEAVY_ATOMS",heavy_atoms);
-  if(heavy_atoms.size()==0){
+  if(heavy_atoms.size()==0) {
     error("HEAVY_ATOMS is not given");
   }
 
   std::vector<AtomNumber> main_atoms;
-  if(methyl_atom.size()>0){
+  if(methyl_atom.size()>0) {
     modeltype_= methyl;
     main_atoms = methyl_atom;
-  } else if(nh_atoms.size()>0){
+  } else if(nh_atoms.size()>0) {
     modeltype_= nh;
     main_atoms = nh_atoms;
   }
@@ -160,11 +160,11 @@ modeltype_(methyl)
   double nl_cut=0.0;
   int nl_st=0;
   parseFlag("NLIST",doneigh);
-  if(doneigh){
-   parse("NL_CUTOFF",nl_cut);
-   if(nl_cut<=0.0) error("NL_CUTOFF should be explicitly specified and positive");
-   parse("NL_STRIDE",nl_st);
-   if(nl_st<=0) error("NL_STRIDE should be explicitly specified and positive");
+  if(doneigh) {
+    parse("NL_CUTOFF",nl_cut);
+    if(nl_cut<=0.0) error("NL_CUTOFF should be explicitly specified and positive");
+    parse("NL_STRIDE",nl_st);
+    if(nl_st<=0) error("NL_STRIDE should be explicitly specified and positive");
   }
 
   parse("R_EFF",r_eff_);
@@ -182,24 +182,24 @@ modeltype_(methyl)
   addValueWithDerivatives();
   setNotPeriodic();
 
-  if(doneigh){
+  if(doneigh) {
     nl= new NeighborList(main_atoms,heavy_atoms,false,pbc_,getPbc(),nl_cut,nl_st);
   }
-  else{
+  else {
     nl= new NeighborList(main_atoms,heavy_atoms,false,pbc_,getPbc());
   }
 
   requestAtoms(nl->getFullAtomList());
 
-  if(modeltype_==methyl){
+  if(modeltype_==methyl) {
     log.printf("  calculation of methyl order parameter using atom %d \n",methyl_atom[0].serial());
   }
-  else if(modeltype_==nh){
+  else if(modeltype_==nh) {
     log.printf("  calculation of NH order parameter using atoms %d and %d\n",nh_atoms[0].serial(),nh_atoms[1].serial());
   }
   log.printf("  heavy atoms used in the calculation (%u in total):\n",static_cast<unsigned int>(heavy_atoms.size()));
-  for(unsigned int i=0;i<heavy_atoms.size();++i){
-    if( (i+1) % 25 == 0 ){log.printf("  \n");}
+  for(unsigned int i=0; i<heavy_atoms.size(); ++i) {
+    if( (i+1) % 25 == 0 ) {log.printf("  \n");}
     log.printf("  %d", heavy_atoms[i].serial());
   }
   log.printf("  \n");
@@ -210,31 +210,31 @@ modeltype_(methyl)
   log.printf(" b=%f,",exp_b_);
   log.printf(" c=%f,",offset_c_);
   log.printf(" n_i=%u\n",n_i_int);
-  if(pbc_){
+  if(pbc_) {
     log.printf("  using periodic boundary conditions\n");
-  }else{
+  } else {
     log.printf("  without periodic boundary conditions\n");
   }
-  if(doneigh){
+  if(doneigh) {
     log.printf("  using neighbor lists with\n");
     log.printf("  update every %d steps and cutoff %f\n",nl_st,nl_cut);
   }
-  if(serial_){
+  if(serial_) {
     log.printf("  calculation done in serial\n");
   }
 }
 
-S2ContactModel::~S2ContactModel(){
+S2ContactModel::~S2ContactModel() {
   delete nl;
 }
 
-void S2ContactModel::prepare(){
-  if(nl->getStride()>0){
-    if(firsttime || (getStep()%nl->getStride()==0)){
+void S2ContactModel::prepare() {
+  if(nl->getStride()>0) {
+    if(firsttime || (getStep()%nl->getStride()==0)) {
       requestAtoms(nl->getFullAtomList());
       invalidateList=true;
       firsttime=false;
-    }else{
+    } else {
       requestAtoms(nl->getReducedAtomList());
       invalidateList=false;
       if(getExchangeStep()) error("Neighbor lists should be updated on exchange steps - choose a NL_STRIDE which divides the exchange stride!");
@@ -244,18 +244,18 @@ void S2ContactModel::prepare(){
 }
 
 // calculator
-void S2ContactModel::calculate(){
+void S2ContactModel::calculate() {
 
   Tensor virial;
   std::vector<Vector> deriv(getNumberOfAtoms());
 
-  if(nl->getStride()>0 && invalidateList){
+  if(nl->getStride()>0 && invalidateList) {
     nl->update(getPositions());
   }
 
   unsigned int stride=comm.Get_size();
   unsigned int rank=comm.Get_rank();
-  if(serial_){
+  if(serial_) {
     stride=1;
     rank=0;
   }
@@ -264,13 +264,13 @@ void S2ContactModel::calculate(){
 
   const unsigned int nn=nl->size();
 
-  for(unsigned int i=rank;i<nn;i+=stride) {
+  for(unsigned int i=rank; i<nn; i+=stride) {
     Vector distance;
     unsigned int i0=nl->getClosePair(i).first;
     unsigned int i1=nl->getClosePair(i).second;
-    if(getAbsoluteIndex(i0)==getAbsoluteIndex(i1)){continue;}
+    if(getAbsoluteIndex(i0)==getAbsoluteIndex(i1)) {continue;}
 
-    if(pbc_){
+    if(pbc_) {
       distance=pbcDistance(getPosition(i0),getPosition(i1));
     } else {
       distance=delta(getPosition(i0),getPosition(i1));
@@ -287,9 +287,9 @@ void S2ContactModel::calculate(){
     virial-=vv;
   }
 
-  if(!serial_){
+  if(!serial_) {
     comm.Sum(contact_sum);
-    if(!deriv.empty()){
+    if(!deriv.empty()) {
       comm.Sum(&deriv[0][0],3*deriv.size());
     }
     comm.Sum(virial);
@@ -300,7 +300,7 @@ void S2ContactModel::calculate(){
   double deriv_f = -inv_r_eff_*total_prefactor_*(1.0-value*value);
   value -= offset_c_;
 
-  for(unsigned int i=0;i<deriv.size();++i){
+  for(unsigned int i=0; i<deriv.size(); ++i) {
     setAtomsDerivatives(i,deriv_f*deriv[i]);
   }
   setValue(value);

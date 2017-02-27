@@ -26,8 +26,8 @@
 #include "tools/Keywords.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST_HIDDEN EXPONENTIAL
 /*
@@ -51,7 +51,7 @@ public:
 VES_REGISTER_TARGET_DISTRIBUTION(TD_Exponential,"EXPONENTIAL")
 
 
-void TD_Exponential::registerKeywords(Keywords& keys){
+void TD_Exponential::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMA","The minima of the exponential distribution.");
   keys.add("compulsory","LAMBDA","The lambda parameters for the chi-squared distribution.");
@@ -63,28 +63,28 @@ void TD_Exponential::registerKeywords(Keywords& keys){
 
 
 TD_Exponential::TD_Exponential( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-minima_(0),
-lambda_(0)
+  TargetDistribution(to),
+  minima_(0),
+  lambda_(0)
 {
   parseVector("MINIMA",minima_);
   parseVector("LAMBDA",lambda_);
-  for(unsigned int k=0; k<lambda_.size(); k++){
-    if(lambda_[k] < 0.0){plumed_merror(getName()+": the values given in LAMBDA should be postive.");}
+  for(unsigned int k=0; k<lambda_.size(); k++) {
+    if(lambda_[k] < 0.0) {plumed_merror(getName()+": the values given in LAMBDA should be postive.");}
   }
 
 
   setDimension(minima_.size());
-  if(lambda_.size()!=getDimension()){plumed_merror(getName()+": the LAMBDA keyword does not match the given dimension in MINIMA");}
+  if(lambda_.size()!=getDimension()) {plumed_merror(getName()+": the LAMBDA keyword does not match the given dimension in MINIMA");}
   checkRead();
 }
 
 
 double TD_Exponential::getValue(const std::vector<double>& argument) const {
   double value = 1.0;
-  for(unsigned int k=0; k<argument.size(); k++){
+  for(unsigned int k=0; k<argument.size(); k++) {
     double arg = (argument[k]-minima_[k])*lambda_[k];
-    if(arg<0.0){plumed_merror(getName()+": the exponential distribution is not defined for values less that ones given in MINIMA");}
+    if(arg<0.0) {plumed_merror(getName()+": the exponential distribution is not defined for values less that ones given in MINIMA");}
     value *= lambda_[k]*exp(-arg);
   }
   return value;

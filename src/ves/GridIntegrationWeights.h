@@ -27,15 +27,15 @@
 #include <string>
 
 
-namespace PLMD{
+namespace PLMD {
 
 
 class Grid;
 
 
-namespace ves{
+namespace ves {
 
-class GridIntegrationWeights{
+class GridIntegrationWeights {
 private:
   static std::vector<double> getOneDimensionalTrapezoidalWeights(const unsigned int, const double, const bool periodic=false);
 public:

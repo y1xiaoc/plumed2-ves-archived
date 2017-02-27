@@ -25,8 +25,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_BASISF_HIDDEN BF_HERMITE
 /*
@@ -52,7 +52,7 @@ public:
 PLUMED_REGISTER_ACTION(BF_Hermite,"BF_HERMITE")
 
 
-void BF_Hermite::registerKeywords(Keywords& keys){
+void BF_Hermite::registerKeywords(Keywords& keys) {
   BasisFunctions::registerKeywords(keys);
   keys.add("optional","SCALING_FACTOR","scaling factor that is used to define the length scale of the basis functions. Depends also on the order employed. By default it is 1.0");
   keys.add("optional","CENTER","the location of the center of the Hermite functions. By default it is 0.0");
@@ -60,24 +60,24 @@ void BF_Hermite::registerKeywords(Keywords& keys){
 }
 
 BF_Hermite::BF_Hermite(const ActionOptions&ao):
- PLUMED_BASISFUNCTIONS_INIT(ao),
- scalingf_(1.0),
- center_(0.0),
- normf_(0)
+  PLUMED_BASISFUNCTIONS_INIT(ao),
+  scalingf_(1.0),
+  center_(0.0),
+  normf_(0)
 {
   setNumberOfBasisFunctions(getOrder()+2);
   setIntrinsicInterval(intervalMin(),intervalMax());
   scalingf_=1.0;
   parse("SCALING_FACTOR",scalingf_);
-  if(scalingf_!=1.0){addKeywordToList("SCALING_FACTOR",scalingf_);}
+  if(scalingf_!=1.0) {addKeywordToList("SCALING_FACTOR",scalingf_);}
   center_=0.0;
   parse("CENTER",center_);
-  if(center_!=0.0){addKeywordToList("CENTER",center_);}
+  if(center_!=0.0) {addKeywordToList("CENTER",center_);}
   //
   // To normalize with 1.0/sqrt(sqrt(pi)*2^n*n!)
   normf_.resize(getOrder()+1);
   normf_[0] = 1.0/(sqrt( sqrt(pi) ));
-  for(unsigned int i=1; i<getOrder()+1; i++){
+  for(unsigned int i=1; i<getOrder()+1; i++) {
     double io = static_cast<double>(i);
     normf_[i] = normf_[i-1]*(1.0/sqrt(io*2.0));
   }
@@ -106,7 +106,7 @@ void BF_Hermite::getAllValues(const double arg, double& argT, bool& inside_range
   derivsH[0]=0.0;
   valuesH[1]=2.0*argT;
   derivsH[1]=2.0;
-  for(unsigned int i=1; i < getOrder();i++){
+  for(unsigned int i=1; i < getOrder(); i++) {
     double io = static_cast<double>(i);
     valuesH[i+1]  = 2.0*argT*valuesH[i] - 2.0*io*valuesH[i-1];
     derivsH[i+1]  = 2.0*argT*derivsH[i] + 2.0*valuesH[i] - 2.0*io*derivsH[i-1];
@@ -116,17 +116,17 @@ void BF_Hermite::getAllValues(const double arg, double& argT, bool& inside_range
   values[0]=1.0;
   derivs[0]=0.0;
   double vexp = exp(-0.5*argT*argT);
-  for(unsigned int i=1; i < getNumberOfBasisFunctions();i++){
+  for(unsigned int i=1; i < getNumberOfBasisFunctions(); i++) {
     values[i] = normf_[i-1] * vexp*valuesH[i-1];
     derivs[i] = normf_[i-1] * scalingf_*vexp*(-argT*valuesH[i-1]+derivsH[i-1]);
   }
-  if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
+  if(!inside_range) {for(unsigned int i=0; i<derivs.size(); i++) {derivs[i]=0.0;}}
 }
 
 
 void BF_Hermite::setupLabels() {
   setLabel(0,"1");
-  for(unsigned int i=1; i < getNumberOfBasisFunctions() ;i++){
+  for(unsigned int i=1; i < getNumberOfBasisFunctions() ; i++) {
     std::string is; Tools::convert(i-1,is);
     setLabel(i,"h"+is+"(s)");
   }

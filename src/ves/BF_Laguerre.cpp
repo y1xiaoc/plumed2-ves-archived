@@ -25,8 +25,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_BASISF_HIDDEN BF_LAGUERRE
 /*
@@ -50,21 +50,21 @@ public:
 PLUMED_REGISTER_ACTION(BF_Laguerre,"BF_LAGUERRE")
 
 
-void BF_Laguerre::registerKeywords(Keywords& keys){
+void BF_Laguerre::registerKeywords(Keywords& keys) {
   BasisFunctions::registerKeywords(keys);
   keys.add("optional","SCALING_FACTOR","scaling factor that is used to define the length scale of the basis functions. Depends also on the order employed. By default it is 1.0");
   keys.remove("NUMERICAL_INTEGRALS");
 }
 
 BF_Laguerre::BF_Laguerre(const ActionOptions&ao):
- PLUMED_BASISFUNCTIONS_INIT(ao),
- scalingf_(1.0)
+  PLUMED_BASISFUNCTIONS_INIT(ao),
+  scalingf_(1.0)
 {
   setNumberOfBasisFunctions(getOrder()+2);
   setIntrinsicInterval(intervalMin(),intervalMax());
   scalingf_ = 1.0;
   parse("SCALING_FACTOR",scalingf_);
-  if(scalingf_!=1.0){addKeywordToList("SCALING_FACTOR",scalingf_);}
+  if(scalingf_!=1.0) {addKeywordToList("SCALING_FACTOR",scalingf_);}
   setNonPeriodic();
   setIntervalBounded();
   setType("Laguerre");
@@ -89,7 +89,7 @@ void BF_Laguerre::getAllValues(const double arg, double& argT, bool& inside_rang
   derivsL[0]=0.0;
   valuesL[1]=1.0-argT;
   derivsL[1]=-1.0;
-  for(unsigned int i=1; i < getOrder();i++){
+  for(unsigned int i=1; i < getOrder(); i++) {
     double io = static_cast<double>(i);
     valuesL[i+1]  = ((2.0*io+1.0-argT)/(io+1.0))*valuesL[i] - (io/(io+1.0))*valuesL[i-1];
     derivsL[i+1]  = ((2.0*io+1.0-argT)/(io+1.0))*derivsL[i] - (1.0/(io+1.0))*valuesL[i] - (io/(io+1.0))*derivsL[i-1];
@@ -99,17 +99,17 @@ void BF_Laguerre::getAllValues(const double arg, double& argT, bool& inside_rang
   values[0]=1.0;
   derivs[0]=0.0;
   double vexp = exp(-0.5*argT);
-  for(unsigned int i=1; i < getNumberOfBasisFunctions();i++){
+  for(unsigned int i=1; i < getNumberOfBasisFunctions(); i++) {
     values[i] = vexp*valuesL[i-1];
     derivs[i] = scalingf_*vexp*(-0.5*valuesL[i-1]+derivsL[i-1]);
   }
-  if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
+  if(!inside_range) {for(unsigned int i=0; i<derivs.size(); i++) {derivs[i]=0.0;}}
 }
 
 
 void BF_Laguerre::setupLabels() {
   setLabel(0,"1");
-  for(unsigned int i=1; i < getNumberOfBasisFunctions() ;i++){
+  for(unsigned int i=1; i < getNumberOfBasisFunctions() ; i++) {
     std::string is; Tools::convert(i-1,is);
     setLabel(i,"l"+is+"(s)");
   }

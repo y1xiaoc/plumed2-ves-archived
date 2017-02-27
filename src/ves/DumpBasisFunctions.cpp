@@ -32,8 +32,8 @@
 #include "tools/Grid.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_UTILS DUMP_BASISFUNCTIONS
 /*
@@ -52,15 +52,15 @@ class DumpBasisFunctions :
 public:
   explicit DumpBasisFunctions(const ActionOptions&);
   TargetDistribution* setupTargetDistPntr(std::string keyword) const;
-  void calculate(){}
-  void apply(){}
+  void calculate() {}
+  void apply() {}
   static void registerKeywords(Keywords& keys);
 };
 
 
 PLUMED_REGISTER_ACTION(DumpBasisFunctions,"DUMP_BASISFUNCTIONS")
 
-void DumpBasisFunctions::registerKeywords(Keywords& keys){
+void DumpBasisFunctions::registerKeywords(Keywords& keys) {
   Action::registerKeywords(keys);
   keys.add("compulsory","BASIS_SET","the label of the basis set that you want to use");
   keys.add("optional","GRID_BINS","the number of bins used for the grid for writing the basis function values and derivatives. The default value is 1000.");
@@ -78,8 +78,8 @@ void DumpBasisFunctions::registerKeywords(Keywords& keys){
 }
 
 DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
-Action(ao),
-bf_pntrs(1)
+  Action(ao),
+  bf_pntrs(1)
 {
   std::string basisset_label="";
   parse("BASIS_SET",basisset_label);
@@ -116,8 +116,8 @@ bf_pntrs(1)
 
   std::vector<std::string> targetdist_keywords;
   std::string str_ps="";
-  for(int i=1;;i++){
-    if(!parseNumbered("TARGET_DISTRIBUTION",i,str_ps)){break;}
+  for(int i=1;; i++) {
+    if(!parseNumbered("TARGET_DISTRIBUTION",i,str_ps)) {break;}
     targetdist_keywords.push_back(str_ps);
   }
   checkRead();
@@ -139,7 +139,7 @@ bf_pntrs(1)
   std::vector<unsigned int> grid_bins(1); grid_bins[0]=nbins;
   std::vector<Value*> arguments(1);
   arguments[0]= new Value(NULL,"arg",false);
-  if(bf_pntrs[0]->arePeriodic() && !ignore_periodicity){
+  if(bf_pntrs[0]->arePeriodic() && !ignore_periodicity) {
     arguments[0]->setDomain(bf_pntrs[0]->intervalMinStr(),bf_pntrs[0]->intervalMaxStr());
   }
   else {
@@ -151,11 +151,11 @@ bf_pntrs(1)
   ofile_targetdist_aver.enforceBackup();
   ofile_targetdist_aver.open(fname_targetdist_aver);
 
-  for(unsigned int i=0; i<targetdist_keywords.size(); i++){
+  for(unsigned int i=0; i<targetdist_keywords.size(); i++) {
     std::string is; Tools::convert(i+1,is);
     //
     TargetDistribution* targetdist_pntr = setupTargetDistPntr(targetdist_keywords[i]);
-    if(targetdist_pntr!=NULL){
+    if(targetdist_pntr!=NULL) {
       targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
       plumed_massert(targetdist_pntr->getDimension()==1,"the target distribution must be one dimensional");
       targetdist_pntr->update();
@@ -164,9 +164,9 @@ bf_pntrs(1)
     std::vector<double> bf_integrals = bf_pntrs[0]->getTargetDistributionIntegrals(targetdist_pntr);
     CoeffsVector targetdist_averages = CoeffsVector("aver.targetdist-"+is,arguments,bf_pntrs,comm,false);
     targetdist_averages.setValues(bf_integrals);
-    if(fmt_targetdist_aver.size()>0){targetdist_averages.setOutputFmt(fmt_targetdist_aver);}
+    if(fmt_targetdist_aver.size()>0) {targetdist_averages.setOutputFmt(fmt_targetdist_aver);}
     targetdist_averages.writeToFile(ofile_targetdist_aver,true);
-    if(targetdist_pntr!=NULL){
+    if(targetdist_pntr!=NULL) {
       Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
       std::string fname = FileBase::appendSuffix(fname_targetdist,is);
       OFile ofile;
@@ -189,10 +189,10 @@ bf_pntrs(1)
 TargetDistribution* DumpBasisFunctions::setupTargetDistPntr(std::string keyword) const {
   std::vector<std::string> words = Tools::getWords(keyword);
   TargetDistribution* pntr = NULL;
-  if(words[0]=="DEFAULT_UNIFORM" && words.size()==1){
+  if(words[0]=="DEFAULT_UNIFORM" && words.size()==1) {
     pntr = NULL;
   }
-  else{
+  else {
     pntr = targetDistributionRegister().create(words);
   }
   return pntr;

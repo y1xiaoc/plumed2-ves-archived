@@ -33,8 +33,8 @@
 #include "core/PlumedMain.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_BIASES VES_LINEAR_EXPANSION
 /*
@@ -79,7 +79,7 @@ target distribution are enclosed within curly brackets.
 //+ENDPLUMEDOC
 
 
-class VesLinearExpansion : public VesBias{
+class VesLinearExpansion : public VesBias {
 private:
   unsigned int nargs_;
   std::vector<BasisFunctions*> basisf_pntrs_;
@@ -111,7 +111,7 @@ public:
 
 PLUMED_REGISTER_ACTION(VesLinearExpansion,"VES_LINEAR_EXPANSION")
 
-void VesLinearExpansion::registerKeywords( Keywords& keys ){
+void VesLinearExpansion::registerKeywords( Keywords& keys ) {
   VesBias::registerKeywords(keys);
   //
   VesBias::useInitialCoeffsKeywords(keys);
@@ -126,17 +126,17 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ){
 }
 
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
-PLUMED_VESBIAS_INIT(ao),
-nargs_(getNumberOfArguments()),
-basisf_pntrs_(getNumberOfArguments(),NULL),
-bias_expansion_pntr_(NULL),
-valueForce2_(NULL)
+  PLUMED_VESBIAS_INIT(ao),
+  nargs_(getNumberOfArguments()),
+  basisf_pntrs_(getNumberOfArguments(),NULL),
+  bias_expansion_pntr_(NULL),
+  valueForce2_(NULL)
 {
   std::vector<std::string> basisf_labels;
   parseMultipleValues("BASIS_FUNCTIONS",basisf_labels,nargs_);
   checkRead();
 
-  for(unsigned int i=0; i<basisf_labels.size(); i++){
+  for(unsigned int i=0; i<basisf_labels.size(); i++) {
     basisf_pntrs_[i] = plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisf_labels[i]);
     plumed_massert(basisf_pntrs_[i]!=NULL,"basis function "+basisf_labels[i]+" does not exist. NOTE: the basis functions should always be defined BEFORE the VES bias.");
   }
@@ -145,11 +145,11 @@ valueForce2_(NULL)
   // check arguments and basis functions
   // this is done to avoid some issues with integration of target distribution
   // and periodic CVs, needs to be fixed later on.
-  for(unsigned int i=0; i<args_pntrs.size(); i++){
-    if(args_pntrs[i]->isPeriodic() && !(basisf_pntrs_[i]->arePeriodic()) ){
+  for(unsigned int i=0; i<args_pntrs.size(); i++) {
+    if(args_pntrs[i]->isPeriodic() && !(basisf_pntrs_[i]->arePeriodic()) ) {
       plumed_merror("argument "+args_pntrs[i]->getName()+" is periodic while the basis functions " + basisf_pntrs_[i]->getLabel()+ " are not. You need to use the COMBINE action to remove the periodicity of the argument if you want to use these basis functions");
     }
-    else if(!(args_pntrs[i]->isPeriodic()) && basisf_pntrs_[i]->arePeriodic() ){
+    else if(!(args_pntrs[i]->isPeriodic()) && basisf_pntrs_[i]->arePeriodic() ) {
       log.printf("  warning: argument %s is not periodic while the basis functions %s used for it are periodic\n",args_pntrs[i]->getName().c_str(),basisf_pntrs_[i]->getLabel().c_str());
     }
   }
@@ -164,24 +164,24 @@ valueForce2_(NULL)
   bias_expansion_pntr_->setGridBins(this->getGridBins());
   //
 
-  if(biasCutoffActive()){
+  if(biasCutoffActive()) {
     std::vector<std::string> keywords(1);
     std::string s1; Tools::convert(getBiasCutoffValue(),s1);
-    if(getNumberOfTargetDistributionKeywords()==0){
+    if(getNumberOfTargetDistributionKeywords()==0) {
       keywords[0]="UNIFORM BIAS_CUTOFF="+s1;
     }
-    else{
+    else {
       keywords = getTargetDistributionKeywords();
       keywords[0]+=" BIAS_CUTOFF="+s1;
     }
     setTargetDistributionKeywords(keywords);
   }
 
-  if(getNumberOfTargetDistributionKeywords()==0){
+  if(getNumberOfTargetDistributionKeywords()==0) {
     log.printf("  using an uniform target distribution: \n");
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
-  else if(getNumberOfTargetDistributionKeywords()==1){
+  else if(getNumberOfTargetDistributionKeywords()==1) {
     bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords()[0]);
     // updateTargetDistributions();
     log.printf("  using the following target distribution:\n   %s\n",getTargetDistributionKeywords()[0].c_str());
@@ -191,11 +191,11 @@ valueForce2_(NULL)
   }
   setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
   //
-  if(coeffs_read && biasCutoffActive()){
+  if(coeffs_read && biasCutoffActive()) {
     updateTargetDistributions();
   }
   //
-  if(coeffs_read){
+  if(coeffs_read) {
     setupBiasFileOutput();
     writeBiasToFile();
   }
@@ -206,7 +206,7 @@ valueForce2_(NULL)
 
 
 VesLinearExpansion::~VesLinearExpansion() {
-  if(bias_expansion_pntr_!=NULL){
+  if(bias_expansion_pntr_!=NULL) {
     delete bias_expansion_pntr_;
   }
 }
@@ -218,25 +218,25 @@ void VesLinearExpansion::calculate() {
   std::vector<double> forces(nargs_);
   std::vector<double> coeffsderivs_values(ncoeffs_);
 
-  for(unsigned int k=0; k<nargs_; k++){
+  for(unsigned int k=0; k<nargs_; k++) {
     cv_values[k]=getArgument(k);
   }
 
   bool all_inside = true;
   double bias = bias_expansion_pntr_->getBiasAndForces(cv_values,all_inside,forces,coeffsderivs_values);
-  if(biasCutoffActive()){
+  if(biasCutoffActive()) {
     applyBiasCutoff(bias,forces,coeffsderivs_values);
     coeffsderivs_values[0]=1.0;
   }
   double totalForce2 = 0.0;
-  for(unsigned int k=0; k<nargs_; k++){
+  for(unsigned int k=0; k<nargs_; k++) {
     setOutputForce(k,forces[k]);
     totalForce2 += forces[k]*forces[k];
   }
 
   setBias(bias);
   valueForce2_->set(totalForce2);
-  if(all_inside){
+  if(all_inside) {
     addToSampledAverages(coeffsderivs_values);
   }
 }
@@ -265,7 +265,7 @@ void VesLinearExpansion::writeBiasToFile() {
   OFile* ofile_pntr = getOFile(getCurrentBiasOutputFilename(),useMultipleWalkers());
   bias_expansion_pntr_->writeBiasGridToFile(*ofile_pntr);
   ofile_pntr->close(); delete ofile_pntr;
-  if(biasCutoffActive()){
+  if(biasCutoffActive()) {
     bias_expansion_pntr_->updateBiasWithoutCutoffGrid();
     OFile* ofile_pntr2 = getOFile(getCurrentBiasOutputFilename("without-cutoff"),useMultipleWalkers());
     bias_expansion_pntr_->writeBiasWithoutCutoffGridToFile(*ofile_pntr2);
@@ -298,7 +298,7 @@ void VesLinearExpansion::resetFesFileOutput() {
 
 
 void VesLinearExpansion::setupFesProjFileOutput() {
-  if(getNumberOfProjectionArguments()>0){
+  if(getNumberOfProjectionArguments()>0) {
     bias_expansion_pntr_->setupFesProjGrid();
   }
 }
@@ -306,7 +306,7 @@ void VesLinearExpansion::setupFesProjFileOutput() {
 
 void VesLinearExpansion::writeFesProjToFile() {
   bias_expansion_pntr_->updateFesGrid();
-  for(unsigned int i=0; i<getNumberOfProjectionArguments(); i++){
+  for(unsigned int i=0; i<getNumberOfProjectionArguments(); i++) {
     std::string suffix;
     Tools::convert(i+1,suffix);
     suffix = "proj-" + suffix;
@@ -329,7 +329,7 @@ void VesLinearExpansion::writeTargetDistToFile() {
 
 
 void VesLinearExpansion::writeTargetDistProjToFile() {
-  for(unsigned int i=0; i<getNumberOfProjectionArguments(); i++){
+  for(unsigned int i=0; i<getNumberOfProjectionArguments(); i++) {
     std::string suffix;
     Tools::convert(i+1,suffix);
     suffix = "proj-" + suffix;

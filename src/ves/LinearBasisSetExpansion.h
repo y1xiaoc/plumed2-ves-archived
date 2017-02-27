@@ -37,7 +37,7 @@ class Grid;
 class OFile;
 
 
-namespace ves{
+namespace ves {
 
 class CoeffsVector;
 class BasisFunctions;
@@ -45,7 +45,7 @@ class TargetDistribution;
 class VesBias;
 
 
-class LinearBasisSetExpansion{
+class LinearBasisSetExpansion {
 private:
   std::string label_;
   //
@@ -203,10 +203,10 @@ inline
 double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values, bool& all_inside, const bool parallel) {
   std::vector<double> forces_dummy(nargs_);
   std::vector<double> coeffsderivs_values_dummy(ncoeffs_);
-  if(parallel){
+  if(parallel) {
     return getBiasAndForces(args_values,all_inside,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
   }
-  else{
+  else {
     return getBiasAndForces(args_values,all_inside,forces_dummy,coeffsderivs_values_dummy,basisf_pntrs_, bias_coeffs_pntr_, NULL);
   }
 }
@@ -214,10 +214,10 @@ double LinearBasisSetExpansion::getBias(const std::vector<double>& args_values, 
 
 inline
 void LinearBasisSetExpansion::getBasisSetValues(const std::vector<double>& args_values, std::vector<double>& basisset_values, const bool parallel) {
-  if(parallel){
+  if(parallel) {
     getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, &mycomm_);
   }
-  else{
+  else {
     getBasisSetValues(args_values,basisset_values,basisf_pntrs_, bias_coeffs_pntr_, NULL);
   }
 }

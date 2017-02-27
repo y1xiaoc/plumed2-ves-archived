@@ -30,12 +30,12 @@
 #include <map>
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 
 
-class TargetDistributionRegister{
+class TargetDistributionRegister {
 private:
 /// Pointer to a function which, given the type for a TargetDistribution, creates it
   typedef TargetDistribution*(*creator_pointer)(const TargetDistributionOptions&);

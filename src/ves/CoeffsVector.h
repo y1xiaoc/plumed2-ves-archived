@@ -30,7 +30,7 @@
 #include <cmath>
 
 
-namespace PLMD{
+namespace PLMD {
 
 class Action;
 class Value;
@@ -38,7 +38,7 @@ class IFile;
 class OFile;
 class Communicator;
 
-namespace ves{
+namespace ves {
 
 class BasisFunctions;
 class CoeffsMatrix;
@@ -86,10 +86,10 @@ public:
     CoeffsMatrix*,
     Communicator&);
   //
-  ~CoeffsVector(){}
+  ~CoeffsVector() {}
   //
   size_t getSize() const {return numberOfCoeffs();}
-    // clear coeffs
+  // clear coeffs
   void clear();
   void setAllValuesToZero();
   //
@@ -120,7 +120,7 @@ public:
   // set value
   void setValue(const size_t, const double);
   void setValue(const std::vector<unsigned int>&, const double);
-    // add to value
+  // add to value
   void addToValue(const size_t, const double);
   void addToValue(const std::vector<unsigned int>&, const double);
   // scale all values
@@ -189,8 +189,8 @@ public:
   void randomizeValuesGaussian(int);
   //
   void resetAveragingCounter() {averaging_counter=0;}
-  void setupExponentiallyDecayingAveraging(const unsigned int averaging_exp_decay_in){averaging_exp_decay_=averaging_exp_decay_in;}
-  void turnOffExponentiallyDecayingAveraging(){averaging_exp_decay_=0;}
+  void setupExponentiallyDecayingAveraging(const unsigned int averaging_exp_decay_in) {averaging_exp_decay_=averaging_exp_decay_in;}
+  void turnOffExponentiallyDecayingAveraging() {averaging_exp_decay_=0;}
   void resetAveraging();
   void addToAverage(const CoeffsVector&);
   //

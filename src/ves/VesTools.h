@@ -30,13 +30,13 @@
 #include <vector>
 
 
-namespace PLMD{
+namespace PLMD {
 
 class Grid;
 
-namespace ves{
+namespace ves {
 
-class VesTools{
+class VesTools {
 public:
   // Convert double into a string with more digits
   static void convertDbl2Str(const double value,std::string& str, unsigned int precision);
@@ -47,7 +47,7 @@ public:
 };
 
 inline
-void VesTools::convertDbl2Str(const double value,std::string& str, unsigned int precision){
+void VesTools::convertDbl2Str(const double value,std::string& str, unsigned int precision) {
   std::ostringstream ostr;
   ostr<<std::setprecision(precision)<<value;
   str=ostr.str();
@@ -55,7 +55,7 @@ void VesTools::convertDbl2Str(const double value,std::string& str, unsigned int 
 
 
 inline
-void VesTools::convertDbl2Str(const double value,std::string& str){
+void VesTools::convertDbl2Str(const double value,std::string& str) {
   unsigned int precision = std::numeric_limits<double>::digits10 + 1;
   convertDbl2Str(value,str,precision);
 }

@@ -26,8 +26,8 @@
 #include "tools/Keywords.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST GAUSSIAN
 /*
@@ -171,7 +171,7 @@ public:
 VES_REGISTER_TARGET_DISTRIBUTION(TD_Gaussian,"GAUSSIAN")
 
 
-void TD_Gaussian::registerKeywords(Keywords& keys){
+void TD_Gaussian::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","CENTER","The centers of the Gaussian distributions. For one Gaussians you can use either CENTER or CENTER1. For more Gaussians you need to use the numbered CENTER keywords, one for each Gaussian.");
   keys.add("numbered","SIGMA","The standard deviations of the Gaussian distributions. For one Gaussians you can use either SIGMA or SIGMA1. For more Gaussians you need to use the numbered SIGMA keywords, one for each Gaussian.");
@@ -185,40 +185,40 @@ void TD_Gaussian::registerKeywords(Keywords& keys){
 
 
 TD_Gaussian::TD_Gaussian( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-centers_(0),
-sigmas_(0),
-correlation_(0),
-weights_(0),
-diagonal_(true),
-ncenters_(0)
+  TargetDistribution(to),
+  centers_(0),
+  sigmas_(0),
+  correlation_(0),
+  weights_(0),
+  diagonal_(true),
+  ncenters_(0)
 {
   for(unsigned int i=1;; i++) {
     std::vector<double> tmp_center;
-    if(!parseNumberedVector("CENTER",i,tmp_center) ){break;}
+    if(!parseNumberedVector("CENTER",i,tmp_center) ) {break;}
     centers_.push_back(tmp_center);
   }
   for(unsigned int i=1;; i++) {
     std::vector<double> tmp_sigma;
-    if(!parseNumberedVector("SIGMA",i,tmp_sigma) ){break;}
+    if(!parseNumberedVector("SIGMA",i,tmp_sigma) ) {break;}
     sigmas_.push_back(tmp_sigma);
   }
-  if(centers_.size()==0 && sigmas_.size()==0){
+  if(centers_.size()==0 && sigmas_.size()==0) {
     std::vector<double> tmp_center;
-    if(parseVector("CENTER",tmp_center,true)){
+    if(parseVector("CENTER",tmp_center,true)) {
       centers_.push_back(tmp_center);
     }
     std::vector<double> tmp_sigma;
-    if(parseVector("SIGMA",tmp_sigma,true)){
+    if(parseVector("SIGMA",tmp_sigma,true)) {
       sigmas_.push_back(tmp_sigma);
     }
   }
   //
-  if(centers_.size()==0){
+  if(centers_.size()==0) {
     plumed_merror(getName()+": CENTER keywords seem to be missing. Note that numbered keywords start at CENTER1.");
   }
   //
-  if(centers_.size()!=sigmas_.size()){
+  if(centers_.size()!=sigmas_.size()) {
     plumed_merror(getName()+": there has to be an equal amount of CENTER and SIGMA keywords");
   }
   //
@@ -226,55 +226,55 @@ ncenters_(0)
   ncenters_ = centers_.size();
   // check centers and sigmas
   for(unsigned int i=0; i<ncenters_; i++) {
-    if(centers_[i].size()!=getDimension()){
+    if(centers_[i].size()!=getDimension()) {
       plumed_merror(getName()+": one of the CENTER keyword does not match the given dimension");
     }
-    if(sigmas_[i].size()!=getDimension()){
+    if(sigmas_[i].size()!=getDimension()) {
       plumed_merror(getName()+": one of the SIGMA keyword does not match the given dimension");
     }
   }
   //
   correlation_.resize(ncenters_);
 
-  if(ncenters_==1){
+  if(ncenters_==1) {
     std::vector<double> corr(1,0.0);
-    if(parseVector("CORRELATION",corr,true)){
+    if(parseVector("CORRELATION",corr,true)) {
       diagonal_ = false;
     }
     correlation_[0] = corr;
   }
   else {
-    for(unsigned int i=0;i<ncenters_; i++){
+    for(unsigned int i=0; i<ncenters_; i++) {
       std::vector<double> corr(1,0.0);
-      if(parseNumberedVector("CORRELATION",(i+1),corr)){
+      if(parseNumberedVector("CORRELATION",(i+1),corr)) {
         diagonal_ = false;
       }
       correlation_[i] = corr;
     }
   }
 
-  if(!diagonal_ && getDimension()!=2){
+  if(!diagonal_ && getDimension()!=2) {
     plumed_merror(getName()+": CORRELATION is only defined for two-dimensional Gaussians for now.");
   }
-  for(unsigned int i=0; i<correlation_.size(); i++){
-    if(correlation_[i].size()!=1){
+  for(unsigned int i=0; i<correlation_.size(); i++) {
+    if(correlation_[i].size()!=1) {
       plumed_merror(getName()+": only one value should be given in CORRELATION");
     }
-    for(unsigned int k=0;k<correlation_[i].size(); k++){
-      if(correlation_[i][k] <= -1.0 ||  correlation_[i][k] >= 1.0){
+    for(unsigned int k=0; k<correlation_[i].size(); k++) {
+      if(correlation_[i][k] <= -1.0 ||  correlation_[i][k] >= 1.0) {
         plumed_merror(getName()+": values given in CORRELATION should be between -1.0 and 1.0" );
       }
     }
   }
   //
-  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(centers_.size(),1.0);}
-  if(centers_.size()!=weights_.size()){
+  if(!parseVector("WEIGHTS",weights_,true)) {weights_.assign(centers_.size(),1.0);}
+  if(centers_.size()!=weights_.size()) {
     plumed_merror(getName()+": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   }
   //
   double sum_weights=0.0;
-  for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
-  for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
+  for(unsigned int i=0; i<weights_.size(); i++) {sum_weights+=weights_[i];}
+  for(unsigned int i=0; i<weights_.size(); i++) {weights_[i]/=sum_weights;}
   //
   checkRead();
 }
@@ -282,13 +282,13 @@ ncenters_(0)
 
 double TD_Gaussian::getValue(const std::vector<double>& argument) const {
   double value=0.0;
-  if(diagonal_){
-    for(unsigned int i=0;i<ncenters_;i++){
+  if(diagonal_) {
+    for(unsigned int i=0; i<ncenters_; i++) {
       value+=weights_[i]*GaussianDiagonal(argument, centers_[i], sigmas_[i]);
     }
   }
-  else if(!diagonal_ && getDimension()==2){
-    for(unsigned int i=0;i<ncenters_;i++){
+  else if(!diagonal_ && getDimension()==2) {
+    for(unsigned int i=0; i<ncenters_; i++) {
       value+=weights_[i]*Gaussian2D(argument, centers_[i], sigmas_[i],correlation_[i]);
     }
   }
@@ -298,10 +298,10 @@ double TD_Gaussian::getValue(const std::vector<double>& argument) const {
 
 double TD_Gaussian::GaussianDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& sigma, bool normalize) const {
   double value = 1.0;
-  for(unsigned int k=0; k<argument.size(); k++){
+  for(unsigned int k=0; k<argument.size(); k++) {
     double arg=(argument[k]-center[k])/sigma[k];
     double tmp_exp = exp(-0.5*arg*arg);
-    if(normalize){tmp_exp/=(sigma[k]*sqrt(2.0*pi));}
+    if(normalize) {tmp_exp/=(sigma[k]*sqrt(2.0*pi));}
     value*=tmp_exp;
   }
   return value;
@@ -315,7 +315,7 @@ double TD_Gaussian::Gaussian2D(const std::vector<double>& argument, const std::v
   double value = (arg1*arg1 + arg2*arg2 - 2.0*corr*arg1*arg2);
   value *= -1.0 / ( 2.0*(1.0-corr*corr) );
   value = exp(value);
-  if(normalize){
+  if(normalize) {
     value /=  2*pi*sigma[0]*sigma[1]*sqrt(1.0-corr*corr);
   }
   return value;

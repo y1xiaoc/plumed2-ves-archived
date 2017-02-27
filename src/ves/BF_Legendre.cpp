@@ -25,8 +25,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_BASISF BF_LEGENDRE
 /*
@@ -43,7 +43,7 @@ These basis functions should not be used for periodic CVs.
 
 Intrinsically the Legendre polynomials are defined on the interval \f$[-1,1]\f$.
 A variable \f$t\f$ in the interval \f$[a,b]\f$ is transformed to a variable \f$x\f$
-in the intrinsic interval \f$[-1,1]\f$ by using the transform function 
+in the intrinsic interval \f$[-1,1]\f$ by using the transform function
 \f[
 x(t) = \frac{t-(a+b)/2}
 {(b-a)/2}
@@ -106,14 +106,14 @@ public:
 PLUMED_REGISTER_ACTION(BF_Legendre,"BF_LEGENDRE")
 
 
-void BF_Legendre::registerKeywords(Keywords& keys){
- BasisFunctions::registerKeywords(keys);
- keys.addFlag("SCALED",false,"Scale the polynomials such that they are orthonormal to 1.");
+void BF_Legendre::registerKeywords(Keywords& keys) {
+  BasisFunctions::registerKeywords(keys);
+  keys.addFlag("SCALED",false,"Scale the polynomials such that they are orthonormal to 1.");
 }
 
 BF_Legendre::BF_Legendre(const ActionOptions&ao):
- PLUMED_BASISFUNCTIONS_INIT(ao),
- scaled_(false)
+  PLUMED_BASISFUNCTIONS_INIT(ao),
+  scaled_(false)
 {
   parseFlag("SCALED",scaled_); addKeywordToList("SCALED",scaled_);
   setNumberOfBasisFunctions(getOrder()+1);
@@ -141,29 +141,29 @@ void BF_Legendre::getAllValues(const double arg, double& argT, bool& inside_rang
   values[1]=argT;
   derivsT[1]=1.0;
   derivs[1]=intervalDerivf();
-  for(unsigned int i=1; i < getOrder();i++){
+  for(unsigned int i=1; i < getOrder(); i++) {
     double io = static_cast<double>(i);
     values[i+1]  = ((2.0*io+1.0)/(io+1.0))*argT*values[i] - (io/(io+1.0))*values[i-1];
     derivsT[i+1] = ((2.0*io+1.0)/(io+1.0))*(values[i]+argT*derivsT[i])-(io/(io+1.0))*derivsT[i-1];
     derivs[i+1]  = intervalDerivf()*derivsT[i+1];
   }
-  if(scaled_){
+  if(scaled_) {
     // L0 is also scaled!
-    for(unsigned int i=0; i<values.size(); i++){
+    for(unsigned int i=0; i<values.size(); i++) {
       double io = static_cast<double>(i);
       double sf = sqrt(io+0.5);
       values[i] *= sf;
       derivs[i] *= sf;
     }
   }
-  if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
+  if(!inside_range) {for(unsigned int i=0; i<derivs.size(); i++) {derivs[i]=0.0;}}
 }
 
 
 void BF_Legendre::setupUniformIntegrals() {
   setAllUniformIntegralsToZero();
   double L0_int = 1.0;
-  if(scaled_){L0_int = sqrt(0.5);}
+  if(scaled_) {L0_int = sqrt(0.5);}
   setUniformIntegral(0,L0_int);
 }
 

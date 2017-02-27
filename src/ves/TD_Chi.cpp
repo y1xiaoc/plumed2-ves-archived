@@ -26,8 +26,8 @@
 #include "tools/Keywords.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST_HIDDEN CHI
 /*
@@ -53,7 +53,7 @@ public:
 VES_REGISTER_TARGET_DISTRIBUTION(TD_Chi,"CHI")
 
 
-void TD_Chi::registerKeywords(Keywords& keys){
+void TD_Chi::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMA","The minima of the chi distribution.");
   keys.add("compulsory","SIGMA","The sigma parameters for the chi distribution.");
@@ -66,34 +66,34 @@ void TD_Chi::registerKeywords(Keywords& keys){
 
 
 TD_Chi::TD_Chi( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-minima_(0),
-sigma_(0),
-kappa_(0),
-normalization_(0)
+  TargetDistribution(to),
+  minima_(0),
+  sigma_(0),
+  kappa_(0),
+  normalization_(0)
 {
   parseVector("MINIMA",minima_);
   parseVector("SIGMA",sigma_);
-  for(unsigned int k=0; k<sigma_.size(); k++){
-    if(sigma_[k] < 0.0){plumed_merror(getName()+": the values given in SIGMA should be postive.");}
+  for(unsigned int k=0; k<sigma_.size(); k++) {
+    if(sigma_[k] < 0.0) {plumed_merror(getName()+": the values given in SIGMA should be postive.");}
   }
 
 
   std::vector<unsigned int> kappa_int(0);
   parseVector("KAPPA",kappa_int,true);
-  if(kappa_int.size()==0){plumed_merror(getName()+": some problem with KAPPA keyword, should given as postive integer(s) larger than 0");}
+  if(kappa_int.size()==0) {plumed_merror(getName()+": some problem with KAPPA keyword, should given as postive integer(s) larger than 0");}
   kappa_.resize(kappa_int.size());
-  for(unsigned int k=0; k<kappa_int.size(); k++){
-    if(kappa_int[k] < 1){plumed_merror(getName()+": KAPPA should be a integers 1 or higher");}
+  for(unsigned int k=0; k<kappa_int.size(); k++) {
+    if(kappa_int[k] < 1) {plumed_merror(getName()+": KAPPA should be a integers 1 or higher");}
     kappa_[k] = static_cast<double>(kappa_int[k]);
   }
 
   setDimension(minima_.size());
-  if(sigma_.size()!=getDimension()){plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
-  if(kappa_.size()!=getDimension()){plumed_merror(getName()+": the KAPPA keyword does not match the given dimension in MINIMA");}
+  if(sigma_.size()!=getDimension()) {plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
+  if(kappa_.size()!=getDimension()) {plumed_merror(getName()+": the KAPPA keyword does not match the given dimension in MINIMA");}
 
   normalization_.resize(getDimension());
-  for(unsigned int k=0; k<getDimension(); k++){
+  for(unsigned int k=0; k<getDimension(); k++) {
     normalization_[k] = pow(2.0,(1.0-0.5*kappa_[k]))/(tgamma(0.5*kappa_[k])*sigma_[k]);
   }
   checkRead();
@@ -102,9 +102,9 @@ normalization_(0)
 
 double TD_Chi::getValue(const std::vector<double>& argument) const {
   double value = 1.0;
-  for(unsigned int k=0; k<argument.size(); k++){
+  for(unsigned int k=0; k<argument.size(); k++) {
     double arg=(argument[k]-minima_[k])/sigma_[k];
-    if(arg<0.0){plumed_merror(getName()+": the chi distribution is not defined for values less that ones given in MINIMA");}
+    if(arg<0.0) {plumed_merror(getName()+": the chi distribution is not defined for values less that ones given in MINIMA");}
     value *= normalization_[k] * pow(arg,kappa_[k]-1.0) * exp(-0.5*arg*arg);
   }
   return value;

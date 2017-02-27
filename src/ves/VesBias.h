@@ -38,11 +38,11 @@
 
 #define PLUMED_VESBIAS_INIT(ao) Action(ao),VesBias(ao)
 
-namespace PLMD{
+namespace PLMD {
 
 class Value;
 
-namespace ves{
+namespace ves {
 
 class CoeffsVector;
 class CoeffsMatrix;
@@ -58,7 +58,7 @@ to include functions related to the variational approach.
 */
 
 class VesBias:
-public bias::Bias
+  public bias::Bias
 {
 private:
   unsigned int ncoeffssets_;
@@ -133,7 +133,7 @@ protected:
   //
   bool readCoeffsFromFiles();
   //
-  void setTargetDistributionKeywords(const std::vector<std::string>& keywords){targetdist_keywords_=keywords;}
+  void setTargetDistributionKeywords(const std::vector<std::string>& keywords) {targetdist_keywords_=keywords;}
   //
   template<class T>
   bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int);
@@ -169,7 +169,7 @@ public:
   std::vector<std::string> getTargetDistributionKeywords() const {return targetdist_keywords_;}
   std::string getTargetDistributionKeyword(const unsigned int i=0) const {return targetdist_keywords_[i];}
   unsigned int getNumberOfTargetDistributionKeywords() const {return targetdist_keywords_.size();}
-    //
+  //
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id]->numberOfCoeffs();}
   size_t totalNumberOfCoeffs() const {return ncoeffs_total_;}
   unsigned int numberOfCoeffsSets() const {return ncoeffssets_;}
@@ -255,7 +255,7 @@ public:
   void setupBiasCutoff(const double, const double);
   bool biasCutoffActive() const {return bias_cutoff_active_;}
   double getBiasCutoffValue() const {return bias_cutoff_value_;}
-  void setCurrentBiasMaxValue(const double max_value){bias_current_max_value=max_value;}
+  void setCurrentBiasMaxValue(const double max_value) {bias_current_max_value=max_value;}
   double getCurrentBiasMaxValue() const {return bias_current_max_value;}
   double getBiasCutoffSwitchingFunction(const double, double&) const;
   double getBiasCutoffSwitchingFunction(const double) const;
@@ -334,11 +334,11 @@ void VesBias::applyBiasCutoff(double& bias, std::vector<double>& forces, std::ve
   double deriv_factor_sf=0.0;
   double value_sf = getBiasCutoffSwitchingFunction(bias,deriv_factor_sf);
   bias *= value_sf;
-  for(unsigned int i=0; i<forces.size(); i++){
+  for(unsigned int i=0; i<forces.size(); i++) {
     forces[i] *= deriv_factor_sf;
   }
   //
-  for(unsigned int i=0; i<coeffsderivs_values.size(); i++){
+  for(unsigned int i=0; i<coeffsderivs_values.size(); i++) {
     coeffsderivs_values[i] *= deriv_factor_sf;
   }
 }
@@ -349,13 +349,13 @@ std::vector<double> VesBias::computeCovarianceFromAverages(const unsigned int c_
   size_t ncoeffs = numberOfCoeffs(c_id);
   std::vector<double> covariance(sampled_cross_averages[c_id].size(),0.0);
   // diagonal part
-  for(size_t i=0; i<ncoeffs;i++){
+  for(size_t i=0; i<ncoeffs; i++) {
     size_t midx = getHessianIndex(i,i,c_id);
     covariance[midx] = sampled_cross_averages[c_id][midx] - sampled_averages[c_id][i]*sampled_averages[c_id][i];
   }
-  if(!diagonal_hessian_){
-    for(size_t i=0; i<ncoeffs;i++){
-      for(size_t j=(i+1); j<ncoeffs;j++){
+  if(!diagonal_hessian_) {
+    for(size_t i=0; i<ncoeffs; i++) {
+      for(size_t j=(i+1); j<ncoeffs; j++) {
         size_t midx = getHessianIndex(i,j,c_id);
         covariance[midx] = sampled_cross_averages[c_id][midx] - sampled_averages[c_id][i]*sampled_averages[c_id][j];
       }
@@ -372,11 +372,11 @@ bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& va
   bool identical_values=false;
   //
   parseVector(keyword,values);
-  if(values.size()==1 && nvalues>1){
+  if(values.size()==1 && nvalues>1) {
     values.resize(nvalues,values[0]);
     identical_values=true;
   }
-  if(values.size()>0 && values.size()!=nvalues){
+  if(values.size()>0 && values.size()!=nvalues) {
     std::string s1; Tools::convert(nvalues,s1);
     plumed_merror("Error in " + keyword + " keyword: either give 1 common parameter value or " + s1 + " separate parameter values");
   }
@@ -386,7 +386,7 @@ bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& va
 template<class T>
 bool VesBias::parseMultipleValues(const std::string& keyword, std::vector<T>& values, unsigned int nvalues, const T& default_value) {
   bool identical_values = parseMultipleValues(keyword,values,nvalues);
-  if(values.size()==0){
+  if(values.size()==0) {
     values.resize(nvalues,default_value);
     identical_values=true;
   }

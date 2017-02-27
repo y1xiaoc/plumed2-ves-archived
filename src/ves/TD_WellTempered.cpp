@@ -28,8 +28,8 @@
 #include "tools/Grid.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST WELL_TEMPERED
 /*
@@ -104,14 +104,14 @@ public:
   explicit TD_WellTempered(const TargetDistributionOptions& to);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~TD_WellTempered(){}
+  ~TD_WellTempered() {}
 };
 
 
 VES_REGISTER_TARGET_DISTRIBUTION(TD_WellTempered,"WELL_TEMPERED")
 
 
-void TD_WellTempered::registerKeywords(Keywords& keys){
+void TD_WellTempered::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","BIASFACTOR","The bias factor used for the well-tempered distribution.");
   keys.use("BIAS_CUTOFF");
@@ -119,11 +119,11 @@ void TD_WellTempered::registerKeywords(Keywords& keys){
 
 
 TD_WellTempered::TD_WellTempered( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-bias_factor_(0.0)
+  TargetDistribution(to),
+  bias_factor_(0.0)
 {
   parse("BIASFACTOR",bias_factor_);
-  if(bias_factor_<=1.0){
+  if(bias_factor_<=1.0) {
     plumed_merror("WELL_TEMPERED target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   }
   setDynamic();
@@ -138,12 +138,12 @@ double TD_WellTempered::getValue(const std::vector<double>& argument) const {
 }
 
 
-void TD_WellTempered::updateGrid(){
+void TD_WellTempered::updateGrid() {
   double beta_prime = getBeta()/bias_factor_;
   plumed_massert(getFesGridPntr()!=NULL,"the FES grid has to be linked to use TD_WellTempered!");
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(getTargetDistGridPntr());
   double norm = 0.0;
-  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++){
+  for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++) {
     double value = beta_prime * getFesGridPntr()->getValue(l);
     logTargetDistGrid().setValue(l,value);
     value = exp(-value);

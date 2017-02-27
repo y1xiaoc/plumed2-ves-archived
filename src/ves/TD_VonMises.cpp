@@ -32,8 +32,8 @@
 
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST VON_MISES
 /*
@@ -109,7 +109,7 @@ public:
 VES_REGISTER_TARGET_DISTRIBUTION(TD_VonMises,"VON_MISES")
 
 
-void TD_VonMises::registerKeywords(Keywords& keys){
+void TD_VonMises::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","CENTER","The centers of the Von Mises distributions. For one distribution you can use either CENTER or CENTER1. For more distributions you need to use the numbered CENTER keywords, one for each distribution.");
   keys.add("numbered","SIGMA","The standard deviations of the Von Mises distributions. For one distribution you can use either CENTER or CENTER1. For more distributions you need to use the numbered CENTER keywords, one for each distribution.");
@@ -123,36 +123,36 @@ void TD_VonMises::registerKeywords(Keywords& keys){
 
 
 TD_VonMises::TD_VonMises( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-sigmas_(0),
-centers_(0),
-normalization_(0),
-weights_(0),
-periods_(0),
-ncenters_(0)
+  TargetDistribution(to),
+  sigmas_(0),
+  centers_(0),
+  normalization_(0),
+  weights_(0),
+  periods_(0),
+  ncenters_(0)
 {
   for(unsigned int i=1;; i++) {
     std::vector<double> tmp_center;
-    if(!parseNumberedVector("CENTER",i,tmp_center) ){break;}
+    if(!parseNumberedVector("CENTER",i,tmp_center) ) {break;}
     centers_.push_back(tmp_center);
   }
   for(unsigned int i=1;; i++) {
     std::vector<double> tmp_sigma;
-    if(!parseNumberedVector("SIGMA",i,tmp_sigma) ){break;}
+    if(!parseNumberedVector("SIGMA",i,tmp_sigma) ) {break;}
     sigmas_.push_back(tmp_sigma);
   }
-  if(centers_.size()==0 && sigmas_.size()==0){
+  if(centers_.size()==0 && sigmas_.size()==0) {
     std::vector<double> tmp_center;
-    if(parseVector("CENTER",tmp_center,true)){
+    if(parseVector("CENTER",tmp_center,true)) {
       centers_.push_back(tmp_center);
     }
     std::vector<double> tmp_sigma;
-    if(parseVector("SIGMA",tmp_sigma,true)){
+    if(parseVector("SIGMA",tmp_sigma,true)) {
       sigmas_.push_back(tmp_sigma);
     }
   }
   plumed_massert(centers_.size()==sigmas_.size(),"there has to be an equal amount of CENTER and SIGMA keywords");
-  if(centers_.size()==0){
+  if(centers_.size()==0) {
     plumed_merror(getName()+": CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
   }
   //
@@ -161,32 +161,32 @@ ncenters_(0)
   //
   // check centers and sigmas
   for(unsigned int i=0; i<ncenters_; i++) {
-    if(centers_[i].size()!=getDimension()){plumed_merror(getName()+": one of the CENTER keyword does not match the given dimension");}
-    if(sigmas_[i].size()!=getDimension()){plumed_merror(getName()+": one of the SIGMA keyword does not match the given dimension");}
+    if(centers_[i].size()!=getDimension()) {plumed_merror(getName()+": one of the CENTER keyword does not match the given dimension");}
+    if(sigmas_[i].size()!=getDimension()) {plumed_merror(getName()+": one of the SIGMA keyword does not match the given dimension");}
   }
   //
   kappas_.resize(sigmas_.size());
-  for(unsigned int i=0; i<sigmas_.size();i++){
+  for(unsigned int i=0; i<sigmas_.size(); i++) {
     kappas_[i].resize(sigmas_[i].size());
-    for(unsigned int k=0; k<kappas_[i].size(); k++){
+    for(unsigned int k=0; k<kappas_[i].size(); k++) {
       kappas_[i][k] = 1.0/(sigmas_[i][k]*sigmas_[i][k]);
     }
   }
   //
-  if(!parseVector("WEIGHTS",weights_,true)){weights_.assign(centers_.size(),1.0);}
-  if(centers_.size()!=weights_.size()){plumed_merror(getName() + ": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");}
+  if(!parseVector("WEIGHTS",weights_,true)) {weights_.assign(centers_.size(),1.0);}
+  if(centers_.size()!=weights_.size()) {plumed_merror(getName() + ": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");}
   //
-  if(!parseVector("PERIODS",periods_,true)){periods_.assign(getDimension(),2*pi);}
-  if(periods_.size()!=getDimension()){plumed_merror(getName() + ": the number of values given in PERIODS does not match the dimension of the distribution");}
+  if(!parseVector("PERIODS",periods_,true)) {periods_.assign(getDimension(),2*pi);}
+  if(periods_.size()!=getDimension()) {plumed_merror(getName() + ": the number of values given in PERIODS does not match the dimension of the distribution");}
   //
   double sum_weights=0.0;
-  for(unsigned int i=0;i<weights_.size();i++){sum_weights+=weights_[i];}
-  for(unsigned int i=0;i<weights_.size();i++){weights_[i]/=sum_weights;}
+  for(unsigned int i=0; i<weights_.size(); i++) {sum_weights+=weights_[i];}
+  for(unsigned int i=0; i<weights_.size(); i++) {weights_[i]/=sum_weights;}
   //
   normalization_.resize(ncenters_);
-  for(unsigned int i=0; i<ncenters_; i++){
+  for(unsigned int i=0; i<ncenters_; i++) {
     normalization_[i].resize(getDimension());
-    for(unsigned int k=0; k<getDimension(); k++){
+    for(unsigned int k=0; k<getDimension(); k++) {
       normalization_[i][k] = getNormalization(kappas_[i][k],periods_[k]);
     }
   }
@@ -196,7 +196,7 @@ ncenters_(0)
 
 double TD_VonMises::getValue(const std::vector<double>& argument) const {
   double value=0.0;
-  for(unsigned int i=0;i<ncenters_;i++){
+  for(unsigned int i=0; i<ncenters_; i++) {
     value+=weights_[i]*VonMisesDiagonal(argument, centers_[i], kappas_[i],periods_,normalization_[i]);
   }
   return value;
@@ -205,7 +205,7 @@ double TD_VonMises::getValue(const std::vector<double>& argument) const {
 
 double TD_VonMises::VonMisesDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& kappa, const std::vector<double>& periods, const std::vector<double>& normalization) const {
   double value = 1.0;
-  for(unsigned int k=0; k<argument.size(); k++){
+  for(unsigned int k=0; k<argument.size(); k++) {
     double arg = kappa[k]*cos( ((2*pi)/periods[k])*(argument[k]-center[k]) );
     value*=normalization[k]*exp(arg);
   }
@@ -232,7 +232,7 @@ double TD_VonMises::getNormalization(const double kappa, const double period) co
   GridIntegrationWeights::getOneDimensionalIntegrationPointsAndWeights(points,weights,nbins,min,max);
   //
   double sum = 0.0;
-  for(unsigned int l=0; l<nbins; l++){
+  for(unsigned int l=0; l<nbins; l++) {
     std::vector<double> arg(1); arg[0]= points[l];
     sum += weights[l] * VonMisesDiagonal(arg,centers,kappas,periods,norm);
   }

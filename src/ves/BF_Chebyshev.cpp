@@ -25,8 +25,8 @@
 #include "core/ActionRegister.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_BASISF BF_CHEBYSHEV
 /*
@@ -43,7 +43,7 @@ These basis functions should not be used for periodic CVs.
 
 Intrinsically the Chebyshev polynomials are defined on the interval \f$[-1,1]\f$.
 A variable \f$t\f$ in the interval \f$[a,b]\f$ is transformed to a variable \f$x\f$
-in the intrinsic interval \f$[-1,1]\f$ by using the transform function 
+in the intrinsic interval \f$[-1,1]\f$ by using the transform function
 \f[
 x(t) = \frac{t-(a+b)/2}
 {(b-a)/2}
@@ -99,12 +99,12 @@ public:
 PLUMED_REGISTER_ACTION(BF_Chebyshev,"BF_CHEBYSHEV")
 
 
-void BF_Chebyshev::registerKeywords(Keywords& keys){
- BasisFunctions::registerKeywords(keys);
+void BF_Chebyshev::registerKeywords(Keywords& keys) {
+  BasisFunctions::registerKeywords(keys);
 }
 
 BF_Chebyshev::BF_Chebyshev(const ActionOptions&ao):
- PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-1.0","+1.0");
@@ -131,20 +131,20 @@ void BF_Chebyshev::getAllValues(const double arg, double& argT, bool& inside_ran
   values[1]=argT;
   derivsT[1]=1.0;
   derivs[1]=intervalDerivf();
-  for(unsigned int i=1; i < getOrder();i++){
+  for(unsigned int i=1; i < getOrder(); i++) {
     values[i+1]  = 2.0*argT*values[i]-values[i-1];
     derivsT[i+1] = 2.0*values[i]+2.0*argT*derivsT[i]-derivsT[i-1];
     derivs[i+1]  = intervalDerivf()*derivsT[i+1];
   }
-  if(!inside_range){for(unsigned int i=0;i<derivs.size();i++){derivs[i]=0.0;}}
+  if(!inside_range) {for(unsigned int i=0; i<derivs.size(); i++) {derivs[i]=0.0;}}
 }
 
 
 void BF_Chebyshev::setupUniformIntegrals() {
-  for(unsigned int i=0; i<numberOfBasisFunctions(); i++){
+  for(unsigned int i=0; i<numberOfBasisFunctions(); i++) {
     double io = i;
     double value = 0.0;
-    if(i % 2 == 0){
+    if(i % 2 == 0) {
       value = -2.0/( pow(io,2.0)-1.0)*0.5;
     }
     setUniformIntegral(i,value);

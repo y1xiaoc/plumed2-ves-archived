@@ -32,7 +32,7 @@
 #include <iostream>
 
 namespace PLMD {
-namespace ves{
+namespace ves {
 
 //+PLUMEDOC VES_CLTOOLS manual_ves
 /*
@@ -55,38 +55,38 @@ plumed manual_ves --targetdist VON_MISES
 //+ENDPLUMEDOC
 
 class Manual_VES:
-public CLTool
+  public CLTool
 {
 public:
   static void registerKeywords( Keywords& keys );
   explicit Manual_VES(const CLToolOptions& co );
   int main(FILE* in, FILE*out,Communicator& pc);
-  std::string description()const{
+  std::string description()const {
     return "print out a description of the keywords for an action in html";
   }
 };
 
 PLUMED_REGISTER_CLTOOL(Manual_VES,"manual_ves")
 
-void Manual_VES::registerKeywords( Keywords& keys ){
+void Manual_VES::registerKeywords( Keywords& keys ) {
   CLTool::registerKeywords( keys );
   keys.add("compulsory","--targetdist","print the manual for this particular target distribution");
   keys.addFlag("--vim",false,"print the keywords in vim syntax");
 }
 
 Manual_VES::Manual_VES(const CLToolOptions& co ):
-CLTool(co)
+  CLTool(co)
 {
   inputdata=commandline;
 }
 
-int Manual_VES::main(FILE* in, FILE*out,Communicator& pc){
+int Manual_VES::main(FILE* in, FILE*out,Communicator& pc) {
   std::string targetdist;
   if( !parse("--targetdist",targetdist) ) return 1;
   std::cerr<<"LIST OF DOCUMENTED TARGET DISTRIBUTIONS:\n";
   std::cerr<<targetDistributionRegister()<<"\n";
   bool vimout; parseFlag("--vim",vimout);
-  if( !targetDistributionRegister().printManual(targetdist,vimout)){
+  if( !targetDistributionRegister().printManual(targetdist,vimout)) {
     fprintf(stderr,"specified action is not registered\n");
     return 1;
   }

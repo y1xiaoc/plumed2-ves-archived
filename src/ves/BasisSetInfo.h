@@ -28,14 +28,14 @@
 #include <cmath>
 
 
-namespace PLMD{
+namespace PLMD {
 
 
 class Value;
 class IFile;
 class OFile;
 
-namespace ves{
+namespace ves {
 
 class BasisFunctions;
 
@@ -63,7 +63,7 @@ private:
   void initialize();
 public:
   explicit BasisSetInfo(const std::string&, std::vector<BasisFunctions*>&);
-  ~BasisSetInfo(){};
+  ~BasisSetInfo() {};
   //
 private:
   unsigned int getDimension() const;

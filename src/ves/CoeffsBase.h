@@ -27,14 +27,14 @@
 #include <string>
 
 
-namespace PLMD{
+namespace PLMD {
 
 class Action;
 class Value;
 class IFile;
 class OFile;
 
-namespace ves{
+namespace ves {
 
 class BasisFunctions;
 class VesBias;
@@ -104,12 +104,12 @@ public:
     const bool use_iteration_counter=false);
   //
   explicit CoeffsBase(
-      const std::string&,
-      std::vector<std::vector<Value*> >&,
-      std::vector<std::vector<BasisFunctions*> >&,
-      const bool use_iteration_counter=false,
-      const std::string& multicoeffs_label="bias"
-    );
+    const std::string&,
+    std::vector<std::vector<Value*> >&,
+    std::vector<std::vector<BasisFunctions*> >&,
+    const bool use_iteration_counter=false,
+    const std::string& multicoeffs_label="bias"
+  );
   //
   ~CoeffsBase() {}
   //
@@ -162,8 +162,8 @@ public:
   void getCoeffsInfoFromFile(IFile&, const bool ignore_coeffs_info=false);
   void checkCoeffsInfo(const std::string&, const std::string&, const unsigned int, const size_t, const std::vector<unsigned int>&);
   //
-  void turnOnIterationCounter(){iteration_and_time_active_=true;}
-  void turnOffIterationCounter(){iteration_and_time_active_=false;}
+  void turnOnIterationCounter() {iteration_and_time_active_=true;}
+  void turnOffIterationCounter() {iteration_and_time_active_=false;}
   bool isIterationCounterActive() const {return iteration_and_time_active_;}
   void setIterationCounter(const unsigned int);
   void setTime(const double);
@@ -171,8 +171,8 @@ public:
   unsigned int getIterationCounter() const {return iteration_opt;}
   double getTimeValue() const {return time_md;}
   //
-  void setOutputFmt(std::string ss){ output_fmt_=ss; }
-  void resetOutputFmt(){output_fmt_="%30.16e";}
+  void setOutputFmt(std::string ss) { output_fmt_=ss; }
+  void resetOutputFmt() {output_fmt_="%30.16e";}
   std::string getOutputFmt() const {return output_fmt_;}
   //
 protected:
@@ -188,17 +188,17 @@ protected:
 };
 
 inline
-void CoeffsBase::setIterationCounter(const unsigned int iteration_opt_in){
+void CoeffsBase::setIterationCounter(const unsigned int iteration_opt_in) {
   iteration_opt=iteration_opt_in;
 }
 
 inline
-void CoeffsBase::setTime(const double time_md_in){
+void CoeffsBase::setTime(const double time_md_in) {
   time_md=time_md_in;
 }
 
 inline
-void CoeffsBase::setIterationCounterAndTime(const unsigned int iteration_opt_in, const double time_md_in){
+void CoeffsBase::setIterationCounterAndTime(const unsigned int iteration_opt_in, const double time_md_in) {
   iteration_opt=iteration_opt_in;
   time_md=time_md_in;
 }
@@ -228,7 +228,7 @@ size_t CoeffsBase::getIndex(const std::vector<unsigned int>& indices) const {
   //   }
   // }
   size_t index=indices[ndimensions_-1];
-  for(unsigned int i=ndimensions_-1; i>0; --i){
+  for(unsigned int i=ndimensions_-1; i>0; --i) {
     index=index*indices_shape_[i-1]+indices[i-1];
   }
   return index;
@@ -240,12 +240,12 @@ std::vector<unsigned int> CoeffsBase::getIndices(const size_t index) const {
   std::vector<unsigned int> indices(ndimensions_);
   size_t kk=index;
   indices[0]=(index%indices_shape_[0]);
-  for(unsigned int i=1; i<ndimensions_-1; ++i){
+  for(unsigned int i=1; i<ndimensions_-1; ++i) {
     kk=(kk-indices[i-1])/indices_shape_[i-1];
     indices[i]=(kk%indices_shape_[i]);
   }
-  if(ndimensions_>=2){
-   indices[ndimensions_-1]=((kk-indices[ndimensions_-2])/indices_shape_[ndimensions_-2]);
+  if(ndimensions_>=2) {
+    indices[ndimensions_-1]=((kk-indices[ndimensions_-2])/indices_shape_[ndimensions_-2]);
   }
   return indices;
 }

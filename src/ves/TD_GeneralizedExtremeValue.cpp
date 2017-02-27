@@ -26,8 +26,8 @@
 #include "tools/Keywords.h"
 
 
-namespace PLMD{
-namespace ves{
+namespace PLMD {
+namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST_HIDDEN GENERALIZED_EXTREME_VALUE
 /*
@@ -54,7 +54,7 @@ public:
 VES_REGISTER_TARGET_DISTRIBUTION(TD_GeneralizedExtremeValue,"GENERALIZED_EXTREME_VALUE")
 
 
-void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys){
+void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","CENTER","The center of the generalized extreme value distribution.");
   keys.add("compulsory","SIGMA","The sigma (scale) parameters for the generalized extreme value distribution.");
@@ -67,23 +67,23 @@ void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys){
 
 
 TD_GeneralizedExtremeValue::TD_GeneralizedExtremeValue( const TargetDistributionOptions& to ):
-TargetDistribution(to),
-center_(0),
-sigma_(0),
-epsilon_(0),
-normalization_(0)
+  TargetDistribution(to),
+  center_(0),
+  sigma_(0),
+  epsilon_(0),
+  normalization_(0)
 {
   parseVector("CENTER",center_);
   parseVector("SIGMA",sigma_);
   parseVector("EPSILON",epsilon_);
 
   setDimension(center_.size());
-  if(sigma_.size()!=getDimension()){plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
-  if(epsilon_.size()!=getDimension()){plumed_merror(getName()+": the EPSILON keyword does not match the given dimension in MINIMA");}
+  if(sigma_.size()!=getDimension()) {plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
+  if(epsilon_.size()!=getDimension()) {plumed_merror(getName()+": the EPSILON keyword does not match the given dimension in MINIMA");}
 
   normalization_.resize(getDimension());
-  for(unsigned int k=0; k<getDimension(); k++){
-    if(sigma_[k]<0.0){plumed_merror(getName()+": the values given in SIGMA should be larger then 0.0");}
+  for(unsigned int k=0; k<getDimension(); k++) {
+    if(sigma_[k]<0.0) {plumed_merror(getName()+": the values given in SIGMA should be larger then 0.0");}
     normalization_[k] = 1.0/sigma_[k];
   }
   checkRead();
@@ -97,15 +97,15 @@ double TD_GeneralizedExtremeValue::getValue(const std::vector<double>& argument)
 
 double TD_GeneralizedExtremeValue::GEVdiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& sigma, const std::vector<double>& epsilon, const std::vector<double>& normalization) const {
   double value = 1.0;
-  for(unsigned int k=0; k<argument.size(); k++){
+  for(unsigned int k=0; k<argument.size(); k++) {
     double arg=(argument[k]-center[k])/sigma[k];
     double tx;
-    if(epsilon_[k]!=0.0){
-      if( epsilon_[k]>0 && argument[k] <= (center[k]-sigma[k]/epsilon[k]) ){return 0.0;}
-      if( epsilon_[k]<0 && argument[k] > (center[k]-sigma[k]/epsilon[k]) ){return 0.0;}
-      tx = pow( (1.0+arg*epsilon[k]) , -1.0/epsilon[k] );
+    if(epsilon_[k]!=0.0) {
+      if( epsilon_[k]>0 && argument[k] <= (center[k]-sigma[k]/epsilon[k]) ) {return 0.0;}
+      if( epsilon_[k]<0 && argument[k] > (center[k]-sigma[k]/epsilon[k]) ) {return 0.0;}
+      tx = pow( (1.0+arg*epsilon[k]), -1.0/epsilon[k] );
     }
-    else{
+    else {
       tx = exp(-arg);
     }
     value *= normalization[k] * pow(tx,epsilon[k]+1.0) * exp(-tx);
