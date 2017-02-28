@@ -72,7 +72,7 @@ N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i},\rho_i) =
 -\frac{1}{2(1-\rho_i^2)}
 \left[
 \frac{(s_{1}-\mu_{1,i})^2}{\sigma_{1,i}^2}+
-\frac{(s_{2}-\mu_{2,i})^2}{\sigma_{2,i}^2}+
+\frac{(s_{2}-\mu_{2,i})^2}{\sigma_{2,i}^2}-
 \frac{2 \rho_i (s_{1}-\mu_{1,i})(s_{2}-\mu_{2,i})}{\sigma_{1,i}\sigma_{2,i}}
 \right]
 \right)
