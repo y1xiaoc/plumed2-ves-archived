@@ -62,8 +62,9 @@ In this case you need to specify the centers \f$\boldsymbol{\mu}_{i}\f$ using th
 numbered CENTER keywords and the standard deviations \f$\boldsymbol{\sigma}_{i}\f$
 using the numbered SIGMA keywords.
 
-For two arguments it is possible to employ bivariate Gaussians with correlation
-between arguments, defined as
+For two arguments it is possible to employ
+[bivariate Gaussians](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
+with correlation between arguments, defined as
 \f[
 N(\mathbf{s};\boldsymbol{\mu}_{i},\boldsymbol{\sigma}_{i},\rho_i) =
 \frac{1}{2 \pi \sigma_{1,i} \sigma_{2,i} \sqrt{1-\rho_i^2}}
