@@ -8,7 +8,7 @@ The VES code is developed independently from the PLUMED code,
 see the [homepage of the VES code](http://www.ves-code.org) for further information.
 
 The VES code is an optional module, to enable it you need to configure
-PLUMED using ./configure --enable-modules=all. 
+PLUMED using ./configure --enable-modules=all.
 
 __This manual is currently under construction.__
 All keywords should be listed for the available actions while
@@ -115,51 +115,47 @@ The following tutorials are available for the VES code
 
 \image html ves-school-2017-logo.png  width=800px
 
-Tutorials for the [MARVEL School on Variationally Enhanced Sampling]
-(https://sites.google.com/site/vesschool2017/home) in Lugano,
-February 14-17, 2017.
+Tutorials from the [MARVEL School on Variationally Enhanced Sampling]
+(https://sites.google.com/site/vesschool2017/home) that was held in
+Lugano, February 14-17, 2017.
+
+\par Suggested readings
+
+Metadynamics:
+
+[Enhancing Important Fluctuations: Rare Events and Metadynamics from a Conceptual Viewpoint](https://doi.org/10.1146/annurev-physchem-040215-112229), Annu. Rev. Phys. Chem. 2016
+
+[Variational Approach to Enhanced Sampling and Free Energy Calculations](https://doi.org/10.1103/PhysRevLett.113.090601), Phys. Rev. Lett. 2014
+
+
+Variationally Enhanced Sampling:
+
+[Variationally Optimized Free-Energy Flooding for Rate Calculation](https://doi.org/10.1103/PhysRevLett.115.070601), Phys. Rev. Lett. 2015
+
 
 
 \par Tuesday February 14
 
-
 \ref lugano-1 "Tutorial 1": Introduction to PLUMED and analyzing molecular simulations - Gareth Tribello
-
 
 \par Wednesday February 15
 
-
 \ref ves-lugano2017-metad "Tutorial 2": Biasing with metadynamics - Pablo Piaggi
-
 
 \ref ves-lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling - Pablo Piaggi, Omar Valsson, and Michele Invernizzi
 
-
 \par Thursday February 16
 
-
 \ref ves-lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling - Pablo Piaggi, Omar Valsson, and Michele Invernizzi
-
 
 Tutorial 5: Advanced collective variables - Gareth Tribello
 - \ref lugano-2 "Path CVs"
 - \ref belfast-10 "Multicolvar"
 - \ref belfast-3 "Dimensionality reduction"
 
-
 \par Friday February 17
 
 \ref ves-lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations - James McCarty and Ferruccio Palazzesi
-
-
-
-
-
-
-
-
-
-
 
 
 */
