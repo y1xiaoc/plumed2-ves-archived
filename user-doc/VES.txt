@@ -136,26 +136,26 @@ Variationally Enhanced Sampling:
 
 \par Tuesday February 14
 
-\ref lugano-1 "Tutorial 1": Introduction to PLUMED and analyzing molecular simulations - Gareth Tribello
+\ref lugano-1 "Tutorial 1": Introduction to PLUMED and analyzing molecular simulations
 
 \par Wednesday February 15
 
-\ref ves-lugano2017-metad "Tutorial 2": Biasing with metadynamics - Pablo Piaggi
+\ref ves-lugano2017-metad "Tutorial 2": Biasing with metadynamics
 
-\ref ves-lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling - Pablo Piaggi, Omar Valsson, and Michele Invernizzi
+\ref ves-lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling
 
 \par Thursday February 16
 
-\ref ves-lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling - Pablo Piaggi, Omar Valsson, and Michele Invernizzi
+\ref ves-lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling
 
-Tutorial 5: Advanced collective variables - Gareth Tribello
+Tutorial 5: Advanced collective variables
 - \ref lugano-2 "Path CVs"
 - \ref belfast-10 "Multicolvar"
 - \ref belfast-3 "Dimensionality reduction"
 
 \par Friday February 17
 
-\ref ves-lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations - James McCarty and Ferruccio Palazzesi
+\ref ves-lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations
 
 
 */
