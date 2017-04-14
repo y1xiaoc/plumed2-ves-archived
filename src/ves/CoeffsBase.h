@@ -170,7 +170,7 @@ public:
   unsigned int getIterationCounter() const {return iteration_opt;}
   double getTimeValue() const {return time_md;}
   //
-  void setOutputFmt(std::string ss) { output_fmt_=ss; }
+  void setOutputFmt(const std::string& ss) { output_fmt_=ss; }
   void resetOutputFmt() {output_fmt_="%30.16e";}
   std::string getOutputFmt() const {return output_fmt_;}
   //

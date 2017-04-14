@@ -45,6 +45,7 @@ class FermiSwitchingFunction {
   double invr0_;
   double fermi_lambda_;
   double fermi_exp_max_;
+  FermiSwitchingFunction& operator=(const FermiSwitchingFunction&);
 public:
   static void registerKeywords( Keywords& keys );
 /// Constructor
