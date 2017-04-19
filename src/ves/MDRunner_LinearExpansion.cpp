@@ -173,6 +173,13 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     coresPerPart = pc.Get_size()/partitions;
   }
 
+  Communicator intra, inter;
+  if(Communicator::initialized()) {
+    int iworld=(pc.Get_rank() / coresPerPart);
+    pc.Split(iworld,0,intra);
+    pc.Split(intra.Get_rank(),0,inter);
+  }
+
   bool plumedon=false;
   std::vector<std::string> plumed_inputfiles;
   parseVector("plumed_input",plumed_inputfiles);
@@ -324,12 +331,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
 
   if(plumedon) plumed=new PLMD::PlumedMain;
 
-  Communicator intra, inter;
-  if(Communicator::initialized()) {
-    int iworld=(pc.Get_rank() / coresPerPart);
-    pc.Split(iworld,0,intra);
-    pc.Split(intra.Get_rank(),0,inter);
-  }
+
 
   if(plumed) {
     int s=sizeof(double);
