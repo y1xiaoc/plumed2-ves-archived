@@ -258,14 +258,37 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     error("Only generating a template coefficent file - Should stop now");
   }
 
+  std::vector<std::string> input_coeffs_fnames(0);
+  parseVector("input_coeffs",input_coeffs_fnames);
   std::string input_coeffs_fname;
-  parse("input_coeffs",input_coeffs_fname);
-  if(input_coeffs_fname.size()==0) {error("you need to give a coeffs file using the coeffs_file keyword.");}
+  bool diff_input_coeffs = false;
+  if(input_coeffs_fnames.size()==1){
+    input_coeffs_fname = input_coeffs_fnames[0];
+  }
+  else if(partitions > 1 && input_coeffs_fnames.size()==partitions){
+    diff_input_coeffs = true;
+    input_coeffs_fname = input_coeffs_fnames[inter.Get_rank()];
+  }
+  else{
+    error("problem with coeffs_file keyword, you need to give either one value or a value for each partition");
+  }
   coeffs_pntr->readFromFile(input_coeffs_fname,true,true);
+  std::vector<double> coeffs_prefactors(0);
   double coeffs_prefactor = 1.0;
-  parse("coeffs_prefactor",coeffs_prefactor);
-  if(coeffs_prefactor!=1.0) {coeffs_pntr->scaleAllValues(coeffs_prefactor);}
-
+  parseVector("coeffs_prefactor",coeffs_prefactors);
+  if(coeffs_prefactors.size()>0){
+    if(coeffs_prefactors.size()==1){
+      coeffs_prefactor = coeffs_prefactors[0];
+    }
+    else if(partitions > 1 && coeffs_prefactors.size()==partitions){
+      diff_input_coeffs = true;
+      coeffs_prefactor = coeffs_prefactors[inter.Get_rank()];
+    }
+    else{
+      error("problem with coeffs_prefactor keyword, you need to give either one value or a value for each partition");
+    }
+    coeffs_pntr->scaleAllValues(coeffs_prefactor);
+  }
   unsigned int pot_grid_bins;
   parse("output_potential_grid",pot_grid_bins);
   potential_expansion_pntr->setGridBins(pot_grid_bins);
@@ -278,6 +301,12 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   ofile_potential.link(pc);
   std::string output_potential_fname;
   parse("output_potential",output_potential_fname);
+  if(diff_input_coeffs){
+    ofile_potential.link(intra);
+    std::string suffix;
+    Tools::convert(inter.Get_rank(),suffix);
+    output_potential_fname = FileBase::appendSuffix(output_potential_fname,"."+suffix);
+  }
   ofile_potential.open(output_potential_fname);
   potential_expansion_pntr->writeBiasGridToFile(ofile_potential);
   ofile_potential.close();
@@ -295,6 +324,12 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   ofile_histogram.link(pc);
   std::string output_histogram_fname;
   parse("output_histogram",output_histogram_fname);
+  if(diff_input_coeffs){
+    ofile_histogram.link(intra);
+    std::string suffix;
+    Tools::convert(inter.Get_rank(),suffix);
+    output_histogram_fname = FileBase::appendSuffix(output_histogram_fname,"."+suffix);
+  }
   ofile_histogram.open(output_histogram_fname);
   histo_grid.writeToFile(ofile_histogram);
   ofile_histogram.close();
@@ -306,6 +341,12 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   coeffs_pntr->setOutputFmt(output_coeffs_fmt);
   OFile ofile_coeffsout;
   ofile_coeffsout.link(pc);
+  if(diff_input_coeffs){
+    ofile_coeffsout.link(intra);
+    std::string suffix;
+    Tools::convert(inter.Get_rank(),suffix);
+    output_coeffs_fname = FileBase::appendSuffix(output_coeffs_fname,"."+suffix);
+  }
   ofile_coeffsout.open(output_coeffs_fname);
   coeffs_pntr->writeToFile(ofile_coeffsout,true);
   ofile_coeffsout.close();
@@ -323,9 +364,15 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     for(unsigned int i=0; i<dim; i++) {
       fprintf(out,"Basis Function %u                      %s\n",i+1,basisf_keywords[i].c_str());
     }
+    if(diff_input_coeffs){
+      fprintf(out,"using different coefficients for each partition\n");
+    }
     fprintf(out,"PLUMED input                          %s",plumed_inputfiles[0].c_str());
     for(unsigned int i=1; i<plumed_inputfiles.size(); i++) {fprintf(out,",%s",plumed_inputfiles[i].c_str());}
     fprintf(out,"\n");
+    if(diff_input_coeffs){
+      fprintf(out,"using different coefficients for each partition\n");
+    }
   }
 
 
