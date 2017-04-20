@@ -169,10 +169,33 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   parse("nstep",nsteps);
   double tstep;
   parse("tstep",tstep);
+  //
   double temp;
-  parse("temperature",temp);
+  std::vector<double> temps_vec(0);
+  parseVector("temperature",temps_vec);
+  if(temps_vec.size()==1){
+    temp = temps_vec[0];
+  }
+  else if(partitions > 1 && temps_vec.size()==partitions){
+    temp = temps_vec[inter.Get_rank()];
+  }
+  else{
+    error("problem with temperature keyword, you need to give either one value or a value for each partition");
+  }
+  //
   double friction;
-  parse("friction",friction);
+  std::vector<double> frictions_vec(0);
+  parseVector("friction",frictions_vec);
+  if(frictions_vec.size()==1){
+    friction = frictions_vec[0];
+  }
+  else if(frictions_vec.size()==partitions){
+    friction = frictions_vec[inter.Get_rank()];
+  }
+  else{
+    error("problem with friction keyword, you need to give either one value or a value for each partition");
+  }
+  //
   int seed;
   parse("random_seed",seed);
   // The following line is important to assure that the seed is negative,
@@ -324,7 +347,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   ofile_histogram.link(pc);
   std::string output_histogram_fname;
   parse("output_histogram",output_histogram_fname);
-  if(diff_input_coeffs){
+  if(diff_input_coeffs || temps_vec.size()>1){
     ofile_histogram.link(intra);
     std::string suffix;
     Tools::convert(inter.Get_rank(),suffix);
