@@ -83,20 +83,20 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ) {
   CLTool::registerKeywords( keys );
   keys.add("compulsory","nstep","10","The number of steps of dynamics you want to run.");
   keys.add("compulsory","tstep","0.005","The integration timestep.");
-  keys.add("compulsory","temperature","1.0","The temperature to perform the simulation at. For multiple partition you can give a seperate value for each partition.");
-  keys.add("compulsory","friction","10.","The friction of the langevin thermostat. For multiple partition you can give a seperate value for each partition.");
+  keys.add("compulsory","temperature","1.0","The temperature to perform the simulation at. For multiple replica you can give a seperate value for each replica.");
+  keys.add("compulsory","friction","10.","The friction of the langevin thermostat. For multiple replica you can give a seperate value for each replica.");
   keys.add("compulsory","random_seed","5293818","Value of random number seed.");
-  keys.add("compulsory","plumed_input","plumed.dat","The name of the plumed input file(s). For multiple partition you can give a seperate value for each partition.");
+  keys.add("compulsory","plumed_input","plumed.dat","The name of the plumed input file(s). For multiple replica you can give a seperate value for each replica.");
   keys.add("compulsory","dimension","1","Number of dimensions, supports 1 to 3.");
-  keys.add("compulsory","initial_position","Initial position of the particle. For multiple partition you can give a seperate value for each partition.");
-  keys.add("compulsory","partitions","1","Number of partitions.");
+  keys.add("compulsory","initial_position","Initial position of the particle. For multiple replica you can give a seperate value for each replica.");
+  keys.add("compulsory","replicas","1","Number of replicas.");
   keys.add("compulsory","basis_functions_1","Basis functions for dimension 1.");
   keys.add("optional","basis_functions_2","Basis functions for dimension 2 if needed.");
   keys.add("optional","basis_functions_3","Basis functions for dimension 3 if needed.");
-  keys.add("compulsory","input_coeffs","potential-coeffs.in.data","Filename of the input coefficent file for the potential. For multiple partition you can give a seperate value for each partition.");
+  keys.add("compulsory","input_coeffs","potential-coeffs.in.data","Filename of the input coefficent file for the potential. For multiple replica you can give a seperate value for each replica.");
   keys.add("compulsory","output_coeffs","potential-coeffs.out.data","Filename of the output coefficent file for the potential.");
   keys.add("compulsory","output_coeffs_fmt","%30.16e","Format of the output coefficent file for the potential. Useful for regtests.");
-  keys.add("optional","coeffs_prefactor","prefactor for multiplying the coefficents with. For multiple partition you can give a seperate value for each partition.");
+  keys.add("optional","coeffs_prefactor","prefactor for multiplying the coefficents with. For multiple replica you can give a seperate value for each replica.");
   keys.add("optional","template_coeffs_file","only generate a template coefficent file with the filename given and exit.");
   keys.add("compulsory","output_potential_grid","100","The number of grid points used for the potential and histogram output files.");
   keys.add("compulsory","output_potential","potential.data","Filename of the potential output file.");
@@ -146,21 +146,21 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   PLMD::PlumedMain* plumed=NULL;
   PLMD::PlumedMain* plumed_bf=NULL;
 
-  unsigned int partitions;
-  unsigned int coresPerPart;
-  parse("partitions",partitions);
-  if(partitions==1) {
-    coresPerPart = pc.Get_size();
+  unsigned int replicas;
+  unsigned int coresPerReplica;
+  parse("replicas",replicas);
+  if(replicas==1) {
+    coresPerReplica = pc.Get_size();
   } else {
-    if(pc.Get_size()%partitions!=0) {
-      error("the number of MPI processes is not a multiple of the number of partitions.");
+    if(pc.Get_size()%replicas!=0) {
+      error("the number of MPI processes is not a multiple of the number of replicas.");
     }
-    coresPerPart = pc.Get_size()/partitions;
+    coresPerReplica = pc.Get_size()/replicas;
   }
   // create intra and inter communicators
   Communicator intra, inter;
   if(Communicator::initialized()) {
-    int iworld=(pc.Get_rank() / coresPerPart);
+    int iworld=(pc.Get_rank() / coresPerReplica);
     pc.Split(iworld,0,intra);
     pc.Split(intra.Get_rank(),0,inter);
   }
@@ -176,11 +176,11 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   if(temps_vec.size()==1){
     temp = temps_vec[0];
   }
-  else if(partitions > 1 && temps_vec.size()==partitions){
+  else if(replicas > 1 && temps_vec.size()==replicas){
     temp = temps_vec[inter.Get_rank()];
   }
   else{
-    error("problem with temperature keyword, you need to give either one value or a value for each partition.");
+    error("problem with temperature keyword, you need to give either one value or a value for each replica.");
   }
   //
   double friction;
@@ -189,11 +189,11 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   if(frictions_vec.size()==1){
     friction = frictions_vec[0];
   }
-  else if(frictions_vec.size()==partitions){
+  else if(frictions_vec.size()==replicas){
     friction = frictions_vec[inter.Get_rank()];
   }
   else{
-    error("problem with friction keyword, you need to give either one value or a value for each partition.");
+    error("problem with friction keyword, you need to give either one value or a value for each replica.");
   }
   //
   int seed;
@@ -206,30 +206,30 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   bool plumedon=false;
   std::vector<std::string> plumed_inputfiles;
   parseVector("plumed_input",plumed_inputfiles);
-  if(plumed_inputfiles.size()!=1 && plumed_inputfiles.size()!=partitions) {
-    error("in plumed_input you should either give one file or separate files for each partition.");
+  if(plumed_inputfiles.size()!=1 && plumed_inputfiles.size()!=replicas) {
+    error("in plumed_input you should either give one file or separate files for each replica.");
   }
   plumedon=true;
 
-  std::vector<Vector> initPos(partitions);
+  std::vector<Vector> initPos(replicas);
   std::vector<double> initPosTmp;
   parseVector("initial_position",initPosTmp);
   if(initPosTmp.size()==dim) {
-    for(unsigned int i=0; i<partitions; i++) {
+    for(unsigned int i=0; i<replicas; i++) {
       for(unsigned int k=0; k<dim; k++) {
         initPos[i][k]=initPosTmp[k];
       }
     }
   }
-  else if(initPosTmp.size()==dim*partitions) {
-    for(unsigned int i=0; i<partitions; i++) {
+  else if(initPosTmp.size()==dim*replicas) {
+    for(unsigned int i=0; i<replicas; i++) {
       for(unsigned int k=0; k<dim; k++) {
         initPos[i][k]=initPosTmp[i*dim+k];
       }
     }
   }
   else {
-    error("problem with initial_position keyword, you need to give either one value or a value for each partition.");
+    error("problem with initial_position keyword, you need to give either one value or a value for each replica.");
   }
 
 
@@ -288,12 +288,12 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   if(input_coeffs_fnames.size()==1){
     input_coeffs_fname = input_coeffs_fnames[0];
   }
-  else if(partitions > 1 && input_coeffs_fnames.size()==partitions){
+  else if(replicas > 1 && input_coeffs_fnames.size()==replicas){
     diff_input_coeffs = true;
     input_coeffs_fname = input_coeffs_fnames[inter.Get_rank()];
   }
   else{
-    error("problem with coeffs_file keyword, you need to give either one value or a value for each partition.");
+    error("problem with coeffs_file keyword, you need to give either one value or a value for each replica.");
   }
   coeffs_pntr->readFromFile(input_coeffs_fname,true,true);
   std::vector<double> coeffs_prefactors(0);
@@ -303,12 +303,12 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     if(coeffs_prefactors.size()==1){
       coeffs_prefactor = coeffs_prefactors[0];
     }
-    else if(partitions > 1 && coeffs_prefactors.size()==partitions){
+    else if(replicas > 1 && coeffs_prefactors.size()==replicas){
       diff_input_coeffs = true;
       coeffs_prefactor = coeffs_prefactors[inter.Get_rank()];
     }
     else{
-      error("problem with coeffs_prefactor keyword, you need to give either one value or a value for each partition.");
+      error("problem with coeffs_prefactor keyword, you need to give either one value or a value for each replica.");
     }
     coeffs_pntr->scaleAllValues(coeffs_prefactor);
   }
@@ -375,8 +375,8 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   ofile_coeffsout.close();
 
   if(pc.Get_rank() == 0) {
-    fprintf(out,"Partitions                            %u\n",partitions);
-    fprintf(out,"Cores per partition                   %u\n",coresPerPart);
+    fprintf(out,"Replicas                              %u\n",replicas);
+    fprintf(out,"Cores per replica                     %u\n",coresPerReplica);
     fprintf(out,"Number of steps                       %u\n",nsteps);
     fprintf(out,"Timestep                              %f\n",tstep);
     fprintf(out,"Temperature                           %f",temps_vec[0]);
@@ -394,7 +394,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     for(unsigned int i=1; i<plumed_inputfiles.size(); i++) {fprintf(out,",%s",plumed_inputfiles[i].c_str());}
     fprintf(out,"\n");
     fprintf(out,"kBoltzmann taken as 1, use NATURAL_UNITS in the plumed input\n");
-    if(diff_input_coeffs){fprintf(out,"using different coefficients for each partition\n");}
+    if(diff_input_coeffs){fprintf(out,"using different coefficients for each replica\n");}
   }
 
 
@@ -405,7 +405,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   if(plumed) {
     int s=sizeof(double);
     plumed->cmd("setRealPrecision",&s);
-    if(partitions>1) {
+    if(replicas>1) {
       if (Communicator::initialized()) {
         plumed->cmd("GREX setMPIIntracomm",&intra.Get_comm());
         if (intra.Get_rank()==0) {
