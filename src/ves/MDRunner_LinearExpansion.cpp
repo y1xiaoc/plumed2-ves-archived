@@ -146,6 +146,25 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   PLMD::PlumedMain* plumed=NULL;
   PLMD::PlumedMain* plumed_bf=NULL;
 
+  unsigned int partitions;
+  unsigned int coresPerPart;
+  parse("partitions",partitions);
+  if(partitions==1) {
+    coresPerPart = pc.Get_size();
+  } else {
+    if(pc.Get_size()%partitions!=0) {
+      error("the number of MPI processes is not a multiple of the number of partitions");
+    }
+    coresPerPart = pc.Get_size()/partitions;
+  }
+  // create intra and inter communicators
+  Communicator intra, inter;
+  if(Communicator::initialized()) {
+    int iworld=(pc.Get_rank() / coresPerPart);
+    pc.Split(iworld,0,intra);
+    pc.Split(intra.Get_rank(),0,inter);
+  }
+
   unsigned int nsteps;
   parse("nstep",nsteps);
   double tstep;
@@ -160,25 +179,6 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   //   as required by the version of plumed we are working with.
   if (seed>0) seed = -seed;
   parse("dimension",dim);
-
-  unsigned int partitions;
-  unsigned int coresPerPart;
-  parse("partitions",partitions);
-  if(partitions==1) {
-    coresPerPart = pc.Get_size();
-  } else {
-    if(pc.Get_size()%partitions!=0) {
-      error("the number of MPI processes is not a multiple of the number of partitions");
-    }
-    coresPerPart = pc.Get_size()/partitions;
-  }
-
-  Communicator intra, inter;
-  if(Communicator::initialized()) {
-    int iworld=(pc.Get_rank() / coresPerPart);
-    pc.Split(iworld,0,intra);
-    pc.Split(intra.Get_rank(),0,inter);
-  }
 
   bool plumedon=false;
   std::vector<std::string> plumed_inputfiles;
