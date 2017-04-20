@@ -83,20 +83,20 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ) {
   CLTool::registerKeywords( keys );
   keys.add("compulsory","nstep","10","The number of steps of dynamics you want to run.");
   keys.add("compulsory","tstep","0.005","The integration timestep.");
-  keys.add("compulsory","temperature","1.0","The temperature to perform the simulation at.");
-  keys.add("compulsory","friction","10.","The friction of the langevin thermostat.");
+  keys.add("compulsory","temperature","1.0","The temperature to perform the simulation at. For multiple partition you can give a seperate value for each partition.");
+  keys.add("compulsory","friction","10.","The friction of the langevin thermostat. For multiple partition you can give a seperate value for each partition.");
   keys.add("compulsory","random_seed","5293818","Value of random number seed.");
-  keys.add("compulsory","plumed_input","plumed.dat","The name of the plumed input file(s). Either give one file or separate files for each partition.");
+  keys.add("compulsory","plumed_input","plumed.dat","The name of the plumed input file(s). For multiple partition you can give a seperate value for each partition.");
   keys.add("compulsory","dimension","1","Number of dimensions, supports 1 to 3.");
-  keys.add("compulsory","initial_position","Initial position for each partition.");
+  keys.add("compulsory","initial_position","Initial position of the particle. For multiple partition you can give a seperate value for each partition.");
   keys.add("compulsory","partitions","1","Number of partitions.");
   keys.add("compulsory","basis_functions_1","Basis functions for dimension 1.");
   keys.add("optional","basis_functions_2","Basis functions for dimension 2 if needed.");
   keys.add("optional","basis_functions_3","Basis functions for dimension 3 if needed.");
-  keys.add("compulsory","input_coeffs","potential-coeffs.in.data","Filename of the input coefficent file for the potential.");
+  keys.add("compulsory","input_coeffs","potential-coeffs.in.data","Filename of the input coefficent file for the potential. For multiple partition you can give a seperate value for each partition.");
   keys.add("compulsory","output_coeffs","potential-coeffs.out.data","Filename of the output coefficent file for the potential.");
   keys.add("compulsory","output_coeffs_fmt","%30.16e","Format of the output coefficent file for the potential. Useful for regtests.");
-  keys.add("optional","coeffs_prefactor","prefactor for multiplying the coefficents with. ");
+  keys.add("optional","coeffs_prefactor","prefactor for multiplying the coefficents with. For multiple partition you can give a seperate value for each partition.");
   keys.add("optional","template_coeffs_file","only generate a template coefficent file with the filename given and exit.");
   keys.add("compulsory","output_potential_grid","100","The number of grid points used for the potential and histogram output files.");
   keys.add("compulsory","output_potential","potential.data","Filename of the potential output file.");
@@ -153,7 +153,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     coresPerPart = pc.Get_size();
   } else {
     if(pc.Get_size()%partitions!=0) {
-      error("the number of MPI processes is not a multiple of the number of partitions");
+      error("the number of MPI processes is not a multiple of the number of partitions.");
     }
     coresPerPart = pc.Get_size()/partitions;
   }
@@ -180,7 +180,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     temp = temps_vec[inter.Get_rank()];
   }
   else{
-    error("problem with temperature keyword, you need to give either one value or a value for each partition");
+    error("problem with temperature keyword, you need to give either one value or a value for each partition.");
   }
   //
   double friction;
@@ -193,7 +193,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     friction = frictions_vec[inter.Get_rank()];
   }
   else{
-    error("problem with friction keyword, you need to give either one value or a value for each partition");
+    error("problem with friction keyword, you need to give either one value or a value for each partition.");
   }
   //
   int seed;
@@ -229,7 +229,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     }
   }
   else {
-    error("initial_position is of the wrong size");
+    error("problem with initial_position keyword, you need to give either one value or a value for each partition.");
   }
 
 
@@ -278,7 +278,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     ofile_coeffstmpl.open(template_coeffs_fname);
     coeffs_pntr->writeToFile(ofile_coeffstmpl,true);
     ofile_coeffstmpl.close();
-    error("Only generating a template coefficent file - Should stop now");
+    error("Only generating a template coefficent file - Should stop now.");
   }
 
   std::vector<std::string> input_coeffs_fnames(0);
@@ -293,7 +293,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     input_coeffs_fname = input_coeffs_fnames[inter.Get_rank()];
   }
   else{
-    error("problem with coeffs_file keyword, you need to give either one value or a value for each partition");
+    error("problem with coeffs_file keyword, you need to give either one value or a value for each partition.");
   }
   coeffs_pntr->readFromFile(input_coeffs_fname,true,true);
   std::vector<double> coeffs_prefactors(0);
@@ -308,7 +308,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
       coeffs_prefactor = coeffs_prefactors[inter.Get_rank()];
     }
     else{
-      error("problem with coeffs_prefactor keyword, you need to give either one value or a value for each partition");
+      error("problem with coeffs_prefactor keyword, you need to give either one value or a value for each partition.");
     }
     coeffs_pntr->scaleAllValues(coeffs_prefactor);
   }
@@ -379,23 +379,22 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     fprintf(out,"Cores per partition                   %u\n",coresPerPart);
     fprintf(out,"Number of steps                       %u\n",nsteps);
     fprintf(out,"Timestep                              %f\n",tstep);
-    fprintf(out,"Temperature                           %f\n",temp);
-    fprintf(out,"kBoltzmann taken as 1, use NATURAL_UNITS in the plumed input\n");
-    fprintf(out,"Friction                              %f\n",friction);
+    fprintf(out,"Temperature                           %f",temps_vec[0]);
+    for(unsigned int i=1; i<temps_vec.size(); i++){fprintf(out,",%f",temps_vec[i]);}
+    fprintf(out,"\n");
+    fprintf(out,"Friction                              %f",frictions_vec[0]);
+    for(unsigned int i=1; i<frictions_vec.size(); i++){fprintf(out,",%f",frictions_vec[i]);}
+    fprintf(out,"\n");
     fprintf(out,"Random seed                           %d\n",seed);
     fprintf(out,"Dimensions                            %u\n",dim);
     for(unsigned int i=0; i<dim; i++) {
       fprintf(out,"Basis Function %u                      %s\n",i+1,basisf_keywords[i].c_str());
     }
-    if(diff_input_coeffs){
-      fprintf(out,"using different coefficients for each partition\n");
-    }
     fprintf(out,"PLUMED input                          %s",plumed_inputfiles[0].c_str());
     for(unsigned int i=1; i<plumed_inputfiles.size(); i++) {fprintf(out,",%s",plumed_inputfiles[i].c_str());}
     fprintf(out,"\n");
-    if(diff_input_coeffs){
-      fprintf(out,"using different coefficients for each partition\n");
-    }
+    fprintf(out,"kBoltzmann taken as 1, use NATURAL_UNITS in the plumed input\n");
+    if(diff_input_coeffs){fprintf(out,"using different coefficients for each partition\n");}
   }
 
 
