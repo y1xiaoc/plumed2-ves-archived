@@ -197,10 +197,27 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   }
   //
   int seed;
-  parse("random_seed",seed);
-  // The following line is important to assure that the seed is negative,
-  //   as required by the version of plumed we are working with.
-  if (seed>0) seed = -seed;
+  std::vector<int> seeds_vec(0);
+  parseVector("random_seed",seeds_vec);
+  for(unsigned int i=0; i<seeds_vec.size(); i++) {
+    if(seeds_vec[i]>0){seeds_vec[i] = -seeds_vec[i];}
+  }
+  if(replicas==1) {
+    if(seeds_vec.size()>1){error("problem with random_seed keyword, for a single replica you should only give one value");}
+    seed = seeds_vec[0];
+  }
+  else {
+    if(seeds_vec.size()!=1 && seeds_vec.size()!=replicas) {
+      error("problem with random_seed keyword, for multiple replicas you should give either one value or a seperate value for each replica");
+    }
+    if(seeds_vec.size()==1) {
+      seeds_vec.resize(replicas);
+      for(unsigned int i=1; i<seeds_vec.size(); i++){seeds_vec[i] = seeds_vec[0] + i;}
+    }
+    seed = seeds_vec[inter.Get_rank()];
+  }
+
+  //
   parse("dimension",dim);
 
   bool plumedon=false;
@@ -385,7 +402,9 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     fprintf(out,"Friction                              %f",frictions_vec[0]);
     for(unsigned int i=1; i<frictions_vec.size(); i++){fprintf(out,",%f",frictions_vec[i]);}
     fprintf(out,"\n");
-    fprintf(out,"Random seed                           %d\n",seed);
+    fprintf(out,"Random seed                           %d",seeds_vec[0]);
+    for(unsigned int i=1; i<seeds_vec.size(); i++){fprintf(out,",%d",seeds_vec[i]);}
+    fprintf(out,"\n");
     fprintf(out,"Dimensions                            %u\n",dim);
     for(unsigned int i=0; i<dim; i++) {
       fprintf(out,"Basis Function %u                      %s\n",i+1,basisf_keywords[i].c_str());
@@ -449,7 +468,6 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   }
 
   // Setup random number generator
-  seed += inter.Get_rank();
   random.setSeed(seed);
 
   double potential, therm_eng=0; std::vector<double> masses(1,1);
