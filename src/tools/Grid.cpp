@@ -128,13 +128,13 @@ void Grid::clear() {
   }
 }
 
-void Grid::enableSpline(){
+void Grid::enableSpline() {
   plumed_massert(!usederiv_,"enableSpline: should only be used for a grid without derivatives");
   plumed_massert(!dospline_,"enableSpline: splines are already active");
   der_.resize(maxsize_);
-  for(index_t i=0;i<maxsize_;++i){
+  for(index_t i=0; i<maxsize_; ++i) {
     der_[i].resize(dimension_);
-    for(unsigned int j=0;j<dimension_;++j){
+    for(unsigned int j=0; j<dimension_; ++j) {
       der_[i][j]=0.0;
     }
   }

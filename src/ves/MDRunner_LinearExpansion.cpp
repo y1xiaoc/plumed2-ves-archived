@@ -173,26 +173,26 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   double temp;
   std::vector<double> temps_vec(0);
   parseVector("temperature",temps_vec);
-  if(temps_vec.size()==1){
+  if(temps_vec.size()==1) {
     temp = temps_vec[0];
   }
-  else if(replicas > 1 && temps_vec.size()==replicas){
+  else if(replicas > 1 && temps_vec.size()==replicas) {
     temp = temps_vec[inter.Get_rank()];
   }
-  else{
+  else {
     error("problem with temperature keyword, you need to give either one value or a value for each replica.");
   }
   //
   double friction;
   std::vector<double> frictions_vec(0);
   parseVector("friction",frictions_vec);
-  if(frictions_vec.size()==1){
+  if(frictions_vec.size()==1) {
     friction = frictions_vec[0];
   }
-  else if(frictions_vec.size()==replicas){
+  else if(frictions_vec.size()==replicas) {
     friction = frictions_vec[inter.Get_rank()];
   }
-  else{
+  else {
     error("problem with friction keyword, you need to give either one value or a value for each replica.");
   }
   //
@@ -200,10 +200,10 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   std::vector<int> seeds_vec(0);
   parseVector("random_seed",seeds_vec);
   for(unsigned int i=0; i<seeds_vec.size(); i++) {
-    if(seeds_vec[i]>0){seeds_vec[i] = -seeds_vec[i];}
+    if(seeds_vec[i]>0) {seeds_vec[i] = -seeds_vec[i];}
   }
   if(replicas==1) {
-    if(seeds_vec.size()>1){error("problem with random_seed keyword, for a single replica you should only give one value");}
+    if(seeds_vec.size()>1) {error("problem with random_seed keyword, for a single replica you should only give one value");}
     seed = seeds_vec[0];
   }
   else {
@@ -212,7 +212,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     }
     if(seeds_vec.size()==1) {
       seeds_vec.resize(replicas);
-      for(unsigned int i=1; i<seeds_vec.size(); i++){seeds_vec[i] = seeds_vec[0] + i;}
+      for(unsigned int i=1; i<seeds_vec.size(); i++) {seeds_vec[i] = seeds_vec[0] + i;}
     }
     seed = seeds_vec[inter.Get_rank()];
   }
@@ -302,29 +302,29 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   parseVector("input_coeffs",input_coeffs_fnames);
   std::string input_coeffs_fname;
   bool diff_input_coeffs = false;
-  if(input_coeffs_fnames.size()==1){
+  if(input_coeffs_fnames.size()==1) {
     input_coeffs_fname = input_coeffs_fnames[0];
   }
-  else if(replicas > 1 && input_coeffs_fnames.size()==replicas){
+  else if(replicas > 1 && input_coeffs_fnames.size()==replicas) {
     diff_input_coeffs = true;
     input_coeffs_fname = input_coeffs_fnames[inter.Get_rank()];
   }
-  else{
+  else {
     error("problem with coeffs_file keyword, you need to give either one value or a value for each replica.");
   }
   coeffs_pntr->readFromFile(input_coeffs_fname,true,true);
   std::vector<double> coeffs_prefactors(0);
   double coeffs_prefactor = 1.0;
   parseVector("coeffs_prefactor",coeffs_prefactors);
-  if(coeffs_prefactors.size()>0){
-    if(coeffs_prefactors.size()==1){
+  if(coeffs_prefactors.size()>0) {
+    if(coeffs_prefactors.size()==1) {
       coeffs_prefactor = coeffs_prefactors[0];
     }
-    else if(replicas > 1 && coeffs_prefactors.size()==replicas){
+    else if(replicas > 1 && coeffs_prefactors.size()==replicas) {
       diff_input_coeffs = true;
       coeffs_prefactor = coeffs_prefactors[inter.Get_rank()];
     }
-    else{
+    else {
       error("problem with coeffs_prefactor keyword, you need to give either one value or a value for each replica.");
     }
     coeffs_pntr->scaleAllValues(coeffs_prefactor);
@@ -341,7 +341,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   ofile_potential.link(pc);
   std::string output_potential_fname;
   parse("output_potential",output_potential_fname);
-  if(diff_input_coeffs){
+  if(diff_input_coeffs) {
     ofile_potential.link(intra);
     std::string suffix;
     Tools::convert(inter.Get_rank(),suffix);
@@ -364,7 +364,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   ofile_histogram.link(pc);
   std::string output_histogram_fname;
   parse("output_histogram",output_histogram_fname);
-  if(diff_input_coeffs || temps_vec.size()>1){
+  if(diff_input_coeffs || temps_vec.size()>1) {
     ofile_histogram.link(intra);
     std::string suffix;
     Tools::convert(inter.Get_rank(),suffix);
@@ -381,7 +381,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
   coeffs_pntr->setOutputFmt(output_coeffs_fmt);
   OFile ofile_coeffsout;
   ofile_coeffsout.link(pc);
-  if(diff_input_coeffs){
+  if(diff_input_coeffs) {
     ofile_coeffsout.link(intra);
     std::string suffix;
     Tools::convert(inter.Get_rank(),suffix);
@@ -397,13 +397,13 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     fprintf(out,"Number of steps                       %u\n",nsteps);
     fprintf(out,"Timestep                              %f\n",tstep);
     fprintf(out,"Temperature                           %f",temps_vec[0]);
-    for(unsigned int i=1; i<temps_vec.size(); i++){fprintf(out,",%f",temps_vec[i]);}
+    for(unsigned int i=1; i<temps_vec.size(); i++) {fprintf(out,",%f",temps_vec[i]);}
     fprintf(out,"\n");
     fprintf(out,"Friction                              %f",frictions_vec[0]);
-    for(unsigned int i=1; i<frictions_vec.size(); i++){fprintf(out,",%f",frictions_vec[i]);}
+    for(unsigned int i=1; i<frictions_vec.size(); i++) {fprintf(out,",%f",frictions_vec[i]);}
     fprintf(out,"\n");
     fprintf(out,"Random seed                           %d",seeds_vec[0]);
-    for(unsigned int i=1; i<seeds_vec.size(); i++){fprintf(out,",%d",seeds_vec[i]);}
+    for(unsigned int i=1; i<seeds_vec.size(); i++) {fprintf(out,",%d",seeds_vec[i]);}
     fprintf(out,"\n");
     fprintf(out,"Dimensions                            %u\n",dim);
     for(unsigned int i=0; i<dim; i++) {
@@ -413,7 +413,7 @@ int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc)
     for(unsigned int i=1; i<plumed_inputfiles.size(); i++) {fprintf(out,",%s",plumed_inputfiles[i].c_str());}
     fprintf(out,"\n");
     fprintf(out,"kBoltzmann taken as 1, use NATURAL_UNITS in the plumed input\n");
-    if(diff_input_coeffs){fprintf(out,"using different coefficients for each replica\n");}
+    if(diff_input_coeffs) {fprintf(out,"using different coefficients for each replica\n");}
   }
 
 
