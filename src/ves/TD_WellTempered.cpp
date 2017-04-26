@@ -89,9 +89,9 @@ to do it every 100-1000 bias update iterations.
 
 \par Examples
 Employ a well-tempered target distribution with a bias factor of 10
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={WELL_TEMPERED BIASFACTOR=10}
-\endverbatim
+\endplumedfile
 
 */
 //+ENDPLUMEDOC

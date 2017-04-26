@@ -40,11 +40,11 @@ Here we define both Fourier cosine and sine expansions of order 10,
 each with 11 basis functions, which are combined. This results
 in a total number of 21 basis functions as only the constant from
 is bf_cos is used.
-\verbatim
+\plumedfile
 bf_cos: BF_COSINE INTERVAL_MIN=-pi INTERVAL_MAX=+pi ORDER=10
 bf_sin: BF_SINE   INTERVAL_MIN=-pi INTERVAL_MAX=+pi ORDER=10
 bf_comb: BF_COMBINED BASIS_FUNCTIONS=bf_cos,bf_sin
-\endverbatim
+\endplumedfile
 In principle this is the same as using BF_FOURIER with
 ORDER=10 but with different ordering of the basis functions.
 Note that the order used in BASIS_FUNCTIONS matters for the ordering

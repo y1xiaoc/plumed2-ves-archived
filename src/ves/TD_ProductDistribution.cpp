@@ -65,13 +65,13 @@ static distribution.
 
 In the following example we employ a uniform distribution for
 argument 1 and a Gaussian distribution for argument 2.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
                      DIST_ARG1={UNIFORM}
                      DIST_ARG2={GAUSSIAN
                                 CENTER=-2.0
                                 SIGMA=0.5}}
-\endverbatim
+\endplumedfile
 
 */
 //+ENDPLUMEDOC

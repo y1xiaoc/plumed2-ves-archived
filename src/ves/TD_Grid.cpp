@@ -73,10 +73,10 @@ will make values outside to be taken as zero.
 
 Generally you only need to provide the the filename of the external grid
 file. The target distribution is then automatically normalized to 1 inside the code.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={GRID_DIST
                      FILE=input-grid.data}
-\endverbatim
+\endplumedfile
 
 */
 //+ENDPLUMEDOC

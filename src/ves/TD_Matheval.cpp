@@ -78,35 +78,35 @@ Here we use as shifted [Maxwell-Boltzmann distribution](https://en.wikipedia.org
 as a target distribution in one-dimension.
 Note that it is not need to include the normalization factor as the distribution will be
 automatically normalized.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={MATHEVAL_DIST
                      FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))}
-\endverbatim
+\endplumedfile
 
 Here we have a two dimensional target distribution where we
 use a [generalized normal distribution](https://en.wikipedia.org/wiki/Generalized_normal_distribution)
 for argument \f$s_2\f$ while the distribution for \f$s_1\f$ is taken as
 uniform as the variable _s1_ is not included in the function.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={MATHEVAL_DIST
                      FUNCTION=exp(-(abs(s2-20.0)/5.0)^4.0)}
-\endverbatim
+\endplumedfile
 
 By using the _FE_ variable the target distribution can depend on
 the free energy surface \f$F(\mathbf{s})\f$. For example,
 the following input is identical to using \ref WELL_TEMPERED with
 BIASFACTOR=10.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={MATHEVAL_DIST
                     FUNCTION=exp(-(beta/10.0)*FE)}
-\endverbatim
+\endplumedfile
 Here the inverse temperature is automatically obtained by using the _beta_
 variable. It is also possible to use the _kBT_ variable. The following
 syntax will give the exact same results as the syntax above
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={MATHEVAL_DIST
                     FUNCTION=exp(-(1.0/(kBT*10.0))*FE)}
-\endverbatim
+\endplumedfile
 
 
 

@@ -84,9 +84,9 @@ Here we employ a Legendre expansion of order 20 over the interval -4.0 to 8.0.
 This results in a total number of 21 basis functions.
 The label used to identify  the basis function action can then be
 referenced later on in the input file.
-\verbatim
+\plumedfile
 bf_leg: BF_LEGENDRE INTERVAL_MIN=-4.0 INTERVAL_MAX=8.0 ORDER=20
-\endverbatim
+\endplumedfile
 
 \par Examples
 

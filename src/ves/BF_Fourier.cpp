@@ -64,9 +64,9 @@ Here we employ a Fourier expansion of order 10 over the periodic interval
 This results in a total number of 21 basis functions.
 The label used to identify  the basis function action can then be
 referenced later on in the input file.
-\verbatim
+\plumedfile
 BF_FOURIER INTERVAL_MIN=-pi INTERVAL_MAX=+pi ORDER=10 LABEL=bf_fourier
-\endverbatim
+\endplumedfile
 
 
 */

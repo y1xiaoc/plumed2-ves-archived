@@ -109,22 +109,22 @@ Therefore, if we consider a target distribution that is
 defined over an interval from 0.0 to 10.0 for the first
 argument and from 0.2 to 1.0 for the second argument are
 all of the following examples equivalent
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM}
-\endverbatim
-\verbatim
+\endplumedfile
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM
                      MINIMA=0.0,0,2
                      MAXIMA=10.0,1.0}
-\endverbatim
-\verbatim
+\endplumedfile
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM
                      MAXIMA=10.0,1.0}
-\endverbatim
-\verbatim
+\endplumedfile
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM
                      MINIMA=0.0,0,2}
-\endverbatim
+\endplumedfile
 
 
 We can also define a target distribution that goes smoothly to zero
@@ -132,33 +132,33 @@ at the boundaries of the uniform distribution. In the following
 we consider an interval of 0 to 10 for the target distribution.
 The following input would result in a target distribution that
 would be uniform from 2 to 7 and then smoothly go to zero.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM
                      MINIMA=2.0
                      MAXIMA=+7.0
                      SIGMA_MINIMA=0.5
                      SIGMA_MAXIMA=1.0}
-\endverbatim
+\endplumedfile
 It is also possible to employ a smooth switching function for just one
 of the boundaries as shown here where the target distribution
 would be uniform from 0 to 7.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM
                      MAXIMA=+7.0
                      SIGMA_MAXIMA=1.0}
-\endverbatim
+\endplumedfile
 Furthermore, it is possible to employ a sharp boundary by
 using
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM
                      MAXIMA=+7.0
                      SIGMA_MAXIMA=0.0}
-\endverbatim
+\endplumedfile
 or
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={UNIFORM
                      MAXIMA=+7.0}
-\endverbatim
+\endplumedfile
 
 
 

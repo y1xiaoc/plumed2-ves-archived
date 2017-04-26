@@ -46,9 +46,9 @@ tool outside those scripts the input is specified using the following command li
 \par Examples
 
 The following generates the html manual for the target distribution \ref VON_MISES
-\verbatim
+\plumedfile
 plumed manual_ves --targetdist VON_MISES
-\endverbatim
+\endplumedfile
 
 
 */

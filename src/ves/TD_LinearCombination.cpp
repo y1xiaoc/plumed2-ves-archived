@@ -68,18 +68,18 @@ static distribution.
 
 Here we employ a linear combination of a uniform and a Gaussian distribution.
 No weights are given so the two distributions will be weighted equally.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={LINEAR_COMBINATION
                      DISTRIBUTION1={UNIFORM}
                      DISTRIBUTION2={GAUSSIAN
                                     CENTER=-2.0
                                     SIGMA=0.5}}
-\endverbatim
+\endplumedfile
 
 Here we employ a linear combination of a uniform and two Gaussian distribution.
 The weights are automatically normalized to 1 such that giving
 WEIGHTS=1.0,1.0,2.0 as we do here is equal to giving WEIGHTS=0.25,0.25,0.50.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={LINEAR_COMBINATION
                      DISTRIBUTION1={UNIFORM}
                      DISTRIBUTION2={GAUSSIAN
@@ -89,7 +89,7 @@ TARGET_DISTRIBUTION={LINEAR_COMBINATION
                                     CENTER=+2.0,+2.0
                                     SIGMA=0.3,0.5}
                      WEIGHTS=1.0,1.0,2.0}
-\endverbatim
+\endplumedfile
 
 In the above example the two Gaussians are given using two separate
 DISTRIBUTION keywords. As the \ref GAUSSIAN target distribution allows multiple
@@ -97,7 +97,7 @@ centers is it also possible to use just one DISTRIBUTION keyword for the two
 Gaussians. This is shown in the following example which will give the
 exact same result as the one above as the weights have been appropriately
 adjusted
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={LINEAR_COMBINATION
                      DISTRIBUTION1={UNIFORM}
                      DISTRIBUTION2={GAUSSIAN
@@ -107,7 +107,7 @@ TARGET_DISTRIBUTION={LINEAR_COMBINATION
                                     SIGMA2=0.3,0.5
                                     WEIGHTS=1.0,2.0}
                      WEIGHTS=0.25,0.75}
-\endverbatim
+\endplumedfile
 
 */
 //+ENDPLUMEDOC

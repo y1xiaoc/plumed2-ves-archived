@@ -66,7 +66,7 @@ Defining Legendre polynomial basis functions of order 6 using BF_MATHEVAL
 where the appropriate transform function is given by the TRANSFORM keyword.
 This is just an example of what can be done, in practice you should use
 \ref BF_LEGENDRE for Legendre polynomial basis functions.
-\verbatim
+\plumedfile
 BF_MATHEVAL ...
  TRANSFORM=(t-(min+max)/2)/((max-min)/2)
  FUNC1=x
@@ -79,14 +79,14 @@ BF_MATHEVAL ...
  INTERVAL_MAX=4.0
  LABEL=bf1
 ... BF_MATHEVAL
-\endverbatim
+\endplumedfile
 
 
 Defining Fourier basis functions of order 3 using BF_MATHEVAL where the
 periodicity is indicated using the PERIODIC flag. This is just an example
 of what can be done, in practice you should use \ref BF_FOURIER
 for Fourier basis functions.
-\verbatim
+\plumedfile
 BF_MATHEVAL ...
  FUNC1=cos(x)
  FUNC2=sin(x)
@@ -99,7 +99,7 @@ BF_MATHEVAL ...
  LABEL=bf1
  PERIODIC
 ... BF_MATHEVAL
-\endverbatim
+\endplumedfile
 
 
 */

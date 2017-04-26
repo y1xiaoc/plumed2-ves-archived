@@ -112,39 +112,39 @@ account for the periodicity of the CVs.
 \par Examples
 
 One single Gaussians in one-dimension.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={GAUSSIAN
                      CENTER=-1.5 SIGMA=0.8}
-\endverbatim
+\endplumedfile
 
 Sum of three Gaussians in two-dimensions with equal weights as
 no weights are given.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={GAUSSIAN
                      CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3
                      CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8
                      CENTER3=+1.5,+1.5 SIGMA3=0.4,0.4}
-\endverbatim
+\endplumedfile
 
 Sum of three Gaussians in two-dimensions which
 are weighted unequally. Note that weights are automatically
 normalized to 1 so that WEIGHTS=1.0,2.0,1.0 is equal to
 specifying WEIGHTS=0.25,0.50,0.25.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={GAUSSIAN
                      CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3
                      CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8
                      CENTER3=+1.5,+1.5 SIGMA3=0.4,0.4
                      WEIGHTS=1.0,2.0,1.0}
-\endverbatim
+\endplumedfile
 
 Sum of two bivariate Gaussians where there is correlation of
 \f$\rho_{2}=0.75\f$ between the two arguments for the second Gaussian.
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={GAUSSIAN
                      CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3
                      CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8 CORRELATION2=0.75}
-\endverbatim
+\endplumedfile
 
 
 

@@ -56,9 +56,9 @@ Simple MD code for dynamics on a energy landscape given by a linear basis set ex
 
 \par Examples
 
-\verbatim
+\plumedfile
 plumed md_linearexpansion input
-\endverbatim
+\endplumedfile
 
 */
 //+ENDPLUMEDOC

@@ -79,9 +79,9 @@ Here we employ a Chebyshev expansion of order 20 over the interval 0.0 to 10.0.
 This results in a total number of 21 basis functions.
 The label used to identify  the basis function action can then be
 referenced later on in the input file.
-\verbatim
+\plumedfile
 bfC: BF_CHEBYSHEV INTERVAL_MIN=0.0 INTERVAL_MAX=10.0 ORDER=20
-\endverbatim
+\endplumedfile
 
 */
 //+ENDPLUMEDOC

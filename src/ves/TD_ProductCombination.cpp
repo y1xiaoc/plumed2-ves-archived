@@ -76,7 +76,7 @@ and distribution that is uniform on the interval -3 to 3 and
 then smoothly decays to zero outside that interval.
 The overall effect will then be to cut off the tails of the
 Gaussian distribution
-\verbatim
+\plumedfile
 TARGET_DISTRIBUTION={PRODUCT_COMBINATION
                      DISTRIBUTION1={GAUSSIAN
                                    CENTER1=-2.9 SIGMA1=1.0
@@ -84,7 +84,7 @@ TARGET_DISTRIBUTION={PRODUCT_COMBINATION
                      DISTRIBUTION2={UNIFORM
                                     MINIMA=-3.0 SIGMA_MINIMA=0.20
                                     MAXIMA=+3.0 SIGMA_MAXIMA=0.15}}
-\endverbatim
+\endplumedfile
 
 */
 //+ENDPLUMEDOC
