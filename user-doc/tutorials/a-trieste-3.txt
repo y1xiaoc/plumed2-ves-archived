@@ -1,5 +1,5 @@
 /**
-\page trieste-3 Trieste tutorial: Using restraints. 
+\page trieste-3 Trieste tutorial: Using restraints 
 
 \section trieste-3-aims Aims
 
@@ -19,6 +19,7 @@ The \tarball{trieste-3} for this tutorial contains the following files:
 - wdimer.tpr: a GROMACS run file to perform MD of two water molecules
 - diala.pdb: a PDB file for alanine dipeptide in vacuo
 - diala.tpr: a GROMACS run file to perform MD of alanine dipeptide
+- do_block_histo.py: the python script from \ref trieste-2 to perform block averaging over histograms
 
 This tutorial has been tested on a pre-release version of version 2.4. However, it should not take advantage
 of 2.4-only features, thus should also work with version 2.3.
@@ -105,7 +106,11 @@ than frames that has been explored with a less disfavoring bias potential.
 
 We will make use of two toy models: the first is a water dimer, i.e. two molecules of water in vacuo, that we will use to compare the effect of a constant bias on the equilibrium properties of the system that in this case can be readily computed. The second toy model is alanine dipeptide in vacuo. This system is more challanging to characterise with a standard MD simulation and we will see how we can use an interative approach to to build a constant bias that will help in flattening the underlying free energy surface and thus sped up the sampling.
 
+\note Create a folder for each exercise and use subfolders if you want to run the same simulation with multiple choices for the parameters
+
 \section trieste-3-ex-1 Exercize 1: converged histogram of the water dimer relative distance
+
+\image html trieste-3-wdimer.png "A water dimer"
 
 First of all let's start to learn something about the water dimer system by running a first simulations. You can start by creating a folder with the dimer.tpr file and run a simulation.
 
@@ -116,8 +121,6 @@ First of all let's start to learn something about the water dimer system by runn
 In this way we have a 25ns long trajectory that we can use to have a first look at the behavior of the system.
 Is the sampling of the relative distance between the two water molecules converged?
 
-\subsection trieste-3-ex-1a Exercize 1a:  
-
 Use plumed driver to analyse the trajectory and evaluate the quality of the sampling.
 
 Here you can find a sample `plumed.dat` file that you can use as a template.
@@ -126,17 +129,18 @@ Whenever you see an highlighted \highlight{FILL} string, this is a string that y
 \plumedfile
 # vim:ft=plumed
 #compute the distance between the two oxygens
-d: DISTANCE __FILL__
+d: DISTANCE ATOMS=1,4
 #accumulate block histograms
-hh: HISTOGRAM ARG=d KERNEL=DISCRETE __FILL__
+hh: HISTOGRAM ARG=d STRIDE=10 GRID_MIN=0 GRID_MAX=4.0 GRID_BIN=200 KERNEL=DISCRETE CLEAR=10000
 #and dump them
-DUMPGRID __FILL__
+DUMPGRID GRID=hh FILE=myhist.dat STRIDE=10000
 # Print the collective variable.
-PRINT __FILL__ 
+PRINT ARG=d STRIDE=10 FILE=distance.dat 
 \endplumedfile
 
 \verbatim
 > plumed driver --mf_xtc traj_comp.xtc --plumed plumed.dat  
+> python3 do_block_histo.py > final-histo-10000.dat
 \endverbatim
 
 If there is something you don't remember about this procedure go back and check in \ref trieste-2 .

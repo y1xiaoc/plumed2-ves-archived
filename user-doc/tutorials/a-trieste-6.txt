@@ -1,0 +1,150 @@
+/**
+\page trieste-6 Trieste tutorial: Real-life applications with complex CVs 
+
+\section trieste-6-aims Aims
+
+The aim of this tutorial is to train users to 
+learn the syntax of complex collective variables and use them to analyze 
+MD trajectories of realistic biological systems and bias them with metadynamics. 
+
+\section trieste-6-objectives Objectives
+
+Once this tutorial is completed students will be able to:
+- Write the PLUMED input file to use complex CVs for analysis 
+- Analyze trajectories and calculate the free energy of complex biological systems  
+- Perform error analysis and evaluate convergence in realistic situations
+- Setup, run, and analyze metadynamics simulations of a complex system 
+
+\section trieste-6-resources Resources
+
+The reference trajectories and input files for the exercizes proposed in this tutorial 
+can be downloaded from `github` using the following command:
+
+\verbatim
+wget https://github.com/plumed/trieste2017/raw/master/tutorial/data/tutorial_6.tgz
+\endverbatim
+
+This tutorial has been tested on a pre-release version of version 2.4. However, it should not take advantage
+of 2.4-only features, thus should also work with version 2.3.
+ 
+\section trieste-6-intro Introduction
+
+In this tutorial we propose exercizes on the following biological systems:
+- the BRCA1-associated RING domain protein 1 (BARD1 complex) 
+- the cmyc peptide in presence of urea at low concentration (cmyc-urea)
+- the protein G B1 domain  
+
+\section trieste-6-ex-1 Exercize 1: analysis of the BARD1 complex simulation 
+
+The BARD1 complex is a heterodimer composed by two domains of 112 and 117 residues each. 
+The system is represented at coarse-grained level using the MARTINI force field.
+
+\anchor trieste-6-bard1
+\image html trieste-6-bard1.png "The BARD1 heterodimer"
+
+In the TARBALL of this exercize, we provide a long MD simulation of the BARD1 complex in which
+the two domains explore multiple different conformations.
+
+\note We encourage the users to get familiar with the system by visualizing the MD trajectory
+using `VMD`.
+
+The users are expected to:
+- calculate the values of different CVs on the trajectory
+- estimate the free energies as a function of the CVs tested (mono- and multi-dimensional)
+- extracting from the trajectories the configurations corresponding to relevant free-energy minima
+- calculate the error in the associated free energy using the block analysis technique
+- evaluate the convergence of the original trajectory
+
+The users are free to choose his/her favorite CVs and they are encouraged to use the
+on-line manual to create their own PLUMED input file.
+However, we encourage all the users to experiment at least with the following CVs: 
+
+1) \ref RMSD and/or \ref DRMSD from the native state (provided in `bard1_native.pdb`)
+
+2) Number of inter-chains contacts (specific, i.e. native, or all) 
+This can be achieved with either \ref COORDINATION or \ref CONTACTMAP. 
+
+3) A CV describing the relative orientation of the two chains.
+This can be achieved, for example, by defining suitable virtual atoms with the \ref CENTER
+keyword and the \ref TORSION CV.
+
+\section trieste-6-ex-2 Exercize 2: analysis of the cmyc-urea simulation
+
+Cmyc is a small disordered peptide made of 11 aminoacid. In solution, cmyc adopts
+a variety of different, but equally populated conformations. 
+In the TARBALL of this exercize, we provide a long MD simulation of cmyc in presence
+of a single molecule of urea. 
+
+\anchor trieste-6-cmycurea
+\image html trieste-6-cmycurea.png "The cmyc peptide in presence of one urea molecule"
+
+\note We encourage the users to get familiar with the system by visualizing the MD trajectory
+using `VMD`.
+
+The users are expected to:
+- calculate the fraction of bound and unbound molecules of urea by defining suitable CVs to measure
+  the position of urea relative to cmyc.
+- find the cmyc aminoacids that bind urea the most and the least.
+- calculate the ensemble averages of different experimental CVs.
+
+\warning Be careful that the original trajectory might be broken by PBC!
+
+The users are free to choose his/her favorite CVs and they are encouraged to use the
+on-line manual to create their own PLUMED input file.
+However, we encourage all the users to experiment at least with the following CVs to characterize
+the conformational landscape of cmyc:
+
+1) the radius of gyration of cmyc (\ref GYRATION) 
+
+2) the content of alpha (\ref ALPHARMSD) and beta (\ref ANTIBETARMSD) secondary structure
+
+For the calculation of ensemble averages of experimental CVs, we suggest to use:
+
+1) 3J scalar couplings (\ref JCOUPLING)
+
+2) the FRET intensity between termini (\ref FRET)  
+
+\section trieste-6-ex-3 Exercize 3: Protein G folding simulations
+GB1 is a small protein domain with a simple beta-alpha-beta fold. It is a well studied protein that folds on the millisecond time scale.
+Here we use a structure based potential and well-tempered metadynamics to study the free energy of folding and unfolding.
+In the TARBALL of this exercise we provide the files needed to run the simulation, the user should write the plumed input file needed
+to bias the sampling.
+
+\anchor trieste-6-pgb
+\image html trieste-6-gb.png "The crystal structure of the protein G B1 domain"
+
+The users are expected to:
+- setup and perform a well-tempered metadynamics simulation
+- calculate the free energy difference between the folded and unfolded state of this protein
+- evaluate convergence and error calculation of the metadynamics simulation
+- evaluate the robustness of the former by reweighting the resulting free energy as function of different CVs
+
+The users are free to choose his/her favorite CVs and they are encouraged to use the
+on-line manual to create their own PLUMED input file.
+However, we encourage all the users to experiment at least with the following CVs to characterize
+the free-energy landscape of GB1:
+
+- \ref RMSD with respect to the folded state
+- \ref GYRATION
+- \ref ALPHABETA and \ref DIHCOR
+
+The users should select two of them for the \ref METAD simulation. Once you are satisfied by the convergence of your simulation, you can use one of the reweighting algorithms proposed
+to evaluate the free-energy difference between folded and unfolded state as a function of multiple collective variables.  
+
+
+\section trieste-6-conclusions Conclusions
+
+In summary, in this tutorial you should have learned how to use PLUMED to:
+- Analyze trajectories of realistic biological systems using complex CVs 
+- Extract conformations that correspond to local free-energy minima 
+- Apply block analysis to estimate error in the reconstructed free-energy profiles
+- Calculate ensemble averages of experimental CVs 
+- Reweight well-tempered metadynamics simulations 
+
+*/
+
+link: @subpage trieste-6
+
+description: This tutorial explains how to use PLUMED to run metadynamics simulations 
+
+additional-files: trieste-6
