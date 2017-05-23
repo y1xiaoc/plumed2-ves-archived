@@ -1,5 +1,5 @@
 /**
-\page ves-lugano2017-ves2 MARVEL-VES tutorial (Lugano 2017): VES 2
+\page ves-lugano2017-ves2 MARVEL-VES tutorial (Lugano Feb 2017): VES 2
 
 \section ves-lugano2017-ves2-lo Learning Outcomes
 

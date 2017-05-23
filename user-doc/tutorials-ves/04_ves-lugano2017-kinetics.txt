@@ -1,5 +1,5 @@
 /**
-\page ves-lugano2017-kinetics MARVEL-VES tutorial (Lugano 2017): Kinetics
+\page ves-lugano2017-kinetics MARVEL-VES tutorial (Lugano Feb 2017): Kinetics
 
 \section ves-lugano2017-kinetics-aims Aims
 The aim of this tutorial is to introduce the use of VES for obtaining kinetic information of activated processes. We will learn how to set up a biased simulation using a fixed flooding potential acting on a relevant slow degree of freedom. We can then rescale the accelerated MD time in a post-processing procedure.

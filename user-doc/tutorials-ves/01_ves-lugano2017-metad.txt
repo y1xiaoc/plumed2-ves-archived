@@ -1,5 +1,5 @@
 /**
-\page ves-lugano2017-metad MARVEL-VES tutorial (Lugano 2017): Metadynamics
+\page ves-lugano2017-metad MARVEL-VES tutorial (Lugano Feb 2017): Metadynamics
 
 \section ves-lugano2017-metad-lo Learning Outcomes
 
