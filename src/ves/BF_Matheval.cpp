@@ -39,7 +39,7 @@ This allows you to define basis functions using matheval. The basis functions
 \f$f_{i}(x)\f$ are given in a matheval format with _x_ as a variable using
 the numbered FUNC keywords that start from
 FUNC1. Consistent with other basis functions is \f$f_{0}(x)=1\f$ defined as
-the constant. The interval on which the basis funcrtions are defined is
+the constant. The interval on which the basis functions are defined is
 given using the INTERVAL_MIN and INTERVAL_MAX keywords.
 
 Using the TRANSFORM keyword it is possible to define a function \f$x(t)\f$ that
