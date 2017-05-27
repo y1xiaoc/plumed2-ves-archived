@@ -31,7 +31,7 @@ namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST PRODUCT_DISTRIBUTION
 /*
-Target distribution given by a separable product
+Target distribution given by a separable product 
 of one-dimensional distributions (static or dynamic).
 
 Employ a target distribution that is a separable product
