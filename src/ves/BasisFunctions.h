@@ -162,7 +162,6 @@ public:
   std::string intervalMaxStr() const {return interval_max_str_;}
   std::vector<double> getUniformIntegrals() const {return uniform_integrals_;}
   std::vector<double> getTargetDistributionIntegrals(const TargetDistribution*) const;
-  unsigned getNumberOfDerivatives() {return 0;}
   //
   std::vector<std::string> getKeywordList() const {return bf_keywords_;}
   std::string getKeywordString() const;
