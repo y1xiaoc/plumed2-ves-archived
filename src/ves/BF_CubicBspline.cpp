@@ -63,7 +63,7 @@ void BF_CubicBspline::registerKeywords(Keywords& keys) {
 }
 
 BF_CubicBspline::BF_CubicBspline(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions((getOrder()+3)+1);
   setIntrinsicInterval(intervalMin(),intervalMax());

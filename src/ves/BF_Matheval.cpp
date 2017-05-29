@@ -149,7 +149,7 @@ BF_Matheval::~BF_Matheval() {
 
 
 BF_Matheval::BF_Matheval(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao),
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   evaluator_pntrs_(0),
   derivs_pntrs_(0),
   transf_pntr_(NULL),

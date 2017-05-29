@@ -59,7 +59,7 @@ void Opt_SteepestDecent::registerKeywords(Keywords& keys) {
 
 
 Opt_SteepestDecent::Opt_SteepestDecent(const ActionOptions&ao):
-  PLUMED_OPTIMIZER_INIT(ao)
+  PLUMED_VES_OPTIMIZER_INIT(ao)
 {
   checkRead();
 }

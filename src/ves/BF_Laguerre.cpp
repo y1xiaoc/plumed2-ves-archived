@@ -57,7 +57,7 @@ void BF_Laguerre::registerKeywords(Keywords& keys) {
 }
 
 BF_Laguerre::BF_Laguerre(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao),
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   scalingf_(1.0)
 {
   setNumberOfBasisFunctions(getOrder()+2);

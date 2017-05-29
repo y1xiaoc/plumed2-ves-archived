@@ -88,7 +88,7 @@ void BF_Combined::registerKeywords(Keywords& keys) {
 
 
 BF_Combined::BF_Combined(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao),
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   basisf_pntrs_(0)
 {
   std::vector<std::string> basisf_labels;

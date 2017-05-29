@@ -32,7 +32,7 @@
 #include <cmath>
 
 
-#define PLUMED_OPTIMIZER_INIT(ao) Action(ao),Optimizer(ao)
+#define PLUMED_VES_OPTIMIZER_INIT(ao) Action(ao),Optimizer(ao)
 
 namespace PLMD {
 

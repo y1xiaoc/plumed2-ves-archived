@@ -98,7 +98,7 @@ void BF_Powers::registerKeywords(Keywords& keys) {
 }
 
 BF_Powers::BF_Powers(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval(intervalMin(),intervalMax());

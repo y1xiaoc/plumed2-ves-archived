@@ -64,7 +64,7 @@ void Opt_RobbinsMonroSGD::registerKeywords(Keywords& keys) {
 
 
 Opt_RobbinsMonroSGD::Opt_RobbinsMonroSGD(const ActionOptions&ao):
-  PLUMED_OPTIMIZER_INIT(ao),
+  PLUMED_VES_OPTIMIZER_INIT(ao),
   decay_constant_(1.0)
 {
   parse("DECAY_CONSTANT",decay_constant_);

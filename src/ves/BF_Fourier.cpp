@@ -91,7 +91,7 @@ void BF_Fourier::registerKeywords(Keywords& keys) {
 
 
 BF_Fourier::BF_Fourier(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(2*getOrder()+1);
   setIntrinsicInterval("-pi","+pi");

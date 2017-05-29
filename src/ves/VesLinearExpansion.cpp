@@ -126,7 +126,7 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ) {
 }
 
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
-  PLUMED_VESBIAS_INIT(ao),
+  PLUMED_VES_VESBIAS_INIT(ao),
   nargs_(getNumberOfArguments()),
   basisf_pntrs_(getNumberOfArguments(),NULL),
   bias_expansion_pntr_(NULL),

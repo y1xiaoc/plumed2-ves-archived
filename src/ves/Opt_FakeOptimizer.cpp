@@ -62,7 +62,7 @@ void Opt_FakeOptimizer::registerKeywords(Keywords& keys) {
 
 
 Opt_FakeOptimizer::Opt_FakeOptimizer(const ActionOptions&ao):
-  PLUMED_OPTIMIZER_INIT(ao)
+  PLUMED_VES_OPTIMIZER_INIT(ao)
 {
   log.printf("  fake optimizer that does not update coefficients\n");
   log.printf("  can be used to monitor gradient and Hessian for debugging purposes\n");

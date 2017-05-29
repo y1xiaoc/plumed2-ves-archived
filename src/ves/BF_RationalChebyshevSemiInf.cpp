@@ -56,7 +56,7 @@ void BF_RationalChebyshevSemiInf::registerKeywords(Keywords& keys) {
 }
 
 BF_RationalChebyshevSemiInf::BF_RationalChebyshevSemiInf(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao),
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   mapf_(0.0)
 {
   setNumberOfBasisFunctions(getOrder()+1);

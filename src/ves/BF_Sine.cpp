@@ -90,7 +90,7 @@ void BF_Sine::registerKeywords(Keywords& keys) {
 
 
 BF_Sine::BF_Sine(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-pi","+pi");

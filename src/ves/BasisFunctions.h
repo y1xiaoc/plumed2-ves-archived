@@ -29,7 +29,7 @@
 #include <cmath>
 
 
-#define PLUMED_BASISFUNCTIONS_INIT(ao) BasisFunctions(ao)
+#define PLUMED_VES_BASISFUNCTIONS_INIT(ao) BasisFunctions(ao)
 
 namespace PLMD {
 

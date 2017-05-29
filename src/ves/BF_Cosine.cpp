@@ -91,7 +91,7 @@ void BF_Cosine::registerKeywords(Keywords& keys) {
 
 
 BF_Cosine::BF_Cosine(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-pi","+pi");

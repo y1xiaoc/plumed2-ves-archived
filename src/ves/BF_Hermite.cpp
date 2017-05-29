@@ -60,7 +60,7 @@ void BF_Hermite::registerKeywords(Keywords& keys) {
 }
 
 BF_Hermite::BF_Hermite(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao),
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   scalingf_(1.0),
   center_(0.0),
   normf_(0)

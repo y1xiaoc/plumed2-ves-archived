@@ -126,7 +126,7 @@ Opt_BachAveragedSGD::~Opt_BachAveragedSGD() {
 
 
 Opt_BachAveragedSGD::Opt_BachAveragedSGD(const ActionOptions&ao):
-  PLUMED_OPTIMIZER_INIT(ao),
+  PLUMED_VES_OPTIMIZER_INIT(ao),
   combinedgradient_pntrs_(0),
   combinedgradient_wstride_(100),
   combinedgradientOFiles_(0),

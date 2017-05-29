@@ -112,7 +112,7 @@ void BF_Legendre::registerKeywords(Keywords& keys) {
 }
 
 BF_Legendre::BF_Legendre(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao),
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   scaled_(false)
 {
   parseFlag("SCALED",scaled_); addKeywordToList("SCALED",scaled_);

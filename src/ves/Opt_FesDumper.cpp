@@ -74,7 +74,7 @@ void Opt_FesDumper::registerKeywords(Keywords& keys) {
 
 
 Opt_FesDumper::Opt_FesDumper(const ActionOptions&ao):
-  PLUMED_OPTIMIZER_INIT(ao)
+  PLUMED_VES_OPTIMIZER_INIT(ao)
 {
   turnOffHessian();
   turnOffCoeffsOutputFiles();

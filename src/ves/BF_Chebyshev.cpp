@@ -104,7 +104,7 @@ void BF_Chebyshev::registerKeywords(Keywords& keys) {
 }
 
 BF_Chebyshev::BF_Chebyshev(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao)
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao)
 {
   setNumberOfBasisFunctions(getOrder()+1);
   setIntrinsicInterval("-1.0","+1.0");

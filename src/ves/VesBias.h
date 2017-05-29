@@ -35,7 +35,7 @@
 #include <cmath>
 
 
-#define PLUMED_VESBIAS_INIT(ao) Action(ao),VesBias(ao)
+#define PLUMED_VES_VESBIAS_INIT(ao) Action(ao),VesBias(ao)
 
 namespace PLMD {
 

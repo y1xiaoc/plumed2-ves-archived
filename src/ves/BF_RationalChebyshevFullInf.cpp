@@ -58,7 +58,7 @@ void BF_RationalChebyshevFullInf::registerKeywords(Keywords& keys) {
 }
 
 BF_RationalChebyshevFullInf::BF_RationalChebyshevFullInf(const ActionOptions&ao):
-  PLUMED_BASISFUNCTIONS_INIT(ao),
+  PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   mapf_(0.0),
   center_(0.0)
 {
