@@ -40,6 +40,7 @@ namespace PLMD {
 namespace ves {
 
 void TargetDistribution::registerKeywords( Keywords& keys ) {
+  Action::registerKeywords(keys);
   keys.reserve("hidden","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
   keys.reserve("optional","WELLTEMPERED_FACTOR","Broaden the target distribution such that it is taken as [p(s)]^(1/g) where g is the well tempered factor given here. If this option is active the distribution will be automatically normalized.");
   keys.reserveFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution. If this option is active the distribution will be automatically normalized.");
