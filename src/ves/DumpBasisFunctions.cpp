@@ -22,7 +22,7 @@
 
 #include "BasisFunctions.h"
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
+
 #include "CoeffsVector.h"
 
 #include "core/ActionRegister.h"
@@ -114,11 +114,14 @@ DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
   bool numerical_deriv = false;
   parseFlag("NUMERICAL_DERIVATIES",numerical_deriv);
 
-  std::vector<std::string> targetdist_keywords;
+  std::vector<TargetDistribution*> targetdist_pntrs;
+  targetdist_pntrs.push_back(NULL);
   std::string str_ps="";
   for(int i=1;; i++) {
     if(!parseNumbered("TARGET_DISTRIBUTION",i,str_ps)) {break;}
-    targetdist_keywords.push_back(str_ps);
+    TargetDistribution* pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(str_ps);
+    plumed_massert(pntr_tmp!=NULL,"target distribution "+str_ps+" does not exist. NOTE: the target distribution should always be defined BEFORE the DUMP_BASISFUNCTIONS action.");
+    targetdist_pntrs.push_back(pntr_tmp);
   }
   checkRead();
   //
@@ -151,23 +154,22 @@ DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
   ofile_targetdist_aver.enforceBackup();
   ofile_targetdist_aver.open(fname_targetdist_aver);
 
-  for(unsigned int i=0; i<targetdist_keywords.size(); i++) {
-    std::string is; Tools::convert(i+1,is);
+  for(unsigned int i=0; i<targetdist_pntrs.size(); i++) {
+    std::string is; Tools::convert(i,is);
     //
-    TargetDistribution* targetdist_pntr = setupTargetDistPntr(targetdist_keywords[i]);
-    if(targetdist_pntr!=NULL) {
-      targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
-      plumed_massert(targetdist_pntr->getDimension()==1,"the target distribution must be one dimensional");
-      targetdist_pntr->update();
+    if(targetdist_pntrs[i]!=NULL) {
+      targetdist_pntrs[i]->setupGrids(arguments,grid_min,grid_max,grid_bins);
+      plumed_massert(targetdist_pntrs[i]->getDimension()==1,"the target distribution must be one dimensional");
+      targetdist_pntrs[i]->updateTargetDist();
     }
     //
-    std::vector<double> bf_integrals = bf_pntrs[0]->getTargetDistributionIntegrals(targetdist_pntr);
+    std::vector<double> bf_integrals = bf_pntrs[0]->getTargetDistributionIntegrals(targetdist_pntrs[i]);
     CoeffsVector targetdist_averages = CoeffsVector("aver.targetdist-"+is,arguments,bf_pntrs,comm,false);
     targetdist_averages.setValues(bf_integrals);
     if(fmt_targetdist_aver.size()>0) {targetdist_averages.setOutputFmt(fmt_targetdist_aver);}
     targetdist_averages.writeToFile(ofile_targetdist_aver,true);
-    if(targetdist_pntr!=NULL) {
-      Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
+    if(targetdist_pntrs[i]!=NULL) {
+      Grid* targetdist_grid_pntr = targetdist_pntrs[i]->getTargetDistGridPntr();
       std::string fname = FileBase::appendSuffix(fname_targetdist,is);
       OFile ofile;
       ofile.link(*this);
@@ -176,7 +178,6 @@ DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
       targetdist_grid_pntr->writeToFile(ofile);
       ofile.close();
     }
-    delete targetdist_pntr;
   }
   ofile_targetdist_aver.close();
   delete arguments[0]; arguments.clear();
@@ -184,23 +185,6 @@ DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
 
 
 }
-
-
-TargetDistribution* DumpBasisFunctions::setupTargetDistPntr(std::string keyword) const {
-  std::vector<std::string> words = Tools::getWords(keyword);
-  TargetDistribution* pntr = NULL;
-  if(words[0]=="DEFAULT_UNIFORM" && words.size()==1) {
-    pntr = NULL;
-  }
-  else {
-    pntr = targetDistributionRegister().create(words);
-  }
-  return pntr;
-}
-
-
-
-
 
 
 

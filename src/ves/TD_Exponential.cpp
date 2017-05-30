@@ -21,9 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 
 
 namespace PLMD {
@@ -43,12 +42,12 @@ class TD_Exponential: public TargetDistribution {
   std::vector<double> lambda_;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_Exponential(const TargetDistributionOptions& to);
+  explicit TD_Exponential(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_Exponential,"EXPONENTIAL")
+PLUMED_REGISTER_ACTION(TD_Exponential,"EXPONENTIAL")
 
 
 void TD_Exponential::registerKeywords(Keywords& keys) {
@@ -62,8 +61,8 @@ void TD_Exponential::registerKeywords(Keywords& keys) {
 }
 
 
-TD_Exponential::TD_Exponential( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_Exponential::TD_Exponential(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   minima_(0),
   lambda_(0)
 {

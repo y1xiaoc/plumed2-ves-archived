@@ -22,7 +22,7 @@
 
 #include "TargetDistribution.h"
 #include "TargetDistModifer.h"
-#include "TargetDistributionRegister.h"
+
 #include "VesBias.h"
 #include "GridIntegrationWeights.h"
 #include "VesTools.h"
@@ -39,11 +39,6 @@
 namespace PLMD {
 namespace ves {
 
-TargetDistributionOptions::TargetDistributionOptions( const std::vector<std::string>& input):
-  words(input)
-{}
-
-
 void TargetDistribution::registerKeywords( Keywords& keys ) {
   keys.reserve("hidden","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
   keys.reserve("optional","WELLTEMPERED_FACTOR","Broaden the target distribution such that it is taken as [p(s)]^(1/g) where g is the well tempered factor given here. If this option is active the distribution will be automatically normalized.");
@@ -52,9 +47,8 @@ void TargetDistribution::registerKeywords( Keywords& keys ) {
 }
 
 
-TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
-  name_(to.words[0]),
-  input(to.words),
+TargetDistribution::TargetDistribution(const ActionOptions&ao):
+  Action(ao),
   type_(static_targetdist),
   force_normalization_(false),
   check_normalization_(true),
@@ -76,12 +70,10 @@ TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
   fes_grid_pntr_(NULL),
   static_grid_calculated(false),
   bias_cutoff_active_(false),
-  bias_cutoff_value_(0.0),
-  keywords(targetDistributionRegister().getKeywords(name_))
+  bias_cutoff_value_(0.0)
 {
-  input.erase( input.begin() );
   //
-  parse("BIAS_CUTOFF",bias_cutoff_value_,true);
+  parse("BIAS_CUTOFF",bias_cutoff_value_);
   if(bias_cutoff_value_<0.0) {
     plumed_merror(getName()+": negative value in BIAS_CUTOFF does not make sense");
   }
@@ -91,7 +83,7 @@ TargetDistribution::TargetDistribution( const TargetDistributionOptions& to):
   //
   if(keywords.exists("WELLTEMPERED_FACTOR")) {
     double welltempered_factor=0.0;
-    parse("WELLTEMPERED_FACTOR",welltempered_factor,true);
+    parse("WELLTEMPERED_FACTOR",welltempered_factor);
     //
     if(welltempered_factor>0.0) {
       if(bias_cutoff_active_) {plumed_merror(getName()+": using WELLTEMPERED_FACTOR with bias cutoff is not allowed.");}
@@ -189,26 +181,6 @@ void TargetDistribution::setupBiasCutoff() {
 }
 
 
-void TargetDistribution::parseFlag(const std::string& key, bool& t) {
-  Tools::parseFlag(input,key,t);
-}
-
-
-void TargetDistribution::checkRead() const {
-  if(!input.empty()) {
-    std::string msg="cannot understand the following words from the target distribution input : ";
-    for(unsigned i=0; i<input.size(); ++i) msg = msg + input[i] + ", ";
-    plumed_merror(msg);
-  }
-}
-
-
-std::string TargetDistribution::description() {
-  std::string str="Type: " + name_;
-  return str;
-}
-
-
 void TargetDistribution::setupGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
   if(getDimension()==0) {
     setDimension(arguments.size());
@@ -293,7 +265,7 @@ Grid TargetDistribution::getMarginal(const std::vector<std::string>& args) {
 }
 
 
-void TargetDistribution::update() {
+void TargetDistribution::updateTargetDist() {
   //
   updateGrid();
   //

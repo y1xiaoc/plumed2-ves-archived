@@ -22,7 +22,6 @@
 
 #include "BasisFunctions.h"
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 #include "VesBias.h"
 #include "VesTools.h"
 #include "GridIntegrationWeights.h"

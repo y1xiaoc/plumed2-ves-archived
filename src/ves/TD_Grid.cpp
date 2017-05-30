@@ -21,11 +21,10 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 #include "GridIntegrationWeights.h"
 #include "VesTools.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 #include "tools/Grid.h"
 #include "core/Value.h"
 #include "tools/File.h"
@@ -91,13 +90,13 @@ class TD_Grid : public TargetDistribution {
   double shift_;
 public:
   static void registerKeywords( Keywords&);
-  explicit TD_Grid( const TargetDistributionOptions& to );
+  explicit TD_Grid(const ActionOptions& ao);
   ~TD_Grid();
   double getValue(const std::vector<double>&) const ;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_Grid,"GRID_DIST")
+PLUMED_REGISTER_ACTION(TD_Grid,"GRID_DIST")
 
 
 void TD_Grid::registerKeywords(Keywords& keys) {
@@ -119,8 +118,8 @@ TD_Grid::~TD_Grid() {
 }
 
 
-TD_Grid::TD_Grid(const TargetDistributionOptions& to):
-  TargetDistribution(to),
+TD_Grid::TD_Grid(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   distGrid_(NULL),
   minima_(0),
   maxima_(0),
@@ -129,7 +128,7 @@ TD_Grid::TD_Grid(const TargetDistributionOptions& to):
 {
   std::string filename;
   parse("FILE",filename);
-  parse("SHIFT",shift_,true);
+  parse("SHIFT",shift_);
   if(shift_!=0.0) {
     if(isTargetDistGridShiftedToZero()) {plumed_merror(getName() + ": using both SHIFT and SHIFT_TO_ZERO is not allowed.");}
   }

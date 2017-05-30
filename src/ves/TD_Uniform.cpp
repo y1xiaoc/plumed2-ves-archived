@@ -21,9 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 
 
 namespace PLMD {
@@ -176,12 +175,12 @@ class TD_Uniform : public TargetDistribution {
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords( Keywords&);
-  explicit TD_Uniform( const TargetDistributionOptions& to );
+  explicit TD_Uniform(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_Uniform,"UNIFORM")
+PLUMED_REGISTER_ACTION(TD_Uniform,"UNIFORM")
 
 
 void TD_Uniform::registerKeywords(Keywords& keys) {
@@ -194,18 +193,18 @@ void TD_Uniform::registerKeywords(Keywords& keys) {
 }
 
 
-TD_Uniform::TD_Uniform(const TargetDistributionOptions& to):
-  TargetDistribution(to),
+TD_Uniform::TD_Uniform(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   minima_(0),
   maxima_(0),
   sigma_min_(0),
   sigma_max_(0)
 {
-  parseVector("MINIMA",minima_,true);
-  parseVector("MAXIMA",maxima_,true);
+  parseVector("MINIMA",minima_);
+  parseVector("MAXIMA",maxima_);
 
-  parseVector("SIGMA_MINIMA",sigma_min_,true);
-  parseVector("SIGMA_MAXIMA",sigma_max_,true);
+  parseVector("SIGMA_MINIMA",sigma_min_);
+  parseVector("SIGMA_MAXIMA",sigma_max_);
   if(minima_.size()==0 && sigma_min_.size()>0) {plumed_merror(getName()+": you cannot give SIGMA_MINIMA if MINIMA is not given");}
   if(maxima_.size()==0 && sigma_max_.size()>0) {plumed_merror(getName()+": you cannot give SIGMA_MAXIMA if MAXIMA is not given");}
 

@@ -21,10 +21,13 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+
+#include "core/ActionRegister.h"
+#include "core/ActionSet.h"
+#include "core/PlumedMain.h"
 #include "tools/Grid.h"
+
 #include "GridIntegrationWeights.h"
 
 
@@ -99,7 +102,7 @@ private:
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_ProductCombination(const TargetDistributionOptions& to);
+  explicit TD_ProductCombination(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~TD_ProductCombination();
@@ -114,7 +117,7 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductCombination,"PRODUCT_COMBINATION")
+PLUMED_REGISTER_ACTION(TD_ProductCombination,"PRODUCT_COMBINATION")
 
 
 void TD_ProductCombination::registerKeywords(Keywords& keys) {
@@ -126,17 +129,18 @@ void TD_ProductCombination::registerKeywords(Keywords& keys) {
 }
 
 
-TD_ProductCombination::TD_ProductCombination( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_ProductCombination::TD_ProductCombination(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   distribution_pntrs_(0),
   grid_pntrs_(0),
   ndist_(0)
 {
   for(unsigned int i=1;; i++) {
-    std::string keywords;
-    if(!parseNumbered("DISTRIBUTION",i,keywords) ) {break;}
-    std::vector<std::string> words = Tools::getWords(keywords);
-    TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
+    std::string targetdist_label;
+    if(!parseNumbered("DISTRIBUTION",i,targetdist_label) ) {break;}
+    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
+    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
+    //
     if(dist_pntr_tmp->isDynamic()) {setDynamic();}
     if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}
     if(dist_pntr_tmp->biasGridNeeded()) {setBiasGridNeeded();}
@@ -175,7 +179,7 @@ void TD_ProductCombination::setupAdditionalGrids(const std::vector<Value*>& argu
 
 void TD_ProductCombination::updateGrid() {
   for(unsigned int i=0; i<ndist_; i++) {
-    distribution_pntrs_[i]->update();
+    distribution_pntrs_[i]->updateTargetDist();
   }
   std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(getTargetDistGridPntr());
   double norm = 0.0;

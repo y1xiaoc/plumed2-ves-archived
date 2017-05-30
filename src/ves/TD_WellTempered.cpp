@@ -21,10 +21,9 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 #include "GridIntegrationWeights.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 #include "tools/Grid.h"
 
 
@@ -101,14 +100,14 @@ private:
   double bias_factor_;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_WellTempered(const TargetDistributionOptions& to);
+  explicit TD_WellTempered(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~TD_WellTempered() {}
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_WellTempered,"WELL_TEMPERED")
+PLUMED_REGISTER_ACTION(TD_WellTempered,"WELL_TEMPERED")
 
 
 void TD_WellTempered::registerKeywords(Keywords& keys) {
@@ -118,8 +117,8 @@ void TD_WellTempered::registerKeywords(Keywords& keys) {
 }
 
 
-TD_WellTempered::TD_WellTempered( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_WellTempered::TD_WellTempered(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   bias_factor_(0.0)
 {
   parse("BIASFACTOR",bias_factor_);

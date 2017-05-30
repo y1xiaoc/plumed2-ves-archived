@@ -21,9 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 
 
 namespace PLMD {
@@ -164,12 +163,12 @@ class TD_Gaussian: public TargetDistribution {
   double Gaussian2D(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const bool normalize=true) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_Gaussian(const TargetDistributionOptions& to);
+  explicit TD_Gaussian(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_Gaussian,"GAUSSIAN")
+PLUMED_REGISTER_ACTION(TD_Gaussian,"GAUSSIAN")
 
 
 void TD_Gaussian::registerKeywords(Keywords& keys) {
@@ -185,8 +184,8 @@ void TD_Gaussian::registerKeywords(Keywords& keys) {
 }
 
 
-TD_Gaussian::TD_Gaussian( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_Gaussian::TD_Gaussian(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   centers_(0),
   sigmas_(0),
   correlation_(0),
@@ -204,17 +203,7 @@ TD_Gaussian::TD_Gaussian( const TargetDistributionOptions& to ):
     if(!parseNumberedVector("SIGMA",i,tmp_sigma) ) {break;}
     sigmas_.push_back(tmp_sigma);
   }
-  if(centers_.size()==0 && sigmas_.size()==0) {
-    std::vector<double> tmp_center;
-    if(parseVector("CENTER",tmp_center,true)) {
-      centers_.push_back(tmp_center);
-    }
-    std::vector<double> tmp_sigma;
-    if(parseVector("SIGMA",tmp_sigma,true)) {
-      sigmas_.push_back(tmp_sigma);
-    }
-  }
-  //
+
   if(centers_.size()==0) {
     plumed_merror(getName()+": CENTER keywords seem to be missing. Note that numbered keywords start at CENTER1.");
   }
@@ -237,21 +226,12 @@ TD_Gaussian::TD_Gaussian( const TargetDistributionOptions& to ):
   //
   correlation_.resize(ncenters_);
 
-  if(ncenters_==1) {
+  for(unsigned int i=0; i<ncenters_; i++) {
     std::vector<double> corr(1,0.0);
-    if(parseVector("CORRELATION",corr,true)) {
+    if(parseNumberedVector("CORRELATION",(i+1),corr)) {
       diagonal_ = false;
     }
-    correlation_[0] = corr;
-  }
-  else {
-    for(unsigned int i=0; i<ncenters_; i++) {
-      std::vector<double> corr(1,0.0);
-      if(parseNumberedVector("CORRELATION",(i+1),corr)) {
-        diagonal_ = false;
-      }
-      correlation_[i] = corr;
-    }
+    correlation_[i] = corr;
   }
 
   if(!diagonal_ && getDimension()!=2) {
@@ -268,7 +248,8 @@ TD_Gaussian::TD_Gaussian( const TargetDistributionOptions& to ):
     }
   }
   //
-  if(!parseVector("WEIGHTS",weights_,true)) {weights_.assign(centers_.size(),1.0);}
+  parseVector("WEIGHTS",weights_);
+  if(weights_.size()==0){weights_.assign(centers_.size(),1.0);}
   if(centers_.size()!=weights_.size()) {
     plumed_merror(getName()+": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   }

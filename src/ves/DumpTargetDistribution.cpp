@@ -21,7 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
+
 #include "GridIntegrationWeights.h"
 
 #include "core/ActionRegister.h"
@@ -107,8 +107,8 @@ DumpTargetDistribution::DumpTargetDistribution(const ActionOptions&ao):
   plumed_massert(grid_max.size()==nargs,"mismatch between number of values given for grid parameters");
   plumed_massert(grid_periodicity.size()==nargs,"mismatch between number of values given for grid parameters");
 
-  std::string targetdist_keyword;
-  parse("TARGET_DISTRIBUTION",targetdist_keyword);
+  std::string targetdist_label;
+  parse("TARGET_DISTRIBUTION",targetdist_label);
   checkRead();
   //
   std::vector<Value*> arguments(nargs);
@@ -127,13 +127,15 @@ DumpTargetDistribution::DumpTargetDistribution(const ActionOptions&ao):
     }
   }
 
-  std::vector<std::string> words = Tools::getWords(targetdist_keyword);
-  TargetDistribution* targetdist_pntr = targetDistributionRegister().create(words);
+
+  TargetDistribution* targetdist_pntr = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
+  plumed_massert(targetdist_pntr!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the DUMP_TARGET_DISTRIBUTION action.");
+  //
   if(targetdist_pntr->isDynamic()) {
     plumed_merror("DUMP_TARGET_DISTRIBUTION only works for static target distributions");
   }
   targetdist_pntr->setupGrids(arguments,grid_min,grid_max,grid_bins);
-  targetdist_pntr->update();
+  targetdist_pntr->updateTargetDist();
   Grid* targetdist_grid_pntr = targetdist_pntr->getTargetDistGridPntr();
   Grid* log_targetdist_grid_pntr = targetdist_pntr->getLogTargetDistGridPntr();
 

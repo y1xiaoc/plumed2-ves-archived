@@ -21,9 +21,10 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
+#include "core/ActionSet.h"
+#include "core/PlumedMain.h"
 #include "tools/Grid.h"
 
 
@@ -123,7 +124,7 @@ private:
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_LinearCombination(const TargetDistributionOptions& to);
+  explicit TD_LinearCombination(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~TD_LinearCombination();
@@ -138,7 +139,7 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_LinearCombination,"LINEAR_COMBINATION")
+PLUMED_REGISTER_ACTION(TD_LinearCombination,"LINEAR_COMBINATION")
 
 
 void TD_LinearCombination::registerKeywords(Keywords& keys) {
@@ -152,18 +153,19 @@ void TD_LinearCombination::registerKeywords(Keywords& keys) {
 }
 
 
-TD_LinearCombination::TD_LinearCombination( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_LinearCombination::TD_LinearCombination(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   distribution_pntrs_(0),
   grid_pntrs_(0),
   weights_(0),
   ndist_(0)
 {
   for(unsigned int i=1;; i++) {
-    std::string keywords;
-    if(!parseNumbered("DISTRIBUTION",i,keywords) ) {break;}
-    std::vector<std::string> words = Tools::getWords(keywords);
-    TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
+    std::string targetdist_label;
+    if(!parseNumbered("DISTRIBUTION",i,targetdist_label) ) {break;}
+    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
+    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
+    //
     if(dist_pntr_tmp->isDynamic()) {setDynamic();}
     if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}
     if(dist_pntr_tmp->biasGridNeeded()) {setBiasGridNeeded();}
@@ -175,7 +177,8 @@ TD_LinearCombination::TD_LinearCombination( const TargetDistributionOptions& to 
   if(ndist_==0) {plumed_merror(getName()+ ": no distributions are given.");}
   if(ndist_==1) {plumed_merror(getName()+ ": giving only one distribution does not make sense.");}
   //
-  if(!parseVector("WEIGHTS",weights_,true)) {weights_.assign(distribution_pntrs_.size(),1.0);}
+  parseVector("WEIGHTS",weights_);
+  if(weights_.size()==0){weights_.assign(distribution_pntrs_.size(),1.0);}
   if(distribution_pntrs_.size()!=weights_.size()) {
     plumed_merror(getName()+ ": there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
   }
@@ -213,7 +216,7 @@ void TD_LinearCombination::setupAdditionalGrids(const std::vector<Value*>& argum
 
 void TD_LinearCombination::updateGrid() {
   for(unsigned int i=0; i<ndist_; i++) {
-    distribution_pntrs_[i]->update();
+    distribution_pntrs_[i]->updateTargetDist();
   }
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++) {
     double value = 0.0;

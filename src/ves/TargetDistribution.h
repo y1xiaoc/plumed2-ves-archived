@@ -22,43 +22,35 @@
 #ifndef __PLUMED_ves_TargetDistribution_h
 #define __PLUMED_ves_TargetDistribution_h
 
-#include "tools/Exception.h"
-#include "tools/Tools.h"
+#include "core/Action.h"
 
 #include <vector>
 #include <string>
 #include <cmath>
 
-
+#define PLUMED_VES_TARGETDISTRIBUTION_INIT(ao) TargetDistribution(ao)
 
 namespace PLMD {
 
+/**
+\ingroup INHERIT
+Abstract base class for implenting new target distributions.
+*/
+
+class Action;
 class Grid;
 class Value;
 class Keywords;
-class Action;
 
 namespace ves {
 
 class TargetDistModifer;
 class VesBias;
 
-
-class TargetDistributionOptions {
-  friend class TargetDistributionRegister;
-  friend class TargetDistribution;
+class TargetDistribution :
+  public Action
+{
 private:
-  std::vector<std::string> words;
-public:
-  TargetDistributionOptions( const std::vector<std::string>& input);
-};
-
-class TargetDistribution {
-private:
-  // Name of the target distribution
-  std::string name_;
-  // The input to the target distribution
-  std::vector<std::string> input;
   enum TargetDistType {
     static_targetdist,
     dynamic_targetdist
@@ -99,20 +91,6 @@ private:
   void updateBiasCutoffForTargetDistGrid();
   void checkNanAndInf();
 protected:
-  const Keywords& keywords;
-  // Read a keywords from the input
-  template <class T>
-  bool parse(const std::string&,T&, bool optional=false);
-  template <class T>
-  bool parseNumbered(const std::string&,const unsigned int, T&);
-  // Read a keywords vector from the input
-  template <class T>
-  bool parseVector(const std::string&,std::vector<T>&, bool optional=false);
-  template <class T>
-  bool parseNumberedVector(const std::string&,const unsigned int, std::vector<T>&);
-  // Read a flag from the input
-  void parseFlag(const std::string& key, bool& t);
-  //
   void setStatic() {type_=static_targetdist;}
   void setDynamic() {type_=dynamic_targetdist;}
   // set the that target distribution is normalized
@@ -146,16 +124,9 @@ protected:
   //
   virtual void updateGrid() {calculateStaticDistributionGrid();}
 public:
-  // keywords
-  static void registerKeywords( Keywords&);
-  explicit TargetDistribution( const TargetDistributionOptions& to );
-  virtual ~TargetDistribution();
-  // Check everything was read in
-  void checkRead() const ;
-  // Return a description
-  std::string description();
-  // Overwrite this to have a more descriptive output
-  virtual std::string rest_of_description() { return ""; };
+  static void registerKeywords(Keywords&);
+  explicit TargetDistribution(const ActionOptions&);
+  ~TargetDistribution();
   //
   bool isStatic() const {return type_==static_targetdist;}
   bool isDynamic() const {return type_==dynamic_targetdist;}
@@ -172,8 +143,6 @@ public:
   //
   void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}
-  // get type of distribution
-  std::string getName()const {return name_;};
   //
   virtual void linkVesBias(VesBias*);
   virtual void linkAction(Action*);
@@ -195,13 +164,17 @@ public:
   //
   Grid getMarginal(const std::vector<std::string>&);
   //
-  void update();
+  void updateTargetDist();
   //
   void readInRestartTargetDistGrid(const std::string&);
   //
   static double integrateGrid(const Grid*);
   static double normalizeGrid(Grid*);
   static Grid getMarginalDistributionGrid(Grid*, const std::vector<std::string>&);
+  // empty standard action stuff
+  void update() {};
+  void apply() {};
+  void calculate() {};
 };
 
 
@@ -223,36 +196,6 @@ inline
 void TargetDistribution::normalizeTargetDistGrid() {
   double normalization = normalizeGrid(targetdist_grid_pntr_);
   if(normalization<0.0) {plumed_merror(getName()+": something went wrong trying to normalize the target distribution, integrating over it gives a negative value.");}
-}
-
-
-template <class T>
-bool TargetDistribution::parse( const std::string& key, T& t, bool optional) {
-  bool found=Tools::parse(input,key,t);
-  if(!optional && !found) plumed_merror("target distribution " + name_ + " requires " + key + " keyword");
-  return found;
-}
-
-
-template<class T>
-bool TargetDistribution::parseNumbered(const std::string&key, const unsigned int no, T&t) {
-  std::string num; Tools::convert(no,num);
-  return Tools::parse(input,key+num,t);
-}
-
-
-template <class T>
-bool TargetDistribution::parseVector( const std::string& key, std::vector<T>& t, bool optional) {
-  bool found=Tools::parseVector(input,key,t);
-  if(!optional && !found) plumed_merror("target distribution " + name_ + " requires " + key + " keyword");
-  return found;
-}
-
-
-template <class T>
-bool TargetDistribution::parseNumberedVector( const std::string& key, const unsigned int no, std::vector<T>& t) {
-  std::string num; Tools::convert(no,num);
-  return Tools::parseVector(input,key+num,t);
 }
 
 

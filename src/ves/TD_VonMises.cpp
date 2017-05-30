@@ -21,12 +21,10 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
-
-
-#include "tools/Keywords.h"
-#include "tools/Tools.h"
 #include "GridIntegrationWeights.h"
+
+#include "core/ActionRegister.h"
+#include "tools/Tools.h"
 
 #include <iostream>
 
@@ -101,12 +99,12 @@ class TD_VonMises: public TargetDistribution {
   double getNormalization(const double, const double) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_VonMises(const TargetDistributionOptions& to);
+  explicit TD_VonMises(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_VonMises,"VON_MISES")
+PLUMED_REGISTER_ACTION(TD_VonMises,"VON_MISES")
 
 
 void TD_VonMises::registerKeywords(Keywords& keys) {
@@ -122,8 +120,8 @@ void TD_VonMises::registerKeywords(Keywords& keys) {
 }
 
 
-TD_VonMises::TD_VonMises( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_VonMises::TD_VonMises(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   sigmas_(0),
   centers_(0),
   normalization_(0),
@@ -141,16 +139,7 @@ TD_VonMises::TD_VonMises( const TargetDistributionOptions& to ):
     if(!parseNumberedVector("SIGMA",i,tmp_sigma) ) {break;}
     sigmas_.push_back(tmp_sigma);
   }
-  if(centers_.size()==0 && sigmas_.size()==0) {
-    std::vector<double> tmp_center;
-    if(parseVector("CENTER",tmp_center,true)) {
-      centers_.push_back(tmp_center);
-    }
-    std::vector<double> tmp_sigma;
-    if(parseVector("SIGMA",tmp_sigma,true)) {
-      sigmas_.push_back(tmp_sigma);
-    }
-  }
+  //
   plumed_massert(centers_.size()==sigmas_.size(),"there has to be an equal amount of CENTER and SIGMA keywords");
   if(centers_.size()==0) {
     plumed_merror(getName()+": CENTER and SIGMA keywords seem to be missing. Note that numbered keywords start at CENTER1 and SIGMA1.");
@@ -173,10 +162,12 @@ TD_VonMises::TD_VonMises( const TargetDistributionOptions& to ):
     }
   }
   //
-  if(!parseVector("WEIGHTS",weights_,true)) {weights_.assign(centers_.size(),1.0);}
+  parseVector("WEIGHTS",weights_);
+  if(weights_.size()==0) {weights_.assign(centers_.size(),1.0);}
   if(centers_.size()!=weights_.size()) {plumed_merror(getName() + ": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");}
   //
-  if(!parseVector("PERIODS",periods_,true)) {periods_.assign(getDimension(),2*pi);}
+  if(periods_.size()==0) {periods_.assign(getDimension(),2*pi);}
+  parseVector("PERIODS",periods_);
   if(periods_.size()!=getDimension()) {plumed_merror(getName() + ": the number of values given in PERIODS does not match the dimension of the distribution");}
   //
   double sum_weights=0.0;

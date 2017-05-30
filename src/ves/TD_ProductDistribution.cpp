@@ -21,9 +21,10 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
+#include "core/ActionSet.h"
+#include "core/PlumedMain.h"
 #include "tools/Grid.h"
 
 namespace PLMD {
@@ -31,7 +32,7 @@ namespace ves {
 
 //+PLUMEDOC VES_TARGETDIST PRODUCT_DISTRIBUTION
 /*
-Target distribution given by a separable product 
+Target distribution given by a separable product
 of one-dimensional distributions (static or dynamic).
 
 Employ a target distribution that is a separable product
@@ -84,7 +85,7 @@ private:
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_ProductDistribution(const TargetDistributionOptions& to);
+  explicit TD_ProductDistribution(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~TD_ProductDistribution();
@@ -97,7 +98,7 @@ public:
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_ProductDistribution,"PRODUCT_DISTRIBUTION")
+PLUMED_REGISTER_ACTION(TD_ProductDistribution,"PRODUCT_DISTRIBUTION")
 
 
 void TD_ProductDistribution::registerKeywords(Keywords& keys) {
@@ -110,17 +111,18 @@ void TD_ProductDistribution::registerKeywords(Keywords& keys) {
 }
 
 
-TD_ProductDistribution::TD_ProductDistribution( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_ProductDistribution::TD_ProductDistribution(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   distribution_pntrs_(0),
   grid_pntrs_(0),
   ndist_(0)
 {
   for(unsigned int i=1;; i++) {
-    std::string keywords;
-    if(!parseNumbered("DIST_ARG",i,keywords) ) {break;}
-    std::vector<std::string> words = Tools::getWords(keywords);
-    TargetDistribution* dist_pntr_tmp = targetDistributionRegister().create( (words) );
+    std::string targetdist_label;
+    if(!parseNumbered("DISTRIBUTION",i,targetdist_label) ) {break;}
+    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
+    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
+    //
     if(dist_pntr_tmp->isDynamic()) {setDynamic();}
     if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}
     if(dist_pntr_tmp->biasGridNeeded()) {setBiasGridNeeded();}
@@ -168,7 +170,7 @@ void TD_ProductDistribution::setupAdditionalGrids(const std::vector<Value*>& arg
 
 void TD_ProductDistribution::updateGrid() {
   for(unsigned int i=0; i<ndist_; i++) {
-    distribution_pntrs_[i]->update();
+    distribution_pntrs_[i]->updateTargetDist();
   }
   for(Grid::index_t l=0; l<targetDistGrid().getSize(); l++) {
     std::vector<unsigned int> indices = targetDistGrid().getIndices(l);

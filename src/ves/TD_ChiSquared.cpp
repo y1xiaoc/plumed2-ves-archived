@@ -21,9 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 
 
 namespace PLMD {
@@ -45,12 +44,12 @@ class TD_ChiSquared: public TargetDistribution {
   std::vector<double> normalization_;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_ChiSquared(const TargetDistributionOptions& to);
+  explicit TD_ChiSquared(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_ChiSquared,"CHI_SQUARED")
+PLUMED_REGISTER_ACTION(TD_ChiSquared,"CHI_SQUARED")
 
 
 void TD_ChiSquared::registerKeywords(Keywords& keys) {
@@ -65,8 +64,8 @@ void TD_ChiSquared::registerKeywords(Keywords& keys) {
 }
 
 
-TD_ChiSquared::TD_ChiSquared( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_ChiSquared::TD_ChiSquared(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   minima_(0),
   sigma_(0),
   kappa_(0),
@@ -79,7 +78,7 @@ TD_ChiSquared::TD_ChiSquared( const TargetDistributionOptions& to ):
   }
 
   std::vector<unsigned int> kappa_int(0);
-  parseVector("KAPPA",kappa_int,true);
+  parseVector("KAPPA",kappa_int);
   if(kappa_int.size()==0) {plumed_merror(getName()+": some problem with KAPPA keyword, should given as postive integer(s) larger than 1");}
   kappa_.resize(kappa_int.size());
   for(unsigned int k=0; k<kappa_int.size(); k++) {

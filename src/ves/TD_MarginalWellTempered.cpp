@@ -21,10 +21,9 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 #include "GridIntegrationWeights.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 #include "tools/Grid.h"
 
 #include "GridProjWeights.h"
@@ -48,14 +47,14 @@ private:
   std::vector<std::string> proj_args;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_MarginalWellTempered(const TargetDistributionOptions& to);
+  explicit TD_MarginalWellTempered(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~TD_MarginalWellTempered() {}
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_MarginalWellTempered,"MARGINAL_WELL_TEMPERED")
+PLUMED_REGISTER_ACTION(TD_MarginalWellTempered,"MARGINAL_WELL_TEMPERED")
 
 
 void TD_MarginalWellTempered::registerKeywords(Keywords& keys) {
@@ -65,8 +64,8 @@ void TD_MarginalWellTempered::registerKeywords(Keywords& keys) {
 }
 
 
-TD_MarginalWellTempered::TD_MarginalWellTempered( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_MarginalWellTempered::TD_MarginalWellTempered(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   bias_factor_(0.0),
   proj_args(0)
 {

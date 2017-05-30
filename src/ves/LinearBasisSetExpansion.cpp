@@ -27,11 +27,13 @@
 #include "GridIntegrationWeights.h"
 #include "BasisFunctions.h"
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
+
 
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
 #include "tools/Communicator.h"
+#include "core/ActionSet.h"
+#include "core/PlumedMain.h"
 
 #include "GridProjWeights.h"
 
@@ -491,9 +493,10 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
 }
 
 
-void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_keyword) {
-  std::vector<std::string> words = Tools::getWords(targetdist_keyword);
-  targetdist_pntr_ = targetDistributionRegister().create(words);
+void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_label) {
+  plumed_massert(action_pntr_!=NULL,"you need to link with Action before using LinearBasisSetExpansion::setupTargetDistribution");
+  targetdist_pntr_ = action_pntr_->plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
+  plumed_massert(targetdist_pntr_!=NULL,"target distribution "+targetdist_label+" does not exist.");
   //
   targetdist_pntr_->linkVesBias(vesbias_pntr_);
   //
@@ -518,7 +521,7 @@ void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetd
     targetdist_pntr_->linkFesGrid(fes_grid_pntr_);
   }
   //
-  targetdist_pntr_->update();
+  targetdist_pntr_->updateTargetDist();
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
 
@@ -529,7 +532,7 @@ void LinearBasisSetExpansion::updateTargetDistribution() {
   if(targetdist_pntr_->biasGridNeeded()) {updateBiasGrid();}
   if(biasCutoffActive()) {updateBiasWithoutCutoffGrid();}
   if(targetdist_pntr_->fesGridNeeded()) {updateFesGrid();}
-  targetdist_pntr_->update();
+  targetdist_pntr_->updateTargetDist();
   calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_);
 }
 

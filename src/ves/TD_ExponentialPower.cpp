@@ -21,9 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 
 
 namespace PLMD {
@@ -48,12 +47,12 @@ class TD_ExponentialPower: public TargetDistribution {
   double ExponentialPowerDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_ExponentialPower(const TargetDistributionOptions& to);
+  explicit TD_ExponentialPower(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_ExponentialPower,"EXPONENTIAL_POWER")
+PLUMED_REGISTER_ACTION(TD_ExponentialPower,"EXPONENTIAL_POWER")
 
 
 void TD_ExponentialPower::registerKeywords(Keywords& keys) {
@@ -69,8 +68,8 @@ void TD_ExponentialPower::registerKeywords(Keywords& keys) {
 }
 
 
-TD_ExponentialPower::TD_ExponentialPower( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_ExponentialPower::TD_ExponentialPower(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   centers_(0),
   alphas_(0),
   betas_(0),
@@ -99,20 +98,6 @@ TD_ExponentialPower::TD_ExponentialPower( const TargetDistributionOptions& to ):
     }
     betas_.push_back(tmp_beta);
   }
-  if(centers_.size()==0 && alphas_.size()==0 && betas_.size()==0) {
-    std::vector<double> tmp_center;
-    if(parseVector("CENTER",tmp_center,true)) {
-      centers_.push_back(tmp_center);
-    }
-    std::vector<double> tmp_alpha;
-    if(parseVector("ALPHA",tmp_alpha,true)) {
-      alphas_.push_back(tmp_alpha);
-    }
-    std::vector<double> tmp_beta;
-    if(parseVector("BETA",tmp_beta,true)) {
-      betas_.push_back(tmp_beta);
-    }
-  }
   //
   if(centers_.size()==0) {
     plumed_merror(getName()+": CENTER keywords seem to be missing. Note that numbered keywords start at CENTER1.");
@@ -138,7 +123,8 @@ TD_ExponentialPower::TD_ExponentialPower( const TargetDistributionOptions& to ):
     }
   }
   //
-  if(!parseVector("WEIGHTS",weights_,true)) {weights_.assign(centers_.size(),1.0);}
+  parseVector("WEIGHTS",weights_);
+  if(weights_.size()==0){weights_.assign(centers_.size(),1.0);}
   if(centers_.size()!=weights_.size()) {
     plumed_merror(getName()+": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   }

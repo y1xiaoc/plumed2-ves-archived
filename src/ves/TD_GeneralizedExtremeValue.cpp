@@ -21,9 +21,8 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
 
-#include "tools/Keywords.h"
+#include "core/ActionRegister.h"
 
 
 namespace PLMD {
@@ -46,12 +45,12 @@ class TD_GeneralizedExtremeValue: public TargetDistribution {
   double GEVdiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_GeneralizedExtremeValue(const TargetDistributionOptions& to);
+  explicit TD_GeneralizedExtremeValue(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-VES_REGISTER_TARGET_DISTRIBUTION(TD_GeneralizedExtremeValue,"GENERALIZED_EXTREME_VALUE")
+PLUMED_REGISTER_ACTION(TD_GeneralizedExtremeValue,"GENERALIZED_EXTREME_VALUE")
 
 
 void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys) {
@@ -66,8 +65,8 @@ void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys) {
 }
 
 
-TD_GeneralizedExtremeValue::TD_GeneralizedExtremeValue( const TargetDistributionOptions& to ):
-  TargetDistribution(to),
+TD_GeneralizedExtremeValue::TD_GeneralizedExtremeValue(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   center_(0),
   sigma_(0),
   epsilon_(0),

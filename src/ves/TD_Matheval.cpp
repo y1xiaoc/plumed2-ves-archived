@@ -20,12 +20,13 @@
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-#include "tools/Grid.h"
 #include "TargetDistribution.h"
-#include "TargetDistributionRegister.h"
+
+#include "core/ActionRegister.h"
+#include "tools/Grid.h"
+
 #include "GridIntegrationWeights.h"
 
-#include "tools/Keywords.h"
 
 #ifdef __PLUMED_HAS_MATHEVAL
 #include <matheval.h>
@@ -139,14 +140,14 @@ private:
   bool use_beta_;
 public:
   static void registerKeywords( Keywords&);
-  explicit TD_Matheval( const TargetDistributionOptions& to );
+  explicit TD_Matheval(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
   ~TD_Matheval();
 };
 
 #ifdef __PLUMED_HAS_MATHEVAL
-VES_REGISTER_TARGET_DISTRIBUTION(TD_Matheval,"MATHEVAL_DIST")
+PLUMED_REGISTER_ACTION(TD_Matheval,"MATHEVAL_DIST")
 
 
 void TD_Matheval::registerKeywords(Keywords& keys) {
@@ -164,8 +165,8 @@ TD_Matheval::~TD_Matheval() {
 
 
 
-TD_Matheval::TD_Matheval(const TargetDistributionOptions& to):
-  TargetDistribution(to),
+TD_Matheval::TD_Matheval(const ActionOptions& ao):
+  PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   evaluator_pntr_(NULL),
 //
   cv_var_idx_(0),
