@@ -88,7 +88,6 @@ public:
   explicit TD_ProductDistribution(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~TD_ProductDistribution();
   //
   void linkVesBias(VesBias*);
   void linkAction(Action*);
@@ -133,13 +132,6 @@ TD_ProductDistribution::TD_ProductDistribution(const ActionOptions& ao):
   setDimension(ndist_);
 
   checkRead();
-}
-
-
-TD_ProductDistribution::~TD_ProductDistribution() {
-  for(unsigned int i=0; i<ndist_; i++) {
-    delete distribution_pntrs_[i];
-  }
 }
 
 

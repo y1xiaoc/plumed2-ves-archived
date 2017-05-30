@@ -182,7 +182,6 @@ DumpTargetDistribution::DumpTargetDistribution(const ActionOptions&ao):
   }
 
   //
-  delete targetdist_pntr;
   for(unsigned int i=0; i < nargs; i++) {
     delete arguments[i];
   }

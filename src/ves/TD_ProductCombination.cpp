@@ -105,7 +105,6 @@ public:
   explicit TD_ProductCombination(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~TD_ProductCombination();
   //
   void linkVesBias(VesBias*);
   void linkAction(Action*);
@@ -150,13 +149,6 @@ TD_ProductCombination::TD_ProductCombination(const ActionOptions& ao):
   grid_pntrs_.assign(ndist_,NULL);
   //
   checkRead();
-}
-
-
-TD_ProductCombination::~TD_ProductCombination() {
-  for(unsigned int i=0; i<ndist_; i++) {
-    delete distribution_pntrs_[i];
-  }
 }
 
 

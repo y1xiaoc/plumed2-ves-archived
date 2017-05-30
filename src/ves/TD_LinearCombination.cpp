@@ -127,7 +127,6 @@ public:
   explicit TD_LinearCombination(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~TD_LinearCombination();
   //
   void linkVesBias(VesBias*);
   void linkAction(Action*);
@@ -187,13 +186,6 @@ TD_LinearCombination::TD_LinearCombination(const ActionOptions& ao):
   for(unsigned int i=0; i<weights_.size(); i++) {sum_weights+=weights_[i];}
   for(unsigned int i=0; i<weights_.size(); i++) {weights_[i]/=sum_weights;}
   checkRead();
-}
-
-
-TD_LinearCombination::~TD_LinearCombination() {
-  for(unsigned int i=0; i<ndist_; i++) {
-    delete distribution_pntrs_[i];
-  }
 }
 
 
