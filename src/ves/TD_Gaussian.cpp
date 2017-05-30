@@ -227,9 +227,13 @@ TD_Gaussian::TD_Gaussian(const ActionOptions& ao):
   correlation_.resize(ncenters_);
 
   for(unsigned int i=0; i<ncenters_; i++) {
-    std::vector<double> corr(1,0.0);
-    if(parseNumberedVector("CORRELATION",(i+1),corr)) {
+    std::vector<double> corr;
+    parseNumberedVector("CORRELATION",(i+1),corr);
+    if(corr.size()>0){
       diagonal_ = false;
+    }
+    else {
+      corr.assign(1,0.0);
     }
     correlation_[i] = corr;
   }
