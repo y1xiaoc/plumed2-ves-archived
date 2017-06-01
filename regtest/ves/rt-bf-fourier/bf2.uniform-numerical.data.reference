@@ -1,4 +1,4 @@
-#! FIELDS idx_arg aver.targetdist-1 index description
+#! FIELDS idx_arg aver.targetdist-0 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  21

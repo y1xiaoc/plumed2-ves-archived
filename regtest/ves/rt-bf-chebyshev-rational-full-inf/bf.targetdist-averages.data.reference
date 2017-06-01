@@ -1,4 +1,4 @@
-#! FIELDS idx_arg aver.targetdist-1 index description
+#! FIELDS idx_arg aver.targetdist-0 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  21
@@ -27,7 +27,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-2 index description
+#! FIELDS idx_arg aver.targetdist-1 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  21
@@ -47,7 +47,7 @@
       12     -0.314793      12  TB12(s)
       13      0.000000      13  TB13(s)
       14     -0.224669      14  TB14(s)
-      15      0.000000      15  TB15(s)
+      15     -0.000000      15  TB15(s)
       16     -0.113453      16  TB16(s)
       17      0.000000      17  TB17(s)
       18     -0.003076      18  TB18(s)
@@ -56,7 +56,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-3 index description
+#! FIELDS idx_arg aver.targetdist-2 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  21
@@ -85,7 +85,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-4 index description
+#! FIELDS idx_arg aver.targetdist-3 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  21

@@ -1,4 +1,4 @@
-#! FIELDS idx_arg aver.targetdist-1 index description
+#! FIELDS idx_arg aver.targetdist-0 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  11
@@ -17,16 +17,16 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-2 index description
+#! FIELDS idx_arg aver.targetdist-1 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  11
 #! SET shape_arg  11
        0      1.000000       0  1
-       1      0.000000       1  cos(1*s)
-       2     -0.000000       2  cos(2*s)
+       1     -0.000000       1  cos(1*s)
+       2      0.000000       2  cos(2*s)
        3      0.000000       3  cos(3*s)
-       4     -0.000000       4  cos(4*s)
+       4      0.000000       4  cos(4*s)
        5     -0.000000       5  cos(5*s)
        6      0.000000       6  cos(6*s)
        7     -0.000000       7  cos(7*s)
@@ -36,7 +36,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-3 index description
+#! FIELDS idx_arg aver.targetdist-2 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  11
@@ -55,7 +55,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-4 index description
+#! FIELDS idx_arg aver.targetdist-3 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  11
@@ -74,7 +74,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-5 index description
+#! FIELDS idx_arg aver.targetdist-4 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  11
@@ -93,7 +93,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-6 index description
+#! FIELDS idx_arg aver.targetdist-5 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  11

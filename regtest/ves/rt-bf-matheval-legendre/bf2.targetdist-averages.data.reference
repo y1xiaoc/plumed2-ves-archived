@@ -1,4 +1,4 @@
-#! FIELDS idx_arg aver.targetdist-1 index description
+#! FIELDS idx_arg aver.targetdist-0 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  7
@@ -13,7 +13,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-2 index description
+#! FIELDS idx_arg aver.targetdist-1 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  7
@@ -28,7 +28,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-3 index description
+#! FIELDS idx_arg aver.targetdist-2 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  7
@@ -43,7 +43,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-4 index description
+#! FIELDS idx_arg aver.targetdist-3 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  7
@@ -58,7 +58,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-5 index description
+#! FIELDS idx_arg aver.targetdist-4 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  7
@@ -73,7 +73,7 @@
 #!-------------------
 
 
-#! FIELDS idx_arg aver.targetdist-6 index description
+#! FIELDS idx_arg aver.targetdist-5 index description
 #! SET type LinearBasisSet
 #! SET ndimensions  1
 #! SET ncoeffs_total  7
