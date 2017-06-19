@@ -2,51 +2,42 @@
 
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
+t1_1: UNIFORM  MINIMA=-3.0  MAXIMA=+3.0
+t1_2: GAUSSIAN  CENTER1=-2.9  SIGMA1=1.0  CENTER2=+2.9 SIGMA2=0.4
+t1: PRODUCT_COMBINATION  DISTRIBUTION1=t1_1  DISTRIBUTION2=t1_2
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0
  GRID_MAX=+4.0
  GRID_BINS=200
- TARGET_DISTRIBUTION={PRODUCT_COMBINATION
-                      DISTRIBUTION1={UNIFORM
-                                     MINIMA=-3.0
-                                     MAXIMA=+3.0}
-                      DISTRIBUTION2={GAUSSIAN
-                                     CENTER1=-2.9 SIGMA1=1.0
-                                     CENTER2=+2.9 SIGMA2=0.4}}
+ TARGET_DISTRIBUTION=t1
  TARGETDIST_FILE=targetdist-1.data
  LOG_TARGETDIST_FILE=targetdist-1.log.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+t1b_1: UNIFORM  MINIMA=-3.0 SIGMA_MINIMA=0.20  MAXIMA=+3.0  SIGMA_MAXIMA=0.15
+t1b_2: GAUSSIAN  CENTER1=-2.9  SIGMA1=1.0  CENTER2=+2.9  SIGMA2=0.4
+t1b: PRODUCT_COMBINATION  DISTRIBUTION1=t1b_1  DISTRIBUTION2=t1b_2
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0
  GRID_MAX=+4.0
  GRID_BINS=200
- TARGET_DISTRIBUTION={PRODUCT_COMBINATION
-                      DISTRIBUTION1={UNIFORM
-                                     MINIMA=-3.0 SIGMA_MINIMA=0.20
-                                     MAXIMA=+3.0 SIGMA_MAXIMA=0.15}
-                      DISTRIBUTION2={GAUSSIAN
-                                     CENTER1=-2.9 SIGMA1=1.0
-                                     CENTER2=+2.9 SIGMA2=0.4}}
+ TARGET_DISTRIBUTION=t1b
  TARGETDIST_FILE=targetdist-1b.data
  LOG_TARGETDIST_FILE=targetdist-1b.log.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+t2_1: UNIFORM  MINIMA=-3.0,-3.0  SIGMA_MINIMA=0.2,0.2  MAXIMA=+3.0,+3.0  SIGMA_MAXIMA=0.2,0.2
+t2_2: GAUSSIAN  CENTER1=-2.9,-2.9  SIGMA1=0.5,0.3
+t2: PRODUCT_COMBINATION  DISTRIBUTION1=t2_1  DISTRIBUTION2=t2_2
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=100,100
- TARGET_DISTRIBUTION={PRODUCT_COMBINATION
-                      DISTRIBUTION1={UNIFORM
-                                     MINIMA=-3.0,-3.0 SIGMA_MINIMA=0.2,0.2
-                                     MAXIMA=+3.0,+3.0 SIGMA_MAXIMA=0.2,0.2}
-                      DISTRIBUTION2={GAUSSIAN
-                                     CENTER=-2.9,-2.9
-                                     SIGMA=0.5,0.3}}
+ TARGET_DISTRIBUTION=t2
  TARGETDIST_FILE=targetdist-2.data
  LOG_TARGETDIST_FILE=targetdist-2.log.data
  FMT_GRIDS=%11.6f

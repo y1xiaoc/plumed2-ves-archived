@@ -2,87 +2,115 @@
 
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
+
+GRID_DIST ...
+ FILE=targetdist-input-grid-1d.data
+ LABEL=t1
+... GRID_DIST
+#
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-6.0
  GRID_MAX=+6.0
  GRID_BINS=500
- TARGET_DISTRIBUTION={GRID_DIST
-                      FILE=targetdist-input-grid-1d.data}
+ TARGET_DISTRIBUTION=t1
  TARGETDIST_FILE=targetdist-1.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
+
+GRID_DIST ...
+ FILE=targetdist-input-grid-1d.data
+ DO_NOT_NORMALIZE
+ LABEL=t1b
+... GRID_DIST
+#
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-6.0
  GRID_MAX=+6.0
  GRID_BINS=500
- TARGET_DISTRIBUTION={GRID_DIST
-                      FILE=targetdist-input-grid-1d.data
-                      DO_NOT_NORMALIZE}
+ TARGET_DISTRIBUTION=t1b
  TARGETDIST_FILE=targetdist-1b.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+GRID_DIST ...
+ FILE=targetdist-input-grid-1d.data
+ ZERO_OUTSIDE
+ LABEL=t2
+... GRID_DIST
+#
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-6.0
  GRID_MAX=+6.0
  GRID_BINS=500
- TARGET_DISTRIBUTION={GRID_DIST
-                      FILE=targetdist-input-grid-1d.data
-                      ZERO_OUTSIDE}
+ TARGET_DISTRIBUTION=t2
  TARGETDIST_FILE=targetdist-2.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
+
+GRID_DIST ...
+ FILE=targetdist-input-grid-1d.data
+ ZERO_OUTSIDE
+ DO_NOT_NORMALIZE
+ LABEL=t2b
+... GRID_DIST
+#
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-6.0
  GRID_MAX=+6.0
  GRID_BINS=500
- TARGET_DISTRIBUTION={GRID_DIST
-                      FILE=targetdist-input-grid-1d.data
-                      ZERO_OUTSIDE
-                      DO_NOT_NORMALIZE}
+ TARGET_DISTRIBUTION=t2b
  TARGETDIST_FILE=targetdist-2b.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+GRID_DIST ...
+ FILE=targetdist-input-grid-2d.data
+ ZERO_OUTSIDE
+ LABEL=t3
+... GRID_DIST
+#
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=110,110
- TARGET_DISTRIBUTION={GRID_DIST
-                      FILE=targetdist-input-grid-2d.data
-                      ZERO_OUTSIDE}
+ TARGET_DISTRIBUTION=t3                    
  TARGETDIST_FILE=targetdist-3.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
+
+GRID_DIST ...
+ FILE=targetdist-input-grid-2d.data
+ ZERO_OUTSIDE
+ DO_NOT_NORMALIZE
+ LABEL=t3b
+... GRID_DIST
+#
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=110,110
- TARGET_DISTRIBUTION={GRID_DIST
-                      FILE=targetdist-input-grid-2d.data
-                      ZERO_OUTSIDE
-                      DO_NOT_NORMALIZE}
+ TARGET_DISTRIBUTION=t3b
  TARGETDIST_FILE=targetdist-3b.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+GRID_DIST ...
+ FILE=targetdist-input-grid-2d.data
+ SHIFT=+2.0
+ LABEL=t4
+... GRID_DIST
+#
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=110,110
- TARGET_DISTRIBUTION={GRID_DIST
-                      FILE=targetdist-input-grid-2d.data
-                      SHIFT=+2.0}
+ TARGET_DISTRIBUTION=t4
  TARGETDIST_FILE=targetdist-4.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
-
-
-
-

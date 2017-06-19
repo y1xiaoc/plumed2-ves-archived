@@ -2,82 +2,72 @@
 
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
+
+t1_1: UNIFORM  MINIMA=-4.0  MAXIMA=+4.0
+t1_2: GAUSSIAN  CENTER1=-2.0  SIGMA1=0.5
+t1: PRODUCT_DISTRIBUTION  DIST_ARG1=t1_1  DIST_ARG2=t1_2
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=100,100
- TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
-                      DIST_ARG1={UNIFORM
-                                 MINIMA=-4.0
-                                 MAXIMA=+4.0}
-                      DIST_ARG2={GAUSSIAN
-                                 CENTER=-2.0
-                                 SIGMA=0.5}}
+ TARGET_DISTRIBUTION=t1
  TARGETDIST_FILE=targetdist-1.data
  LOG_TARGETDIST_FILE=targetdist-1.log.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+
+t1b_1: UNIFORM 
+t1b_2: GAUSSIAN  CENTER1=-2.0  SIGMA1=0.5
+t1b: PRODUCT_DISTRIBUTION  DIST_ARG1=t1b_1  DIST_ARG2=t1b_2
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=100,100
- TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
-                      DIST_ARG1={UNIFORM}
-                      DIST_ARG2={GAUSSIAN
-                                 CENTER=-2.0
-                                 SIGMA=0.5}}
+ TARGET_DISTRIBUTION=t1b
  TARGETDIST_FILE=targetdist-1b.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+
+t2_1: GAUSSIAN  CENTER1=+2.0  SIGMA1=0.3
+t2_2: GAUSSIAN  CENTER1=-2.0  SIGMA1=0.5
+t2: PRODUCT_DISTRIBUTION  DIST_ARG1=t2_1  DIST_ARG2=t2_2
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=100,100
- TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
-                      DIST_ARG1={GAUSSIAN
-                                 CENTER=+2.0
-                                 SIGMA=0.3}
-                      DIST_ARG2={GAUSSIAN
-                                 CENTER=-2.0
-                                 SIGMA=0.5}}
+ TARGET_DISTRIBUTION=t2
  TARGETDIST_FILE=targetdist-2.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+
+t3_1: UNIFORM  MINIMA=-4.0  MAXIMA=+4.0
+t3_2: GAUSSIAN  CENTER1=-3.7  SIGMA1=0.8  NORMALIZE
+t3: PRODUCT_DISTRIBUTION  DIST_ARG1=t3_1  DIST_ARG2=t3_2
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=100,100
- TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
-                      DIST_ARG1={UNIFORM
-                                 MINIMA=-4.0
-                                 MAXIMA=+4.0}
-                      DIST_ARG2={GAUSSIAN
-                                 CENTER=-3.7
-                                 SIGMA=0.8
-                                 NORMALIZE}}
+ TARGET_DISTRIBUTION=t3
  TARGETDIST_FILE=targetdist-3.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
 
+
+t3b_1: UNIFORM  MINIMA=-4.0  MAXIMA=+4.0
+t3b_2: GAUSSIAN  CENTER1=-3.7  SIGMA1=0.8  
+t3b: PRODUCT_DISTRIBUTION  DIST_ARG1=t3b_1  DIST_ARG2=t3b_2  NORMALIZE
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
  GRID_BINS=100,100
- TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
-                      NORMALIZE
-                      DIST_ARG1={UNIFORM
-                                 MINIMA=-4.0
-                                 MAXIMA=+4.0}
-                      DIST_ARG2={GAUSSIAN
-                                 CENTER=-3.7
-                                 SIGMA=0.8}}
+ TARGET_DISTRIBUTION=t3b
  TARGETDIST_FILE=targetdist-3b.data
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
