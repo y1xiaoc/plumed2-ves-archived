@@ -1,5 +1,3 @@
-/**
-
 \page ves_main Variationally Enhanced Sampling
 
 The VES code is a module for PLUMED that implements enhanced sampling methods
@@ -221,6 +219,3 @@ Tutorial 5: Advanced collective variables
 \par Friday February 17
 
 \ref ves-lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations
-
-
-*/

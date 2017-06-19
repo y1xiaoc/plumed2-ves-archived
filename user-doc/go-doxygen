@@ -2,7 +2,7 @@
 
 source ../sourceme.sh
 
-LIST_VES="`ls VES*PP.txt` automatic-ves tutorials-ves"
+LIST_VES="VariationallyEnhancedSamplingPP.md automatic-ves tutorials-ves"
 
 LIST="
  IntroductionPP.md
