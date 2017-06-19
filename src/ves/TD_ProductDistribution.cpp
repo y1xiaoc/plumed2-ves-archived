@@ -118,7 +118,7 @@ TD_ProductDistribution::TD_ProductDistribution(const ActionOptions& ao):
 {
   for(unsigned int i=1;; i++) {
     std::string targetdist_label;
-    if(!parseNumbered("DISTRIBUTION",i,targetdist_label) ) {break;}
+    if(!parseNumbered("DIST_ARG",i,targetdist_label) ) {break;}
     TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
     plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
     //
