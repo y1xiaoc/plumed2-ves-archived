@@ -136,17 +136,19 @@ done
 sed -ie 's/<b> --/<b> \\c \\-\\-/g' automatic-ves/*.txt
 rm automatic-ves/*.txte
 
-txtfiles_ves="
-VES.txt
+files_ves="
+VariationallyEnhancedSampling.md
 "
-for f in ${txtfiles_ves}
+for f in ${files_ves}
 do
-file=${f%.txt}
+  
+extension=${f##*.}
+file=${f%.$extension}  
 
 # first replace with the content of the files
 # then grep out the special strings
 
-cat $file.txt |
+cat $f |
   sed "
     /^ *@VES_GLOSSARY@ *$/r automatic-ves/VES_GLOSSARY.list
     /^ *@VES_DICTIONARY@ *$/r automatic-ves/VES_DICTIONARY.list
@@ -159,5 +161,5 @@ cat $file.txt |
     /^ *@VES_CLTOOLS@ *$/r automatic-ves/VES_CLTOOLS.list
     /^ *@VES_WEBSITES@ *$/r automatic-ves/VES_WEBSITES.list
     /^ *@VES_TUTORIALS@ *$/r automatic-ves/VES_TUTORIALS.list
-" | grep -Ev '^ *@[A-Z_]*@ *$' > ${file}PP.txt
+" | grep -Ev '^ *@[A-Z_]*@ *$' > ${file}PP.$extension
 done

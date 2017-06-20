@@ -183,7 +183,8 @@ PLUMED_CONFIG_ENABLE([fussy],[fussy],[fussy warnings],[no])
 PLUMED_CONFIG_ENABLE([debug_glibcxx],[debug-glibcxx],[enable boundary check],[no])
 PLUMED_CONFIG_ENABLE([shared],[shared],[shared libs],[yes])
 PLUMED_CONFIG_ENABLE([dependency_tracking],[dependency-tracking],[dependency tracking],[yes])
-PLUMED_CONFIG_ENABLE([cxx_exceptions],[cxx-exceptions],[c++ exceptions],[no])
+PLUMED_CONFIG_ENABLE([rpath],[rpath],[store rpath],[no])
+PLUMED_CONFIG_ENABLE([cxx_exceptions],[cxx-exceptions],[c++ exceptions],[yes])
 PLUMED_CONFIG_ENABLE([ld_r],[ld-r],[group object files],[yes])
 PLUMED_CONFIG_ENABLE([mpi],[mpi],[search for mpi],[yes])
 PLUMED_CONFIG_ENABLE([external_lapack],[external-lapack],[search for external lapack],[yes])
@@ -425,6 +426,68 @@ then
   AC_DEFINE([F77_NO_UNDERSCORE])
 fi
 
+if test -n "$blas_found" ; then
+
+AC_DEFUN([PLUMED_TEST_SDOT],[
+#if ! defined(F77_NO_UNDERSCORE)
+#define sdot sdot_
+#endif
+extern "C"{
+$1 sdot(int *n, float *dx, int *incx, float *dy, int *incy);
+}
+
+int main(){
+  int size=5;
+// notice that [[]] is required to cheat autoconf
+  float af[[5]],bf[[5]];
+  for(unsigned i=0;i<size;i++){
+    af[[i]]=size;
+    bf[[i]]=size-i;
+  }
+  int inca=1;
+  int incb=1;
+  $1 f=sdot(&size,af,&inca,bf,&incb)-75;
+  if(f*f<1e-10) return 0;
+  else return 1;
+}
+])
+
+
+AC_MSG_CHECKING([whether sdot returns float])
+AC_RUN_IFELSE([AC_LANG_SOURCE([PLUMED_TEST_SDOT([float])])],
+  [ sdot_returns_float=yes ; AC_MSG_RESULT([yes]) ],
+  [ sdot_returns_float=no ;  AC_MSG_RESULT([no]) ],
+  [ AC_MSG_RESULT([not checked (cross compiling)]) ]
+)
+
+if test "$sdot_returns_float" == no ;
+then
+
+AC_MSG_CHECKING([whether sdot returns double])
+AC_RUN_IFELSE([AC_LANG_SOURCE([PLUMED_TEST_SDOT([double])])],
+  [ sdot_returns_double=yes ; AC_MSG_RESULT([yes]) ],
+  [ sdot_returns_double=no ;  AC_MSG_RESULT([no]) ],
+  [ AC_MSG_RESULT([not checked (cross compiling)]) ]
+)
+
+fi
+
+if test "$sdot_returns_double" = yes ; then
+  AC_MSG_NOTICE([Setting workaround for blas float functions returning double])
+  AC_DEFINE(__PLUMED_BLAS_RETURNS_FLOAT,double)
+  if test -n "$lapack_found" ; then
+    AC_MSG_NOTICE([Setting workaround for lapack float functions returning double])
+    AC_DEFINE(__PLUMED_LAPACK_RETURNS_FLOAT,double)
+  fi
+else if test "$sdot_returns_float" = no && test "$sdot_returns_double" = no ;
+then
+  AC_MSG_WARN([There is a problem with your blas implementation])
+fi
+
+fi
+
+fi
+
 #### End of compulsory libraries ####
 
 #### Optional libraries ####
@@ -576,6 +639,10 @@ if test "$shared" == true ; then
     AC_MSG_NOTICE([LDSO needs special flags])
     SOEXT=dylib
     LDSO="$LDSO -undefined suppress -flat_namespace -dynamiclib -Wl,-headerpad_max_install_names"
+    if test "$rpath" = true ; then
+      AC_MSG_NOTICE([Switching off rpath on OSX])
+      rpath=false
+    fi
   ;;
   (Linux)
     AC_MSG_NOTICE([*** Special settings for dynamic libraries on Linux ***])
@@ -607,6 +674,22 @@ then
     AC_MSG_RESULT([no])
     AC_MSG_WARN([dynamic library will be disabled])
     SOEXT=
+  fi
+  if test -n "$SOEXT" && test "$rpath" = true ; then
+    rm -f conftest.$SOEXT
+    readelf=""
+    AC_CHECK_PROG([readelf],[readelf],[found])
+    if test "$readelf" == found ; then
+      test_LDSO="$LDSO -Wl,-R -Wl,/some/random/dir/"
+      $test_LDSO $LDFLAGS conftest.o -o conftest.$SOEXT 1>/dev/null 2>/dev/null
+      if readelf -d conftest.$SOEXT | grep RPATH | grep -q /some/random/dir ; then
+        LDSO="$LDSO -Wl,-R -Wl,\"$LIBRARY_PATH\""
+      else
+        AC_MSG_WARN([-R option seems not working, disabling rpath])
+      fi
+    else
+      AC_MSG_WARN([readelf not available, no way to set rpath])
+    fi 
   fi
   rm -f conftest.*
 fi
