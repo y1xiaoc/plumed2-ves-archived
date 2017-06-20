@@ -118,9 +118,6 @@ LinearBasisSetExpansion::~LinearBasisSetExpansion() {
   if(fes_grid_pntr_!=NULL) {
     delete fes_grid_pntr_;
   }
-  if(targetdist_pntr_!=NULL) {
-    delete targetdist_pntr_;
-  }
 }
 
 
