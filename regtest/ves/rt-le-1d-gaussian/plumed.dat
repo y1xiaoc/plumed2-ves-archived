@@ -3,6 +3,11 @@
 phi:   TORSION ATOMS=5,7,9,15     NOPBC
 
 bf1: BF_FOURIER ORDER=5 INTERVAL_MIN=-pi INTERVAL_MAX=pi
+GAUSSIAN ... 
+ CENTER1=-1.5 SIGMA1=0.8 
+ CENTER2=+1.5 SIGMA2=0.3
+ LABEL=td1
+... GAUSSIAN
 
 VES_LINEAR_EXPANSION ...
  ARG=phi
@@ -10,9 +15,7 @@ VES_LINEAR_EXPANSION ...
  LABEL=ves1
  TEMP=300.0
  GRID_BINS=100
- TARGET_DISTRIBUTION={GAUSSIAN
-                      CENTER1=-1.5 SIGMA1=0.8
-                      CENTER2=+1.5 SIGMA2=0.3}
+ TARGET_DISTRIBUTION=td1
 ... VES_LINEAR_EXPANSION
 
 # NOTE: These parameters do not reflect parameters used in real simulations! 
