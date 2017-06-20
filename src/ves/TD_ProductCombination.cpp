@@ -121,7 +121,7 @@ PLUMED_REGISTER_ACTION(TD_ProductCombination,"TD_PRODUCT_COMBINATION")
 
 void TD_ProductCombination::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the product combination, each given within a separate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
+  keys.add("compulsory","DISTRIBUTIONS","The labels of the target distributions to be used in the product combination.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
@@ -134,11 +134,11 @@ TD_ProductCombination::TD_ProductCombination(const ActionOptions& ao):
   grid_pntrs_(0),
   ndist_(0)
 {
-  for(unsigned int i=1;; i++) {
-    std::string targetdist_label;
-    if(!parseNumbered("DISTRIBUTION",i,targetdist_label) ) {break;}
-    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
-    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
+  std::vector<std::string> targetdist_labels;
+  parseVector("DISTRIBUTIONS",targetdist_labels);    
+  for(unsigned int i=0; i<targetdist_labels.size(); i++) {
+    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);  
+    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_labels[i]+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
     //
     if(dist_pntr_tmp->isDynamic()) {setDynamic();}
     if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}
@@ -147,6 +147,8 @@ TD_ProductCombination::TD_ProductCombination(const ActionOptions& ao):
   }
   ndist_ = distribution_pntrs_.size();
   grid_pntrs_.assign(ndist_,NULL);
+  if(ndist_==0) {plumed_merror(getName()+ ": no distributions are given.");}
+  if(ndist_==1) {plumed_merror(getName()+ ": giving only one distribution does not make sense.");}
   //
   checkRead();
 }

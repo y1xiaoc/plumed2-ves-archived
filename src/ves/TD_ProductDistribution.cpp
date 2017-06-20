@@ -102,7 +102,7 @@ PLUMED_REGISTER_ACTION(TD_ProductDistribution,"TD_PRODUCT_DISTRIBUTION")
 
 void TD_ProductDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DIST_ARG","The one-dimensional target distributions for each argument to be used in the product distribution, each given within a separate numbered DIST_ARG keyword and enclosed in curly brackets {}.");
+  keys.add("compulsory","DISTRIBUTIONS","Labels of the one-dimensional target distributions for each argument to be used in the product distribution. Note that order of the labels is important.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
@@ -116,11 +116,11 @@ TD_ProductDistribution::TD_ProductDistribution(const ActionOptions& ao):
   grid_pntrs_(0),
   ndist_(0)
 {
-  for(unsigned int i=1;; i++) {
-    std::string targetdist_label;
-    if(!parseNumbered("DIST_ARG",i,targetdist_label) ) {break;}
-    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
-    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
+  std::vector<std::string> targetdist_labels;
+  parseVector("DISTRIBUTIONS",targetdist_labels);    
+  for(unsigned int i=0; i<targetdist_labels.size(); i++) {
+    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);  
+    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_labels[i]+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
     //
     if(dist_pntr_tmp->isDynamic()) {setDynamic();}
     if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}

@@ -143,8 +143,8 @@ PLUMED_REGISTER_ACTION(TD_LinearCombination,"TD_LINEAR_COMBINATION")
 
 void TD_LinearCombination::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","DISTRIBUTION","The target distributions to be used in the linear combination, each given within a separate numbered DISTRIBUTION keyword and enclosed in curly brackets {}.");
-  keys.add("optional","WEIGHTS","The weights of target distributions. Have to be as many as the number of target distributions given with the numbered DISTRIBUTION keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
+  keys.add("compulsory","DISTRIBUTIONS","The labels of the target distributions to be used in the linear combination.");
+  keys.add("optional","WEIGHTS","The weights of target distributions. Have to be as many as the number of target distribution labels given in DISTRIBUTIONS. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
   keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   //keys.use("SHIFT_TO_ZERO");
@@ -159,11 +159,11 @@ TD_LinearCombination::TD_LinearCombination(const ActionOptions& ao):
   weights_(0),
   ndist_(0)
 {
-  for(unsigned int i=1;; i++) {
-    std::string targetdist_label;
-    if(!parseNumbered("DISTRIBUTION",i,targetdist_label) ) {break;}
-    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
-    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
+  std::vector<std::string> targetdist_labels;
+  parseVector("DISTRIBUTIONS",targetdist_labels);    
+  for(unsigned int i=0; i<targetdist_labels.size(); i++) {
+    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);
+    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_labels[i]+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
     //
     if(dist_pntr_tmp->isDynamic()) {setDynamic();}
     if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}
@@ -179,7 +179,7 @@ TD_LinearCombination::TD_LinearCombination(const ActionOptions& ao):
   parseVector("WEIGHTS",weights_);
   if(weights_.size()==0){weights_.assign(distribution_pntrs_.size(),1.0);}
   if(distribution_pntrs_.size()!=weights_.size()) {
-    plumed_merror(getName()+ ": there has to be as many weights given in WEIGHTS as numbered DISTRIBUTION keywords");
+    plumed_merror(getName()+ ": there has to be as many weights given in WEIGHTS as the number of target distribution labels given in DISTRIBUTIONS");
   }
   //
   double sum_weights=0.0;
