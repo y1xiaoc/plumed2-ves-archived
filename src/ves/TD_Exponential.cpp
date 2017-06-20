@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN EXPONENTIAL
+//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_EXPONENTIAL
 /*
 Exponential distribution (static).
 
@@ -47,7 +47,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_Exponential,"EXPONENTIAL")
+PLUMED_REGISTER_ACTION(TD_Exponential,"TD_EXPONENTIAL")
 
 
 void TD_Exponential::registerKeywords(Keywords& keys) {

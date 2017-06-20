@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN CHI_SQUARED
+//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_CHISQUARED 
 /*
 Chi-squared distribution (static).
 
@@ -49,7 +49,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_ChiSquared,"CHI_SQUARED")
+PLUMED_REGISTER_ACTION(TD_ChiSquared,"TD_CHISQUARED")
 
 
 void TD_ChiSquared::registerKeywords(Keywords& keys) {

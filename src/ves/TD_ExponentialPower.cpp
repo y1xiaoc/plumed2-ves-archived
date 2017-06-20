@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN EXPONENTIAL_POWER
+//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_EXPONENTIAL_POWER
 /*
 Target distribution given by a sum of exponential power distributions (static).
 
@@ -52,7 +52,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_ExponentialPower,"EXPONENTIAL_POWER")
+PLUMED_REGISTER_ACTION(TD_ExponentialPower,"TD_EXPONENTIAL_POWER")
 
 
 void TD_ExponentialPower::registerKeywords(Keywords& keys) {

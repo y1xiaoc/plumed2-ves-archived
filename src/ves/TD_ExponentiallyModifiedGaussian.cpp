@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN EXPONENTIALLY_MODIFIED_GAUSSIAN
+//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_EXPONENTIALLY_MODIFIED_GAUSSIAN
 /*
 Target distribution given by a sum of exponentially modified Gaussian distributions (static).
 
@@ -51,7 +51,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_ExponentiallyModifiedGaussian,"EXPONENTIALLY_MODIFIED_GAUSSIAN")
+PLUMED_REGISTER_ACTION(TD_ExponentiallyModifiedGaussian,"TD_EXPONENTIALLY_MODIFIED_GAUSSIAN")
 
 
 void TD_ExponentiallyModifiedGaussian::registerKeywords(Keywords& keys) {

@@ -30,7 +30,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST PRODUCT_DISTRIBUTION
+//+PLUMEDOC VES_TARGETDIST TD_PRODUCT_DISTRIBUTION
 /*
 Target distribution given by a separable product
 of one-dimensional distributions (static or dynamic).
@@ -45,7 +45,7 @@ where \f$d\f$ is the number of arguments used and \f$p_{k}(s_{k})\f$ is the
 one-dimensional distribution corresponding to the \f$k\f$-th argument.
 
 Note the difference between this target distribution and the one defined in
-\ref PRODUCT_COMBINATION. Here we have a separable distribution given as a
+\ref TD_PRODUCT_COMBINATION. Here we have a separable distribution given as a
 product of one-dimensional distribution \f$p_{k}(s_{k})\f$.
 
 The distributions \f$p_{k}(s_{k})\f$ are given by using a separate numbered
@@ -67,9 +67,9 @@ static distribution.
 In the following example we employ a uniform distribution for
 argument 1 and a Gaussian distribution for argument 2.
 \plumedfile
-TARGET_DISTRIBUTION={PRODUCT_DISTRIBUTION
-                     DIST_ARG1={UNIFORM}
-                     DIST_ARG2={GAUSSIAN
+TARGET_DISTRIBUTION={TD_PRODUCT_DISTRIBUTION
+                     DIST_ARG1={TD_UNIFORM}
+                     DIST_ARG2={TD_GAUSSIAN
                                 CENTER=-2.0
                                 SIGMA=0.5}}
 \endplumedfile
@@ -97,7 +97,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_ProductDistribution,"PRODUCT_DISTRIBUTION")
+PLUMED_REGISTER_ACTION(TD_ProductDistribution,"TD_PRODUCT_DISTRIBUTION")
 
 
 void TD_ProductDistribution::registerKeywords(Keywords& keys) {

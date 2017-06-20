@@ -168,7 +168,7 @@ VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
     std::vector<std::string> keywords(1);
     std::string s1; Tools::convert(getBiasCutoffValue(),s1);
     if(getNumberOfTargetDistributionKeywords()==0) {
-      keywords[0]="UNIFORM BIAS_CUTOFF="+s1;
+      keywords[0]="TD_UNIFORM BIAS_CUTOFF="+s1;
     }
     else {
       keywords = getTargetDistributionKeywords();

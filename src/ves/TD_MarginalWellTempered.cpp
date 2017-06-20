@@ -32,7 +32,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN MARGINAL_WELL_TEMPERED
+//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_MARGINAL_WELLTEMPERED
 /*
 One-dimensional marginal well-tempered target distribution (dynamic).
 
@@ -54,7 +54,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_MarginalWellTempered,"MARGINAL_WELL_TEMPERED")
+PLUMED_REGISTER_ACTION(TD_MarginalWellTempered,"TD_MARGINAL_WELLTEMPERED")
 
 
 void TD_MarginalWellTempered::registerKeywords(Keywords& keys) {

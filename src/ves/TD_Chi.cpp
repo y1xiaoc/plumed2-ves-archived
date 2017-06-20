@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN CHI
+//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_CHI
 /*
 Chi distribution (static).
 
@@ -49,7 +49,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_Chi,"CHI")
+PLUMED_REGISTER_ACTION(TD_Chi,"TD_CHI")
 
 
 void TD_Chi::registerKeywords(Keywords& keys) {

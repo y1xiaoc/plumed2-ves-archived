@@ -34,7 +34,7 @@ namespace PLMD {
 namespace ves {
 
 
-//+PLUMEDOC VES_TARGETDIST GRID_DIST
+//+PLUMEDOC VES_TARGETDIST TD_GRID
 /*
 Target distribution from an external grid file (static).
 
@@ -73,7 +73,7 @@ will make values outside to be taken as zero.
 Generally you only need to provide the the filename of the external grid
 file. The target distribution is then automatically normalized to 1 inside the code.
 \plumedfile
-TARGET_DISTRIBUTION={GRID_DIST
+TARGET_DISTRIBUTION={TD_GRID
                      FILE=input-grid.data}
 \endplumedfile
 
@@ -96,7 +96,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_Grid,"GRID_DIST")
+PLUMED_REGISTER_ACTION(TD_Grid,"TD_GRID")
 
 
 void TD_Grid::registerKeywords(Keywords& keys) {

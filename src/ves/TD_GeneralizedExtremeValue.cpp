@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN GENERALIZED_EXTREME_VALUE
+//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_GENERALIZED_EXTREME_VALUE
 /*
 Generalized extreme value distribution (static).
 
@@ -50,7 +50,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_GeneralizedExtremeValue,"GENERALIZED_EXTREME_VALUE")
+PLUMED_REGISTER_ACTION(TD_GeneralizedExtremeValue,"TD_GENERALIZED_EXTREME_VALUE")
 
 
 void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys) {

@@ -30,7 +30,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST WELL_TEMPERED
+//+PLUMEDOC VES_TARGETDIST TD_WELLTEMPERED
 /*
 Well-tempered target distribution (dynamic).
 
@@ -89,7 +89,7 @@ to do it every 100-1000 bias update iterations.
 \par Examples
 Employ a well-tempered target distribution with a bias factor of 10
 \plumedfile
-TARGET_DISTRIBUTION={WELL_TEMPERED BIASFACTOR=10}
+TARGET_DISTRIBUTION={TD_WELLTEMPERED BIASFACTOR=10}
 \endplumedfile
 
 */
@@ -107,7 +107,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_WellTempered,"WELL_TEMPERED")
+PLUMED_REGISTER_ACTION(TD_WellTempered,"TD_WELLTEMPERED")
 
 
 void TD_WellTempered::registerKeywords(Keywords& keys) {
@@ -123,7 +123,7 @@ TD_WellTempered::TD_WellTempered(const ActionOptions& ao):
 {
   parse("BIASFACTOR",bias_factor_);
   if(bias_factor_<=1.0) {
-    plumed_merror("WELL_TEMPERED target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
+    plumed_merror("TD_WELLTEMPERED target distribution: the value of the bias factor doesn't make sense, it should be larger than 1.0");
   }
   setDynamic();
   setFesGridNeeded();

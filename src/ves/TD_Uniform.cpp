@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST UNIFORM
+//+PLUMEDOC VES_TARGETDIST TD_UNIFORM
 /*
 Uniform target distribution (static).
 
@@ -109,19 +109,19 @@ defined over an interval from 0.0 to 10.0 for the first
 argument and from 0.2 to 1.0 for the second argument are
 all of the following examples equivalent
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM}
+TARGET_DISTRIBUTION={TD_UNIFORM}
 \endplumedfile
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM
+TARGET_DISTRIBUTION={TD_UNIFORM
                      MINIMA=0.0,0,2
                      MAXIMA=10.0,1.0}
 \endplumedfile
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM
+TARGET_DISTRIBUTION={TD_UNIFORM
                      MAXIMA=10.0,1.0}
 \endplumedfile
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM
+TARGET_DISTRIBUTION={TD_UNIFORM
                      MINIMA=0.0,0,2}
 \endplumedfile
 
@@ -132,7 +132,7 @@ we consider an interval of 0 to 10 for the target distribution.
 The following input would result in a target distribution that
 would be uniform from 2 to 7 and then smoothly go to zero.
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM
+TARGET_DISTRIBUTION={TD_UNIFORM
                      MINIMA=2.0
                      MAXIMA=+7.0
                      SIGMA_MINIMA=0.5
@@ -142,20 +142,20 @@ It is also possible to employ a smooth switching function for just one
 of the boundaries as shown here where the target distribution
 would be uniform from 0 to 7.
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM
+TARGET_DISTRIBUTION={TD_UNIFORM
                      MAXIMA=+7.0
                      SIGMA_MAXIMA=1.0}
 \endplumedfile
 Furthermore, it is possible to employ a sharp boundary by
 using
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM
+TARGET_DISTRIBUTION={TD_UNIFORM
                      MAXIMA=+7.0
                      SIGMA_MAXIMA=0.0}
 \endplumedfile
 or
 \plumedfile
-TARGET_DISTRIBUTION={UNIFORM
+TARGET_DISTRIBUTION={TD_UNIFORM
                      MAXIMA=+7.0}
 \endplumedfile
 
@@ -180,7 +180,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_Uniform,"UNIFORM")
+PLUMED_REGISTER_ACTION(TD_Uniform,"TD_UNIFORM")
 
 
 void TD_Uniform::registerKeywords(Keywords& keys) {

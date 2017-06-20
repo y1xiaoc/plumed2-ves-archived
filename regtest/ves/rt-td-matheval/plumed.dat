@@ -2,8 +2,8 @@
 
 arg1: READ FILE=arg.in VALUES=arg IGNORE_TIME
 
-# should be the same as GAUSSIAN CENTER1=-1.5 SIGMA1=0.8
-t1: MATHEVAL_DIST  FUNCTION=exp(-0.5*((s1+1.5)/0.8)^2)
+# should be the same as TD_GAUSSIAN CENTER1=-1.5 SIGMA1=0.8
+t1: TD_CUSTOM  FUNCTION=exp(-0.5*((s1+1.5)/0.8)^2)
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0
  GRID_MAX=+4.0
@@ -16,8 +16,8 @@ DUMP_TARGET_DISTRIBUTION ...
 
 
 
-# should be the same as GAUSSIAN  CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3  CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8  WEIGHTS=1.0,4.0
-t2: MATHEVAL_DIST  FUNCTION=1.0*exp(-0.5*((s1+1.5)/0.8)^2)*exp(-0.5*((s2-1.5)/0.3)^2)+4.0*exp(-0.5*((s1-1.5)/0.3)^2)*exp(-0.5*((s2+1.5)/0.8)^2)
+# should be the same as TD_GAUSSIAN  CENTER1=-1.5,+1.5 SIGMA1=0.8,0.3  CENTER2=+1.5,-1.5 SIGMA2=0.3,0.8  WEIGHTS=1.0,4.0
+t2: TD_CUSTOM  FUNCTION=1.0*exp(-0.5*((s1+1.5)/0.8)^2)*exp(-0.5*((s2-1.5)/0.3)^2)+4.0*exp(-0.5*((s1-1.5)/0.3)^2)*exp(-0.5*((s2+1.5)/0.8)^2)
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-4.0,-4.0
  GRID_MAX=+4.0,+4.0
@@ -29,7 +29,7 @@ DUMP_TARGET_DISTRIBUTION ...
 
 
 
-t3: MATHEVAL_DIST  FUNCTION=sin(2*s1)+cos(3*s1)  SHIFT_TO_ZERO
+t3: TD_CUSTOM  FUNCTION=sin(2*s1)+cos(3*s1)  SHIFT_TO_ZERO
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-pi
  GRID_MAX=+pi
@@ -40,7 +40,7 @@ DUMP_TARGET_DISTRIBUTION ...
 ... DUMP_TARGET_DISTRIBUTION
 
 
-t4: MATHEVAL_DIST  FUNCTION=sin(2*s1)*cos(3*s2)+cos(3*s1)*sin(2*s2)  SHIFT_TO_ZERO
+t4: TD_CUSTOM  FUNCTION=sin(2*s1)*cos(3*s2)+cos(3*s1)*sin(2*s2)  SHIFT_TO_ZERO
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-pi,-pi
  GRID_MAX=+pi,+pi
@@ -54,7 +54,7 @@ DUMP_TARGET_DISTRIBUTION ...
 
 # Shifted Maxwell-Boltzmann 
 # https://en.wikipedia.org/wiki/Maxwell%E2%80%93Boltzmann_distribution
-t5: MATHEVAL_DIST  FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))
+t5: TD_CUSTOM  FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-20
  GRID_MAX=+50
@@ -66,7 +66,7 @@ DUMP_TARGET_DISTRIBUTION ...
 
 
 
-t5b: MATHEVAL_DIST  FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))
+t5b: TD_CUSTOM  FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-20,-20
  GRID_MAX=+50,+20
@@ -81,7 +81,7 @@ DUMP_TARGET_DISTRIBUTION ...
 # Generalized Normal, or exponential power distribution, or generalized error distribution
 # https://en.wikipedia.org/wiki/Generalized_normal_distribution
 # beta=4.0
-t6: MATHEVAL_DIST  FUNCTION=exp(-(abs(s1-20.0)/5.0)^4.0)
+t6: TD_CUSTOM  FUNCTION=exp(-(abs(s1-20.0)/5.0)^4.0)
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=0.0
  GRID_MAX=+40.0
@@ -93,7 +93,7 @@ DUMP_TARGET_DISTRIBUTION ...
 
 
 
-t6a: MATHEVAL_DIST  FUNCTION=exp(-(abs(s2-20.0)/5.0)^4.0)
+t6a: TD_CUSTOM  FUNCTION=exp(-(abs(s2-20.0)/5.0)^4.0)
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-10,0.0
  GRID_MAX=10,+40.0
@@ -103,7 +103,7 @@ DUMP_TARGET_DISTRIBUTION ...
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
-t6b: MATHEVAL_DIST  FUNCTION=exp(-(abs(s1-20.0)/5.0)^4.0)+exp(-(abs(s1+20.0)/5.0)^4.0)
+t6b: TD_CUSTOM  FUNCTION=exp(-(abs(s1-20.0)/5.0)^4.0)+exp(-(abs(s1+20.0)/5.0)^4.0)
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-40.0
  GRID_MAX=+40.0
@@ -113,7 +113,7 @@ DUMP_TARGET_DISTRIBUTION ...
  FMT_GRIDS=%11.6f
 ... DUMP_TARGET_DISTRIBUTION
 
-t6c: MATHEVAL_DIST  FUNCTION=1.0*exp(-(abs(s1-20.0)/5.0)^4.0)+4.0*exp(-(abs(s1+20.0)/5.0)^4.0)
+t6c: TD_CUSTOM  FUNCTION=1.0*exp(-(abs(s1-20.0)/5.0)^4.0)+4.0*exp(-(abs(s1+20.0)/5.0)^4.0)
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-40.0
  GRID_MAX=+40.0
@@ -128,7 +128,7 @@ DUMP_TARGET_DISTRIBUTION ...
 # Generalized Normal, or exponential power distribution, or generalized error distribution
 # https://en.wikipedia.org/wiki/Generalized_normal_distribution
 # beta=1.5
-t7: MATHEVAL_DIST  FUNCTION=exp(-(abs(s1-20.0)/5.0)^1.5)
+t7: TD_CUSTOM  FUNCTION=exp(-(abs(s1-20.0)/5.0)^1.5)
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=0.0
  GRID_MAX=+40.0
@@ -143,7 +143,7 @@ DUMP_TARGET_DISTRIBUTION ...
 # Frechet distribution
 # https://en.wikipedia.org/wiki/Frechet_distribution
 # a=3.0 s=10.0 m=-20.0001
-t8: MATHEVAL_DIST  FUNCTION=(3.0/10.0)*((s1+20.0001)/10.0)^(-1.0-3.0)*exp(-((s1+20.0001)/10.0)^(-3.0))
+t8: TD_CUSTOM  FUNCTION=(3.0/10.0)*((s1+20.0001)/10.0)^(-1.0-3.0)*exp(-((s1+20.0001)/10.0)^(-3.0))
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-20.0
  GRID_MAX=+50.0
@@ -158,7 +158,7 @@ DUMP_TARGET_DISTRIBUTION ...
 # Frechet distribution
 # https://en.wikipedia.org/wiki/Frechet_distribution
 # a=3.0 s=3.0 m=-20.0001
-t9: MATHEVAL_DIST  FUNCTION=(3.0/3.0)*((s1+20.0001)/3.0)^(-1.0-3.0)*exp(-((s1+20.0001)/3.0)^(-3.0))
+t9: TD_CUSTOM  FUNCTION=(3.0/3.0)*((s1+20.0001)/3.0)^(-1.0-3.0)*exp(-((s1+20.0001)/3.0)^(-3.0))
 DUMP_TARGET_DISTRIBUTION ...
  GRID_MIN=-20.0
  GRID_MAX=+0.0

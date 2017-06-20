@@ -38,7 +38,7 @@ class Action;
 
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST PRODUCT_COMBINATION
+//+PLUMEDOC VES_TARGETDIST TD_PRODUCT_COMBINATION
 /*
 Target distribution given by product combination of distributions (static or dynamic).
 
@@ -53,7 +53,7 @@ where the distributions \f$p_{i}(\mathbf{s})\f$ are in full dimensional space
 of the arguments used.
 
 Note the difference between this target distribution and the one defined in
-\ref PRODUCT_DISTRIBUTION. Here we have a non-separable distribution given
+\ref TD_PRODUCT_DISTRIBUTION. Here we have a non-separable distribution given
 as a product of distribution \f$p_{i}(\mathbf{s})\f$ which are in full dimensional
 space of the arguments used.
 
@@ -80,11 +80,11 @@ then smoothly decays to zero outside that interval.
 The overall effect will then be to cut off the tails of the
 Gaussian distribution
 \plumedfile
-TARGET_DISTRIBUTION={PRODUCT_COMBINATION
-                     DISTRIBUTION1={GAUSSIAN
+TARGET_DISTRIBUTION={TD_PRODUCT_COMBINATION
+                     DISTRIBUTION1={TD_GAUSSIAN
                                    CENTER1=-2.9 SIGMA1=1.0
                                    CENTER2=+2.9 SIGMA2=0.4}
-                     DISTRIBUTION2={UNIFORM
+                     DISTRIBUTION2={TD_UNIFORM
                                     MINIMA=-3.0 SIGMA_MINIMA=0.20
                                     MAXIMA=+3.0 SIGMA_MAXIMA=0.15}}
 \endplumedfile
@@ -116,7 +116,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_ProductCombination,"PRODUCT_COMBINATION")
+PLUMED_REGISTER_ACTION(TD_ProductCombination,"TD_PRODUCT_COMBINATION")
 
 
 void TD_ProductCombination::registerKeywords(Keywords& keys) {

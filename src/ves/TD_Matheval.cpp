@@ -36,7 +36,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST MATHEVAL_DIST
+//+PLUMEDOC VES_TARGETDIST TD_CUSTOM
 /*
 Target distribution given by a matheval parsed function (static or dynamic).
 
@@ -58,7 +58,7 @@ It is also possible to include the free energy surface \f$F(\mathbf{s})\f$
 in the target distribution by using the _FE_ variable. In this case the
 target distribution is dynamic and needs to be updated with current
 best estimate of \f$F(\mathbf{s})\f$, similarly as for the
-\ref WELL_TEMPERED "well-tempered target distribution".
+\ref TD_WELLTEMPERED "well-tempered target distribution".
 Furthermore, the inverse temperature \f$\beta = (k_{\mathrm{B}}T)^{-1}\f$ and
 the thermal energy \f$k_{\mathrm{B}}T\f$ can be included
 by using the _beta_ and _kBT_ variables.
@@ -70,7 +70,7 @@ code will perform checks to make sure that this is indeed the case.
 
 
 \attention
-The MATHEVAL_DIST only works if libmatheval is installed on the system and
+The TD_CUSTOM only works if libmatheval is installed on the system and
 PLUMED has been linked to it.
 
 \par Examples
@@ -80,7 +80,7 @@ as a target distribution in one-dimension.
 Note that it is not need to include the normalization factor as the distribution will be
 automatically normalized.
 \plumedfile
-TARGET_DISTRIBUTION={MATHEVAL_DIST
+TARGET_DISTRIBUTION={TD_CUSTOM
                      FUNCTION=(s1+20)^2*exp(-(s1+20)^2/(2*10.0^2))}
 \endplumedfile
 
@@ -89,23 +89,23 @@ use a [generalized normal distribution](https://en.wikipedia.org/wiki/Generalize
 for argument \f$s_2\f$ while the distribution for \f$s_1\f$ is taken as
 uniform as the variable _s1_ is not included in the function.
 \plumedfile
-TARGET_DISTRIBUTION={MATHEVAL_DIST
+TARGET_DISTRIBUTION={TD_CUSTOM
                      FUNCTION=exp(-(abs(s2-20.0)/5.0)^4.0)}
 \endplumedfile
 
 By using the _FE_ variable the target distribution can depend on
 the free energy surface \f$F(\mathbf{s})\f$. For example,
-the following input is identical to using \ref WELL_TEMPERED with
+the following input is identical to using \ref TD_WELLTEMPERED with
 BIASFACTOR=10.
 \plumedfile
-TARGET_DISTRIBUTION={MATHEVAL_DIST
+TARGET_DISTRIBUTION={TD_CUSTOM
                     FUNCTION=exp(-(beta/10.0)*FE)}
 \endplumedfile
 Here the inverse temperature is automatically obtained by using the _beta_
 variable. It is also possible to use the _kBT_ variable. The following
 syntax will give the exact same results as the syntax above
 \plumedfile
-TARGET_DISTRIBUTION={MATHEVAL_DIST
+TARGET_DISTRIBUTION={TD_CUSTOM
                     FUNCTION=exp(-(1.0/(kBT*10.0))*FE)}
 \endplumedfile
 
@@ -147,7 +147,7 @@ public:
 };
 
 #ifdef __PLUMED_HAS_MATHEVAL
-PLUMED_REGISTER_ACTION(TD_Matheval,"MATHEVAL_DIST")
+PLUMED_REGISTER_ACTION(TD_Matheval,"TD_CUSTOM")
 
 
 void TD_Matheval::registerKeywords(Keywords& keys) {
