@@ -57,7 +57,6 @@ void TD_Chi::registerKeywords(Keywords& keys) {
   keys.add("compulsory","MINIMA","The minima of the chi distribution.");
   keys.add("compulsory","SIGMA","The sigma parameters for the chi distribution.");
   keys.add("compulsory","KAPPA","The kappa parameters for the chi distribution.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");

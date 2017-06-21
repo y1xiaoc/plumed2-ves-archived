@@ -113,7 +113,6 @@ void TD_VonMises::registerKeywords(Keywords& keys) {
   keys.add("numbered","SIGMA","The standard deviations of the Von Mises distributions. For one distribution you can use either CENTER or CENTER1. For more distributions you need to use the numbered CENTER keywords, one for each distribution.");
   keys.add("optional","WEIGHTS","The weights of the Von Mises distributions. Have to be as many as the number of centers given with the numbered CENTER keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
   keys.add("hidden","PERIODS","The periods for each of the dimensions. By default they are 2*pi for each dimension.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   //keys.use("NORMALIZE");

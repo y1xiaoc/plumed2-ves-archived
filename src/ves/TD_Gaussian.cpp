@@ -177,7 +177,6 @@ void TD_Gaussian::registerKeywords(Keywords& keys) {
   keys.add("numbered","SIGMA","The standard deviations of the Gaussian distributions. For one Gaussians you can use either SIGMA or SIGMA1. For more Gaussians you need to use the numbered SIGMA keywords, one for each Gaussian.");
   keys.add("numbered","CORRELATION","The correlation for two-dimensional bivariate Gaussian distributions. Only works for two arguments. The value should be between -1 and 1. If no value is given the Gaussians is considered as un-correlated (i.e. value of 0.0). For one Gaussians you can use either CORRELATION or CORRELATION1. For more Gaussians you need to use the numbered CORRELATION keywords, one for each Gaussian.");
   keys.add("optional","WEIGHTS","The weights of the Gaussian distributions. Have to be as many as the number of centers given with the numbered CENTER keywords. If no weights are given the distributions are weighted equally. The weights are automatically normalized to 1.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");

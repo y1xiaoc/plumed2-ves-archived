@@ -103,7 +103,6 @@ PLUMED_REGISTER_ACTION(TD_ProductDistribution,"TD_PRODUCT_DISTRIBUTION")
 void TD_ProductDistribution::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","DISTRIBUTIONS","Labels of the one-dimensional target distributions for each argument to be used in the product distribution. Note that order of the labels is important.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");

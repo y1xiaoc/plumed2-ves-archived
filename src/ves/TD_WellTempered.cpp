@@ -113,7 +113,6 @@ PLUMED_REGISTER_ACTION(TD_WellTempered,"TD_WELLTEMPERED")
 void TD_WellTempered::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","BIASFACTOR","The bias factor used for the well-tempered distribution.");
-  keys.use("BIAS_CUTOFF");
 }
 
 

@@ -153,7 +153,6 @@ PLUMED_REGISTER_ACTION(TD_Matheval,"TD_CUSTOM")
 void TD_Matheval::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FUNCTION","The function you wish to use for the target distribution where you should use the variables _s1_,_s2_,... for the arguments. You can also use the current estimate of the FES by using the variable _FE_ and the temperature by using the _kBT_ and _beta_ variables.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
 }

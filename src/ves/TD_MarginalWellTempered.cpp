@@ -79,6 +79,7 @@ TD_MarginalWellTempered::TD_MarginalWellTempered(const ActionOptions& ao):
   }
   setDynamic();
   setFesGridNeeded();
+  doNotAllowBiasCutoff();
   checkRead();
 }
 

@@ -84,8 +84,8 @@ private:
   //
   bool static_grid_calculated;
   //
+  bool allow_bias_cutoff_;
   bool bias_cutoff_active_;
-  double bias_cutoff_value_;
   //
   void calculateStaticDistributionGrid();
   void updateBiasCutoffForTargetDistGrid();
@@ -138,8 +138,10 @@ public:
   bool biasWithoutCutoffGridNeeded() const {return needs_bias_withoutcutoff_grid_;}
   bool fesGridNeeded()  const {return needs_fes_grid_;}
   //
+  void allowBiasCutoff(){allow_bias_cutoff_=true;}
+  void doNotAllowBiasCutoff(){allow_bias_cutoff_=false;}
+  bool isBiasCutoffAllowed() const {return allow_bias_cutoff_;}
   bool biasCutoffActive() const {return bias_cutoff_active_;}
-  double getBiasCutoffValue() const {return bias_cutoff_value_;}
   //
   void setDimension(const unsigned int dimension);
   unsigned getDimension() const {return dimension_;}

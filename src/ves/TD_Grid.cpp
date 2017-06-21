@@ -106,7 +106,6 @@ void TD_Grid::registerKeywords(Keywords& keys) {
   keys.add("optional","SHIFT","Shift the grid read-in by some constant value. Due to normalization the final shift in the target distribution will generally not be the same as the value given here");
   keys.addFlag("ZERO_OUTSIDE",false,"By default the target distribution is continuous such that values outside the boundary of the external grid file are the same as at the boundary. This can be changed by using this flag which will make values outside to be taken as zero.");
   keys.addFlag("DO_NOT_NORMALIZE",false,"By default the target distribution from the external grid is always normalized inside the code. You can use this flag to disable this normalization. However, be warned that this will generally lead to the wrong behavior if the distribution from the external grid is not properly normalized to 1.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
 }

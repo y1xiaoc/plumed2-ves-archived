@@ -61,7 +61,6 @@ void TD_ExponentialPower::registerKeywords(Keywords& keys) {
   keys.add("numbered","ALPHA","The alpha parameters for each exponential power distribution.");
   keys.add("numbered","BETA","The beta parameters for each exponential power distribution.");
   keys.add("optional","WEIGHTS","The weights of the exponential power distribution. By default all are weighted equally.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");

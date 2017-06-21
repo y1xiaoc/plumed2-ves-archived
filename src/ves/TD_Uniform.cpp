@@ -189,7 +189,6 @@ void TD_Uniform::registerKeywords(Keywords& keys) {
   keys.add("optional","MAXIMA","The maxima of the intervals where the target distribution is taken as uniform. You should give one value for each argument.");
   keys.add("optional","SIGMA_MINIMA","The standard deviation parameters of the Gaussian switching functions for the minima of the intervals. You should give one value for each argument. Value of 0.0 means that switch is done without a smooth switching function, this is the default behavior.");
   keys.add("optional","SIGMA_MAXIMA","The standard deviation parameters of the Gaussian switching functions for the maxima of the intervals. You should give one value for each argument. Value of 0.0 means that switch is done without a smooth switching function, this is the default behavior.");
-  keys.use("BIAS_CUTOFF");
 }
 
 

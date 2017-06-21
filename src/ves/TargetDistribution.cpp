@@ -41,7 +41,6 @@ namespace ves {
 
 void TargetDistribution::registerKeywords( Keywords& keys ) {
   Action::registerKeywords(keys);
-  keys.reserve("hidden","BIAS_CUTOFF","Add a bias cutoff to the target distribution.");
   keys.reserve("optional","WELLTEMPERED_FACTOR","Broaden the target distribution such that it is taken as [p(s)]^(1/g) where g is the well tempered factor given here. If this option is active the distribution will be automatically normalized.");
   keys.reserveFlag("SHIFT_TO_ZERO",false,"Shift the minimum value of the target distribution to zero. This can for example be used to avoid negative values in the target distribution. If this option is active the distribution will be automatically normalized.");
   keys.reserveFlag("NORMALIZE",false,"Renormalized the target distribution over the intervals on which it is defined to make sure that it is properly normalized to 1. In most cases this should not be needed as the target distributions should be normalized. The code will issue a warning (but still run) if this is needed for some reason.");
@@ -70,24 +69,15 @@ TargetDistribution::TargetDistribution(const ActionOptions&ao):
   bias_withoutcutoff_grid_pntr_(NULL),
   fes_grid_pntr_(NULL),
   static_grid_calculated(false),
-  bias_cutoff_active_(false),
-  bias_cutoff_value_(0.0)
+  allow_bias_cutoff_(true),
+  bias_cutoff_active_(false)
 {
-  //
-  parse("BIAS_CUTOFF",bias_cutoff_value_);
-  if(bias_cutoff_value_<0.0) {
-    plumed_merror(getName()+": negative value in BIAS_CUTOFF does not make sense");
-  }
-  if(bias_cutoff_value_>0.0) {
-    setupBiasCutoff();
-  }
   //
   if(keywords.exists("WELLTEMPERED_FACTOR")) {
     double welltempered_factor=0.0;
     parse("WELLTEMPERED_FACTOR",welltempered_factor);
     //
     if(welltempered_factor>0.0) {
-      if(bias_cutoff_active_) {plumed_merror(getName()+": using WELLTEMPERED_FACTOR with bias cutoff is not allowed.");}
       TargetDistModifer* pntr = new WellTemperedModifer(welltempered_factor);
       targetdist_modifer_pntrs_.push_back(pntr);
     }
@@ -108,8 +98,7 @@ TargetDistribution::TargetDistribution(const ActionOptions&ao):
     bool force_normalization=false;
     parseFlag("NORMALIZE",force_normalization);
     if(force_normalization) {
-      if(shift_targetdist_to_zero_) {plumed_merror(getName()+": using NORMALIZE with SHIFT_TO_ZERO is not needed, the target distribution will be automatically normalized.");}
-      if(bias_cutoff_active_) {plumed_merror(getName()+": using NORMALIZE with bias cutoff is not allowed, the target distribution will be automatically normalized.");}
+      if(shift_targetdist_to_zero_) {plumed_merror(getName()+" with label "+getLabel()+": using NORMALIZE with SHIFT_TO_ZERO is not needed, the target distribution will be automatically normalized.");}
       setForcedNormalization();
     }
   }
@@ -169,8 +158,11 @@ void TargetDistribution::linkFesGrid(Grid* fes_grid_pntr_in) {
 
 
 void TargetDistribution::setupBiasCutoff() {
-  if(!keywords.exists("BIAS_CUTOFF")) {
-    plumed_merror(getName()+": this target distribution does not support a bias cutoff");
+  if(!allow_bias_cutoff_) {
+    plumed_merror(getName()+" with label "+getLabel()+": this target distribution does not support a bias cutoff");
+  }
+  if(targetdist_modifer_pntrs_.size()>0) {
+    plumed_merror(getName()+" with label "+getLabel()+": using a bias cutoff with a target distribution modifer like WELLTEMPERED_FACTOR is not allowed");
   }
   bias_cutoff_active_=true;
   setBiasWithoutCutoffGridNeeded();

@@ -60,7 +60,6 @@ void TD_ExponentiallyModifiedGaussian::registerKeywords(Keywords& keys) {
   keys.add("numbered","SIGMA","The sigma parameters for each exponentially modified Gaussian distributions.");
   keys.add("numbered","LAMBDA","The lambda parameters for each exponentially modified Gaussian distributions");
   keys.add("optional","WEIGHTS","The weights of the distributions. By default all are weighted equally.");
-  keys.use("BIAS_CUTOFF");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");
