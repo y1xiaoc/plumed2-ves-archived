@@ -172,7 +172,7 @@ VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
   else if(getNumberOfTargetDistributionPntrs()==1) {
-    if(biasCutoffActive()){getTargetDistributionPntrs()[0]->setupBiasCutoff();}
+    if(biasCutoffActive()) {getTargetDistributionPntrs()[0]->setupBiasCutoff();}
     bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionPntrs()[0]);
     log.printf("  using target distribution of type %s with label %s \n",getTargetDistributionPntrs()[0]->getName().c_str(),getTargetDistributionPntrs()[0]->getLabel().c_str());
   }

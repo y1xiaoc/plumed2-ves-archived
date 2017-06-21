@@ -108,14 +108,14 @@ VesBias::VesBias(const ActionOptions&ao):
   std::vector<std::string> targetdist_labels;
   if(keywords.exists("TARGET_DISTRIBUTION")) {
     parseVector("TARGET_DISTRIBUTION",targetdist_labels);
-    if(targetdist_labels.size()>1){
+    if(targetdist_labels.size()>1) {
       plumed_merror(getName()+" with label "+getLabel()+": multiple target distribution labels not allowed");
     }
   }
   else if(keywords.exists("TARGET_DISTRIBUTIONS")) {
     parseVector("TARGET_DISTRIBUTIONS",targetdist_labels);
   }
-  
+
   targetdist_pntrs_.assign(targetdist_labels.size(),NULL);
   for(unsigned int i=0; i<targetdist_labels.size(); i++) {
     targetdist_pntrs_[i] = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);
@@ -124,8 +124,8 @@ VesBias::VesBias(const ActionOptions&ao):
     }
     targetdist_pntrs_[i]->linkVesBias(this);
   }
-  
-  
+
+
   if(getNumberOfArguments()>2) {
     disableStaticTargetDistFileOutput();
   }
@@ -253,7 +253,7 @@ void VesBias::useTargetDistributionKeywords(Keywords& keys) {
 
 void VesBias::useMultipleTargetDistributionKeywords(Keywords& keys) {
   plumed_massert(!keys.exists("TARGET_DISTRIBUTION"),"you cannot use both useTargetDistributionKeywords and useMultipleTargetDistributionKeywords");
-  keys.use("TARGET_DISTRIBUTIONS"); 
+  keys.use("TARGET_DISTRIBUTIONS");
 }
 
 

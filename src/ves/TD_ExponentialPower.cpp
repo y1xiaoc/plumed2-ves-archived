@@ -123,7 +123,7 @@ TD_ExponentialPower::TD_ExponentialPower(const ActionOptions& ao):
   }
   //
   parseVector("WEIGHTS",weights_);
-  if(weights_.size()==0){weights_.assign(centers_.size(),1.0);}
+  if(weights_.size()==0) {weights_.assign(centers_.size(),1.0);}
   if(centers_.size()!=weights_.size()) {
     plumed_merror(getName()+": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   }

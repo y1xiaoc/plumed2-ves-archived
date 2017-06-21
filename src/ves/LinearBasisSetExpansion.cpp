@@ -488,8 +488,8 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
 }
 
 
-void LinearBasisSetExpansion::setupTargetDistribution(TargetDistribution* targetdist_pntr_in) {  
-  targetdist_pntr_ = targetdist_pntr_in;  
+void LinearBasisSetExpansion::setupTargetDistribution(TargetDistribution* targetdist_pntr_in) {
+  targetdist_pntr_ = targetdist_pntr_in;
   //
   targetdist_pntr_->setupGrids(args_pntrs_,grid_min_,grid_max_,grid_bins_);
   targetdist_grid_pntr_      = targetdist_pntr_->getTargetDistGridPntr();

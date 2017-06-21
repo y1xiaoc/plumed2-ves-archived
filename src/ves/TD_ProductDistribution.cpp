@@ -116,9 +116,9 @@ TD_ProductDistribution::TD_ProductDistribution(const ActionOptions& ao):
   ndist_(0)
 {
   std::vector<std::string> targetdist_labels;
-  parseVector("DISTRIBUTIONS",targetdist_labels);    
+  parseVector("DISTRIBUTIONS",targetdist_labels);
   for(unsigned int i=0; i<targetdist_labels.size(); i++) {
-    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);  
+    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);
     plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_labels[i]+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
     //
     if(dist_pntr_tmp->isDynamic()) {setDynamic();}

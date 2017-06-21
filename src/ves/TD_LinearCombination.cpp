@@ -159,7 +159,7 @@ TD_LinearCombination::TD_LinearCombination(const ActionOptions& ao):
   ndist_(0)
 {
   std::vector<std::string> targetdist_labels;
-  parseVector("DISTRIBUTIONS",targetdist_labels);    
+  parseVector("DISTRIBUTIONS",targetdist_labels);
   for(unsigned int i=0; i<targetdist_labels.size(); i++) {
     TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);
     plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_labels[i]+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
@@ -176,7 +176,7 @@ TD_LinearCombination::TD_LinearCombination(const ActionOptions& ao):
   if(ndist_==1) {plumed_merror(getName()+ ": giving only one distribution does not make sense.");}
   //
   parseVector("WEIGHTS",weights_);
-  if(weights_.size()==0){weights_.assign(distribution_pntrs_.size(),1.0);}
+  if(weights_.size()==0) {weights_.assign(distribution_pntrs_.size(),1.0);}
   if(distribution_pntrs_.size()!=weights_.size()) {
     plumed_merror(getName()+ ": there has to be as many weights given in WEIGHTS as the number of target distribution labels given in DISTRIBUTIONS");
   }

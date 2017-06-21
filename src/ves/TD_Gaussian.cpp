@@ -228,7 +228,7 @@ TD_Gaussian::TD_Gaussian(const ActionOptions& ao):
   for(unsigned int i=0; i<ncenters_; i++) {
     std::vector<double> corr;
     parseNumberedVector("CORRELATION",(i+1),corr);
-    if(corr.size()>0){
+    if(corr.size()>0) {
       diagonal_ = false;
     }
     else {
@@ -252,7 +252,7 @@ TD_Gaussian::TD_Gaussian(const ActionOptions& ao):
   }
   //
   parseVector("WEIGHTS",weights_);
-  if(weights_.size()==0){weights_.assign(centers_.size(),1.0);}
+  if(weights_.size()==0) {weights_.assign(centers_.size(),1.0);}
   if(centers_.size()!=weights_.size()) {
     plumed_merror(getName()+": there has to be as many weights given in WEIGHTS as numbered CENTER keywords");
   }
