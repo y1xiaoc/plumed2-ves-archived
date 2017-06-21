@@ -26,6 +26,7 @@
 #include "CoeffsMatrix.h"
 #include "BasisFunctions.h"
 #include "Optimizer.h"
+#include "TargetDistribution.h"
 
 #include "bias/Bias.h"
 #include "core/ActionRegister.h"
@@ -164,27 +165,14 @@ VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
   bias_expansion_pntr_->setGridBins(this->getGridBins());
   //
 
-  if(biasCutoffActive()) {
-    std::vector<std::string> keywords(1);
-    std::string s1; Tools::convert(getBiasCutoffValue(),s1);
-    if(getNumberOfTargetDistributionKeywords()==0) {
-      keywords[0]="TD_UNIFORM BIAS_CUTOFF="+s1;
-    }
-    else {
-      keywords = getTargetDistributionKeywords();
-      keywords[0]+=" BIAS_CUTOFF="+s1;
-    }
-    setTargetDistributionKeywords(keywords);
-  }
 
-  if(getNumberOfTargetDistributionKeywords()==0) {
+  if(getNumberOfTargetDistributionPntrs()==0) {
     log.printf("  using an uniform target distribution: \n");
     bias_expansion_pntr_->setupUniformTargetDistribution();
   }
-  else if(getNumberOfTargetDistributionKeywords()==1) {
-    bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionKeywords()[0]);
-    // updateTargetDistributions();
-    log.printf("  using the following target distribution:\n   %s\n",getTargetDistributionKeywords()[0].c_str());
+  else if(getNumberOfTargetDistributionPntrs()==1) {
+    bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionPntrs()[0]);
+    log.printf("  using target distribution of type %s with label %s \n",getTargetDistributionPntrs()[0]->getName().c_str(),getTargetDistributionPntrs()[0]->getLabel().c_str());
   }
   else {
     plumed_merror("problem with the TARGET_DISTRIBUTION keyword, either give no keyword or just one keyword");

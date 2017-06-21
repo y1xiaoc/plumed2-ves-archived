@@ -83,7 +83,6 @@ private:
   //
   double kbt_;
   //
-  std::vector<std::string> targetdist_keywords_;
   std::vector<TargetDistribution*> targetdist_pntrs_;
   bool dynamic_targetdist_;
   //
@@ -132,8 +131,6 @@ protected:
   //
   bool readCoeffsFromFiles();
   //
-  void setTargetDistributionKeywords(const std::vector<std::string>& keywords) {targetdist_keywords_=keywords;}
-  //
   template<class T>
   bool parseMultipleValues(const std::string&, std::vector<T>&, unsigned int);
   template<class T>
@@ -148,7 +145,7 @@ public:
   //
   static void useInitialCoeffsKeywords(Keywords&);
   static void useTargetDistributionKeywords(Keywords&);
-  static void useNumberedTargetDistributionKeywords(Keywords&);
+  static void useMultipleTargetDistributionKeywords(Keywords&);
   static void useGridBinKeywords(Keywords&);
   static void useGridLimitsKeywords(Keywords&);
   static void useBiasCutoffKeywords(Keywords&);
@@ -165,9 +162,7 @@ public:
   CoeffsVector* getGradientPntr(const unsigned int coeffs_id = 0)const {return gradient_pntrs_[coeffs_id];}
   CoeffsMatrix* getHessianPntr(const unsigned int coeffs_id = 0) const {return hessian_pntrs_[coeffs_id];}
   //
-  std::vector<std::string> getTargetDistributionKeywords() const {return targetdist_keywords_;}
-  std::string getTargetDistributionKeyword(const unsigned int i=0) const {return targetdist_keywords_[i];}
-  unsigned int getNumberOfTargetDistributionKeywords() const {return targetdist_keywords_.size();}
+  unsigned int getNumberOfTargetDistributionPntrs() const {return targetdist_pntrs_.size();}
   //
   size_t numberOfCoeffs(const unsigned int coeffs_id = 0) const {return coeffs_pntrs_[coeffs_id]->numberOfCoeffs();}
   size_t totalNumberOfCoeffs() const {return ncoeffs_total_;}

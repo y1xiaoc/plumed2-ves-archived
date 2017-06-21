@@ -27,8 +27,10 @@
 #include "Optimizer.h"
 #include "FermiSwitchingFunction.h"
 #include "VesTools.h"
+#include "TargetDistribution.h"
 
 #include "tools/Communicator.h"
+#include "core/ActionSet.h"
 #include "core/PlumedMain.h"
 #include "core/Atoms.h"
 #include "tools/File.h"
@@ -56,7 +58,6 @@ VesBias::VesBias(const ActionOptions&ao):
   diagonal_hessian_(true),
   aver_counters(0),
   kbt_(0.0),
-  targetdist_keywords_(0),
   targetdist_pntrs_(0),
   dynamic_targetdist_(false),
   grid_bins_(0),
@@ -104,33 +105,27 @@ VesBias::VesBias(const ActionOptions&ao):
     parseMultipleValues("GRID_MAX",grid_max_,getNumberOfArguments());
   }
 
+  std::vector<std::string> targetdist_labels;
   if(keywords.exists("TARGET_DISTRIBUTION")) {
-    plumed_massert(targetdist_keywords_.size()==0,"the target distribution keywords should be empty before the reading of the TARGET_DISTRIBUTION keywords");
-    // Single keyword
-    if(!keywords.numbered("TARGET_DISTRIBUTION")) {
-      std::string targetdist_str="";
-      parse("TARGET_DISTRIBUTION",targetdist_str);
-      if(targetdist_str.size()>0) {
-        targetdist_keywords_.push_back(targetdist_str);
-        plumed_assert(targetdist_keywords_.size()==1);
-      }
-    }
-    // Multiple numbered keywords
-    else {
-      for(int i=1;; i++) {
-        std::string targetdist_str="";
-        if(!parseNumbered("TARGET_DISTRIBUTION",i,targetdist_str)) {break;}
-        targetdist_keywords_.push_back(targetdist_str);
-      }
-      std::string str_tmp1="";
-      parse("TARGET_DISTRIBUTION",str_tmp1);
-      if(str_tmp1.size()>0) {
-        plumed_merror("Using the TARGET_DISTRIBUTION keyword is not allowed. You need to give multiple numbered keywords using TARGET_DISTRIBUTION1, TARGET_DISTRIBUTION2, etc.");
-      }
+    parseVector("TARGET_DISTRIBUTION",targetdist_labels);
+    if(targetdist_labels.size()>1){
+      plumed_merror(getName()+" with label "+getLabel()+": multiple target distribution labels not allowed");
     }
   }
-
-
+  else if(keywords.exists("TARGET_DISTRIBUTIONS")) {
+    parseVector("TARGET_DISTRIBUTIONS",targetdist_labels);
+  }
+  
+  targetdist_pntrs_.assign(targetdist_labels.size(),NULL);
+  for(unsigned int i=0; i<targetdist_labels.size(); i++) {
+    targetdist_pntrs_[i] = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);
+    if(targetdist_pntrs_[i]==NULL) {
+      plumed_merror(getName()+" with label "+getLabel()+":target distribution "+targetdist_labels[i]+" does not exist. The target distribution should always be defined with a specfic label before using them in a bias.");
+    }
+    targetdist_pntrs_[i]->linkVesBias(this);
+  }
+  
+  
   if(getNumberOfArguments()>2) {
     disableStaticTargetDistFileOutput();
   }
@@ -227,7 +222,8 @@ void VesBias::registerKeywords( Keywords& keys ) {
   //
   keys.reserve("optional","COEFFS","read-in the coefficents from files.");
   //
-  keys.reserve("optional","TARGET_DISTRIBUTION","the target distribution to be used. See the list in \\ref ves_targetdist");
+  keys.reserve("optional","TARGET_DISTRIBUTION","the label of the target distribution to be used.");
+  keys.reserve("optional","TARGET_DISTRIBUTIONS","the label of the target distribution to be used. Here you are allows to use multiple labels.");
   //
   keys.reserve("optional","GRID_BINS","the number of bins used for the grid. The default value is 100 bins per dimension.");
   keys.reserve("optional","GRID_MIN","the lower bounds used for the grid.");
@@ -250,15 +246,14 @@ void VesBias::useInitialCoeffsKeywords(Keywords& keys) {
 
 
 void VesBias::useTargetDistributionKeywords(Keywords& keys) {
-  plumed_massert(!keys.exists("TARGET_DISTRIBUTION"),"you cannot use both useTargetDistributionKeywords and useTargetDistributionKeywords");
+  plumed_massert(!keys.exists("TARGET_DISTRIBUTIONS"),"you cannot use both useTargetDistributionKeywords and useMultipleTargetDistributionKeywords");
   keys.use("TARGET_DISTRIBUTION");
 }
 
 
-void VesBias::useNumberedTargetDistributionKeywords(Keywords& keys) {
-  plumed_massert(!keys.exists("TARGET_DISTRIBUTION"),"you cannot use both useTargetDistributionKeywords and useTargetDistributionKeywords");
-  keys.remove("TARGET_DISTRIBUTION");
-  keys.add("numbered","TARGET_DISTRIBUTION","the target distributions to be used.");
+void VesBias::useMultipleTargetDistributionKeywords(Keywords& keys) {
+  plumed_massert(!keys.exists("TARGET_DISTRIBUTION"),"you cannot use both useTargetDistributionKeywords and useMultipleTargetDistributionKeywords");
+  keys.use("TARGET_DISTRIBUTIONS"); 
 }
 
 

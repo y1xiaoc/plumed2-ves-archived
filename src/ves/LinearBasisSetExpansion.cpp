@@ -32,8 +32,6 @@
 #include "tools/Keywords.h"
 #include "tools/Grid.h"
 #include "tools/Communicator.h"
-#include "core/ActionSet.h"
-#include "core/PlumedMain.h"
 
 #include "GridProjWeights.h"
 
@@ -490,12 +488,8 @@ void LinearBasisSetExpansion::setupUniformTargetDistribution() {
 }
 
 
-void LinearBasisSetExpansion::setupTargetDistribution(const std::string& targetdist_label) {
-  plumed_massert(action_pntr_!=NULL,"you need to link with Action before using LinearBasisSetExpansion::setupTargetDistribution");
-  targetdist_pntr_ = action_pntr_->plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
-  plumed_massert(targetdist_pntr_!=NULL,"target distribution "+targetdist_label+" does not exist.");
-  //
-  targetdist_pntr_->linkVesBias(vesbias_pntr_);
+void LinearBasisSetExpansion::setupTargetDistribution(TargetDistribution* targetdist_pntr_in) {  
+  targetdist_pntr_ = targetdist_pntr_in;  
   //
   targetdist_pntr_->setupGrids(args_pntrs_,grid_min_,grid_max_,grid_bins_);
   targetdist_grid_pntr_      = targetdist_pntr_->getTargetDistGridPntr();

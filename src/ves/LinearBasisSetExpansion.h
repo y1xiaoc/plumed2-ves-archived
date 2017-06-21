@@ -167,7 +167,7 @@ public:
   double kBT() const {return kbt_;}
   //
   void setupUniformTargetDistribution();
-  void setupTargetDistribution(const std::string&);
+  void setupTargetDistribution(TargetDistribution*);
   void updateTargetDistribution();
   //
   void readInRestartTargetDistribution(const std::string&);
