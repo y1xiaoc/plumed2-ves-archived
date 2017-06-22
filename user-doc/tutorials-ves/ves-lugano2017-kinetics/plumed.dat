@@ -1,3 +1,5 @@
+# vim:ft=plumed
+
 # set distance units to angstrom, time to ps, and energy to eV
 UNITS LENGTH=A TIME=ps ENERGY=eV
 
@@ -38,8 +40,3 @@ COMMITTOR ARG=d1 BASIN_LL1=-2.0 BASIN_UL1=-1.0 STRIDE=600
 
 ### FINALLY PRINT EVERYTHING
 PRINT FILE=COLVAR ARG=CV1,CV2,d1,variational.* STRIDE=100
-
-
-
-
-

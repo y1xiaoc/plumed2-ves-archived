@@ -1,3 +1,5 @@
+# vim:ft=plumed
+
 RESTART
 
 d1:  DISTANCE ATOMS=319,320

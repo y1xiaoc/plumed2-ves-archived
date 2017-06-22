@@ -1,3 +1,5 @@
+# vim:ft=plumed
+
 d1:  DISTANCE ATOMS=319,320
 
 COORDINATION ...

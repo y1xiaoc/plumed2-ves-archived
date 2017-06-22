@@ -1,3 +1,5 @@
+# vim:ft=plumed
+
 distance:       READ FILE=COLVAR  IGNORE_TIME VALUES=d1
 ves:       READ FILE=COLVAR IGNORE_TIME VALUES=b1.bias
 
