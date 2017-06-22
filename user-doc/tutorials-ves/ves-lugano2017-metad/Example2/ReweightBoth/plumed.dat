@@ -1,3 +1,5 @@
+# vim:ft=plumed
+
 dist:        READ FILE=COLVAR  IGNORE_TIME VALUES=d1
 coord:       READ FILE=COLVAR  IGNORE_TIME VALUES=coord
 metad:       READ FILE=COLVAR IGNORE_TIME VALUES=metad.rbias
