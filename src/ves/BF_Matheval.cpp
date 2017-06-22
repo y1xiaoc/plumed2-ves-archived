@@ -31,7 +31,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_BASISF BF_MATHEVAL
+//+PLUMEDOC VES_BASISF BF_CUSTOM
 /*
 Basis functions given by matheval expressions.
 
@@ -57,17 +57,17 @@ e.g. not result in a not a number (nan) or infinity (inf).
 The code will perform checks to make sure that this is the case.
 
 \attention
-The BF_MATHEVAL only works if libmatheval is installed on the system and
+The BF_CUSTOM only works if libmatheval is installed on the system and
 PLUMED has been linked to it.
 
 \par Examples
 
-Defining Legendre polynomial basis functions of order 6 using BF_MATHEVAL
+Defining Legendre polynomial basis functions of order 6 using BF_CUSTOM
 where the appropriate transform function is given by the TRANSFORM keyword.
 This is just an example of what can be done, in practice you should use
 \ref BF_LEGENDRE for Legendre polynomial basis functions.
 \plumedfile
-BF_MATHEVAL ...
+BF_CUSTOM ...
  TRANSFORM=(t-(min+max)/2)/((max-min)/2)
  FUNC1=x
  FUNC2=(1/2)*(3*x^2-1)
@@ -78,16 +78,16 @@ BF_MATHEVAL ...
  INTERVAL_MIN=-4.0
  INTERVAL_MAX=4.0
  LABEL=bf1
-... BF_MATHEVAL
+... BF_CUSTOM
 \endplumedfile
 
 
-Defining Fourier basis functions of order 3 using BF_MATHEVAL where the
+Defining Fourier basis functions of order 3 using BF_CUSTOM where the
 periodicity is indicated using the PERIODIC flag. This is just an example
 of what can be done, in practice you should use \ref BF_FOURIER
 for Fourier basis functions.
 \plumedfile
-BF_MATHEVAL ...
+BF_CUSTOM ...
  FUNC1=cos(x)
  FUNC2=sin(x)
  FUNC3=cos(2*x)
@@ -98,14 +98,14 @@ BF_MATHEVAL ...
  INTERVAL_MAX=+pi
  LABEL=bf1
  PERIODIC
-... BF_MATHEVAL
+... BF_CUSTOM
 \endplumedfile
 
 
 */
 //+ENDPLUMEDOC
 
-class BF_Matheval : public BasisFunctions {
+class BF_CUSTOM : public BasisFunctions {
   std::vector<void*> evaluator_pntrs_;
   std::vector<void*> derivs_pntrs_;
   void* transf_pntr_;
@@ -114,15 +114,15 @@ class BF_Matheval : public BasisFunctions {
   std::string transf_variable_str_;
 public:
   static void registerKeywords( Keywords&);
-  explicit BF_Matheval(const ActionOptions&);
-  ~BF_Matheval();
+  explicit BF_CUSTOM(const ActionOptions&);
+  ~BF_CUSTOM();
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 #ifdef __PLUMED_HAS_MATHEVAL
-PLUMED_REGISTER_ACTION(BF_Matheval,"BF_MATHEVAL")
+PLUMED_REGISTER_ACTION(BF_CUSTOM,"BF_CUSTOM")
 
-void BF_Matheval::registerKeywords(Keywords& keys) {
+void BF_CUSTOM::registerKeywords(Keywords& keys) {
   BasisFunctions::registerKeywords(keys);
   keys.remove("ORDER");
   keys.add("numbered","FUNC","The basis functions f_i(x) given in a matheval format using _x_ as a variable.");
@@ -132,7 +132,7 @@ void BF_Matheval::registerKeywords(Keywords& keys) {
 }
 
 
-BF_Matheval::~BF_Matheval() {
+BF_CUSTOM::~BF_CUSTOM() {
   for(unsigned int i=0; i<evaluator_pntrs_.size(); i++) {
     evaluator_destroy(evaluator_pntrs_[i]);
   }
@@ -148,7 +148,7 @@ BF_Matheval::~BF_Matheval() {
 }
 
 
-BF_Matheval::BF_Matheval(const ActionOptions&ao):
+BF_CUSTOM::BF_CUSTOM(const ActionOptions&ao):
   PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   evaluator_pntrs_(0),
   derivs_pntrs_(0),
@@ -257,7 +257,7 @@ BF_Matheval::BF_Matheval(const ActionOptions&ao):
 }
 
 
-void BF_Matheval::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_CUSTOM::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   inside_range=true;
   argT=checkIfArgumentInsideInterval(arg,inside_range);
   double transf_derivf=1.0;
