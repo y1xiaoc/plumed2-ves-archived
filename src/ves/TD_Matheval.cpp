@@ -121,7 +121,7 @@ TARGET_DISTRIBUTION={TD_CUSTOM
 */
 //+ENDPLUMEDOC
 
-class TD_Matheval : public TargetDistribution {
+class TD_Custom : public TargetDistribution {
 private:
   void setupAdditionalGrids(const std::vector<Value*>&, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<unsigned int>&);
   //
@@ -140,17 +140,17 @@ private:
   bool use_beta_;
 public:
   static void registerKeywords( Keywords&);
-  explicit TD_Matheval(const ActionOptions& ao);
+  explicit TD_Custom(const ActionOptions& ao);
   void updateGrid();
   double getValue(const std::vector<double>&) const;
-  ~TD_Matheval();
+  ~TD_Custom();
 };
 
 #ifdef __PLUMED_HAS_MATHEVAL
-PLUMED_REGISTER_ACTION(TD_Matheval,"TD_CUSTOM")
+PLUMED_REGISTER_ACTION(TD_Custom,"TD_CUSTOM")
 
 
-void TD_Matheval::registerKeywords(Keywords& keys) {
+void TD_Custom::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FUNCTION","The function you wish to use for the target distribution where you should use the variables _s1_,_s2_,... for the arguments. You can also use the current estimate of the FES by using the variable _FE_ and the temperature by using the _kBT_ and _beta_ variables.");
   keys.use("WELLTEMPERED_FACTOR");
@@ -158,13 +158,13 @@ void TD_Matheval::registerKeywords(Keywords& keys) {
 }
 
 
-TD_Matheval::~TD_Matheval() {
+TD_Custom::~TD_Custom() {
   evaluator_destroy(evaluator_pntr_);
 }
 
 
 
-TD_Matheval::TD_Matheval(const ActionOptions& ao):
+TD_Custom::TD_Custom(const ActionOptions& ao):
   PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   evaluator_pntr_(NULL),
 //
@@ -222,20 +222,20 @@ TD_Matheval::TD_Matheval(const ActionOptions& ao):
 }
 
 
-void TD_Matheval::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
+void TD_Custom::setupAdditionalGrids(const std::vector<Value*>& arguments, const std::vector<std::string>& min, const std::vector<std::string>& max, const std::vector<unsigned int>& nbins) {
   if(cv_var_idx_.size()>0 && cv_var_idx_[cv_var_idx_.size()-1]>getDimension()) {
     plumed_merror(getName()+": mismatch between CVs given in FUNC and the dimension of the target distribution");
   }
 }
 
 
-double TD_Matheval::getValue(const std::vector<double>& argument) const {
-  plumed_merror("getValue not implemented for TD_Matheval");
+double TD_Custom::getValue(const std::vector<double>& argument) const {
+  plumed_merror("getValue not implemented for TD_Custom");
   return 0.0;
 }
 
 
-void TD_Matheval::updateGrid() {
+void TD_Custom::updateGrid() {
   std::vector<char*> var_char(cv_var_str_.size());
   std::vector<double> var_values(cv_var_str_.size());
   for(unsigned int j=0; j<cv_var_str_.size(); j++) {
