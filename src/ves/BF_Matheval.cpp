@@ -105,7 +105,7 @@ BF_CUSTOM ...
 */
 //+ENDPLUMEDOC
 
-class BF_CUSTOM : public BasisFunctions {
+class BF_Custom : public BasisFunctions {
   std::vector<void*> evaluator_pntrs_;
   std::vector<void*> derivs_pntrs_;
   void* transf_pntr_;
@@ -114,15 +114,15 @@ class BF_CUSTOM : public BasisFunctions {
   std::string transf_variable_str_;
 public:
   static void registerKeywords( Keywords&);
-  explicit BF_CUSTOM(const ActionOptions&);
-  ~BF_CUSTOM();
+  explicit BF_Custom(const ActionOptions&);
+  ~BF_Custom();
   void getAllValues(const double, double&, bool&, std::vector<double>&, std::vector<double>&) const;
 };
 
 #ifdef __PLUMED_HAS_MATHEVAL
-PLUMED_REGISTER_ACTION(BF_CUSTOM,"BF_CUSTOM")
+PLUMED_REGISTER_ACTION(BF_Custom,"BF_CUSTOM")
 
-void BF_CUSTOM::registerKeywords(Keywords& keys) {
+void BF_Custom::registerKeywords(Keywords& keys) {
   BasisFunctions::registerKeywords(keys);
   keys.remove("ORDER");
   keys.add("numbered","FUNC","The basis functions f_i(x) given in a matheval format using _x_ as a variable.");
@@ -132,7 +132,7 @@ void BF_CUSTOM::registerKeywords(Keywords& keys) {
 }
 
 
-BF_CUSTOM::~BF_CUSTOM() {
+BF_Custom::~BF_Custom() {
   for(unsigned int i=0; i<evaluator_pntrs_.size(); i++) {
     evaluator_destroy(evaluator_pntrs_[i]);
   }
@@ -148,7 +148,7 @@ BF_CUSTOM::~BF_CUSTOM() {
 }
 
 
-BF_CUSTOM::BF_CUSTOM(const ActionOptions&ao):
+BF_Custom::BF_Custom(const ActionOptions&ao):
   PLUMED_VES_BASISFUNCTIONS_INIT(ao),
   evaluator_pntrs_(0),
   derivs_pntrs_(0),
@@ -257,7 +257,7 @@ BF_CUSTOM::BF_CUSTOM(const ActionOptions&ao):
 }
 
 
-void BF_CUSTOM::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
+void BF_Custom::getAllValues(const double arg, double& argT, bool& inside_range, std::vector<double>& values, std::vector<double>& derivs) const {
   inside_range=true;
   argT=checkIfArgumentInsideInterval(arg,inside_range);
   double transf_derivf=1.0;
