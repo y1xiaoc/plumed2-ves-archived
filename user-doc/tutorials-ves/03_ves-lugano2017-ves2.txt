@@ -87,19 +87,17 @@ with \f$ C \f$ a normalization factor.
 The files needed for this exercise are in the directory Example1.
 This target distribution can be specified in plumed using:
 \verbatim
+td_uniform: TD_UNIFORM MINIMA=0.23 MAXIMA=0.6 SIGMA_MAXIMA=0.05 
+td_welltemp: TD_WELLTEMPERED BIASFACTOR=5
+td_combination: TD_PRODUCT_COMBINATION DISTRIBUTIONS=td_uniform,td_welltemp
+
 VES_LINEAR_EXPANSION ...
  ARG=d1
  BASIS_FUNCTIONS=bf1
  LABEL=b1
  TEMP=300.0
  GRID_BINS=300
- TARGET_DISTRIBUTION={PRODUCT_COMBINATION
-                      DISTRIBUTION1={UNIFORM
-                                 MINIMA=0.23
-                                 MAXIMA=0.6
-                                 SIGMA_MAXIMA=0.05}
-                      DISTRIBUTION2={WELL_TEMPERED
-                                     BIASFACTOR=5}}
+ TARGET_DISTRIBUTION=td_combination
 ... VES_LINEAR_EXPANSION
 \endverbatim
 As usual, we run the example using the run.sh script.
@@ -241,19 +239,17 @@ are given by the first two columns.
 We use the well-tempered target distribution together with a barrier at 0.6 nm
 on the distance Na-Cl.
 \verbatim
+td_uniform: TD_UNIFORM MINIMA=0.2,2.5 MAXIMA=0.6,7.5 SIGMA_MAXIMA=0.05,0.0
+td_welltemp: TD_WELLTEMPERED BIASFACTOR=5
+td_combination: TD_PRODUCT_COMBINATION DISTRIBUTIONS=td_uniform,td_welltemp
+
 VES_LINEAR_EXPANSION ...
  ARG=d1,coord
  BASIS_FUNCTIONS=bf1,bf2
  LABEL=b1
  TEMP=300.0
  GRID_BINS=300,300
- TARGET_DISTRIBUTION={PRODUCT_COMBINATION
-                      DISTRIBUTION1={UNIFORM
-                                 MINIMA=0.2,2.5
-                                 MAXIMA=0.6,7.5
-                                 SIGMA_MAXIMA=0.05,0.}
-                      DISTRIBUTION2={WELL_TEMPERED
-                                     BIASFACTOR=5}}
+ TARGET_DISTRIBUTION=td_combination
 ... VES_LINEAR_EXPANSION
 \endverbatim
 We can now run the simulation and control its progress.

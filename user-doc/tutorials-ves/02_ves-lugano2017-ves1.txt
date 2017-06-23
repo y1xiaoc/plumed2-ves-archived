@@ -133,11 +133,13 @@ This is the same relation that holds for non-tempered metadynamics.
 
 The syntax for the bias potential in Plumed is:
 \verbatim
+td1: TD_UNIFORM
+
 VES_LINEAR_EXPANSION ...
  ARG=d1
  BASIS_FUNCTIONS=bf1
  GRID_BINS=300
- TARGET_DISTRIBUTION={UNIFORM}
+ TARGET_DISTRIBUTION=td1
  LABEL=b1
 ... VES_LINEAR_EXPANSION
 \endverbatim
@@ -282,13 +284,15 @@ p(s)=
 where \f$ s_0=0.6\f$ nm and \f$ \sigma=0.05\f$.
 To define this \f$ p(s) \f$ in Plumed the input is:
 \verbatim
+td1: TD_UNIFORM MINIMA=0.23 MAXIMA=0.6 SIGMA_MAXIMA=0.05
+
 VES_LINEAR_EXPANSION ...
  ARG=d1
  BASIS_FUNCTIONS=bf1
  LABEL=b1
  TEMP=300.0
  GRID_BINS=300
- TARGET_DISTRIBUTION={UNIFORM MINIMA=0.23 MAXIMA=0.6 SIGMA_MAXIMA=0.05}
+ TARGET_DISTRIBUTION=td1
 ... VES_LINEAR_EXPANSION
 \endverbatim
 

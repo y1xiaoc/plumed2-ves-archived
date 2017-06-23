@@ -65,6 +65,8 @@ bf1: BF_CHEBYSHEV ORDER=36 INTERVAL_MIN=0.0 INTERVAL_MAX=2.0
 and we tell PLUMED to use VES acting on CV2 with a free energy cutoff
 
 \verbatim
+td_uniform: TD_UNIFORM
+
 VES_LINEAR_EXPANSION ...
   ARG=CV2
   BASIS_FUNCTIONS=bf1
@@ -72,6 +74,7 @@ VES_LINEAR_EXPANSION ...
   TEMP=1700
   BIAS_CUTOFF=15.0
   BIAS_CUTOFF_FERMI_LAMBDA=10.0
+  TARGET_DISTRIBUTION=td_uniform
 ... VES_LINEAR_EXPANSION
 \endverbatim
 
@@ -151,6 +154,8 @@ tail -n 47 coeffs.dat > fixed-coeffs.dat
 Now create a new directory from which you will run a new simulation and copy the necessary input files (including the fixed-coeffs.dat) into this directory. Modify the PLUMED file so that the optimized coefficients are read by the VES_LINEAR_EXPANSION
 
 \verbatim
+td_uniform: TD_UNIFORM
+
 VES_LINEAR_EXPANSION ...
   ARG=CV2
   BASIS_FUNCTIONS=bf1
@@ -158,6 +163,7 @@ VES_LINEAR_EXPANSION ...
   TEMP=1700
   BIAS_CUTOFF=6.0
   BIAS_CUTOFF_FERMI_LAMBDA=10.0
+  TARGET_DISTRIBUTION=td_uniform
   COEFFS=fixed-coeffs.dat
 ... VES_LINEAR_EXPANSION
 \endverbatim
