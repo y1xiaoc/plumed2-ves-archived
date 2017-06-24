@@ -1,5 +1,5 @@
 plumed_modules=ves
 mpiprocs=4
 type=plumed
-arg="md_linearexpansion input"
+arg="ves_md_linearexpansion input"
 

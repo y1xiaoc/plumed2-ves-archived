@@ -50,14 +50,14 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_CLTOOLS md_linearexpansion
+//+PLUMEDOC VES_CLTOOLS ves_md_linearexpansion
 /*
-Simple MD code for dynamics on a energy landscape given by a linear basis set expansion.
+Simple MD code for dynamics on a potential energy surface given by a linear basis set expansion.
 
 \par Examples
 
 \plumedfile
-plumed md_linearexpansion input
+plumed ves_md_linearexpansion input
 \endplumedfile
 
 */
@@ -65,7 +65,7 @@ plumed md_linearexpansion input
 
 class MD_LinearExpansionPES : public PLMD::CLTool {
 public:
-  std::string description() const {return "dynamics of one atom on energy landscape";}
+  std::string description() const {return "MD of a one particle on a linear expansion PES";}
   static void registerKeywords( Keywords& keys );
   explicit MD_LinearExpansionPES( const CLToolOptions& co );
   int main( FILE* in, FILE* out, PLMD::Communicator& pc);
@@ -77,7 +77,7 @@ private:
   double calc_temp( const std::vector<Vector>& );
 };
 
-PLUMED_REGISTER_CLTOOL(MD_LinearExpansionPES,"md_linearexpansion")
+PLUMED_REGISTER_CLTOOL(MD_LinearExpansionPES,"ves_md_linearexpansion")
 
 void MD_LinearExpansionPES::registerKeywords( Keywords& keys ) {
   CLTool::registerKeywords( keys );
