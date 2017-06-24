@@ -1,5 +1,0 @@
-plumed_modules=ves
-mpiprocs=2
-type=plumed
-arg="md_linearexpansion input"
-

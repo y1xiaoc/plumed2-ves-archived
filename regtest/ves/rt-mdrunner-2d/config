@@ -1,4 +1,0 @@
-plumed_modules=ves
-type=plumed
-arg="md_linearexpansion input"
-
