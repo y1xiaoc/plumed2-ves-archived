@@ -63,11 +63,11 @@ plumed md_linearexpansion input
 */
 //+ENDPLUMEDOC
 
-class MDRunner_LinearExpansion : public PLMD::CLTool {
+class MD_LinearExpansionPES : public PLMD::CLTool {
 public:
   std::string description() const {return "dynamics of one atom on energy landscape";}
   static void registerKeywords( Keywords& keys );
-  explicit MDRunner_LinearExpansion( const CLToolOptions& co );
+  explicit MD_LinearExpansionPES( const CLToolOptions& co );
   int main( FILE* in, FILE* out, PLMD::Communicator& pc);
 private:
   unsigned int dim;
@@ -77,9 +77,9 @@ private:
   double calc_temp( const std::vector<Vector>& );
 };
 
-PLUMED_REGISTER_CLTOOL(MDRunner_LinearExpansion,"md_linearexpansion")
+PLUMED_REGISTER_CLTOOL(MD_LinearExpansionPES,"md_linearexpansion")
 
-void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ) {
+void MD_LinearExpansionPES::registerKeywords( Keywords& keys ) {
   CLTool::registerKeywords( keys );
   keys.add("compulsory","nstep","10","The number of steps of dynamics you want to run.");
   keys.add("compulsory","tstep","0.005","The integration timestep.");
@@ -104,7 +104,7 @@ void MDRunner_LinearExpansion::registerKeywords( Keywords& keys ) {
 }
 
 
-MDRunner_LinearExpansion::MDRunner_LinearExpansion( const CLToolOptions& co ):
+MD_LinearExpansionPES::MD_LinearExpansionPES( const CLToolOptions& co ):
   CLTool(co),
   dim(0),
   potential_expansion_pntr(NULL)
@@ -113,7 +113,7 @@ MDRunner_LinearExpansion::MDRunner_LinearExpansion( const CLToolOptions& co ):
 }
 
 inline
-double MDRunner_LinearExpansion::calc_energy( const std::vector<Vector>& pos, std::vector<Vector>& forces) {
+double MD_LinearExpansionPES::calc_energy( const std::vector<Vector>& pos, std::vector<Vector>& forces) {
   std::vector<double> pos_tmp(dim);
   std::vector<double> forces_tmp(dim,0.0);
   for(unsigned int j=0; j<dim; ++j) {
@@ -129,7 +129,7 @@ double MDRunner_LinearExpansion::calc_energy( const std::vector<Vector>& pos, st
 
 
 inline
-double MDRunner_LinearExpansion::calc_temp( const std::vector<Vector>& vel) {
+double MD_LinearExpansionPES::calc_temp( const std::vector<Vector>& vel) {
   double total_KE=0.0;
   //! Double the total kinetic energy of the system
   for(unsigned int j=0; j<dim; ++j) {
@@ -138,7 +138,7 @@ double MDRunner_LinearExpansion::calc_temp( const std::vector<Vector>& vel) {
   return total_KE / (double) dim; // total_KE is actually 2*KE
 }
 
-int MDRunner_LinearExpansion::main( FILE* in, FILE* out, PLMD::Communicator& pc) {
+int MD_LinearExpansionPES::main( FILE* in, FILE* out, PLMD::Communicator& pc) {
   int plumedWantsToStop;
   Random random;
   unsigned int stepWrite=1000;
