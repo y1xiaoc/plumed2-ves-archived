@@ -114,7 +114,7 @@ syntax will give the exact same results as the syntax above
 TD_CUSTOM ...
  FUNCTION=exp(-(1.0/(kBT*10.0))*FE)}
  LABEL=td
-... TD_CUSTOM                  
+... TD_CUSTOM
 \endplumedfile
 
 

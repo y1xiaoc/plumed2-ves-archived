@@ -57,8 +57,8 @@ Note the difference between this target distribution and the one defined in
 as a product of distribution \f$p_{i}(\mathbf{s})\f$ which are in full dimensional
 space of the arguments used.
 
-The labels of the distributions \f$p_{i}(\mathbf{s})\f$ to be used in the 
-product combination are given in the DISTRIBUTIONS keyword. 
+The labels of the distributions \f$p_{i}(\mathbf{s})\f$ to be used in the
+product combination are given in the DISTRIBUTIONS keyword.
 
 The target distribution resulting from the product combination will be
 automatically normalized. Therefore, the product combination needs to
@@ -83,7 +83,7 @@ TD_GAUSSIAN ...
  CENTER1=-2.9 SIGMA1=1.0
  CENTER2=+2.9 SIGMA2=0.4
  LABEL=td_gauss
-... TD_GAUSSIAN 
+... TD_GAUSSIAN
 
 TD_UNIFORM ...
  MINIMA=-3.0 SIGMA_MINIMA=0.20
