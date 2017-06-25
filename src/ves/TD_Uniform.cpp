@@ -155,7 +155,7 @@ using
 \plumedfile
 TD_UNIFORM ...
  MAXIMA=+7.0
- SIGMA_MAXIMA=0.0}
+ SIGMA_MAXIMA=0.0
  LABEL=td
 ... TD_UNIFORM
 \endplumedfile

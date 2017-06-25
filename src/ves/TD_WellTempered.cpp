@@ -90,7 +90,6 @@ to do it every 100-1000 bias update iterations.
 Employ a well-tempered target distribution with a bias factor of 10
 \plumedfile
 td_welltemp: TD_WELLTEMPERED BIASFACTOR=10
-
 \endplumedfile
 
 */
