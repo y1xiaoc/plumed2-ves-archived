@@ -68,19 +68,23 @@ using the numbered CENTER keywords and the "standard deviations"
 Sum of two Von Mises distribution in one dimension that have equal weights
 as no weights are given.
 \plumedfile
-TARGET_DISTRIBUTION={TD_VONMISES
-                     CENTER1=+2.0 SIGMA1=0.6
-                     CENTER2=-2.0 SIGMA2=0.7}
+TD_VONMISES ...
+ CENTER1=+2.0 SIGMA1=0.6
+ CENTER2=-2.0 SIGMA2=0.7
+ LABEL=td
+... TD_VONMISES
 \endplumedfile
 
 Sum of two Von Mises distribution in two dimensions that have different weights.
 Note that the weights are automatically normalized to 1 such that
 specifying WEIGHTS=1.0,2.0 is equal to specifying WEIGHTS=0.33333,0.66667.
 \plumedfile
-TARGET_DISTRIBUTION={TD_VONMISES
-                     CENTER1=+2.0,+2.0 SIGMA1=0.6,0.7
-                     CENTER2=-2.0,+2.0 SIGMA2=0.7,0.6
-                     WEIGHTS=1.0,2.0}
+TD_VONMISES ...
+ CENTER1=+2.0,+2.0 SIGMA1=0.6,0.7
+ CENTER2=-2.0,+2.0 SIGMA2=0.7,0.6
+ WEIGHTS=1.0,2.0
+ LABEL=td
+... TD_VONMISES
 \endplumedfile
 
 */

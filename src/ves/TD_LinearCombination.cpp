@@ -46,17 +46,17 @@ p(\mathbf{s}) = \sum_{i} w_{i} \, p_{i}(\mathbf{s})
 \f]
 where the weights \f$w_{i}\f$ are normalized to 1, \f$\sum_{i}w_{i}=1\f$.
 
-The distributions \f$p_{i}(\mathbf{s})\f$ are given by using a separate numbered
-DISTRIBUTION keyword for each distribution. The keywords for each distribution
-should be enclosed within curly brackets.
+The labels of the distributions \f$p_{i}(\mathbf{s})\f$ to be used in the 
+linear combination are given in the DISTRIBUTIONS keyword. 
 
 The weights \f$w_{i}\f$ can be given using
 the WEIGHTS keyword. The distributions are weighted equally if no weights are given.
 
-It is assumed that all the distributions \f$p_{i}(\mathbf{s})\f$ given with the numbered
-DISTRIBUTION keywords are normalized. If that is not the case you should
+It is assumed that all the distributions \f$p_{i}(\mathbf{s})\f$ are normalized. 
+If that is not the case for some reason should you 
 normalize each distribution separately by using the NORMALIZE
-keyword within the curly brackets of each separate DISTRIBUTION keyword.
+keyword when defining them in the input file (i.e. before the 
+TD_LINEAR_COMBINATION action).
 Note that normalizing the overall
 linear combination will generally lead to different results than normalizing
 each distribution separately.
@@ -70,26 +70,28 @@ static distribution.
 Here we employ a linear combination of a uniform and a Gaussian distribution.
 No weights are given so the two distributions will be weighted equally.
 \plumedfile
-TARGET_DISTRIBUTION={TD_LINEAR_COMBINATION
-                     DISTRIBUTION1={TD_UNIFORM}
-                     DISTRIBUTION2={TD_GAUSSIAN
-                                    CENTER=-2.0
-                                    SIGMA=0.5}}
+td_uni: TD_UNIFORM
+
+td_gauss: TD_GAUSSIAN CENTER1=-2.0 SIGMA1=0.5
+
+td_comb: TD_LINEAR_COMBINATION DISTRIBUTIONS=td_uniform,td_gaussian
 \endplumedfile
 
 Here we employ a linear combination of a uniform and two Gaussian distribution.
 The weights are automatically normalized to 1 such that giving
 WEIGHTS=1.0,1.0,2.0 as we do here is equal to giving WEIGHTS=0.25,0.25,0.50.
 \plumedfile
-TARGET_DISTRIBUTION={TD_LINEAR_COMBINATION
-                     DISTRIBUTION1={TD_UNIFORM}
-                     DISTRIBUTION2={TD_GAUSSIAN
-                                    CENTER=-2.0,-2.0
-                                    SIGMA=0.5,0.3}
-                     DISTRIBUTION3={TD_GAUSSIAN
-                                    CENTER=+2.0,+2.0
-                                    SIGMA=0.3,0.5}
-                     WEIGHTS=1.0,1.0,2.0}
+td_uni: TD_UNIFORM 
+
+td_gauss1: TD_GAUSSIAN CENTER1=-2.0,-2.0 SIGMA1=0.5,0.3
+
+td_gauss2: TD_GAUSSIAN CENTER1=+2.0,+2.0 SIGMA1=0.3,0.5
+
+TD_LINEAR_COMBINATION ...
+ DISTRIBUTIONS=td_uni,td_gauss1,td_gauss2
+ WEIGHTS=1.0,1.0,2.0
+ LABEL=td_comb
+... TD_LINEAR_COMBINATION
 \endplumedfile
 
 In the above example the two Gaussians are given using two separate
@@ -99,15 +101,20 @@ Gaussians. This is shown in the following example which will give the
 exact same result as the one above as the weights have been appropriately
 adjusted
 \plumedfile
-TARGET_DISTRIBUTION={TD_LINEAR_COMBINATION
-                     DISTRIBUTION1={TD_UNIFORM}
-                     DISTRIBUTION2={TD_GAUSSIAN
-                                    CENTER1=-2.0,-2.0
-                                    SIGMA1=0.5,0.3
-                                    CENTER2=+2.0,+2.0
-                                    SIGMA2=0.3,0.5
-                                    WEIGHTS=1.0,2.0}
-                     WEIGHTS=0.25,0.75}
+td_uni: TD_UNIFORM 
+
+TD_GAUSSIAN ...
+ CENTER1=-2.0,-2.0  SIGMA1=0.5,0.3
+ CENTER2=+2.0,+2.0  SIGMA2=0.3,0.5
+ WEIGHTS=1.0,2.0
+ LABEL=td_gauss
+... TD_GAUSSIAN
+
+TD_LINEAR_COMBINATION ...
+ DISTRIBUTIONS=td_uni,td_gauss
+ WEIGHTS=0.25,0.75
+ LABEL=td_comb
+... TD_LINEAR_COMBINATION 
 \endplumedfile
 
 */

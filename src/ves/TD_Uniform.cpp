@@ -109,20 +109,20 @@ defined over an interval from 0.0 to 10.0 for the first
 argument and from 0.2 to 1.0 for the second argument are
 all of the following examples equivalent
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM}
+td: TD_UNIFORM
 \endplumedfile
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM
-                     MINIMA=0.0,0,2
-                     MAXIMA=10.0,1.0}
+TD_UNIFORM ...
+ MINIMA=0.0,0,2
+ MAXIMA=10.0,1.0
+ LABEL=td
+ ... TD_UNIFORM
 \endplumedfile
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM
-                     MAXIMA=10.0,1.0}
+td: TD_UNIFORM  MAXIMA=10.0,1.0
 \endplumedfile
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM
-                     MINIMA=0.0,0,2}
+td: TD_UNIFORM MINIMA=0.0,0,2
 \endplumedfile
 
 
@@ -132,35 +132,37 @@ we consider an interval of 0 to 10 for the target distribution.
 The following input would result in a target distribution that
 would be uniform from 2 to 7 and then smoothly go to zero.
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM
-                     MINIMA=2.0
-                     MAXIMA=+7.0
-                     SIGMA_MINIMA=0.5
-                     SIGMA_MAXIMA=1.0}
+TD_UNIFORM ...
+ MINIMA=2.0
+ MAXIMA=+7.0
+ SIGMA_MINIMA=0.5
+ SIGMA_MAXIMA=1.0
+ LABEL=td
+... TD_UNIFORM
 \endplumedfile
 It is also possible to employ a smooth switching function for just one
 of the boundaries as shown here where the target distribution
 would be uniform from 0 to 7.
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM
-                     MAXIMA=+7.0
-                     SIGMA_MAXIMA=1.0}
+TD_UNIFORM ...
+ MAXIMA=+7.0
+ SIGMA_MAXIMA=1.0
+ LABEL=td
+... TD_UNIFORM
 \endplumedfile
 Furthermore, it is possible to employ a sharp boundary by
 using
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM
-                     MAXIMA=+7.0
-                     SIGMA_MAXIMA=0.0}
+TD_UNIFORM ...
+ MAXIMA=+7.0
+ SIGMA_MAXIMA=0.0}
+ LABEL=td
+... TD_UNIFORM
 \endplumedfile
 or
 \plumedfile
-TARGET_DISTRIBUTION={TD_UNIFORM
-                     MAXIMA=+7.0}
+td: TD_UNIFORM MAXIMA=+7.0
 \endplumedfile
-
-
-
 
 
 */

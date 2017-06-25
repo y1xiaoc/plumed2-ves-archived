@@ -73,8 +73,7 @@ will make values outside to be taken as zero.
 Generally you only need to provide the the filename of the external grid
 file. The target distribution is then automatically normalized to 1 inside the code.
 \plumedfile
-TARGET_DISTRIBUTION={TD_GRID
-                     FILE=input-grid.data}
+td: TD_GRID FILE=input-grid.data
 \endplumedfile
 
 */

@@ -48,12 +48,12 @@ Note the difference between this target distribution and the one defined in
 \ref TD_PRODUCT_COMBINATION. Here we have a separable distribution given as a
 product of one-dimensional distribution \f$p_{k}(s_{k})\f$.
 
-The distributions \f$p_{k}(s_{k})\f$ are given by using a separate numbered
-DIST_ARG keyword for each argument. The keywords for each distribution
-should be enclosed within curly brackets.
+The labels of the one-dimensional distributions \f$p_{k}(s_{k})\f$ to be 
+used in the product distribution are given in the DISTRIBUTIONS keyword, where 
+of course the order of the labels is important.
 
-It is assumed that all the distributions given with the
-DIST_ARG keywords are normalized. If that is not the case you need to
+It is assumed that all the distributions to be used in the product distribution 
+are normalized. If that is not the case you need to
 normalize the distributions by using the NORMALIZE keyword.
 Here it does not matter if you normalize each distribution separately
 or the overall product, it will give the same results.
@@ -67,12 +67,15 @@ static distribution.
 In the following example we employ a uniform distribution for
 argument 1 and a Gaussian distribution for argument 2.
 \plumedfile
-TARGET_DISTRIBUTION={TD_PRODUCT_DISTRIBUTION
-                     DIST_ARG1={TD_UNIFORM}
-                     DIST_ARG2={TD_GAUSSIAN
-                                CENTER=-2.0
-                                SIGMA=0.5}}
+td_uni: TD_UNIFORM
+
+td_gauss: TD_GAUSSIAN CENTER=-2.0 SIGMA=0.5
+
+td_pd: TD_PRODUCT_DISTRIBUTION DISTRIBUTIONS=td_uni,td_gauss
 \endplumedfile
+Note that order of the labels is important, using DISTRIBUTIONS=td_gauss,td_uni 
+would mean that we would employ a Gaussian distribution for argument 1 and a uniform 
+distribution for argument 2, which would lead to completely different results. 
 
 */
 //+ENDPLUMEDOC
