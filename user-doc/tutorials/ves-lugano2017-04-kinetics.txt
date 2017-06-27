@@ -87,7 +87,7 @@ where \f$\lambda\f$ (inverse energy units) controls how sharply the function goe
 
 The following input updates the VES bias every 200 steps, writing out the bias every 10 iterations. To enforce the energy cutoff we also need to update the target distribution which we do every 40 iterations with the TARGETDIST_STRIDE flag.
 \verbatim
-AVERAGED_SGD ...
+OPT_AVERAGED_SGD ...
   BIAS=variational
   STRIDE=200
   LABEL=var-S
@@ -97,7 +97,7 @@ AVERAGED_SGD ...
   TARGETDIST_STRIDE=40
   TARGETDIST_OUTPUT=40
   COEFFS_OUTPUT=1
-... AVERAGED_SGD
+... OPT_AVERAGED_SGD
 \endverbatim
 
 Finally, we will stop the simulation when the transition occurs using the COMMITTOR in PLUMED
@@ -170,7 +170,7 @@ VES_LINEAR_EXPANSION ...
 
 The final line specifies the coefficients to be read from a file.
 
-Make sure to remove the lines for the stochastic optimization (AVERAGED_SGD) as we no longer wish to update the bias.
+Make sure to remove the lines for the stochastic optimization (OPT_AVERAGED_SGD) as we no longer wish to update the bias.
 
 We will also perform metadynamics with an infrequent deposition stride to ensure that the trajectory does not get stuck in any regions where the bias potential is not fully converged The following implements metadynamics on both CV1 and CV2 with a deposition stride of 4000 steps and a hill height of 0.15 eV.
 

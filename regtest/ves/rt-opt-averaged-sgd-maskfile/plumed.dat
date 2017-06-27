@@ -16,7 +16,7 @@ VES_LINEAR_EXPANSION ...
 #       This is only for testing!
 #
 
-AVERAGED_SGD ...
+OPT_AVERAGED_SGD ...
   BIAS=ves1
   STRIDE=1000
   LABEL=o1
@@ -29,7 +29,7 @@ AVERAGED_SGD ...
   TARGETDIST_AVERAGES_FMT=%12.6f
   MASK_FILE=mask.in.data
   OUTPUT_MASK_FILE=mask.out.data
-... AVERAGED_SGD
+... OPT_AVERAGED_SGD
 
 PRINT ...
   STRIDE=500

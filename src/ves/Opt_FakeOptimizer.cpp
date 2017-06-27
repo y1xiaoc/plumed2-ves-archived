@@ -29,7 +29,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_OPTIMIZER FAKE_OPTIMIZER
+//+PLUMEDOC VES_OPTIMIZER OPT_DUMMY
 /*
 Dummy optimizer for debugging.
 
@@ -49,7 +49,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(Opt_FakeOptimizer,"FAKE_OPTIMIZER")
+PLUMED_REGISTER_ACTION(Opt_FakeOptimizer,"OPT_DUMMY")
 
 
 void Opt_FakeOptimizer::registerKeywords(Keywords& keys) {

@@ -29,7 +29,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_OPTIMIZER ROBBINS_MONRO_SGD
+//+PLUMEDOC VES_OPTIMIZER OPT_ROBBINS_MONRO_SGD
 /*
 Robbins-Monro stochastic gradient decent.
 
@@ -48,7 +48,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(Opt_RobbinsMonroSGD,"ROBBINS_MONRO_SGD")
+PLUMED_REGISTER_ACTION(Opt_RobbinsMonroSGD,"OPT_ROBBINS_MONRO_SGD")
 
 
 void Opt_RobbinsMonroSGD::registerKeywords(Keywords& keys) {

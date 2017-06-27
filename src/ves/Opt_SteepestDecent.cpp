@@ -29,7 +29,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_OPTIMIZER_HIDDEN STEEPEST_DECENT
+//+PLUMEDOC VES_OPTIMIZER_HIDDEN OPT_STEEPEST_DECENT
 /*
 Steepest decent optimizer.
 
@@ -47,7 +47,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(Opt_SteepestDecent,"STEEPEST_DECENT")
+PLUMED_REGISTER_ACTION(Opt_SteepestDecent,"OPT_STEEPEST_DECENT")
 
 
 void Opt_SteepestDecent::registerKeywords(Keywords& keys) {

@@ -32,7 +32,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_OPTIMIZER AVERAGED_SGD
+//+PLUMEDOC VES_OPTIMIZER OPT_AVERAGED_SGD
 /*
 Averaged stochastic gradient decent with fixed step size.
 
@@ -95,7 +95,7 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(Opt_BachAveragedSGD,"AVERAGED_SGD")
+PLUMED_REGISTER_ACTION(Opt_BachAveragedSGD,"OPT_AVERAGED_SGD")
 
 
 void Opt_BachAveragedSGD::registerKeywords(Keywords& keys) {
