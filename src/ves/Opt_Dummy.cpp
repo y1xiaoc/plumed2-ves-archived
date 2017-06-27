@@ -40,19 +40,19 @@ Dummy optimizer for debugging.
 
 
 
-class Opt_FakeOptimizer : public Optimizer {
+class Opt_Dummy : public Optimizer {
 
 public:
   static void registerKeywords(Keywords&);
-  explicit Opt_FakeOptimizer(const ActionOptions&);
+  explicit Opt_Dummy(const ActionOptions&);
   void coeffsUpdate(const unsigned int c_id = 0);
 };
 
 
-PLUMED_REGISTER_ACTION(Opt_FakeOptimizer,"OPT_DUMMY")
+PLUMED_REGISTER_ACTION(Opt_Dummy,"OPT_DUMMY")
 
 
-void Opt_FakeOptimizer::registerKeywords(Keywords& keys) {
+void Opt_Dummy::registerKeywords(Keywords& keys) {
   Optimizer::registerKeywords(keys);
   //
   Optimizer::useMultipleWalkersKeywords(keys);
@@ -61,7 +61,7 @@ void Opt_FakeOptimizer::registerKeywords(Keywords& keys) {
 }
 
 
-Opt_FakeOptimizer::Opt_FakeOptimizer(const ActionOptions&ao):
+Opt_Dummy::Opt_Dummy(const ActionOptions&ao):
   PLUMED_VES_OPTIMIZER_INIT(ao)
 {
   log.printf("  fake optimizer that does not update coefficients\n");
@@ -80,7 +80,7 @@ Opt_FakeOptimizer::Opt_FakeOptimizer(const ActionOptions&ao):
 }
 
 
-void Opt_FakeOptimizer::coeffsUpdate(const unsigned int c_id) {}
+void Opt_Dummy::coeffsUpdate(const unsigned int c_id) {}
 
 
 }
