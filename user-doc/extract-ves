@@ -36,7 +36,7 @@ awk -v showHiddenActions=${ShowHiddenActions} 'BEGIN{gfile="automatic-ves/VES_GL
       sub("_HIDDEN","",$2)
     }
     #
-    if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_CLTOOLS" || $2=="VES_UTILS" || $2=="VES_BIASES" || $2=="VES_COLVAR" ){
+    if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_UTILS" || $2=="VES_BIASES" || $2=="VES_COLVAR" ){
       if(lfile!="") close(lfile)
       lfile="automatic-ves/"$2".list"
 
@@ -73,25 +73,11 @@ for file in automatic-ves/*.list ; do
   mv $file-1 $file
 done
 
-# Generate links to tutorial pages
-for file in ./tutorials-ves/*.txt ; do
+# Generate links to VES tutorial pages
+grep "ves-"  automatic/TUTORIALS.list   > automatic-ves/VES_TUTORIALS.list
 
-    link=`grep link: $file | sed -e 's/link://'`
-    describe=`grep description: $file | sed -e 's/description://'`
-
-    echo "<tr> <td> $link </td> <td> $describe </td> </tr>" >> automatic-ves/VES_TUTORIALS.list
-
-done
-
-# Generate links to websites
-for file in ./tutorials-ves/*.site; do
-
-   link=`grep link: $file | sed -e 's/link://'`
-   describe=`grep description: $file | sed -e 's/description://'`
-
-   echo "<tr> <td> $link </td> <td> $describe </td> </tr>" >> automatic-ves/VES_WEBSITES.list
-
-done
+# Generate links to VES cl tools pages
+grep "ves_"  automatic/TOOLS.list       > automatic-ves/VES_CLTOOLS.list
 
 
 # Generate all the documentation from keywords
