@@ -37,7 +37,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_BIAS VES_LINEAR_EXPANSION
+//+PLUMEDOC VES_BIASES VES_LINEAR_EXPANSION
 /*
 Linear basis set expansion bias.
 
