@@ -114,7 +114,7 @@ f_{\mathbf{l}}(\mathbf{s})
 
 The following list contains the biases available in the VES code.
 
-@VES_BIASES@
+@VES_BIAS@
 
 \page ves_basisf Basis functions
 
