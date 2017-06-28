@@ -36,7 +36,7 @@ awk -v showHiddenActions=${ShowHiddenActions} 'BEGIN{gfile="automatic-ves/VES_GL
       sub("_HIDDEN","",$2)
     }
     #
-    if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_UTILS" || $2=="VES_BIASES" || $2=="VES_COLVAR" ){
+    if( $2=="VES_BASISF" || $2=="VES_TARGETDIST" || $2=="VES_OPTIMIZER" || $2=="VES_UTILS" || $2=="VES_BIAS" || $2=="VES_COLVAR" ){
       if(lfile!="") close(lfile)
       lfile="automatic-ves/"$2".list"
 
@@ -77,7 +77,7 @@ done
 grep "ves-"  automatic/TUTORIALS.list   > automatic-ves/VES_TUTORIALS.list
 
 # Generate links to VES cl tools pages
-grep "ves_"  automatic/TOOLS.list       > automatic-ves/VES_CLTOOLS.list
+grep "ves_"  automatic/TOOLS.list       > automatic-ves/VES_TOOLS.list
 
 
 # Generate all the documentation from keywords
@@ -107,7 +107,7 @@ done
 sed -ie 's/<b> --/<b> \\c \\-\\-/g' automatic-ves/*.txt
 rm automatic-ves/*.txte
 
-for file in VES_BASISF VES_TARGETDIST VES_OPTIMIZER VES_BIASES VES_GLOSSARY VES_DICTIONARY VES_CLTOOLS VES_UTILS VES_COLVAR VES_TUTORIALS VES_WEBSITES
+for file in VES_BASISF VES_TARGETDIST VES_OPTIMIZER VES_BIAS VES_GLOSSARY VES_DICTIONARY VES_TOOLS VES_UTILS VES_COLVAR VES_TUTORIALS VES_WEBSITES
 do
   mv automatic-ves/$file.list automatic-ves/$file.1.list
   {
@@ -141,10 +141,10 @@ cat $f |
     /^ *@VES_BASISF@ *$/r automatic-ves/VES_BASISF.list
     /^ *@VES_TARGETDIST@ *$/r automatic-ves/VES_TARGETDIST.list
     /^ *@VES_OPTIMIZER@ *$/r automatic-ves/VES_OPTIMIZER.list
-    /^ *@VES_BIASES@ *$/r automatic-ves/VES_BIASES.list
+    /^ *@VES_BIAS@ *$/r automatic-ves/VES_BIAS.list
     /^ *@VES_COLVAR@ *$/r automatic-ves/VES_COLVAR.list
     /^ *@VES_UTILS@ *$/r automatic-ves/VES_UTILS.list
-    /^ *@VES_CLTOOLS@ *$/r automatic-ves/VES_CLTOOLS.list
+    /^ *@VES_TOOLS@ *$/r automatic-ves/VES_TOOLS.list
     /^ *@VES_WEBSITES@ *$/r automatic-ves/VES_WEBSITES.list
     /^ *@VES_TUTORIALS@ *$/r automatic-ves/VES_TUTORIALS.list
 " | grep -Ev '^ *@[A-Z_]*@ *$' > ${file}PP.$extension

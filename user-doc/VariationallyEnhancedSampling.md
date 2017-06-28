@@ -114,7 +114,7 @@ f_{\mathbf{l}}(\mathbf{s})
 
 The following list contains the biases available in the VES code.
 
-@VES_BIASES@
+@VES_BIAS@
 
 \page ves_basisf Basis functions
 
@@ -156,7 +156,7 @@ The following list contains various utilities available in the VES code.
 
 The following list contains the command line tools available in the VES code.
 
-@VES_CLTOOLS@
+@VES_TOOLS@
 
 
 
