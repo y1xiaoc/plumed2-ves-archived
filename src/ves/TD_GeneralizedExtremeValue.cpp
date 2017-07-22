@@ -28,7 +28,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST_HIDDEN TD_GENERALIZED_EXTREME_VALUE
+//+PLUMEDOC VES_TARGETDIST TD_GENERALIZED_EXTREME_VALUE
 /*
 Generalized extreme value distribution (static).
 

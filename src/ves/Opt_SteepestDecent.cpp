@@ -29,7 +29,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_OPTIMIZER_HIDDEN OPT_STEEPEST_DECENT
+//+PLUMEDOC VES_OPTIMIZER OPT_STEEPEST_DECENT
 /*
 Steepest decent optimizer.
 

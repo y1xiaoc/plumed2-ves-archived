@@ -35,7 +35,7 @@ namespace ves {
 
 //
 
-//+PLUMEDOC VES_COLVAR_HIDDEN S2_CONTACT_MODEL
+//+PLUMEDOC VES_COLVAR S2_CONTACT_MODEL
 /*
 NMR S2 contact model
 

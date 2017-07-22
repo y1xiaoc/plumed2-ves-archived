@@ -31,7 +31,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_OPTIMIZER_HIDDEN FES_DUMPER
+//+PLUMEDOC VES_OPTIMIZER FES_DUMPER
 /*
 Tool to output biases and FESs from coefficients.
 
