@@ -25,7 +25,6 @@ Furthermore, keywords and options might be changed without warning.
 - \subpage ves_colvar
 - \subpage ves_utils
 - \subpage ves_cltools
-- \subpage ves_glossary
 
 
 \page ves_theory Theory of VES
@@ -158,13 +157,6 @@ The following list contains the command line tools available in the VES code.
 
 @VES_CLTOOLS@
 
-
-
-\page ves_glossary VES Index of Actions
-
-The following list contains all actions available in the VES code
-
-@VES_GLOSSARY@
 
 
 \page ves_tutorials Tutorials
