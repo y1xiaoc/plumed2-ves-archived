@@ -13,7 +13,7 @@ LIST="
    FunctionsPP.md
  AnalysisPP.md
  BiasPP.md
- VariationallyEnhancedSamplingPP.md
+ VESPP.md
  CommandLineToolsPP.md
  MiscelaneousPP.md
    RegexPP.md
@@ -84,3 +84,4 @@ cd latex
 sed -i 's/pdfencoding=unicode/unicode/g' refman.tex
 make
 cp refman.pdf ../manual.pdf
+
