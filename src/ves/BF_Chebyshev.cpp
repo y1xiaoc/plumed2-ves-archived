@@ -57,7 +57,7 @@ T_{n+1}(x)  &= 2 \, x \, T_{n}(x) - T_{n-1}(x)
 \f}
 
 The first 6 polynomials are shown below
-\image html basisf-chebyshev.png
+\image html ves_basisf-chebyshev.png
 
 The Chebyshev polynomial are orthogonal over the interval \f$[-1,1]\f$
 with respect to the weight \f$\frac{1}{\sqrt{1-x^2}}\f$

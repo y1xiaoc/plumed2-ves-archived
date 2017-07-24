@@ -57,7 +57,7 @@ P_{n+1}(x)  &= \frac{2n+1}{n+1} \, x \, P_{n}(x) -  \frac{n}{n+1} \, P_{n-1}(x)
 \f}
 
 The first 6 polynomials are shown below
-\image html basisf-legendre.png
+\image html ves_basisf-legendre.png
 
 The Legendre polynomial are orthogonal over the interval \f$[-1,1]\f$
 \f[
