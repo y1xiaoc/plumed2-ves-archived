@@ -397,8 +397,7 @@ ReweightDistance. The procedure to the the reweighting and plot the results is
 similar to the ones in the cases above and therefore it is not described in
 detail. The reweighted FES is plotted in the next figure and compared to the
 FES calculated from the formula
-\f$ V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} \f$
-.
+\f$ V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} \f$.
 
 \anchor ves-school-2017-ves1-reweight
 \image html ves_lugano2017-ves1_reweight.png "Comparison of the FES estimated from the bias and p(s), and the reweighted FES"

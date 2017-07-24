@@ -188,10 +188,11 @@ Metadynamics:
 
 [Enhancing Important Fluctuations: Rare Events and Metadynamics from a Conceptual Viewpoint](https://doi.org/10.1146/annurev-physchem-040215-112229), Annu. Rev. Phys. Chem. 2016
 
-[Variational Approach to Enhanced Sampling and Free Energy Calculations](https://doi.org/10.1103/PhysRevLett.113.090601), Phys. Rev. Lett. 2014
 
 
 Variationally Enhanced Sampling:
+
+[Variational Approach to Enhanced Sampling and Free Energy Calculations](https://doi.org/10.1103/PhysRevLett.113.090601), Phys. Rev. Lett. 2014
 
 [Variationally Optimized Free-Energy Flooding for Rate Calculation](https://doi.org/10.1103/PhysRevLett.115.070601), Phys. Rev. Lett. 2015
 
@@ -203,13 +204,13 @@ Variationally Enhanced Sampling:
 
 \par Wednesday February 15
 
-\ref ves-lugano2017-metad "Tutorial 2": Biasing with metadynamics
+\ref ves_lugano2017-metad "Tutorial 2": Biasing with metadynamics
 
-\ref ves-lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling
+\ref ves_lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling
 
 \par Thursday February 16
 
-\ref ves-lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling
+\ref ves_lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling
 
 Tutorial 5: Advanced collective variables
 - \ref lugano-2 "Path CVs"
@@ -218,4 +219,4 @@ Tutorial 5: Advanced collective variables
 
 \par Friday February 17
 
-\ref ves-lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations
+\ref ves_lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations

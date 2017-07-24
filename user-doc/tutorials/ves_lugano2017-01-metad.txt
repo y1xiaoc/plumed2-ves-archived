@@ -29,8 +29,8 @@ We consider the association/dissociation of NaCl in acqueous solution.
 The dissociation barrier is expected to be around 2.5 \f$k_\mathrm{B} T\f$.
 One interesting aspect of the ion dissociation problem is that collective
 solvent motions play an important role in the transition.
-This problem has been considered in the original metadynamics paper \cite
-metad and also in reference \cite tps2 .
+This problem has been considered in the original metadynamics paper \cite metad 
+and also in reference \cite tps2 .
 We will use the potential developed in ref.\ \cite Pettitt-JCP-1986 for NaCl and TIP3P water with
 parameters corrected to be used with long-range Coulomb solvers \cite Price-JCP-2004.
 The system contains 1 Na, 1 Cl, and 106 water molecules (total 320 atoms).

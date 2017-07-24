@@ -35,7 +35,7 @@ Polynomial power basis functions.
 \attention
 __These basis functions should not be used in conventional biasing simulations__.
 Instead you should use orthogonal basis functions like Legendre or
-Chebyshev polynomials. They are only included for usage in \ref md_linearexpansion
+Chebyshev polynomials. They are only included for usage in \ref ves_md_linearexpansion
 and some special cases.
 
 Basis functions given by polynomial powers defined on a bounded interval.
@@ -60,7 +60,7 @@ f_{N}(x)    &= x^N \\
 Note that these basis functions are __not__ orthogonal. In fact the integral
 over the uniform target distribution blows up as the interval is increased.
 Therefore they should not be used in conventional biasing simulations.
-However, they can be useful for usage with \ref md_linearexpansion.
+However, they can be useful for usage with \ref ves_md_linearexpansion.
 
 \par Examples
 
