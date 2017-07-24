@@ -110,7 +110,7 @@ The result should be similar to the following plot where the distribution at
 different times has been shifted to see more clearly the difference.
 
 \anchor ves-school-2017-ves2-targetDistrib
-\image html VES2-targetDistrib.png "Evolution of the target distribution as the simulation progresses"
+\image html ves_lugano2017-ves2_targetDistrib.png "Evolution of the target distribution as the simulation progresses"
 
 
 To shed some light on the nature of the well-tempered target distribution, we
@@ -190,7 +190,7 @@ The output should be similar to the next plot where we plot the negative
 logarithm of the distributions.
 
 \anchor ves-school-2017-ves2-well-tempered
-\image html VES2-well-tempered.png "Unbiased distribution of CVs P(s) and well-tempered distribution calculated in two ways"
+\image html ves_lugano2017-ves2_well-tempered.png "Unbiased distribution of CVs P(s) and well-tempered distribution calculated in two ways"
 
 Notice that as expected both equations to calculate \f$ p_{\mathrm{WT}}(s)\f$ agree.
 Also the association barrier of \f$ 5 \: k_{\mathrm{B}} T \f$ becomes of \f$ 1 \: k_{\mathrm{B}} T
@@ -263,7 +263,7 @@ following one. The bias
 therefore converges smoothly as in one dimensional problems.
 
 \anchor ves-school-2017-ves2-2d-coeffs
-\image html VES2-2D-coeffs.png "Evolution of the largest coefficients"
+\image html ves_lugano2017-ves2_2D-coeffs.png "Evolution of the largest coefficients"
 
 The estimated FES can also be plotted to control the progress of the
 simulation. For instance in gnuplot,
@@ -280,7 +280,7 @@ There is a gnuplot script plotFes.gpi that generates the following plot for
 the FES after 10 ns of simulation:
 
 \anchor ves-school-2017-ves2-2d-fes
-\image html VES2-2D-fes.png "FES estimated from the 2D bias after 10 ns"
+\image html ves_lugano2017-ves2_2D-fes.png "FES estimated from the 2D bias after 10 ns"
 
 This FES agrees with that calculated through reweighting in the metadynamics
 tutorial.

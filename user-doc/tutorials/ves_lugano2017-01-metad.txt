@@ -36,7 +36,7 @@ parameters corrected to be used with long-range Coulomb solvers \cite Price-JCP-
 The system contains 1 Na, 1 Cl, and 106 water molecules (total 320 atoms).
 
 \anchor ves-school-2017-metad-NaCl
-\image html NaCl.png "NaCl in water"
+\image html ves_lugano2017-metad_nacl.png "NaCl in water"
 
 
 \subsection ves_lugano2017-metad-subsection-2 Perform an unbiased simulation and control the distance Na-Cl
@@ -227,7 +227,7 @@ c(t).
 \f]
 The behavior of \f$ c(t) \f$ will be studied with greater detail later.
 \anchor ves-school-2017-metad-fesEvolution
-\image html Metad-fesEvolution.png "Evolution of the estimated free energy"
+\image html ves_lugano2017-metad_fesEvolution.png "Evolution of the estimated free energy"
 
 It should be stressed that we are actually not calculating the free energy \f$ F(\mathbf{s}) \f$ but rather \f$ F(\mathbf{s})+V_{wall}(\mathbf{s}) \f$.
 For this reason for distances higher than 0.6 nm the free energy increases sharply.
@@ -243,7 +243,7 @@ plumed sum_hills --hills ../HILLS --min 0.1 --max 0.8 --bin 300 --stride 100 --n
 \endverbatim
 This plot illustrates clearly how the bias is constructed to progressively "fill" the FES.
 \anchor ves-school-2017-metad-biasEvolution
-\image html Metad-biasEvolution.png "Evolution of the bias potential"
+\image html ves_lugano2017-metad_biasEvolution.png "Evolution of the bias potential"
 
 
 
@@ -279,7 +279,7 @@ python barrier_calculation.py > barrier.txt
 and the results can be plotted using the gnuplot script plot.gpi.
 After roughly 4 ns the barrier stabilizes around 3 and 3.5 \f$k_\mathrm{B} T\f$.
 \anchor ves-school-2017-metad-barrier
-\image html Metad-barrier.png "Dissociation barrier as a function of simulation time"
+\image html ves_lugano2017-metad_barrier.png "Dissociation barrier as a function of simulation time"
 
 It is important to stress that it is only possible to calculate the free energy difference
 between two points if the system has gone back and forth
@@ -385,7 +385,7 @@ reweighting with metadynamics bias, and reweighting using both the metadynamics 
 You will find a gnuplot script plot.gpi to make this plot inside the ReweightDistance folder.
 
 \anchor ves-school-2017-metad-reweightDist
-\image html Metad-reweightDist.png "FES estimated from sum_hills, reweighting using only the metadynamics bias, and reweighting using both the metadynamics bias and the upper wall bias"
+\image html ves_lugano2017-metad_reweightDist.png "FES estimated from sum_hills, reweighting using only the metadynamics bias, and reweighting using both the metadynamics bias and the upper wall bias"
 
 We can obtain important information of the system by reweighting on 2 CVs: The
 distance Na-Cl and the coordination of Na with O.
@@ -399,7 +399,7 @@ coordination of 3, 4 or 5. The transition state is characterized by a
 coordination number of ~5.
 
 \anchor ves-school-2017-metad-reweightBoth
-\image html Metad-reweightBoth.png "Free energy as a function of distance Na-Cl and the coordination number of Na and O."
+\image html ves_lugano2017-metad_reweightBoth.png "Free energy as a function of distance Na-Cl and the coordination number of Na and O."
 
 
 \subsection ves_lugano2017-metad-subsection-6 Construct a bias potential on the coordination Na-O

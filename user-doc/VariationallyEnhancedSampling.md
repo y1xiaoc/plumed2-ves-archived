@@ -176,7 +176,7 @@ The following tutorials are available for the VES code
 
 \page ves_tutorial_lugano_2017 MARVEL-VES School February 2017
 
-\image html ves-school-2017-logo.png  width=800px
+\image html ves_lugano2017-logo.png  width=800px
 
 Tutorials from the [MARVEL School on Variationally Enhanced Sampling]
 (https://sites.google.com/site/vesschool2017/home) that was held in

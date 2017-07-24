@@ -35,7 +35,7 @@ The <a href="tutorial-resources/ves_lugano2017-kinetics.tar.gz" download="ves_lu
 \section ves_lugano2017-kinetics-Instructions Instructions
 
 \anchor stone-wales
-\image html Stone-Wales.png "Stone Wales Transformation" width=500px
+\image html ves_lugano2017-kinetics_StoneWales.png "Stone Wales Transformation" width=500px
 
 \subsection ves_lugano2017-kinetics-exercise-1A Exercise 1A. Preliminary investigation using VES
 
@@ -117,7 +117,7 @@ and plot the last few bias output files (bias.variational.iter-n.data) using gnu
 Figure \ref Figure1A shows an example bias potential after 90 iterations. Note that a cutoff of 15 eV is too large as the system transitions before the bias reaches the prescribed cutoff. From Figure \ref Figure1A we see a barrier height of approximately 7.3 eV.
 
 \anchor Figure1A
-\image html Kinetics-figure-1A.png "Figure-1A"
+\image html ves_lugano2017-kinetics_figure-1A.png "Figure-1A"
 
 
 The output also produces an movie.xyz file which can be viewed in vmd. For better visualization, first change atom id from 1 to C by typing
@@ -140,7 +140,7 @@ Plot some of the bias files (bias.variational.iter-n.data) that are printed duri
 Figure \ref Figure1B shows the bias potential after 70,80, and 90 iteration steps. Note that the bias has reached the cutoff and goes to zero at around 1 Angstrom.
 
 \anchor Figure1B
-\image html Kinetics-figure-1B.png "Figure-1B"
+\image html ves_lugano2017-kinetics_figure-1B.png "Figure-1B"
 
 \subsection ves_lugano2017-kinetics-exercise-2 Exercise 2. Using a fixed bias as a flooding potential to obtain rates
 In this exercise we will use the bias obtained above as a static umbrella potential. We will set up and run a new trajectory to measure the first passage time of escape from the well.
@@ -193,7 +193,7 @@ COMMITTOR ARG=d1 BASIN_LL1=-2.0 BASIN_UL1=-1.0
 Now run a trajectory with the fixed bias. What is the time (biased) to escape? Plot the trajectory of the approximate reaction coordinate (column 4 in the COLVAR) in gnuplot. An example is shown in Figure \ref Figure2.
 
 \anchor Figure2
-\image html Kinetics-figure-2.png "Figure-2"
+\image html ves_lugano2017-kinetics_figure-2.png "Figure-2"
 
 Also look at the metadynamics bias in the column labeled metad.bias. How does the magnitude compare to the bias from VES in column variational.bias?
 
@@ -246,7 +246,7 @@ python cdf-analyysis.py
 from the same directory where the fpt.dat file is located. The script prints both the mean first passage time of the data as well as the fit parameter \f$\tau\f$. How do these two values compare?
 
 \anchor Figure3
-\image html Kinetics-figure-3.png "Figure-3"
+\image html ves_lugano2017-kinetics_figure-3.png "Figure-3"
 
 
 Figure \ref Figure3 shows an example fit of the ECDF to the theoretical CDF for a Poisson process. To test the reliability of the fit, we can generate some data set according the theoretical CDF and perform a two-sample Kolmogorov-Smirnov (KS) test. The KS test provides the probability that the two sets of data are drawn from the same underlying distribution expressed in the so-called p-value. The null hypothesis is typically rejected for p-value < 0.05. The script cdf-analysis.py also performs the KS test and prints the p-value. What is the p-value we obtain from your dataset of transition times?

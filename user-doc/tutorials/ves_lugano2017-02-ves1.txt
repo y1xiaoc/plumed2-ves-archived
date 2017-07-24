@@ -240,7 +240,7 @@ coefficients using the gnuplot script plotCoeffs.gpi . The output should be simi
 the next figure.
 
 \anchor ves-school-2017-ves1-coeffs1
-\image html VES-coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
+\image html ves_lugano2017-ves1_coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
 
 The \f$ \boldsymbol\alpha \f$ change fast and oscillate around some mean
 value. The \f$ \bar{\boldsymbol\alpha} \f$ evolve smoothly until they stabilize
@@ -257,7 +257,7 @@ bias and therefore we will have to shift the FES ourselves to distinguish severa
 FES at different times in the same plot.
 
 \anchor ves-school-2017-ves1-fesEvolution
-\image html VES-fesEvolution1.png "Evolution of the estimated free energy"
+\image html ves_lugano2017-ves1_fesEvolution1.png "Evolution of the estimated free energy"
 
 We can also calculate the height of the barrier as we did in the metadynamics
 tutorial. The files for carrying out this task can be found in the Barrier_calculation
@@ -315,7 +315,7 @@ plot it to confirm that it is what we are looking for. There is a gnuplot script
 plotTargetDistrib.gpi that creates the following plot.
 
 \anchor ves-school-2017-ves1-targetDistrib
-\image html VES-targetDistrib.png "Target distribution for Example 2"
+\image html ves_lugano2017-ves1_targetDistrib.png "Target distribution for Example 2"
 
 As the simulation runs, it is useful to control the evolution of the
 coefficients using the gnuplot script plotCoeffs.gpi.
@@ -340,7 +340,7 @@ pl "./fes.b1.iter-10000.data" u 1:2 w l
 This plot should be similar to the next figure.
 
 \anchor ves-school-2017-ves1-fes
-\image html VES-fes.png "FES for Example 2"
+\image html ves_lugano2017-ves1_fes.png "FES for Example 2"
 
 
 Only the interval [0.23:0.7] is plotted since there is little sampling in the
@@ -384,7 +384,7 @@ The next plot shows that in fact the sampled distribution agrees with the
 target distribution.
 
 \anchor ves-school-2017-ves1-biasedDistrib
-\image html VES-biasedDistrib.png "Sampled biased distribution of the distance Na-Cl and target distribution"
+\image html ves_lugano2017-ves1_biasedDistrib.png "Sampled biased distribution of the distance Na-Cl and target distribution"
 
 Once that the coefficients are stabilized it is possible to reweight using the
 standard umbrella sampling formula \cite torrie-valleau . In this case the weight assigned to each
@@ -401,7 +401,7 @@ FES calculated from the formula
 .
 
 \anchor ves-school-2017-ves1-reweight
-\image html VES-reweight.png "Comparison of the FES estimated from the bias and p(s), and the reweighted FES"
+\image html ves_lugano2017-ves1_reweight.png "Comparison of the FES estimated from the bias and p(s), and the reweighted FES"
 
 
 The two curves do not differ much since the order of the expansion was
