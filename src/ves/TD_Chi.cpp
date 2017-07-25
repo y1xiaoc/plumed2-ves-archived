@@ -32,6 +32,26 @@ namespace ves {
 /*
 Chi distribution (static).
 
+Employ a target distribution given by a chi distribution that is defined as
+\f[
+p(s) =
+\frac
+{2^{1-\frac{k}{2}}}
+{\sigma \, \Gamma\left(\frac{k}{2}\right) }
+\, \left(\frac{s-a}{\sigma}\right)^{k-1} \, \exp\left(- \frac{1}{2} \left(\frac{s-a}{\sigma}\right)^2\right),
+\f]
+where \f$a\f$ is the minimum of the distribution that is defined on the interval \f$[a,\infty)\f$,
+the parameter \f$k\f$ (known as the "degrees of freedom") determines how far 
+the peak of the distribution is from the minimum, 
+and the parameter \f$\sigma\f$ determines the broadness of the distribution. 
+
+The minimum \f$a\f$ is given using the MINIMUM keyword, the parameter \f$k\f$ is given 
+using the KAPPA keyword, and the parameter \f$\sigma\f$ is given using the SIGMA keyword. 
+
+This target distribution action is only defined for one dimension, for multiple dimensions
+it should be used in combination with \ref TD_PRODUCT_DISTRIBUTION action. 
+
+
 \par Examples
 
 */
