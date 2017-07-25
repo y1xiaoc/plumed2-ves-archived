@@ -52,8 +52,8 @@ PLUMED_REGISTER_ACTION(TD_Exponential,"TD_EXPONENTIAL")
 
 void TD_Exponential::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","MINIMA","The minima of the exponential distribution.");
-  keys.add("compulsory","LAMBDA","The lambda parameters for the chi-squared distribution.");
+  keys.add("compulsory","MINIMUM","The minimum of the exponential distribution.");
+  keys.add("compulsory","LAMBDA","The lambda parameter for the chi-squared distribution.");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");
@@ -65,15 +65,16 @@ TD_Exponential::TD_Exponential(const ActionOptions& ao):
   minima_(0),
   lambda_(0)
 {
-  parseVector("MINIMA",minima_);
+  parseVector("MINIMUM",minima_);
   parseVector("LAMBDA",lambda_);
   for(unsigned int k=0; k<lambda_.size(); k++) {
-    if(lambda_[k] < 0.0) {plumed_merror(getName()+": the values given in LAMBDA should be postive.");}
+    if(lambda_[k] < 0.0) {plumed_merror(getName()+": the value given in LAMBDA should be postive.");}
   }
 
 
   setDimension(minima_.size());
-  if(lambda_.size()!=getDimension()) {plumed_merror(getName()+": the LAMBDA keyword does not match the given dimension in MINIMA");}
+  if(getDimension()>1) {plumed_merror(getName()+": only defined for one dimension");}
+  if(lambda_.size()!=getDimension()) {plumed_merror(getName()+": the LAMBDA keyword does not match the given dimension in MINIMUM");}
   checkRead();
 }
 
@@ -82,7 +83,7 @@ double TD_Exponential::getValue(const std::vector<double>& argument) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++) {
     double arg = (argument[k]-minima_[k])*lambda_[k];
-    if(arg<0.0) {plumed_merror(getName()+": the exponential distribution is not defined for values less that ones given in MINIMA");}
+    if(arg<0.0) {plumed_merror(getName()+": the exponential distribution is not defined for values less that ones given in MINIMUM");}
     value *= lambda_[k]*exp(-arg);
   }
   return value;

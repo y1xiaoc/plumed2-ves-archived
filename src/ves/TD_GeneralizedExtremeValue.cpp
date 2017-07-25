@@ -56,8 +56,8 @@ PLUMED_REGISTER_ACTION(TD_GeneralizedExtremeValue,"TD_GENERALIZED_EXTREME_VALUE"
 void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","CENTER","The center of the generalized extreme value distribution.");
-  keys.add("compulsory","SIGMA","The sigma (scale) parameters for the generalized extreme value distribution.");
-  keys.add("compulsory","EPSILON","The epsilon (shape) parameters for the generalized extreme value distribution.");
+  keys.add("compulsory","SIGMA","The sigma (scale) parameter for the generalized extreme value distribution.");
+  keys.add("compulsory","EPSILON","The epsilon (shape) parameter for the generalized extreme value distribution.");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");
@@ -76,12 +76,13 @@ TD_GeneralizedExtremeValue::TD_GeneralizedExtremeValue(const ActionOptions& ao):
   parseVector("EPSILON",epsilon_);
 
   setDimension(center_.size());
+  if(getDimension()>1) {plumed_merror(getName()+": only defined for one dimension");}
   if(sigma_.size()!=getDimension()) {plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
   if(epsilon_.size()!=getDimension()) {plumed_merror(getName()+": the EPSILON keyword does not match the given dimension in MINIMA");}
 
   normalization_.resize(getDimension());
   for(unsigned int k=0; k<getDimension(); k++) {
-    if(sigma_[k]<0.0) {plumed_merror(getName()+": the values given in SIGMA should be larger then 0.0");}
+    if(sigma_[k]<0.0) {plumed_merror(getName()+": the value given in SIGMA should be larger than 0.0");}
     normalization_[k] = 1.0/sigma_[k];
   }
   checkRead();
