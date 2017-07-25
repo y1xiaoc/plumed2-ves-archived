@@ -28,9 +28,9 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC VES_TARGETDIST TD_EXPONENTIAL_POWER
+//+PLUMEDOC VES_TARGETDIST TD_GENERALIZED_NORMAL
 /*
-Target distribution given by a sum of exponential power distributions (static).
+Target distribution given by a sum of generalized normal distributions (static).
 
 \par Examples
 
@@ -52,15 +52,15 @@ public:
 };
 
 
-PLUMED_REGISTER_ACTION(TD_ExponentialPower,"TD_EXPONENTIAL_POWER")
+PLUMED_REGISTER_ACTION(TD_ExponentialPower,"TD_GENERALIZED_NORMAL")
 
 
 void TD_ExponentialPower::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("numbered","CENTER","The center of each exponential power distribution.");
-  keys.add("numbered","ALPHA","The alpha parameters for each exponential power distribution.");
-  keys.add("numbered","BETA","The beta parameters for each exponential power distribution.");
-  keys.add("optional","WEIGHTS","The weights of the exponential power distribution. By default all are weighted equally.");
+  keys.add("numbered","CENTER","The center of each generalized normal distribution.");
+  keys.add("numbered","ALPHA","The alpha parameters for each generalized normal distribution.");
+  keys.add("numbered","BETA","The beta parameters for each generalized normal distribution.");
+  keys.add("optional","WEIGHTS","The weights of the generalized normal distribution. By default all are weighted equally.");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");
