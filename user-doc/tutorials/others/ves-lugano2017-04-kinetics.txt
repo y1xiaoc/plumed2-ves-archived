@@ -1,10 +1,10 @@
 /**
-\page ves_lugano2017-kinetics MARVEL-VES tutorial (Lugano Feb 2017): Kinetics
+\page ves-lugano2017-kinetics MARVEL-VES tutorial (Lugano Feb 2017): Kinetics
 
-\section ves_lugano2017-kinetics-aims Aims
+\section ves-lugano2017-kinetics-aims Aims
 The aim of this tutorial is to introduce the use of VES for obtaining kinetic information of activated processes. We will learn how to set up a biased simulation using a fixed flooding potential acting on a relevant slow degree of freedom. We can then rescale the accelerated MD time in a post-processing procedure.
 
-\section ves_lugano2017-kinetics-lo Learning Outcomes
+\section ves-lugano2017-kinetics-lo Learning Outcomes
 
 Once this tutorial is completed students will:
 
@@ -13,9 +13,9 @@ Once this tutorial is completed students will:
 - Post-process the accelerated trajectory to obtain an unbiased estimate of the transition rate
 - Compute the empirical cumulative distribution of first passage times and compare to a theoretical model.
 
-\section ves_lugano2017-kinetics-resources Resources
+\section ves-lugano2017-kinetics-resources Resources
 
-The <a href="tutorial-resources/ves_lugano2017-kinetics.tar.gz" download="ves_lugano2017-kinetics.tar.gz"> tarball </a> for this project contains the following files:
+The <a href="tutorial-resources/ves-lugano2017-kinetics.tar.gz" download="ves-lugano2017-kinetics.tar.gz"> tarball </a> for this project contains the following files:
 
 - CH.airebo : Force field parameters for LAMMPS
 - input : LAMMPS input script
@@ -26,20 +26,20 @@ The <a href="tutorial-resources/ves_lugano2017-kinetics.tar.gz" download="ves_lu
 - get-all-fpt.py : A python script to extract transition times from the trajectories
 - cdf.analysis.py : A python script to compute the cumulative probability distribution and perform KS test
 
-\section ves_lugano2017-kinetics-requirements Requirements
+\section ves-lugano2017-kinetics-requirements Requirements
 
 - python with numpy, scipy, and statsmodels
 - LAMMPS compiled with MANYBODY package
 - VMD for visualization
 
-\section ves_lugano2017-kinetics-Instructions Instructions
+\section ves-lugano2017-kinetics-Instructions Instructions
 
 \anchor stone-wales
-\image html ves_lugano2017-kinetics_StoneWales.png "Stone Wales Transformation" width=500px
+\image html ves-lugano2017-kinetics_StoneWales.png "Stone Wales Transformation" width=500px
 
-\subsection ves_lugano2017-kinetics-exercise-1A Exercise 1A. Preliminary investigation using VES
+\subsection ves-lugano2017-kinetics-exercise-1A Exercise 1A. Preliminary investigation using VES
 
-As an example of an activated process in materials science, we will work with the Stone-Wales transformation in a carbon nanotube. The  <a href="tutorial-resources/ves_lugano2017-kinetics.tar.gz" download="ves_lugano2017-kinetics.tar.gz"> tarball </a> for this project contains the inputs neccessary to run a simulation in LAMMPS for a 480 atom carbon nanotube. We use the AIREBO (Adaptive Intermolecular Reactive Empirical Bond Order) force field parameters which can approximately describe C-C bond breakage and formation at reasonable computational cost. For CVs we can use the coordination number in PLUMED to measure the number of covalent bonds among different groups of atoms. The transformation involves breaking two C-C bonds and forming two alternative C-C bonds.A definition of these CVs as well as the relevant C-C bonds are depicted in Figure \ref stone-wales. We prepare a PLUMED input file as follows.
+As an example of an activated process in materials science, we will work with the Stone-Wales transformation in a carbon nanotube. The  <a href="tutorial-resources/ves-lugano2017-kinetics.tar.gz" download="ves-lugano2017-kinetics.tar.gz"> tarball </a> for this project contains the inputs neccessary to run a simulation in LAMMPS for a 480 atom carbon nanotube. We use the AIREBO (Adaptive Intermolecular Reactive Empirical Bond Order) force field parameters which can approximately describe C-C bond breakage and formation at reasonable computational cost. For CVs we can use the coordination number in PLUMED to measure the number of covalent bonds among different groups of atoms. The transformation involves breaking two C-C bonds and forming two alternative C-C bonds.A definition of these CVs as well as the relevant C-C bonds are depicted in Figure \ref stone-wales. We prepare a PLUMED input file as follows.
 
 \verbatim
 # set distance units to angstrom, time to ps, and energy to eV
@@ -117,7 +117,7 @@ and plot the last few bias output files (bias.variational.iter-n.data) using gnu
 Figure \ref Figure1A shows an example bias potential after 90 iterations. Note that a cutoff of 15 eV is too large as the system transitions before the bias reaches the prescribed cutoff. From Figure \ref Figure1A we see a barrier height of approximately 7.3 eV.
 
 \anchor Figure1A
-\image html ves_lugano2017-kinetics_figure-1A.png "Figure-1A"
+\image html ves-lugano2017-kinetics_figure-1A.png "Figure-1A"
 
 
 The output also produces an movie.xyz file which can be viewed in vmd. For better visualization, first change atom id from 1 to C by typing
@@ -126,7 +126,7 @@ sed "s/^1 /C /" movie.xyz > newmovie.xyz
 \endverbatim
 Then load the newmovie.xyz into vmd and choose Graphics --> Representations and set Drawing Method to DynamicBonds. Create a second representation by clicking Create Rep and set the Drawing Method to VDW. Change the sphere scale to 0.3 and play the movie. You should observe the Stone-Wales transformation right before the end of the trajectory.
 
-\subsection ves_lugano2017-kinetics-exercise-1B Exercise 1B. Set up and run a VES bias imposing a cutoff
+\subsection ves-lugano2017-kinetics-exercise-1B Exercise 1B. Set up and run a VES bias imposing a cutoff
 In this exercise we will run a VES simulation to fill the FES only up to a certain cutoff. This will be the first step in order to obtain kinetic information from biased simulations. In the previous section, we observed that a cutoff of 15 eV is too strong for our purpose. Change the cutoff energy from 15.0 to 6.0 eV by setting
 
 \verbatim
@@ -140,9 +140,9 @@ Plot some of the bias files (bias.variational.iter-n.data) that are printed duri
 Figure \ref Figure1B shows the bias potential after 70,80, and 90 iteration steps. Note that the bias has reached the cutoff and goes to zero at around 1 Angstrom.
 
 \anchor Figure1B
-\image html ves_lugano2017-kinetics_figure-1B.png "Figure-1B"
+\image html ves-lugano2017-kinetics_figure-1B.png "Figure-1B"
 
-\subsection ves_lugano2017-kinetics-exercise-2 Exercise 2. Using a fixed bias as a flooding potential to obtain rates
+\subsection ves-lugano2017-kinetics-exercise-2 Exercise 2. Using a fixed bias as a flooding potential to obtain rates
 In this exercise we will use the bias obtained above as a static umbrella potential. We will set up and run a new trajectory to measure the first passage time of escape from the well.
 
 We can extract the coefficients that we need from the final iteration in Exercise-1B above.
@@ -193,7 +193,7 @@ COMMITTOR ARG=d1 BASIN_LL1=-2.0 BASIN_UL1=-1.0
 Now run a trajectory with the fixed bias. What is the time (biased) to escape? Plot the trajectory of the approximate reaction coordinate (column 4 in the COLVAR) in gnuplot. An example is shown in Figure \ref Figure2.
 
 \anchor Figure2
-\image html ves_lugano2017-kinetics_figure-2.png "Figure-2"
+\image html ves-lugano2017-kinetics_figure-2.png "Figure-2"
 
 Also look at the metadynamics bias in the column labeled metad.bias. How does the magnitude compare to the bias from VES in column variational.bias?
 
@@ -205,7 +205,7 @@ velocity      all create 1700.  495920
 
 Choose a different 6 digit random number and repeat Exercise 2. How does the escape time compare to what you obtained before? Repeat the procedure several times with different velocity seeds to get a distribution of first passage times. Make sure you launch each simulation from a separate directory and keep all COLVAR files as you will need them in the next section where we will analyze the transition times.
 
-\subsection ves_lugano2017-kinetics-exercise-3 Exercise 3. Post processing to obtain unbiased estimate for the transition rate
+\subsection ves-lugano2017-kinetics-exercise-3 Exercise 3. Post processing to obtain unbiased estimate for the transition rate
 In the previous section you generated several trajectories with different first passage times. However, these times need to be re-weighted to correct for the bias potential. We can rescale the time according to the hyperdynamics formula
 
 \f[
@@ -246,7 +246,7 @@ python cdf-analyysis.py
 from the same directory where the fpt.dat file is located. The script prints both the mean first passage time of the data as well as the fit parameter \f$\tau\f$. How do these two values compare?
 
 \anchor Figure3
-\image html ves_lugano2017-kinetics_figure-3.png "Figure-3"
+\image html ves-lugano2017-kinetics_figure-3.png "Figure-3"
 
 
 Figure \ref Figure3 shows an example fit of the ECDF to the theoretical CDF for a Poisson process. To test the reliability of the fit, we can generate some data set according the theoretical CDF and perform a two-sample Kolmogorov-Smirnov (KS) test. The KS test provides the probability that the two sets of data are drawn from the same underlying distribution expressed in the so-called p-value. The null hypothesis is typically rejected for p-value < 0.05. The script cdf-analysis.py also performs the KS test and prints the p-value. What is the p-value we obtain from your dataset of transition times?
@@ -254,8 +254,8 @@ Figure \ref Figure3 shows an example fit of the ECDF to the theoretical CDF for 
 
 */
 
-link: @subpage ves_lugano2017-kinetics
+link: @subpage ves-lugano2017-kinetics
 
 description: How to obtain kinetics from biased molecular simulations using VES.
 
-additional-files: ves_lugano2017-kinetics
+additional-files: ves-lugano2017-kinetics

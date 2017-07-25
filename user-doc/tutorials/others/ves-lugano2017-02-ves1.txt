@@ -1,7 +1,7 @@
 /**
-\page ves_lugano2017-ves1 MARVEL-VES tutorial (Lugano Feb 2017): VES 1
+\page ves-lugano2017-ves1 MARVEL-VES tutorial (Lugano Feb 2017): VES 1
 
-\section ves_lugano2017-ves1-lo Learning Outcomes
+\section ves-lugano2017-ves1-lo Learning Outcomes
 
 Once this tutorial is completed students will learn to:
 
@@ -14,16 +14,16 @@ Once this tutorial is completed students will learn to:
 - Assess the convergence of the simulation.
 - Obtain biased and unbiased histograms.
 
-\section ves_lugano2017-ves1-resources Resources
+\section ves-lugano2017-ves1-resources Resources
 
-The <a href="tutorial-resources/ves_lugano2017-ves1.tar.gz"
-download="ves_lugano2017-ves1.tar.gz"> tarball </a> for this project contains
+The <a href="tutorial-resources/ves-lugano2017-ves1.tar.gz"
+download="ves-lugano2017-ves1.tar.gz"> tarball </a> for this project contains
 the following folders:
 
 - Example1 : Contains the input file for the first example.
 - Example2 : Contains the input file for the second example.
 
-\section ves_lugano2017-ves1-summary Summary of theory
+\section ves-lugano2017-ves1-summary Summary of theory
 
 Variationally enhanced sampling \cite Valsson-PRL-2014 is based on the the following functional of
 the bias potential:
@@ -79,13 +79,13 @@ The behavior of the coefficients will become clear in the examples below.
 
 
 
-\section ves_lugano2017-ves1-instructions Instructions
+\section ves-lugano2017-ves1-instructions Instructions
 
-\subsection ves_lugano2017-ves1-subsection-1 The system
+\subsection ves-lugano2017-ves1-subsection-1 The system
 
 We will consider the same system employed for the metadynamics tutorial.
 
-\subsection ves_lugano2017-ves1-subsection-2 Example 1: First VES simulation
+\subsection ves-lugano2017-ves1-subsection-2 Example 1: First VES simulation
 
 For the first VES simulation we will revisit the problem of the ion pair
 dissociation but replacing the metadynamics bias with a VES bias. The bias
@@ -240,7 +240,7 @@ coefficients using the gnuplot script plotCoeffs.gpi . The output should be simi
 the next figure.
 
 \anchor ves-school-2017-ves1-coeffs1
-\image html ves_lugano2017-ves1_coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
+\image html ves-lugano2017-ves1_coeffs1.png "Evolution of the instantaneous and averaged coefficients with simulation time"
 
 The \f$ \boldsymbol\alpha \f$ change fast and oscillate around some mean
 value. The \f$ \bar{\boldsymbol\alpha} \f$ evolve smoothly until they stabilize
@@ -257,7 +257,7 @@ bias and therefore we will have to shift the FES ourselves to distinguish severa
 FES at different times in the same plot.
 
 \anchor ves-school-2017-ves1-fesEvolution
-\image html ves_lugano2017-ves1_fesEvolution1.png "Evolution of the estimated free energy"
+\image html ves-lugano2017-ves1_fesEvolution1.png "Evolution of the estimated free energy"
 
 We can also calculate the height of the barrier as we did in the metadynamics
 tutorial. The files for carrying out this task can be found in the Barrier_calculation
@@ -265,7 +265,7 @@ folder. Remember that the accuracy of this calculation is limited by the fact
 that we have chosen a small order in the basis set expansion. We will discuss
 this aspect in greater detail in the next example.
 
-\subsection ves_lugano2017-ves1-subsection-3 Example 2: Target distributions and basis sets
+\subsection ves-lugano2017-ves1-subsection-3 Example 2: Target distributions and basis sets
 
 In this example we will consider other choices of target distributions and we
 will understand the influence of the order of the basis set expansion. The
@@ -315,7 +315,7 @@ plot it to confirm that it is what we are looking for. There is a gnuplot script
 plotTargetDistrib.gpi that creates the following plot.
 
 \anchor ves-school-2017-ves1-targetDistrib
-\image html ves_lugano2017-ves1_targetDistrib.png "Target distribution for Example 2"
+\image html ves-lugano2017-ves1_targetDistrib.png "Target distribution for Example 2"
 
 As the simulation runs, it is useful to control the evolution of the
 coefficients using the gnuplot script plotCoeffs.gpi.
@@ -340,7 +340,7 @@ pl "./fes.b1.iter-10000.data" u 1:2 w l
 This plot should be similar to the next figure.
 
 \anchor ves-school-2017-ves1-fes
-\image html ves_lugano2017-ves1_fes.png "FES for Example 2"
+\image html ves-lugano2017-ves1_fes.png "FES for Example 2"
 
 
 Only the interval [0.23:0.7] is plotted since there is little sampling in the
@@ -384,7 +384,7 @@ The next plot shows that in fact the sampled distribution agrees with the
 target distribution.
 
 \anchor ves-school-2017-ves1-biasedDistrib
-\image html ves_lugano2017-ves1_biasedDistrib.png "Sampled biased distribution of the distance Na-Cl and target distribution"
+\image html ves-lugano2017-ves1_biasedDistrib.png "Sampled biased distribution of the distance Na-Cl and target distribution"
 
 Once that the coefficients are stabilized it is possible to reweight using the
 standard umbrella sampling formula \cite torrie-valleau . In this case the weight assigned to each
@@ -400,14 +400,14 @@ FES calculated from the formula
 \f$ V(\mathbf{s}) = -F(\mathbf{s})-{\frac {1}{\beta}} \log {p(\mathbf{s})} \f$.
 
 \anchor ves-school-2017-ves1-reweight
-\image html ves_lugano2017-ves1_reweight.png "Comparison of the FES estimated from the bias and p(s), and the reweighted FES"
+\image html ves-lugano2017-ves1_reweight.png "Comparison of the FES estimated from the bias and p(s), and the reweighted FES"
 
 
 The two curves do not differ much since the order of the expansion was
 relatively large. What happens if you chose a lower or higher order in the expansion?
 
 
-\subsection ves_lugano2017-ves1-subsection-4 Restarting a simulation
+\subsection ves-lugano2017-ves1-subsection-4 Restarting a simulation
 
 In this section we will restart the simulation that we have performed in our
 second example. In directory Example2, cd to the folder Restart. To restart
@@ -442,7 +442,7 @@ that the starting time of the new simulation is the ending time of the old
 simulation, that CV values are coherent, and that coefficients evolve
 continuously.
 
-\subsection ves_lugano2017-ves1-subsection-5 Gaussian target distribution
+\subsection ves-lugano2017-ves1-subsection-5 Gaussian target distribution
 
 As an exercise, you can use a target distribution consisting in a gaussian
 centered at the dissociation barrier. The syntax in Plumed is:
@@ -461,7 +461,7 @@ Gaussian target distributions are useful to focus the sampling on a particular
 region of CV space. This has been used in protein folding problems to focus
 the sampling on the small but relevant folded state \cite Shaffer16.
 
-\subsection ves_lugano2017-ves1-subsection-6 Optimization algorithm
+\subsection ves-lugano2017-ves1-subsection-6 Optimization algorithm
 
 We suggest an exercise to gain experience in choosing the parameters of the
 optimization algorithm. The averaged stochastic gradient descent algorithm has
@@ -477,7 +477,7 @@ CV space and coefficients oscillate wildly. When the step size is too small,
 the algorithm runs out of "steam" too fast and the simulation converges
 slowly. These two extreme cases should be avoided.
 
-\section ves_lugano2017-ves1-final Final remarks
+\section ves-lugano2017-ves1-final Final remarks
 
 The purpose of this first tutorial was to introduce the student to VES. At
 this point one can see that VES is a powerful and versatile enhanced sampling
@@ -490,8 +490,8 @@ distribution and the construction of biases on 2 CVs.
 
 */
 
-link: @subpage ves_lugano2017-ves1
+link: @subpage ves-lugano2017-ves1
 
 description: Introduction to VES, using different target distributions and basis sets.
 
-additional-files: ves_lugano2017-ves1
+additional-files: ves-lugano2017-ves1

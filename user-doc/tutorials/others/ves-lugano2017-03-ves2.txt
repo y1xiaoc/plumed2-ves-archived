@@ -1,23 +1,23 @@
 /**
-\page ves_lugano2017-ves2 MARVEL-VES tutorial (Lugano Feb 2017): VES 2
+\page ves-lugano2017-ves2 MARVEL-VES tutorial (Lugano Feb 2017): VES 2
 
-\section ves_lugano2017-ves2-lo Learning Outcomes
+\section ves-lugano2017-ves2-lo Learning Outcomes
 
 Once this tutorial is completed students will learn to:
 
 - Use the well-tempered target distribution and understand its usefulness
 - Construct biases in 1 and 2 dimensions.
 
-\section ves_lugano2017-ves2-resources Resources
+\section ves-lugano2017-ves2-resources Resources
 
-The <a href="tutorial-resources/ves_lugano2017-ves2.tar.gz"
-download="ves_lugano2017-ves2.tar.gz"> tarball </a> for this project contains
+The <a href="tutorial-resources/ves-lugano2017-ves2.tar.gz"
+download="ves-lugano2017-ves2.tar.gz"> tarball </a> for this project contains
 the following folders:
 
 - Example1 : Contains the input file for the the first example.
 - Example2 : Contains the input file for the the second example.
 
-\section ves_lugano2017-ves2-sumtheo Summary of theory
+\section ves-lugano2017-ves2-sumtheo Summary of theory
 
 One of the most useful target distribution is the well-tempered one.
 The well-tempered target distribution is \cite Valsson-JCTC-2015 :
@@ -59,13 +59,13 @@ when the simulation has converged. It has been shown that in some cases the
 convergence is faster using the well-tempered target distribution than using
 the uniform \f$ p(\mathbf{s}) \f$ \cite Valsson-JCTC-2015.
 
-\section ves_lugano2017-ves2-instructions Instructions
+\section ves-lugano2017-ves2-instructions Instructions
 
-\subsection ves_lugano2017-ves2-subsection-1 The system
+\subsection ves-lugano2017-ves2-subsection-1 The system
 
 We will consider the same system employed in previous tutorials.
 
-\subsection ves_lugano2017-ves2-subsection-3 Example 1: Enhancing fluctuations
+\subsection ves-lugano2017-ves2-subsection-3 Example 1: Enhancing fluctuations
 
 We consider Example 2 of the VES 1 tutorial. In that case we used a uniform
 target distribution that at some value decayed to zero. In this case we will
@@ -110,7 +110,7 @@ The result should be similar to the following plot where the distribution at
 different times has been shifted to see more clearly the difference.
 
 \anchor ves-school-2017-ves2-targetDistrib
-\image html ves_lugano2017-ves2_targetDistrib.png "Evolution of the target distribution as the simulation progresses"
+\image html ves-lugano2017-ves2_targetDistrib.png "Evolution of the target distribution as the simulation progresses"
 
 
 To shed some light on the nature of the well-tempered target distribution, we
@@ -190,7 +190,7 @@ The output should be similar to the next plot where we plot the negative
 logarithm of the distributions.
 
 \anchor ves-school-2017-ves2-well-tempered
-\image html ves_lugano2017-ves2_well-tempered.png "Unbiased distribution of CVs P(s) and well-tempered distribution calculated in two ways"
+\image html ves-lugano2017-ves2_well-tempered.png "Unbiased distribution of CVs P(s) and well-tempered distribution calculated in two ways"
 
 Notice that as expected both equations to calculate \f$ p_{\mathrm{WT}}(s)\f$ agree.
 Also the association barrier of \f$ 5 \: k_{\mathrm{B}} T \f$ becomes of \f$ 1 \: k_{\mathrm{B}} T
@@ -201,7 +201,7 @@ target distribution is employed, the biased distribution of CVs preserves
 all the features of the unbiased distribution, but barriers are lowered.
 Equivalently one may say that fluctuations are enhanced.
 
-\subsection ves_lugano2017-ves2-subsection-4 Example 2: Constructing a 2 dimensional bias
+\subsection ves-lugano2017-ves2-subsection-4 Example 2: Constructing a 2 dimensional bias
 
 In this example we will construct a 2 dimensional bias on the distance Na-Cl
 and the coodrination number of Na with respect to O.
@@ -263,7 +263,7 @@ following one. The bias
 therefore converges smoothly as in one dimensional problems.
 
 \anchor ves-school-2017-ves2-2d-coeffs
-\image html ves_lugano2017-ves2_2D-coeffs.png "Evolution of the largest coefficients"
+\image html ves-lugano2017-ves2_2D-coeffs.png "Evolution of the largest coefficients"
 
 The estimated FES can also be plotted to control the progress of the
 simulation. For instance in gnuplot,
@@ -280,7 +280,7 @@ There is a gnuplot script plotFes.gpi that generates the following plot for
 the FES after 10 ns of simulation:
 
 \anchor ves-school-2017-ves2-2d-fes
-\image html ves_lugano2017-ves2_2D-fes.png "FES estimated from the 2D bias after 10 ns"
+\image html ves-lugano2017-ves2_2D-fes.png "FES estimated from the 2D bias after 10 ns"
 
 This FES agrees with that calculated through reweighting in the metadynamics
 tutorial.
@@ -291,7 +291,7 @@ convergence time of both simulations. Discuss the reasons why the algorithm
 converges faster to the well-tempered target distribution than to the uniform
 one. Does it make sense to sample all the CV space uniformly?
 
-\section ves_lugano2017-ves2-final Final remarks
+\section ves-lugano2017-ves2-final Final remarks
 
 At this point the student has acquired experience with several
 characteristics of the VES method. There is one tool that has proven to be
@@ -301,8 +301,8 @@ This tool will be the subject of another tutorial.
 
 */
 
-link: @subpage ves_lugano2017-ves2
+link: @subpage ves-lugano2017-ves2
 
 description: VES, well-tempered target distribution and 2 dimensional biases.
 
-additional-files: ves_lugano2017-ves2
+additional-files: ves-lugano2017-ves2

@@ -168,7 +168,7 @@ The following tutorials are available for the VES code
 
 \page ves_tutorial_lugano_2017 MARVEL-VES School February 2017
 
-\image html ves_lugano2017-logo.png  width=800px
+\image html ves-lugano2017-logo.png  width=800px
 
 Tutorials from the [MARVEL School on Variationally Enhanced Sampling]
 (https://sites.google.com/site/vesschool2017/home) that was held in
@@ -196,13 +196,13 @@ Variationally Enhanced Sampling:
 
 \par Wednesday February 15
 
-\ref ves_lugano2017-metad "Tutorial 2": Biasing with metadynamics
+\ref ves-lugano2017-metad "Tutorial 2": Biasing with metadynamics
 
-\ref ves_lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling
+\ref ves-lugano2017-ves1 "Tutorial 3": Biasing with variationally enhanced sampling
 
 \par Thursday February 16
 
-\ref ves_lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling
+\ref ves-lugano2017-ves2 "Tutorial 4": Further on variationally enhanced sampling
 
 Tutorial 5: Advanced collective variables
 - \ref lugano-2 "Path CVs"
@@ -211,4 +211,4 @@ Tutorial 5: Advanced collective variables
 
 \par Friday February 17
 
-\ref ves_lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations
+\ref ves-lugano2017-kinetics "Tutorial 6": Obtaining kinetics from molecular simulations
