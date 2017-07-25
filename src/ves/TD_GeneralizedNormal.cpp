@@ -37,7 +37,7 @@ Target distribution given by a sum of generalized normal distributions (static).
 */
 //+ENDPLUMEDOC
 
-class TD_ExponentialPower: public TargetDistribution {
+class TD_GeneralizedNormal: public TargetDistribution {
   std::vector< std::vector<double> > centers_;
   std::vector< std::vector<double> > alphas_;
   std::vector< std::vector<double> > betas_;
@@ -47,15 +47,15 @@ class TD_ExponentialPower: public TargetDistribution {
   double ExponentialPowerDiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
   static void registerKeywords(Keywords&);
-  explicit TD_ExponentialPower(const ActionOptions& ao);
+  explicit TD_GeneralizedNormal(const ActionOptions& ao);
   double getValue(const std::vector<double>&) const;
 };
 
 
-PLUMED_REGISTER_ACTION(TD_ExponentialPower,"TD_GENERALIZED_NORMAL")
+PLUMED_REGISTER_ACTION(TD_GeneralizedNormal,"TD_GENERALIZED_NORMAL")
 
 
-void TD_ExponentialPower::registerKeywords(Keywords& keys) {
+void TD_GeneralizedNormal::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("numbered","CENTER","The center of each generalized normal distribution.");
   keys.add("numbered","ALPHA","The alpha parameters for each generalized normal distribution.");
@@ -67,7 +67,7 @@ void TD_ExponentialPower::registerKeywords(Keywords& keys) {
 }
 
 
-TD_ExponentialPower::TD_ExponentialPower(const ActionOptions& ao):
+TD_GeneralizedNormal::TD_GeneralizedNormal(const ActionOptions& ao):
   PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   centers_(0),
   alphas_(0),
@@ -143,7 +143,7 @@ TD_ExponentialPower::TD_ExponentialPower(const ActionOptions& ao):
 }
 
 
-double TD_ExponentialPower::getValue(const std::vector<double>& argument) const {
+double TD_GeneralizedNormal::getValue(const std::vector<double>& argument) const {
   double value=0.0;
   for(unsigned int i=0; i<ncenters_; i++) {
     value+=weights_[i]*ExponentialPowerDiagonal(argument,centers_[i],alphas_[i],betas_[i],normalization_[i]);
@@ -152,7 +152,7 @@ double TD_ExponentialPower::getValue(const std::vector<double>& argument) const 
 }
 
 
-double TD_ExponentialPower::ExponentialPowerDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& alpha, const std::vector<double>& beta, const std::vector<double>& normalization) const {
+double TD_GeneralizedNormal::ExponentialPowerDiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& alpha, const std::vector<double>& beta, const std::vector<double>& normalization) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++) {
     double arg=(std::abs(argument[k]-center[k]))/alpha[k];
