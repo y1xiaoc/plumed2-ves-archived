@@ -37,21 +37,21 @@ Employ a target distribution given by a
 that is defined as
 \f[
 p(s) =
-\frac{1}{\sigma} \, t(s)^{\varepsilon+1} \, e^{-t(s)},
+\frac{1}{\sigma} \, t(s)^{\xi+1} \, e^{-t(s)},
 \f]
 where
 \f[
 t(s) =
 \begin{cases}
-\left( 1 + \varepsilon \left( \frac{s-\mu}{\sigma} \right) \right)^{-1/\varepsilon} & \mathrm{if\ }\varepsilon \neq 0 \\
-\exp\left(- \frac{s-\mu}{\sigma} \right) & \mathrm{if\ } \varepsilon = 0
+\left( 1 + \xi \left( \frac{s-\mu}{\sigma} \right) \right)^{-1/\xi} & \mathrm{if\ }\xi \neq 0 \\
+\exp\left(- \frac{s-\mu}{\sigma} \right) & \mathrm{if\ } \xi = 0
 \end{cases},
 \f]
 and \f$\mu\f$ is the location parameter, \f$\sigma\f$ is the scale parameter,
-and \f$\varepsilon\f$ is the shape parameter.
+and \f$\xi\f$ is the shape parameter.
 
-The location parameter \f$\mu\f$ is given using the CENTER keyword, the scale parameter
-using the SIGMA keyword, and the shape parameter \f$\varepsilon\f$ using the EPSILON
+The location parameter \f$\mu\f$ is given using the LOCATION keyword, the scale parameter \f$\sigma\f$
+using the SCALE keyword, and the shape parameter \f$\xi\f$ using the SHAPE
 keyword.
 
 This target distribution action is only defined for one dimension, for multiple dimensions
@@ -64,8 +64,8 @@ it should be used in combination with \ref TD_PRODUCT_DISTRIBUTION action.
 
 class TD_GeneralizedExtremeValue: public TargetDistribution {
   std::vector<double> center_;
-  std::vector<double> sigma_;
-  std::vector<double> epsilon_;
+  std::vector<double> scale_;
+  std::vector<double> shape_;
   std::vector<double> normalization_;
   double GEVdiagonal(const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, const std::vector<double>&) const;
 public:
@@ -80,9 +80,9 @@ PLUMED_REGISTER_ACTION(TD_GeneralizedExtremeValue,"TD_GENERALIZED_EXTREME_VALUE"
 
 void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
-  keys.add("compulsory","CENTER","The center of the generalized extreme value distribution.");
-  keys.add("compulsory","SIGMA","The sigma (scale) parameter for the generalized extreme value distribution.");
-  keys.add("compulsory","EPSILON","The epsilon (shape) parameter for the generalized extreme value distribution.");
+  keys.add("compulsory","LOCATION","The location parameter of the generalized extreme value distribution.");
+  keys.add("compulsory","SCALE","The scale parameter for the generalized extreme value distribution.");
+  keys.add("compulsory","SHAPE","The shape parameter for the generalized extreme value distribution.");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");
@@ -92,47 +92,47 @@ void TD_GeneralizedExtremeValue::registerKeywords(Keywords& keys) {
 TD_GeneralizedExtremeValue::TD_GeneralizedExtremeValue(const ActionOptions& ao):
   PLUMED_VES_TARGETDISTRIBUTION_INIT(ao),
   center_(0),
-  sigma_(0),
-  epsilon_(0),
+  scale_(0),
+  shape_(0),
   normalization_(0)
 {
-  parseVector("CENTER",center_);
-  parseVector("SIGMA",sigma_);
-  parseVector("EPSILON",epsilon_);
+  parseVector("LOCATION",center_);
+  parseVector("SCALE",scale_);
+  parseVector("SHAPE",shape_);
 
   setDimension(center_.size());
   if(getDimension()>1) {plumed_merror(getName()+": only defined for one dimension");}
-  if(sigma_.size()!=getDimension()) {plumed_merror(getName()+": the SIGMA keyword does not match the given dimension in MINIMA");}
-  if(epsilon_.size()!=getDimension()) {plumed_merror(getName()+": the EPSILON keyword does not match the given dimension in MINIMA");}
+  if(scale_.size()!=getDimension()) {plumed_merror(getName()+": the SCALE keyword does not match the given dimension in MINIMA");}
+  if(shape_.size()!=getDimension()) {plumed_merror(getName()+": the SHAPE keyword does not match the given dimension in MINIMA");}
 
   normalization_.resize(getDimension());
   for(unsigned int k=0; k<getDimension(); k++) {
-    if(sigma_[k]<0.0) {plumed_merror(getName()+": the value given in SIGMA should be larger than 0.0");}
-    normalization_[k] = 1.0/sigma_[k];
+    if(scale_[k]<0.0) {plumed_merror(getName()+": the value given for the scale parameter in SCALE should be larger than 0.0");}
+    normalization_[k] = 1.0/scale_[k];
   }
   checkRead();
 }
 
 
 double TD_GeneralizedExtremeValue::getValue(const std::vector<double>& argument) const {
-  return GEVdiagonal(argument,center_,sigma_,epsilon_,normalization_);
+  return GEVdiagonal(argument,center_,scale_,shape_,normalization_);
 }
 
 
-double TD_GeneralizedExtremeValue::GEVdiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& sigma, const std::vector<double>& epsilon, const std::vector<double>& normalization) const {
+double TD_GeneralizedExtremeValue::GEVdiagonal(const std::vector<double>& argument, const std::vector<double>& center, const std::vector<double>& scale, const std::vector<double>& shape, const std::vector<double>& normalization) const {
   double value = 1.0;
   for(unsigned int k=0; k<argument.size(); k++) {
-    double arg=(argument[k]-center[k])/sigma[k];
+    double arg=(argument[k]-center[k])/scale[k];
     double tx;
-    if(epsilon_[k]!=0.0) {
-      if( epsilon_[k]>0 && argument[k] <= (center[k]-sigma[k]/epsilon[k]) ) {return 0.0;}
-      if( epsilon_[k]<0 && argument[k] > (center[k]-sigma[k]/epsilon[k]) ) {return 0.0;}
-      tx = pow( (1.0+arg*epsilon[k]), -1.0/epsilon[k] );
+    if(shape_[k]!=0.0) {
+      if( shape_[k]>0 && argument[k] <= (center[k]-scale[k]/shape[k]) ) {return 0.0;}
+      if( shape_[k]<0 && argument[k] > (center[k]-scale[k]/shape[k]) ) {return 0.0;}
+      tx = pow( (1.0+arg*shape[k]), -1.0/shape[k] );
     }
     else {
       tx = exp(-arg);
     }
-    value *= normalization[k] * pow(tx,epsilon[k]+1.0) * exp(-tx);
+    value *= normalization[k] * pow(tx,shape[k]+1.0) * exp(-tx);
   }
   return value;
 }
