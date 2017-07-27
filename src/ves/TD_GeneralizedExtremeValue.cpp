@@ -32,6 +32,31 @@ namespace ves {
 /*
 Generalized extreme value distribution (static).
 
+Employ a target distribution given by a
+[generalized extreme value distribution](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution)
+that is defined as
+\f[
+p(s) =
+\frac{1}{\sigma} \, t(s)^{\varepsilon+1} \, e^{-t(s)},
+\f]
+where
+\f[
+t(s) =
+\begin{cases}
+\left( 1 + \varepsilon \left( \frac{s-\mu}{\sigma} \right) \right)^{-1/\varepsilon} & \mathrm{if\ }\varepsilon \neq 0 \\
+\exp\left(- \frac{s-\mu}{\sigma} \right) & \mathrm{if\ } \varepsilon = 0
+\end{cases},
+\f]
+and \f$\mu\f$ is the location parameter, \f$\sigma\f$ is the scale parameter,
+and \f$\varepsilon\f$ is the shape parameter.
+
+The location parameter \f$\mu\f$ is given using the CENTER keyword, the scale parameter
+using the SIGMA keyword, and the shape parameter \f$\varepsilon\f$ using the EPSILON
+keyword.
+
+This target distribution action is only defined for one dimension, for multiple dimensions
+it should be used in combination with \ref TD_PRODUCT_DISTRIBUTION action.
+
 \par Examples
 
 */
