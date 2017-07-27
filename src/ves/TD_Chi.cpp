@@ -32,7 +32,9 @@ namespace ves {
 /*
 Chi distribution (static).
 
-Employ a target distribution given by a chi distribution that is defined as
+Employ a target distribution given by a 
+[chi distribution](https://en.wikipedia.org/wiki/Chi_distribution)
+that is defined as
 \f[
 p(s) =
 \frac
@@ -75,8 +77,8 @@ PLUMED_REGISTER_ACTION(TD_Chi,"TD_CHI")
 void TD_Chi::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMUM","The minimum of the chi distribution.");
-  keys.add("compulsory","SIGMA","The sigma parameter for the chi distribution.");
-  keys.add("compulsory","KAPPA","The kappa parameter for the chi distribution.");
+  keys.add("compulsory","SIGMA","The sigma parameter of the chi distribution.");
+  keys.add("compulsory","KAPPA","The kappa parameter of the chi distribution.");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");

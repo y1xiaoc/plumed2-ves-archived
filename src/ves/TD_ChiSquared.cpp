@@ -32,7 +32,9 @@ namespace ves {
 /*
 Chi-squared distribution (static).
 
-Employ a target distribution given by a chi-squared distribution that is defined as
+Employ a target distribution given by a 
+[chi-squared distribution](https://en.wikipedia.org/wiki/Chi-squared_distribution) 
+that is defined as
 \f[
 p(s) =
 \frac
@@ -75,8 +77,8 @@ PLUMED_REGISTER_ACTION(TD_ChiSquared,"TD_CHISQUARED")
 void TD_ChiSquared::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","MINIMUM","The minimum of the chi-squared distribution.");
-  keys.add("compulsory","SIGMA","The sigma parameter for the chi-squared distribution.");
-  keys.add("compulsory","KAPPA","The kappa parameter for the chi-squared distribution.");
+  keys.add("compulsory","SIGMA","The sigma parameter of the chi-squared distribution.");
+  keys.add("compulsory","KAPPA","The kappa parameter of the chi-squared distribution.");
   keys.use("WELLTEMPERED_FACTOR");
   keys.use("SHIFT_TO_ZERO");
   keys.use("NORMALIZE");
