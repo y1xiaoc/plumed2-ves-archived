@@ -32,7 +32,7 @@ namespace ves {
 /*
 Chi distribution (static).
 
-Employ a target distribution given by a 
+Employ a target distribution given by a
 [chi distribution](https://en.wikipedia.org/wiki/Chi_distribution)
 that is defined as
 \f[

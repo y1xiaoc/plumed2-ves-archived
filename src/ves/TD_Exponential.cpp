@@ -32,18 +32,18 @@ namespace ves {
 /*
 Exponential distribution (static).
 
-Employ a target distribution given by an 
-[exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution) 
+Employ a target distribution given by an
+[exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution)
 that is defined as
 \f[
 p(s) =
 \lambda e^{-\lambda(s-a)}
 \f]
-where \f$a\f$ is the minimum of the distribution that is defined on the interval \f$[a,\infty)\f$, 
-and \f$\lambda\f$ is the so-called rate parameter. 
+where \f$a\f$ is the minimum of the distribution that is defined on the interval \f$[a,\infty)\f$,
+and \f$\lambda\f$ is the so-called rate parameter.
 
 The minimum \f$a\f$ is given using the MINIMUM keyword, and the rate parameter \f$\lambda\f$ is given
-using the LAMBDA keyword. 
+using the LAMBDA keyword.
 
 This target distribution action is only defined for one dimension, for multiple dimensions
 it should be used in combination with \ref TD_PRODUCT_DISTRIBUTION action.

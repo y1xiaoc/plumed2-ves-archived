@@ -32,8 +32,8 @@ namespace ves {
 /*
 Chi-squared distribution (static).
 
-Employ a target distribution given by a 
-[chi-squared distribution](https://en.wikipedia.org/wiki/Chi-squared_distribution) 
+Employ a target distribution given by a
+[chi-squared distribution](https://en.wikipedia.org/wiki/Chi-squared_distribution)
 that is defined as
 \f[
 p(s) =
