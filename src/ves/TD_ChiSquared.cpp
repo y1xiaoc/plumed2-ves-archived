@@ -42,15 +42,15 @@ p(s) =
 \left(\frac{s-a}{\sigma}\right) \right),
 \f]
 where \f$a\f$ is the minimum of the distribution that is defined on the interval \f$[a,\infty)\f$,
-the parameter \f$k\f$ (known as the "degrees of freedom") determines how far 
+the parameter \f$k\f$ (known as the "degrees of freedom") determines how far
 the peak of the distribution is from the minimum,
-and the parameter \f$\sigma\f$ determines the broadness of the distribution. 
+and the parameter \f$\sigma\f$ determines the broadness of the distribution.
 
-The minimum \f$a\f$ is given using the MINIMUM keyword, the parameter \f$k\f$ is given 
-using the KAPPA keyword, and the parameter \f$\sigma\f$ is given using the SIGMA keyword. 
+The minimum \f$a\f$ is given using the MINIMUM keyword, the parameter \f$k\f$ is given
+using the KAPPA keyword, and the parameter \f$\sigma\f$ is given using the SIGMA keyword.
 
 This target distribution action is only defined for one dimension, for multiple dimensions
-it should be used in combination with \ref TD_PRODUCT_DISTRIBUTION action. 
+it should be used in combination with \ref TD_PRODUCT_DISTRIBUTION action.
 
 \par Examples
 
