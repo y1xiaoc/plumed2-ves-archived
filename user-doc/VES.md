@@ -1,4 +1,10 @@
-\page ves_main Variationally Enhanced Sampling
+\page VES VES code
+
+<!-- 
+description: PLUMED module that implements enhanced sampling methods based on Variationally Enhanced Sampling
+authors: Omar Valsson
+reference: \cite Valsson-PRL-2014
+-->
 
 The VES code is a module for PLUMED that implements enhanced sampling methods
 based on _Variationally Enhanced Sampling_ (VES) \cite Valsson-PRL-2014.

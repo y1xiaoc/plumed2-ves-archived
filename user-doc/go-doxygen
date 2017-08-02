@@ -14,6 +14,7 @@ LIST="
  AnalysisPP.md
  BiasPP.md
  AdditionalModulesPP.md
+ VESPP.md
  CommandLineToolsPP.md
  MiscelaneousPP.md
    RegexPP.md
