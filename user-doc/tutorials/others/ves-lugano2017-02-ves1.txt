@@ -459,7 +459,7 @@ VES_LINEAR_EXPANSION ...
 
 Gaussian target distributions are useful to focus the sampling on a particular
 region of CV space. This has been used in protein folding problems to focus
-the sampling on the small but relevant folded state \cite Shaffer16.
+the sampling on the small but relevant folded state \cite Shaffer-PNAS-2016.
 
 \subsection ves-lugano2017-ves1-subsection-6 Optimization algorithm
 
