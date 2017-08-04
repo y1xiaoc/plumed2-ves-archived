@@ -68,6 +68,7 @@ class S2ContactModel : public Colvar {
   double offset_c_;
   double n_i_;
   double total_prefactor_;
+  double r_globalshift_;
 
   enum ModelType {methyl,nh} modeltype_;
 
@@ -97,6 +98,7 @@ void S2ContactModel::registerKeywords( Keywords& keys ) {
   keys.add("compulsory","EXPONENT_B","the exponent, b in the equation");
   keys.add("compulsory","OFFSET_C","the offset, c in the equation");
   keys.add("compulsory","N_I"," n_i in the equation");
+  keys.add("optional","R_SHIFT","shift all distances by given amount");
 }
 
 S2ContactModel::S2ContactModel(const ActionOptions&ao):
@@ -113,6 +115,7 @@ S2ContactModel::S2ContactModel(const ActionOptions&ao):
   offset_c_(0.0),
   n_i_(0.0),
   total_prefactor_(0.0),
+  r_globalshift_(0.0),
   modeltype_(methyl)
 {
 
@@ -176,6 +179,8 @@ S2ContactModel::S2ContactModel(const ActionOptions&ao):
   parse("N_I",n_i_int);
   n_i_ = static_cast<double>(n_i_int);
   total_prefactor_ = prefactor_a_/pow(n_i_,exp_b_);
+  //
+  parse("R_SHIFT",r_globalshift_);
 
   checkRead();
 
@@ -206,10 +211,15 @@ S2ContactModel::S2ContactModel(const ActionOptions&ao):
   log.printf("  total number of distances: %u\n",nl->size());
   //
   log.printf("  using parameters");
+  log.printf(" r_eff=%f,",r_eff_);
   log.printf(" a=%f,",prefactor_a_);
   log.printf(" b=%f,",exp_b_);
   log.printf(" c=%f,",offset_c_);
-  log.printf(" n_i=%u\n",n_i_int);
+  log.printf(" n_i=%u",n_i_int);
+  if(r_globalshift_!=0.0) {
+    log.printf(", r_shift=%f",r_globalshift_);
+  }
+  log.printf("\n");
   if(pbc_) {
     log.printf("  using periodic boundary conditions\n");
   } else {
@@ -276,7 +286,7 @@ void S2ContactModel::calculate() {
       distance=delta(getPosition(i0),getPosition(i1));
     }
 
-    double exp_arg = exp(-distance.modulo()*inv_r_eff_);
+    double exp_arg = exp(-(distance.modulo()-r_globalshift_)*inv_r_eff_);
     contact_sum += exp_arg;
 
     exp_arg /= distance.modulo();
