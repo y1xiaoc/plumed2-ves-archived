@@ -161,7 +161,7 @@ The following list contains various utilities available in the VES code.
 
 The following list contains the command line tools available in the VES code.
 
-@VES_CLTOOLS@
+@VES_TOOLS@
 
 
 

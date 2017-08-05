@@ -50,7 +50,7 @@
 namespace PLMD {
 namespace ves {
 
-//+PLUMEDOC TOOLS ves_md_linearexpansion
+//+PLUMEDOC VES_TOOLS ves_md_linearexpansion
 /*
 Simple MD code for dynamics on a potential energy surface given by a linear basis set expansion.
 
