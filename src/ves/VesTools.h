@@ -42,7 +42,13 @@ public:
   static void convertDbl2Str(const double value,std::string& str);
   // copy grid values
   static void copyGridValues(Grid* grid_pntr_orig, Grid* grid_pntr_copy);
+  //
   static unsigned int getGridFileInfo(const std::string&, std::string&, std::vector<std::string>&, std::vector<std::string>&, std::vector<std::string>&, std::vector<bool>&, std::vector<unsigned int>&, bool&);
+  //
+  double getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double> p);
+private:
+  double getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double> p);
+  double getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double> p);
 };
 
 inline
