@@ -91,7 +91,7 @@ unsigned int VesTools::getGridFileInfo(const std::string& filepath, std::string&
 }
 
 
-double VesTools::getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double> p) {
+double VesTools::getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double>& p) {
   plumed_massert(grid_pntr->getDimension()==1,"The grid is of the wrong dimension, should be one-dimensional");
   plumed_massert(p.size()==1,"input value is of the wrong size");
 
@@ -111,7 +111,7 @@ double VesTools::getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const s
 }
 
 
-double VesTools::getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double> p) {
+double VesTools::getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double>& p) {
   plumed_massert(grid_pntr->getDimension()==2,"The grid is of the wrong dimension, should be two-dimensional");
   plumed_massert(p.size()==2,"input value is of the wrong size");
 
@@ -150,7 +150,7 @@ double VesTools::getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const s
 }
 
 
-double VesTools::getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double> p) {
+double VesTools::getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double>& p) {
   unsigned int dim = grid_pntr->getDimension();
   if(dim==1) {
     return getGridValueWithLinearInterpolation_1D(grid_pntr,p);
