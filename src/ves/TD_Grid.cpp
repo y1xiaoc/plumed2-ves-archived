@@ -23,6 +23,7 @@
 #include "TargetDistribution.h"
 #include "GridIntegrationWeights.h"
 #include "VesTools.h"
+#include "GridLinearInterpolation.h"
 
 #include "core/ActionRegister.h"
 #include "tools/Grid.h"
@@ -58,8 +59,9 @@ the SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero.
 
 Note that the number of grid bins used in the external grid file do not have
 to be the same as used in the bias or action where the target distribution is
-employed as the code will employ a spline interpolation to calculate
-values.
+employed as the code will employ a linear (or bilinear for two dimensions) 
+interpolation to calculate values. Currently only one or two dimensional grids 
+are supported. 
 
 It can happen that the intervals on which the target distribution is defined is
 larger than the intervals covered by the external grid file. In this case the
@@ -101,7 +103,6 @@ PLUMED_REGISTER_ACTION(TD_Grid,"TD_GRID")
 void TD_Grid::registerKeywords(Keywords& keys) {
   TargetDistribution::registerKeywords(keys);
   keys.add("compulsory","FILE","The name of the external grid file to be used as a target distribution.");
-  // keys.addFlag("NOSPLINE",false,"specifies that no spline interpolation is to be used when calculating the target distribution");
   keys.add("optional","SHIFT","Shift the grid read-in by some constant value. Due to normalization the final shift in the target distribution will generally not be the same as the value given here");
   keys.addFlag("ZERO_OUTSIDE",false,"By default the target distribution is continuous such that values outside the boundary of the external grid file are the same as at the boundary. This can be changed by using this flag which will make values outside to be taken as zero.");
   keys.addFlag("DO_NOT_NORMALIZE",false,"By default the target distribution from the external grid is always normalized inside the code. You can use this flag to disable this normalization. However, be warned that this will generally lead to the wrong behavior if the distribution from the external grid is not properly normalized to 1.");
@@ -131,9 +132,6 @@ TD_Grid::TD_Grid(const ActionOptions& ao):
     if(isTargetDistGridShiftedToZero()) {plumed_merror(getName() + ": using both SHIFT and SHIFT_TO_ZERO is not allowed.");}
   }
   parseFlag("ZERO_OUTSIDE",zero_outside_);
-  bool no_spline=false;
-  // parseFlag("NOSPLINE",no_spline);
-  bool use_spline = !no_spline;
 
   bool do_not_normalize=false;
   parseFlag("DO_NOT_NORMALIZE",do_not_normalize);
@@ -168,11 +166,10 @@ TD_Grid::TD_Grid(const ActionOptions& ao):
 
   IFile gridfile; gridfile.open(filename);
   if(has_deriv) {
-    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,use_spline,true);
+    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,true,true);
   }
   else {
-    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);
-    if(use_spline) {distGrid_->enableSpline();}
+    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);    
   }
   gridfile.close();
 
@@ -206,7 +203,7 @@ double TD_Grid::getValue(const std::vector<double>& argument) const {
       arg[k] =maxima_[k];
     }
   }
-  return distGrid_->getValue(arg)+shift_;
+  return GridLinearInterpolation::getGridValueWithLinearInterpolation(distGrid_,arg)+shift_;
 }
 
 
