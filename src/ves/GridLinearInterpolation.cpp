@@ -31,12 +31,12 @@ namespace PLMD {
 namespace ves {
   
   
-double GridLinearInterpolation::getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double>& p) {
+double GridLinearInterpolation::getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double>& arg) {
   
   plumed_massert(grid_pntr->getDimension()==1,"The grid is of the wrong dimension, should be one-dimensional");
-  plumed_massert(p.size()==1,"input value is of the wrong size");
+  plumed_massert(arg.size()==1,"input value is of the wrong size");
 
-  double x = p[0];
+  double x = arg[0];
   double grid_dx = grid_pntr->getDx()[0];
   double grid_min; Tools::convert( grid_pntr->getMin()[0], grid_min);
   std::vector<unsigned int> i0(1); i0[0] = unsigned( std::floor( (x-grid_min)/grid_dx ) );
@@ -51,9 +51,9 @@ double GridLinearInterpolation::getGridValueWithLinearInterpolation_1D(Grid* gri
 }
 
 
-double GridLinearInterpolation::getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double>& p) {
+double GridLinearInterpolation::getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double>& arg) {
   plumed_massert(grid_pntr->getDimension()==2,"The grid is of the wrong dimension, should be two-dimensional");
-  plumed_massert(p.size()==2,"input value is of the wrong size");
+  plumed_massert(arg.size()==2,"input value is of the wrong size");
 
   std::vector<double> grid_delta = grid_pntr->getDx();
   std::vector<double> grid_min(2);
@@ -65,15 +65,15 @@ double GridLinearInterpolation::getGridValueWithLinearInterpolation_2D(Grid* gri
   std::vector<unsigned int> i10(2);
   std::vector<unsigned int> i11(2);
 
-  i00[0] = i01[0] = unsigned( std::floor( (p[0]-grid_min[0])/grid_delta[0] ) );
-  i10[0] = i11[0] = unsigned( std::ceil(  (p[0]-grid_min[0])/grid_delta[0] ) );
+  i00[0] = i01[0] = unsigned( std::floor( (arg[0]-grid_min[0])/grid_delta[0] ) );
+  i10[0] = i11[0] = unsigned( std::ceil(  (arg[0]-grid_min[0])/grid_delta[0] ) );
 
-  i00[1] = i10[1] = unsigned( std::floor( (p[1]-grid_min[1])/grid_delta[0] ) );
-  i01[1] = i11[1] = unsigned( std::ceil(  (p[1]-grid_min[1])/grid_delta[0] ) );
+  i00[1] = i10[1] = unsigned( std::floor( (arg[1]-grid_min[1])/grid_delta[0] ) );
+  i01[1] = i11[1] = unsigned( std::ceil(  (arg[1]-grid_min[1])/grid_delta[0] ) );
 
   // https://en.wikipedia.org/wiki/Bilinear_interpolation
-  double x = p[0];
-  double y = p[1];
+  double x = arg[0];
+  double y = arg[1];
 
   double x0 = grid_pntr->getPoint(i00)[0];
   double x1 = grid_pntr->getPoint(i10)[0];
@@ -95,13 +95,13 @@ double GridLinearInterpolation::getGridValueWithLinearInterpolation_2D(Grid* gri
 }
 
 
-double GridLinearInterpolation::getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double>& p) {
+double GridLinearInterpolation::getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double>& arg) {
   unsigned int dim = grid_pntr->getDimension();
   if(dim==1) {
-    return getGridValueWithLinearInterpolation_1D(grid_pntr,p);
+    return getGridValueWithLinearInterpolation_1D(grid_pntr,arg);
   }
   else if(dim==2) {
-    return getGridValueWithLinearInterpolation_2D(grid_pntr,p);
+    return getGridValueWithLinearInterpolation_2D(grid_pntr,arg);
   }
   else {
     plumed_merror("GridLinearInterpolation::getGridValueWithLinearInterpolation only defined for 1D or 2D grids");

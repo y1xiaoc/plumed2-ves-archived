@@ -35,11 +35,11 @@ namespace ves {
 
 class GridLinearInterpolation {
 private:
-  static double getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double>& p);
-  static double getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double>& p);
+  static double getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double>& arg);
+  static double getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double>& arg);
   static double linearInterpolation(const double x, const double x0, const double x1, const double y0, const double y1);
 public:
-  static double getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double>& p);
+  static double getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double>& arg);
 };
 
 
