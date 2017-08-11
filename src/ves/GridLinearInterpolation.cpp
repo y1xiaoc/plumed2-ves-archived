@@ -29,10 +29,10 @@
 
 namespace PLMD {
 namespace ves {
-  
-  
+
+
 double GridLinearInterpolation::getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double>& arg) {
-  
+
   plumed_massert(grid_pntr->getDimension()==1,"The grid is of the wrong dimension, should be one-dimensional");
   plumed_massert(arg.size()==1,"input value is of the wrong size");
 
@@ -41,11 +41,11 @@ double GridLinearInterpolation::getGridValueWithLinearInterpolation_1D(Grid* gri
   double grid_min; Tools::convert( grid_pntr->getMin()[0], grid_min);
   std::vector<unsigned int> i0(1); i0[0] = unsigned( std::floor( (x-grid_min)/grid_dx ) );
   std::vector<unsigned int> i1(1); i1[0] = unsigned( std::ceil(  (x-grid_min)/grid_dx ) );
-  //  
+  //
   double x0 = grid_pntr->getPoint(i0)[0];
   double x1 = grid_pntr->getPoint(i1)[0];
   double y0 = grid_pntr->getValue(i0);
-  double y1 = grid_pntr->getValue(i1);    
+  double y1 = grid_pntr->getValue(i1);
   //
   return linearInterpolation(x,x0,x1,y0,y1);
 }
@@ -91,7 +91,7 @@ double GridLinearInterpolation::getGridValueWithLinearInterpolation_2D(Grid* gri
   // linear interpolation in y-direction
   double fxy = linearInterpolation(y,y0,y1,fx0,fx1);
   //
-  return fxy; 
+  return fxy;
 }
 
 
@@ -106,7 +106,7 @@ double GridLinearInterpolation::getGridValueWithLinearInterpolation(Grid* grid_p
   else {
     plumed_merror("GridLinearInterpolation::getGridValueWithLinearInterpolation only defined for 1D or 2D grids");
   }
-}  
+}
 
 
 
