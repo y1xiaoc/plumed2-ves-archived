@@ -25,7 +25,6 @@
 #include "tools/Grid.h"
 #include "tools/IFile.h"
 #include "tools/Exception.h"
-#include "tools/Tools.h"
 
 
 namespace PLMD {
@@ -89,80 +88,6 @@ unsigned int VesTools::getGridFileInfo(const std::string& filepath, std::string&
   ifile.close();
   return nargs;
 }
-
-
-double VesTools::getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double> p) {
-  plumed_massert(grid_pntr->getDimension()==1,"The grid is of the wrong dimension, should be one-dimensional");
-  plumed_massert(p.size()==1,"input value is of the wrong size");
-
-  double grid_dx = grid_pntr->getDx()[0];
-  double grid_min; Tools::convert( grid_pntr->getMin()[0], grid_min);
-  std::vector<unsigned int> i0(1); i0[0] = unsigned( std::floor( (p[0]-grid_min)/grid_dx ) );
-  std::vector<unsigned int> i1(1); i1[0] = unsigned( std::ceil(  (p[0]-grid_min)/grid_dx ) );
-
-  // https://en.wikipedia.org/wiki/Linear_interpolation
-  double x = p[0];
-  double x0 = grid_pntr->getPoint(i0)[0];
-  double x1 = grid_pntr->getPoint(i1)[0];
-  double y0 = grid_pntr->getValue(i0);
-  double y1 = grid_pntr->getValue(i1);
-
-  return ( y0*(x1-x)+y1*(x-x0) ) / (x1-x0);
-}
-
-
-double VesTools::getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double> p) {
-  plumed_massert(grid_pntr->getDimension()==2,"The grid is of the wrong dimension, should be two-dimensional");
-  plumed_massert(p.size()==2,"input value is of the wrong size");
-
-  std::vector<double> grid_delta = grid_pntr->getDx();
-  std::vector<double> grid_min(2);
-  Tools::convert( grid_pntr->getMin()[0], grid_min[0]);
-  Tools::convert( grid_pntr->getMin()[1], grid_min[1]);
-
-  std::vector<unsigned int> i00(2);
-  std::vector<unsigned int> i01(2);
-  std::vector<unsigned int> i10(2);
-  std::vector<unsigned int> i11(2);
-
-  i00[0] = i01[0] = unsigned( std::floor( (p[0]-grid_min[0])/grid_delta[0] ) );
-  i10[0] = i11[0] = unsigned( std::ceil(  (p[0]-grid_min[0])/grid_delta[0] ) );
-
-  i00[1] = i10[1] = unsigned( std::floor( (p[1]-grid_min[1])/grid_delta[0] ) );
-  i01[1] = i11[1] = unsigned( std::ceil(  (p[1]-grid_min[1])/grid_delta[0] ) );
-
-  // https://en.wikipedia.org/wiki/Bilinear_interpolation
-  double x = p[0];
-  double y = p[1];
-
-  double x0 = grid_pntr->getPoint(i00)[0];
-  double x1 = grid_pntr->getPoint(i10)[0];
-  double y0 = grid_pntr->getPoint(i00)[1];
-  double y1 = grid_pntr->getPoint(i11)[1];
-
-  double z00 = grid_pntr->getValue(i00);
-  double z01 = grid_pntr->getValue(i01);
-  double z10 = grid_pntr->getValue(i10);
-  double z11 = grid_pntr->getValue(i11);
-
-  double value = ( z00*(x1-x)*(y1-y) + z10*(x-x0)*(y1-y) + z01*(x1-x)*(y-y0) + z11*(x-x0)*(y-y0) ) / ( (x1-x0)*(y1-y0) );
-  return value;
-}
-
-
-double VesTools::getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double> p) {
-  unsigned int dim = grid_pntr->getDimension();
-  if(dim==1) {
-    return getGridValueWithLinearInterpolation_1D(grid_pntr,p);
-  }
-  else if(dim==2) {
-    return getGridValueWithLinearInterpolation_2D(grid_pntr,p);
-  }
-  else {
-    plumed_merror("VesTools::getGridValueWithLinearInterpolation only defined for 1D or 2D grids");
-  }
-}
-
 
 
 }
