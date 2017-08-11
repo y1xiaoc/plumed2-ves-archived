@@ -45,10 +45,10 @@ public:
   //
   static unsigned int getGridFileInfo(const std::string&, std::string&, std::vector<std::string>&, std::vector<std::string>&, std::vector<std::string>&, std::vector<bool>&, std::vector<unsigned int>&, bool&);
   //
-  static double getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double>& p);
+  static double getGridValueWithLinearInterpolation(Grid* grid_pntr, const std::vector<double> p);
 private:
-  static double getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double>& p);
-  static double getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double>& p);
+  static double getGridValueWithLinearInterpolation_1D(Grid* grid_pntr, const std::vector<double> p);
+  static double getGridValueWithLinearInterpolation_2D(Grid* grid_pntr, const std::vector<double> p);
 };
 
 inline
