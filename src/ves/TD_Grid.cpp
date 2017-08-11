@@ -59,9 +59,9 @@ the SHIFT_TO_ZERO keyword to shift the minimum of the distribution to zero.
 
 Note that the number of grid bins used in the external grid file do not have
 to be the same as used in the bias or action where the target distribution is
-employed as the code will employ a linear (or bilinear for two dimensions) 
-interpolation to calculate values. Currently only one or two dimensional grids 
-are supported. 
+employed as the code will employ a linear (or bilinear for two dimensions)
+interpolation to calculate values. Currently only one or two dimensional grids
+are supported.
 
 It can happen that the intervals on which the target distribution is defined is
 larger than the intervals covered by the external grid file. In this case the
@@ -169,7 +169,7 @@ TD_Grid::TD_Grid(const ActionOptions& ao):
     distGrid_=Grid::create(gridlabel,arguments,gridfile,false,true,true);
   }
   else {
-    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);    
+    distGrid_=Grid::create(gridlabel,arguments,gridfile,false,false,false);
   }
   gridfile.close();
 
