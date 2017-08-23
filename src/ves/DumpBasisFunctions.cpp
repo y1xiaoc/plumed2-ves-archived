@@ -24,6 +24,7 @@
 #include "TargetDistribution.h"
 
 #include "CoeffsVector.h"
+#include "VesTools.h"
 
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
@@ -79,12 +80,15 @@ void DumpBasisFunctions::registerKeywords(Keywords& keys) {
 
 DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
   Action(ao),
-  bf_pntrs(1)
+  bf_pntrs(0)
 {
-  std::string basisset_label="";
-  parse("BASIS_SET",basisset_label);
-  bf_pntrs[0]=plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisset_label);
-  plumed_massert(bf_pntrs[0]!=NULL,"basis function "+basisset_label+" does not exist. NOTE: the basis functions should always be defined BEFORE the DUMP_BASISFUNCTIONS action.");
+  std::vector<std::string> basisset_labels(0);
+  parseVector("BASIS_SET",basisset_labels);
+  if(basisset_labels.size()>1) {plumed_merror("Only one basis set label allowed in keyword BASIS_SET of "+getName());}
+
+  std::string error_msg = "";
+  bf_pntrs = VesTools::getPointersFromLabels<BasisFunctions*>(basisset_labels,plumed.getActionSet(),error_msg);
+  if(error_msg.size()>0) {plumed_merror("Error in keyword BASIS_SET of "+getName()+": "+error_msg);}
 
   unsigned int nbins = 1000;
   parse("GRID_BINS",nbins);
@@ -116,11 +120,12 @@ DumpBasisFunctions::DumpBasisFunctions(const ActionOptions&ao):
 
   std::vector<TargetDistribution*> targetdist_pntrs;
   targetdist_pntrs.push_back(NULL);
-  std::string str_ps="";
+  std::string targetdist_label="";
   for(int i=1;; i++) {
-    if(!parseNumbered("TARGET_DISTRIBUTION",i,str_ps)) {break;}
-    TargetDistribution* pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(str_ps);
-    plumed_massert(pntr_tmp!=NULL,"target distribution "+str_ps+" does not exist. NOTE: the target distribution should always be defined BEFORE the DUMP_BASISFUNCTIONS action.");
+    if(!parseNumbered("TARGET_DISTRIBUTION",i,targetdist_label)) {break;}
+    std::string error_msg = "";
+    TargetDistribution* pntr_tmp = VesTools::getPointerFromLabel<TargetDistribution*>(targetdist_label,plumed.getActionSet(),error_msg);
+    if(error_msg.size()>0) {plumed_merror("Error in keyword TARGET_DISTRIBUTION of "+getName()+": "+error_msg);}
     targetdist_pntrs.push_back(pntr_tmp);
   }
   checkRead();

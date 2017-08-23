@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "BasisFunctions.h"
+#include "VesTools.h"
 
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
@@ -96,13 +97,9 @@ BF_Combined::BF_Combined(const ActionOptions&ao):
   if(basisf_labels.size()==1) {
     plumed_merror("using only one basis function in BF_COMBINED does not make sense");
   }
-  basisf_pntrs_.assign(basisf_labels.size(),NULL);
-  for(unsigned int i=0; i<basisf_labels.size(); i++) {
-    basisf_pntrs_[i] = plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisf_labels[i]);
-    if(basisf_pntrs_[i]==NULL) {
-      plumed_merror("basis function "+basisf_labels[i]+" does not exist. NOTE: the basis functions should always be defined before BF_COMBINED.");
-    }
-  }
+  std::string error_msg = "";
+  basisf_pntrs_ = VesTools::getPointersFromLabels<BasisFunctions*>(basisf_labels,plumed.getActionSet(),error_msg);
+  if(error_msg.size()>0) {plumed_merror("Error in keyword BASIS_FUNCTIONS of "+getName()+": "+error_msg);}
 
   unsigned int nbasisf_total_ = 1;
   bool periodic = true;

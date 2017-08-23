@@ -27,6 +27,7 @@
 #include "BasisFunctions.h"
 #include "Optimizer.h"
 #include "TargetDistribution.h"
+#include "VesTools.h"
 
 #include "bias/Bias.h"
 #include "core/ActionRegister.h"
@@ -129,7 +130,7 @@ void VesLinearExpansion::registerKeywords( Keywords& keys ) {
 VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
   PLUMED_VES_VESBIAS_INIT(ao),
   nargs_(getNumberOfArguments()),
-  basisf_pntrs_(getNumberOfArguments(),NULL),
+  basisf_pntrs_(0),
   bias_expansion_pntr_(NULL),
   valueForce2_(NULL)
 {
@@ -137,11 +138,11 @@ VesLinearExpansion::VesLinearExpansion(const ActionOptions&ao):
   parseMultipleValues("BASIS_FUNCTIONS",basisf_labels,nargs_);
   checkRead();
 
-  for(unsigned int i=0; i<basisf_labels.size(); i++) {
-    basisf_pntrs_[i] = plumed.getActionSet().selectWithLabel<BasisFunctions*>(basisf_labels[i]);
-    plumed_massert(basisf_pntrs_[i]!=NULL,"basis function "+basisf_labels[i]+" does not exist. NOTE: the basis functions should always be defined BEFORE the VES bias.");
-  }
+  std::string error_msg = "";
+  basisf_pntrs_ = VesTools::getPointersFromLabels<BasisFunctions*>(basisf_labels,plumed.getActionSet(),error_msg);
+  if(error_msg.size()>0) {plumed_merror("Error in keyword BASIS_FUNCTIONS of "+getName()+": "+error_msg);}
   //
+
   std::vector<Value*> args_pntrs = getArguments();
   // check arguments and basis functions
   // this is done to avoid some issues with integration of target distribution

@@ -116,12 +116,11 @@ VesBias::VesBias(const ActionOptions&ao):
     parseVector("TARGET_DISTRIBUTIONS",targetdist_labels);
   }
 
-  targetdist_pntrs_.assign(targetdist_labels.size(),NULL);
-  for(unsigned int i=0; i<targetdist_labels.size(); i++) {
-    targetdist_pntrs_[i] = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);
-    if(targetdist_pntrs_[i]==NULL) {
-      plumed_merror(getName()+" with label "+getLabel()+":target distribution "+targetdist_labels[i]+" does not exist. The target distribution should always be defined with a specfic label before using them in a bias.");
-    }
+  std::string error_msg = "";
+  targetdist_pntrs_ = VesTools::getPointersFromLabels<TargetDistribution*>(targetdist_labels,plumed.getActionSet(),error_msg);
+  if(error_msg.size()>0) {plumed_merror("Problem with target distribution in "+getName()+": "+error_msg);}
+
+  for(unsigned int i=0; i<targetdist_pntrs_.size(); i++) {
     targetdist_pntrs_[i]->linkVesBias(this);
   }
 

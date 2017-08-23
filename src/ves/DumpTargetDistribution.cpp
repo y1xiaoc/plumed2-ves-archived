@@ -23,9 +23,9 @@
 #include "TargetDistribution.h"
 
 #include "GridIntegrationWeights.h"
+#include "VesTools.h"
 
 #include "core/ActionRegister.h"
-#include "core/ActionSet.h"
 #include "core/PlumedMain.h"
 #include "tools/File.h"
 #include "tools/Grid.h"
@@ -127,9 +127,9 @@ DumpTargetDistribution::DumpTargetDistribution(const ActionOptions&ao):
     }
   }
 
-
-  TargetDistribution* targetdist_pntr = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_label);
-  plumed_massert(targetdist_pntr!=NULL,"target distribution "+targetdist_label+" does not exist. NOTE: the target distribution should always be defined BEFORE the DUMP_TARGET_DISTRIBUTION action.");
+  std::string error_msg = "";
+  TargetDistribution* targetdist_pntr = VesTools::getPointerFromLabel<TargetDistribution*>(targetdist_label,plumed.getActionSet(),error_msg);
+  if(error_msg.size()>0) {plumed_merror("Error in keyword TARGET_DISTRIBUTION of "+getName()+": "+error_msg);}
   //
   if(targetdist_pntr->isDynamic()) {
     plumed_merror("DUMP_TARGET_DISTRIBUTION only works for static target distributions");

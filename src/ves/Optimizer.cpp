@@ -24,6 +24,7 @@
 #include "CoeffsVector.h"
 #include "CoeffsMatrix.h"
 #include "VesBias.h"
+#include "VesTools.h"
 
 #include "tools/Exception.h"
 #include "core/PlumedMain.h"
@@ -93,12 +94,11 @@ Optimizer::Optimizer(const ActionOptions&ao):
   plumed_massert(bias_labels.size()>0,"problem with BIAS keyword");
   nbiases_ = bias_labels.size();
   //
-  bias_pntrs_.resize(nbiases_);
-  //
-  for(unsigned int i=0; i<nbiases_; i++) {
-    bias_pntrs_[i]=plumed.getActionSet().selectWithLabel<VesBias*>(bias_labels[i]);
-    if(!bias_pntrs_[i]) {plumed_merror("VES bias "+bias_labels[i]+" does not exist. NOTE: the optimizer should always be defined AFTER the VES biases.");}
-    //
+  std::string error_msg = "";
+  bias_pntrs_ = VesTools::getPointersFromLabels<VesBias*>(bias_labels,plumed.getActionSet(),error_msg);
+  if(error_msg.size()>0) {plumed_merror("Error in keyword BIAS of "+getName()+": "+error_msg);}
+
+  for(unsigned int i=0; i<bias_pntrs_.size(); i++) {
     bias_pntrs_[i]->linkOptimizer(this);
     //
     std::vector<CoeffsVector*> pntrs_coeffs = bias_pntrs_[i]->getCoeffsPntrs();

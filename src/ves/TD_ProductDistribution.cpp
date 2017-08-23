@@ -21,6 +21,7 @@
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #include "TargetDistribution.h"
+#include "VesTools.h"
 
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
@@ -120,15 +121,17 @@ TD_ProductDistribution::TD_ProductDistribution(const ActionOptions& ao):
 {
   std::vector<std::string> targetdist_labels;
   parseVector("DISTRIBUTIONS",targetdist_labels);
-  for(unsigned int i=0; i<targetdist_labels.size(); i++) {
-    TargetDistribution* dist_pntr_tmp = plumed.getActionSet().selectWithLabel<TargetDistribution*>(targetdist_labels[i]);
-    plumed_massert(dist_pntr_tmp!=NULL,"target distribution "+targetdist_labels[i]+" does not exist. NOTE: the target distribution should always be defined BEFORE the " + getName() + " action.");
-    //
-    if(dist_pntr_tmp->isDynamic()) {setDynamic();}
-    if(dist_pntr_tmp->fesGridNeeded()) {setFesGridNeeded();}
-    if(dist_pntr_tmp->biasGridNeeded()) {setBiasGridNeeded();}
-    distribution_pntrs_.push_back(dist_pntr_tmp);
+
+  std::string error_msg = "";
+  distribution_pntrs_ = VesTools::getPointersFromLabels<TargetDistribution*>(targetdist_labels,plumed.getActionSet(),error_msg);
+  if(error_msg.size()>0) {plumed_merror("Error in keyword DISTRIBUTIONS of "+getName()+": "+error_msg);}
+
+  for(unsigned int i=0; i<distribution_pntrs_.size(); i++) {
+    if(distribution_pntrs_[i]->isDynamic()) {setDynamic();}
+    if(distribution_pntrs_[i]->fesGridNeeded()) {setFesGridNeeded();}
+    if(distribution_pntrs_[i]->biasGridNeeded()) {setBiasGridNeeded();}
   }
+
   ndist_ = distribution_pntrs_.size();
   grid_pntrs_.assign(ndist_,NULL);
   setDimension(ndist_);
