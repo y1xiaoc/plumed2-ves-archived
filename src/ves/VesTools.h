@@ -80,8 +80,8 @@ std::vector<std::string> VesTools::getLabelsOfAvailableActions(const ActionSet& 
 
 template<typename T>
 T VesTools::getPointerFromLabel(const std::string& action_label, const ActionSet& actionset, std::string& error_msg) {
-  std::vector<std::string> action_labels(1); 
-  action_labels[0] = action_label; 
+  std::vector<std::string> action_labels(1);
+  action_labels[0] = action_label;
   std::vector<T> action_pntrs = getPointersFromLabels<T>(action_labels,actionset,error_msg);
   return action_pntrs[0];
 }
