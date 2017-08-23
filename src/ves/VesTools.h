@@ -83,13 +83,13 @@ T VesTools::getPointerFromLabel(const std::string& action_label, const ActionSet
   T action_pntr = actionset.selectWithLabel<T>(action_label);
   error_msg = "";
   if(action_pntr==NULL) {
-    error_msg = "label "+action_label+" does not exist\n"; 
+    error_msg = "label "+action_label+" does not exist\n";
     std::vector<T> avail_action_pntrs = actionset.select<T>();
     if(avail_action_pntrs.size()>0) {
       error_msg += "             Hint! the actions defined in the input file that can be used here are: \n";
       for(unsigned int i=0; i<avail_action_pntrs.size(); i++) {
         error_msg += "             " + avail_action_pntrs[i]->getName() + " with label " + avail_action_pntrs[i]->getLabel() + "\n";
-      }    
+      }
     }
     else {
       error_msg += "             Hint! no actions defined in the input file that can be used here, they should be defined before this actions\n";
@@ -103,29 +103,29 @@ template<typename T>
 std::vector<T> VesTools::getPointersFromLabels(const std::vector<std::string>& action_labels, const ActionSet& actionset, std::string& error_msg) {
   std::vector<T> action_pntrs(action_labels.size(),NULL);
   error_msg = "";
-  std::vector<std::string> missing(0); 
+  std::vector<std::string> missing(0);
   for(unsigned int i=0; i<action_labels.size(); i++) {
     action_pntrs[i] = actionset.selectWithLabel<T>(action_labels[i]);
     if(action_pntrs[i]==NULL) {
       missing.push_back(action_labels[i]);
     }
   }
-  
-  if(missing.size()>0){ 
+
+  if(missing.size()>0) {
     if(missing.size()==1) {
-      error_msg = "label "+missing[0]+" does not exist\n"; 
+      error_msg = "label "+missing[0]+" does not exist\n";
     }
     else if(missing.size()>1) {
       std::string tmp="";
       for(unsigned int j=0; j<missing.size(); j++) {tmp +=missing[j]+" ";}
-      error_msg = "labels "+tmp+"do not exist\n"; 
+      error_msg = "labels "+tmp+"do not exist\n";
     }
     std::vector<T> avail_action_pntrs = actionset.select<T>();
     if(avail_action_pntrs.size()>0) {
       error_msg += "             Hint! the actions defined in the input file that can be used here are: \n";
       for(unsigned int i=0; i<avail_action_pntrs.size(); i++) {
         error_msg += "             " + avail_action_pntrs[i]->getName() + " with label " + avail_action_pntrs[i]->getLabel() + "\n";
-      }    
+      }
     }
     else {
       error_msg += "             Hint! no actions defined in the input file that can be used here, they should be defined before this actions\n";
