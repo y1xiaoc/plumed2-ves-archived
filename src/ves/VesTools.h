@@ -80,22 +80,10 @@ std::vector<std::string> VesTools::getLabelsOfAvailableActions(const ActionSet& 
 
 template<typename T>
 T VesTools::getPointerFromLabel(const std::string& action_label, const ActionSet& actionset, std::string& error_msg) {
-  T action_pntr = actionset.selectWithLabel<T>(action_label);
-  error_msg = "";
-  if(action_pntr==NULL) {
-    error_msg = "label "+action_label+" does not exist\n";
-    std::vector<T> avail_action_pntrs = actionset.select<T>();
-    if(avail_action_pntrs.size()>0) {
-      error_msg += "             Hint! the actions defined in the input file that can be used here are: \n";
-      for(unsigned int i=0; i<avail_action_pntrs.size(); i++) {
-        error_msg += "             " + avail_action_pntrs[i]->getName() + " with label " + avail_action_pntrs[i]->getLabel() + "\n";
-      }
-    }
-    else {
-      error_msg += "             Hint! no actions defined in the input file that can be used here, they should be defined before this actions\n";
-    }
-  }
-  return action_pntr;
+  std::vector<std::string> action_labels(1); 
+  action_labels[0] = action_label; 
+  std::vector<T> action_pntrs = getPointersFromLabels<T>(action_labels,actionset,error_msg);
+  return action_pntrs[0];
 }
 
 
@@ -110,7 +98,7 @@ std::vector<T> VesTools::getPointersFromLabels(const std::vector<std::string>& a
       missing.push_back(action_labels[i]);
     }
   }
-
+  // error handling
   if(missing.size()>0) {
     if(missing.size()==1) {
       error_msg = "label "+missing[0]+" does not exist\n";
