@@ -19,6 +19,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with ves-code.  If not, see <http://www.gnu.org/licenses/>.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#ifdef __PLUMED_HAS_MXNET
 
 #include "VesBias.h"
 #include "LinearBasisSetExpansion.h"
@@ -33,6 +34,12 @@
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
 #include "core/PlumedMain.h"
+
+#include "mxnet-cpp/MxNetCpp.h"
+#include <vector>
+#include <map>
+
+using namespace mxnet::cpp;
 
 namespace PLMD
 {
@@ -111,6 +118,7 @@ public:
   void writeTargetDistToFile();
   void writeTargetDistProjToFile();
   static void registerKeywords(Keywords &keys);
+  static Symbol createMLP(const std::vector<int> &layers);
 };
 
 PLUMED_REGISTER_ACTION(VesNeuralNetwork, "VES_NEURAL_NETWORK")
@@ -129,6 +137,29 @@ void VesNeuralNetwork::registerKeywords(Keywords &keys)
   keys.add("compulsory", "BASIS_FUNCTIONS", "the label of the basis sets that you want to use");
   keys.addOutputComponent("force2", "default", "the instantaneous value of the squared force due to this bias potential.");
 }
+
+Symbol VesNeuralNetwork::createMLP(const std::vector<int> &layers) {
+  auto s = Symbol::Variable("s");
+  // auto label = Symbol::Variable("V");
+
+  std::vector<Symbol> weights(layers.size());
+  std::vector<Symbol> biases(layers.size());
+  std::vector<Symbol> outputs(layers.size());
+
+  for (size_t i = 0; i < layers.size(); ++i) {
+    weights[i] = Symbol::Variable("w" + std::to_string(i));
+    biases[i] = Symbol::Variable("b" + std::to_string(i));
+    Symbol fc = FullyConnected(
+      i == 0? s : outputs[i-1],  // data
+      weights[i],
+      biases[i],
+      layers[i]);
+    outputs[i] = i == layers.size()-1 ? fc : Activation(fc, ActivationActType::kTanh);
+  }
+
+return outputs.back();
+}
+
 
 VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS_INIT(ao),
                                                               nargs_(getNumberOfArguments()),
@@ -203,6 +234,36 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
   addComponent("force2");
   componentIsNotPeriodic("force2");
   valueForce2_ = getPntrToComponent("force2");
+
+  const std::vector<int> layers{10, 1};
+  auto net = createMLP(layers);
+  
+  Context ctx = Context::cpu();
+  std::map<std::string, NDArray> args;
+  args["s"] = NDArray(Shape(1,nargs_), ctx);
+  // Let MXNet infer shapes other parameters such as weights
+  net.InferArgsMap(ctx, &args, args);
+
+  auto initializer = Uniform(0.01);
+  for (auto& arg : args) {
+    // arg.first is parameter name, and arg.second is the value
+    // initializer(arg.first, &arg.second);
+    arg.second = 1;
+  }
+  auto *exec = net.SimpleBind(ctx, args);
+
+  auto arg_names = net.ListArguments();
+  NDArray head_g_(Shape(1, 1), Context::cpu());
+  head_g_ = 1;
+  std::vector<NDArray> head_grad{head_g_};
+
+  exec->Forward(true);
+  exec->Backward(head_grad);
+
+  std::cout << "outputs " << exec->outputs[0] << std::endl;
+  for (size_t i = 0; i < arg_names.size();i++){
+    std::cout << arg_names[i] << " " << exec->arg_arrays[i] << " " << exec->grad_arrays[i] << std::endl;
+  }
 }
 
 VesNeuralNetwork::~VesNeuralNetwork()
@@ -347,3 +408,5 @@ void VesNeuralNetwork::writeTargetDistProjToFile()
 }
 }
 }
+
+#endif

@@ -724,6 +724,7 @@ enable_gsl
 enable_xdrfile
 enable_boost_graph
 enable_fftw
+enable_mxnet
 enable_openmp
 '
       ac_precious_vars='build_alias
@@ -1394,6 +1395,7 @@ Optional Features:
   --enable-xdrfile        enable search for xdrfile, default: yes
   --enable-boost_graph    enable search for boost graph, default: no
   --enable-fftw           enable search for fftw, default: no
+  --enable-mxnet          enable search for mxnet, default: yes
   --disable-openmp        do not use OpenMP
 
 Some influential environment variables:
@@ -2938,6 +2940,24 @@ else
   case "no" in
              (yes) fftw=true ;;
              (no)  fftw=false ;;
+  esac
+
+fi
+
+
+
+mxnet=
+# Check whether --enable-mxnet was given.
+if test "${enable_mxnet+set}" = set; then :
+  enableval=$enable_mxnet; case "${enableval}" in
+             (yes) mxnet=true ;;
+             (no)  mxnet=false ;;
+             (*)   as_fn_error $? "wrong argument to --enable-mxnet" "$LINENO" 5 ;;
+  esac
+else
+  case "yes" in
+             (yes) mxnet=true ;;
+             (no)  mxnet=false ;;
   esac
 
 fi
@@ -6697,6 +6717,76 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_fftw_execute" >&5
 $as_echo "$ac_cv_lib_fftw3_fftw_execute" >&6; }
 if test "x$ac_cv_lib_fftw3_fftw_execute" = xyes; then :
+  LIBS="-lfftw3 $LIBS" && found=ok
+fi
+
+          fi
+
+
+fi
+
+
+fi
+
+
+    if test $found == ok ; then
+      $as_echo "#define __PLUMED_HAS_FFTW 1" >>confdefs.h
+
+    else
+       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: cannot enable __PLUMED_HAS_FFTW" >&5
+$as_echo "$as_me: WARNING: cannot enable __PLUMED_HAS_FFTW" >&2;}
+    fi
+
+fi
+if test $mxnet == true ; then
+
+    found=ko
+    ac_fn_cxx_check_header_mongrel "$LINENO" "mxnet-cpp/MxNetCpp.h" "ac_cv_header_mxnet_cpp_MxNetCpp_h" "$ac_includes_default"
+if test "x$ac_cv_header_mxnet_cpp_MxNetCpp_h" = xyes; then :
+
+      ac_fn_cxx_check_func "$LINENO" "exit" "ac_cv_func_exit"
+if test "x$ac_cv_func_exit" = xyes; then :
+  found=ok
+else
+
+          if test "${libsearch}" == true ; then
+           { $as_echo "$as_me:${as_lineno-$LINENO}: checking for exit in -lfftw3" >&5
+$as_echo_n "checking for exit in -lfftw3... " >&6; }
+if ${ac_cv_lib_fftw3_exit+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfftw3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char exit ();
+int
+main ()
+{
+return exit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_fftw3_exit=yes
+else
+  ac_cv_lib_fftw3_exit=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_exit" >&5
+$as_echo "$ac_cv_lib_fftw3_exit" >&6; }
+if test "x$ac_cv_lib_fftw3_exit" = xyes; then :
   LIBS="-lfftw3 $LIBS" && found=ok
 fi
 

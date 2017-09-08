@@ -201,6 +201,7 @@ PLUMED_CONFIG_ENABLE([gsl],[gsl],[search for gsl],[yes])
 PLUMED_CONFIG_ENABLE([xdrfile],[xdrfile],[search for xdrfile],[yes])
 PLUMED_CONFIG_ENABLE([boost_graph],[boost_graph],[search for boost graph],[no])
 PLUMED_CONFIG_ENABLE([fftw],[fftw],[search for fftw],[no])
+PLUMED_CONFIG_ENABLE([mxnet],[mxnet],[search for mxnet],[yes])
 
 AC_ARG_VAR(SOEXT,[extension of dynamic libraries (so/dylib)])
 AC_ARG_VAR(STATIC_LIBS,[variables that should be linked statically directly to MD code - configure will add here -ldl if necessary ])
@@ -601,6 +602,9 @@ if test $boost_graph == true ; then
 fi
 if test $fftw == true ; then
   PLUMED_CHECK_PACKAGE([fftw3.h],[fftw_execute],[__PLUMED_HAS_FFTW],[fftw3])
+fi
+if test $mxnet == true ; then
+  PLUMED_CHECK_PACKAGE([mxnet-cpp/MxNetCpp.h],[exit],[__PLUMED_HAS_FFTW],[fftw3])
 fi
 
 # in non-debug mode, add -DNDEBUG
