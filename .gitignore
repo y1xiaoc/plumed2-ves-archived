@@ -14,7 +14,7 @@
 *.gcno
 a.out
 makefile.dep
-/Makefile.conf
+# /Makefile.conf
 /sourceme.sh
 /tmp
 /codes
