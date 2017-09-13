@@ -38,6 +38,7 @@
 #include "mxnet-cpp/MxNetCpp.h"
 #include <vector>
 #include <map>
+#include <chrono>
 
 using namespace mxnet::cpp;
 
@@ -97,9 +98,23 @@ private:
   size_t ncoeffs_;
   Value *valueForce2_;
 
+  Symbol net_;
+  std::map<std::string, NDArray> coeffs_;
+  std::map<std::string, NDArray> coeff_grads_;
+  Executor *exec_;
+  std::vector<std::string> coeff_names_;
+  std::vector<NDArray> head_grad_;
+
 public:
   explicit VesNeuralNetwork(const ActionOptions &);
   ~VesNeuralNetwork();
+
+  void updateNetInputs(std::vector<double> args);
+  void updateNetCoeffs();
+  std::vector<double> getNetCoeffGrads();
+  std::vector<double> getNetCoeffs();  
+  std::vector<double> getNetForces();  
+  
   void calculate();
   void updateTargetDistributions();
   void restartTargetDistributions();
@@ -118,7 +133,9 @@ public:
   void writeTargetDistToFile();
   void writeTargetDistProjToFile();
   static void registerKeywords(Keywords &keys);
-  static Symbol createMLP(const std::vector<int> &layers);
+  
+  static Symbol createMLP(std::vector<int> &layers);
+  static std::vector<double> NDArray2VectorD(NDArray &array);
 };
 
 PLUMED_REGISTER_ACTION(VesNeuralNetwork, "VES_NEURAL_NETWORK")
@@ -138,7 +155,7 @@ void VesNeuralNetwork::registerKeywords(Keywords &keys)
   keys.addOutputComponent("force2", "default", "the instantaneous value of the squared force due to this bias potential.");
 }
 
-Symbol VesNeuralNetwork::createMLP(const std::vector<int> &layers) {
+Symbol VesNeuralNetwork::createMLP(std::vector<int> &layers) {
   auto s = Symbol::Variable("s");
   // auto label = Symbol::Variable("V");
 
@@ -160,6 +177,66 @@ Symbol VesNeuralNetwork::createMLP(const std::vector<int> &layers) {
 return outputs.back();
 }
 
+std::vector<double> VesNeuralNetwork::NDArray2VectorD(NDArray &ndarray) {
+  // ndarray.WaitToRead();
+  return std::vector<double>(ndarray.GetData(), ndarray.GetData() + ndarray.Size());
+}
+
+void VesNeuralNetwork::updateNetInputs(std::vector<double> args) {
+  std::vector<mx_float> tmp_vec_float(args.begin(), args.end());
+  coeffs_.at("s").SyncCopyFromCPU(tmp_vec_float);
+}
+
+void VesNeuralNetwork::updateNetCoeffs() {
+  mx_float temp_float_p[ncoeffs_];
+  CoeffsVector *coeff_p = getCoeffsPntr();
+  for (size_t i = 0; i < ncoeffs_; ++i) {
+    temp_float_p[i] = (float) coeff_p[0][i];
+  }
+  size_t index = 0;
+  for (auto& coeff : coeffs_) {
+    if (coeff.first == "s") {
+      continue;
+    }
+    if (coeff.second.At(0, 0) == temp_float_p[index])
+    {
+      index += coeff.second.Size();
+      continue;
+    }
+    std::cout<< "copy "<< coeff.first << std::endl;
+    coeff.second.SyncCopyFromCPU(temp_float_p+index, coeff.second.Size());
+    index += coeff.second.Size();
+  }
+}
+
+std::vector<double> VesNeuralNetwork::getNetCoeffs() {
+  std::vector<double> coeffs;
+  for (auto& coeff : coeffs_) {
+    if (coeff.first != "s") {
+      // grads.insert(grads.back(), grad.second.GetData(), grad.second.GetData() + grad.second.Size());
+      std::copy(coeff.second.GetData(), coeff.second.GetData() + coeff.second.Size(), std::back_inserter(coeffs));
+    }
+  }
+  return coeffs;
+}
+
+std::vector<double> VesNeuralNetwork::getNetCoeffGrads() {
+  std::vector<double> grads;
+  for (auto& grad : coeff_grads_) {
+    if (grad.first != "s") {
+      // grads.insert(grads.back(), grad.second.GetData(), grad.second.GetData() + grad.second.Size());
+      std::copy(grad.second.GetData(), grad.second.GetData() + grad.second.Size(), std::back_inserter(grads));
+    }
+  }
+  return grads;
+}
+
+std::vector<double> VesNeuralNetwork::getNetForces() {
+  std::vector<double> forces;
+  NDArray &netForces = coeff_grads_.at("s");
+  std::copy(netForces.GetData(), netForces.GetData() + netForces.Size(), std::back_inserter(forces));
+  return forces;
+}
 
 VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS_INIT(ao),
                                                               nargs_(getNumberOfArguments()),
@@ -191,12 +268,11 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
       log.printf("  warning: argument %s is not periodic while the basis functions %s used for it are periodic\n",args_pntrs[i]->getName().c_str(),basisf_pntrs_[i]->getLabel().c_str());
     }
   }*/
-  std::vector<std::string> dimension_labels{"weights"};
-  std::vector<unsigned int> indices_shape{100};
+  // std::vector<std::string> dimension_labels{"weights"};
+  // std::vector<unsigned int> indices_shape{100};
   // addCoeffsSet(args_pntrs,basisf_pntrs_);
-  addCoeffsSet(dimension_labels, indices_shape);
-  ncoeffs_ = numberOfCoeffs();
-  bool coeffs_read = readCoeffsFromFiles();
+  // addCoeffsSet(dimension_labels, indices_shape);
+  // ncoeffs_ = numberOfCoeffs();
 
   checkThatTemperatureIsGiven();
   // bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),getBeta(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
@@ -217,14 +293,68 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
   //   plumed_merror("problem with the TARGET_DISTRIBUTION keyword, either give no keyword or just one keyword");
   // }
   // setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
-  std::vector<double> targetdist_averages(100, 0);
+
+  // initiallize the neural network
+
+  std::vector<int> layer_shape{10, 1};
+  net_ = createMLP(layer_shape);
+  
+  Context ctx = Context::cpu();
+  // std::map<std::string, NDArray> coeffs_;
+  coeffs_["s"] = NDArray(Shape(1,nargs_), ctx);
+  // Let MXNet infer shapes other parameters such as weights
+  net_.InferArgsMap(ctx, &coeffs_, coeffs_);
+
+  ncoeffs_ = 0;
+
+  auto initializer = Uniform(0.01);
+  for (auto& coeff : coeffs_) {
+    // coeff.first is parameter name, and coeff.second is the value
+    initializer(coeff.first, &coeff.second);
+    // coeff.second = 1;
+    coeff_grads_[coeff.first] = NDArray(coeff.second.GetShape(), ctx);
+    if (coeff.first != "s") {
+      ncoeffs_ += coeff.second.Size();
+    }
+    // std::cout << coeff.first << coeff.second << std::endl;
+  }
+
+  coeff_names_ = net_.ListArguments();
+  NDArray head_g_(Shape(1, 1), Context::cpu());
+  head_g_ = 1;
+  // std::vector<NDArray> head_grad_{head_g_};
+  head_grad_.push_back(head_g_);
+
+  exec_ = net_.SimpleBind(ctx, coeffs_, coeff_grads_);
+  exec_->Forward(true);
+  exec_->Backward(head_grad_);
+  // std::cout << "outputs " << exec_->outputs[0] << std::endl;
+  // for (size_t i = 0; i < coeff_names_.size();i++){
+  //   // std::cout << coeff_names_[i] << " " << exec_->arg_arrays[i] << " " << exec_->grad_arrays[i] << std::endl;
+  //   std::cout << coeff_names_[i] << " " << coeffs_[coeff_names_[i]] << " " << coeff_grads_[coeff_names_[i]] << std::endl;    
+  // }
+
+  std::vector<std::string> dimension_labels{"all"};
+  std::vector<unsigned int> indices_shape{ncoeffs_};
+  addCoeffsSet(dimension_labels, indices_shape);
+  std::vector<double> temp_coeffs = getNetCoeffs();
+  // for (auto i : temp_coeffs) {
+  //   std::cout << i << std::endl;
+  // }
+  // std::cout<<temp_coeffs.size()<<std::endl;
+  getCoeffsPntr()->setValues(temp_coeffs);
+
+
+
+  bool coeffs_read = readCoeffsFromFiles();
+  
+  std::vector<double> targetdist_averages(ncoeffs_, 0);
   setTargetDistAverages(targetdist_averages);
   //
   if (coeffs_read && biasCutoffActive())
   {
     updateTargetDistributions();
   }
-  //
   if (coeffs_read)
   {
     setupBiasFileOutput();
@@ -235,35 +365,6 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
   componentIsNotPeriodic("force2");
   valueForce2_ = getPntrToComponent("force2");
 
-  const std::vector<int> layers{10, 1};
-  auto net = createMLP(layers);
-  
-  Context ctx = Context::cpu();
-  std::map<std::string, NDArray> args;
-  args["s"] = NDArray(Shape(1,nargs_), ctx);
-  // Let MXNet infer shapes other parameters such as weights
-  net.InferArgsMap(ctx, &args, args);
-
-  auto initializer = Uniform(0.01);
-  for (auto& arg : args) {
-    // arg.first is parameter name, and arg.second is the value
-    // initializer(arg.first, &arg.second);
-    arg.second = 1;
-  }
-  auto *exec = net.SimpleBind(ctx, args);
-
-  auto arg_names = net.ListArguments();
-  NDArray head_g_(Shape(1, 1), Context::cpu());
-  head_g_ = 1;
-  std::vector<NDArray> head_grad{head_g_};
-
-  exec->Forward(true);
-  exec->Backward(head_grad);
-
-  std::cout << "outputs " << exec->outputs[0] << std::endl;
-  for (size_t i = 0; i < arg_names.size();i++){
-    std::cout << arg_names[i] << " " << exec->arg_arrays[i] << " " << exec->grad_arrays[i] << std::endl;
-  }
 }
 
 VesNeuralNetwork::~VesNeuralNetwork()
@@ -271,23 +372,52 @@ VesNeuralNetwork::~VesNeuralNetwork()
   // if(bias_expansion_pntr_!=NULL) {
   //   delete bias_expansion_pntr_;
   // }
+  if(exec_ != NULL) {
+    delete exec_;
+  }
 }
 
 void VesNeuralNetwork::calculate()
 {
-
+  //auto tic = std::chrono::system_clock::now();
   std::vector<double> cv_values(nargs_, 0);
-  std::vector<double> forces(nargs_, 0);
-  std::vector<double> coeffsderivs_values(ncoeffs_, 0);
 
   for (unsigned int k = 0; k < nargs_; k++)
   {
     cv_values[k] = getArgument(k);
   }
 
+  updateNetInputs(cv_values);
+  updateNetCoeffs();
+  //auto tac = std::chrono::system_clock::now();
+  exec_->Forward(true);
+  exec_->Backward(head_grad_);
   bool all_inside = true;
   // double bias = bias_expansion_pntr_->getBiasAndForces(cv_values,all_inside,forces,coeffsderivs_values);
-  double bias = 0;
+  double bias = exec_->outputs[0].At(0,0);
+  
+  std::vector<double> forces = getNetForces();
+  std::vector<double> coeffsderivs_values = getNetCoeffGrads();
+  
+
+  // for (auto i : forces) {
+  //   std::cout << i << " ";
+  // }
+  // std::cout << std::endl;
+  // for (auto i : coeffsderivs_values) {
+  //   std::cout << i << " ";
+  // }
+  // std::cout << std::endl;
+  //auto toc = std::chrono::system_clock::now();
+  //log.printf("bias: %f, tic-tac: %f, tac-toc: %f\n", bias, std::chrono::duration_cast<std::chrono::milliseconds>(tac - tic).count() / 1000.0, std::chrono::duration_cast<std::chrono::milliseconds>(toc - tac).count() / 1000.0);
+  // double bias = 0;
+
+  // std::cout << "outputs " << exec_->outputs[0] << std::endl;
+  // for (size_t i = 0; i < coeff_names_.size();i++){
+  //   // std::cout << coeff_names_[i] << " " << exec_->arg_arrays[i] << " " << exec_->grad_arrays[i] << std::endl;
+  //   std::cout << coeff_names_[i] << " " << coeffs_[coeff_names_[i]] << " " << coeff_grads_[coeff_names_[i]] << std::endl;    
+  // }
+
   if (biasCutoffActive())
   {
     applyBiasCutoff(bias, forces, coeffsderivs_values);
