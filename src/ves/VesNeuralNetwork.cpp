@@ -23,6 +23,7 @@
 
 #include "VesBias.h"
 #include "LinearBasisSetExpansion.h"
+#include "GridIntegrationWeights.h"
 #include "CoeffsVector.h"
 #include "CoeffsMatrix.h"
 #include "BasisFunctions.h"
@@ -34,6 +35,7 @@
 #include "core/ActionRegister.h"
 #include "core/ActionSet.h"
 #include "core/PlumedMain.h"
+#include "tools/Grid.h"
 
 #include "mxnet-cpp/MxNetCpp.h"
 #include <vector>
@@ -44,6 +46,7 @@ using namespace mxnet::cpp;
 
 namespace PLMD
 {
+// class Grid;
 namespace ves
 {
 
@@ -105,6 +108,9 @@ private:
   std::vector<std::string> coeff_names_;
   std::vector<NDArray> head_grad_;
 
+  Grid* targetdist_grid_pntr_;
+  TargetDistribution* targetdist_pntr_;
+
 public:
   explicit VesNeuralNetwork(const ActionOptions &);
   ~VesNeuralNetwork();
@@ -113,8 +119,9 @@ public:
   void updateNetCoeffs();
   std::vector<double> getNetCoeffGrads();
   std::vector<double> getNetCoeffs();  
-  std::vector<double> getNetForces();  
-  
+  std::vector<double> getNetForces();
+  std::vector<double> calculateTargetDistAveragesFromGrid(const Grid *);
+
   void calculate();
   void updateTargetDistributions();
   void restartTargetDistributions();
@@ -238,6 +245,40 @@ std::vector<double> VesNeuralNetwork::getNetForces() {
   return forces;
 }
 
+std::vector<double> VesNeuralNetwork::calculateTargetDistAveragesFromGrid(const Grid *targetdist_grid_pntr) {
+  plumed_assert(targetdist_grid_pntr!=NULL);
+  std::vector<double> targetdist_averages(ncoeffs_,0.0);
+  std::vector<double> integration_weights = GridIntegrationWeights::getIntegrationWeights(targetdist_grid_pntr);
+  // Grid::index_t stride=mycomm_.Get_size();
+  // Grid::index_t rank=mycomm_.Get_rank();
+  updateNetCoeffs();
+  for (Grid::index_t l = 0; l < targetdist_grid_pntr->getSize(); l++)
+  {
+    std::vector<double> args_values = targetdist_grid_pntr->getPoint(l);
+    // std::vector<double> basisset_values(ncoeffs_);
+    updateNetInputs(args_values);
+    exec_->Forward(true);
+    exec_->Backward(head_grad_);
+    std::vector<double> coeffsgrads_values = getNetCoeffGrads();
+    // std::cout << coeff_grads_.at("w0") << std::endl;
+    // getBasisSetValues(args_values,basisset_values,false);
+    double weight = integration_weights[l]*targetdist_grid_pntr->getValue(l);
+    // std::cout << integration_weights[l] <<" "<< targetdist_grid_pntr->getValue(l)<< " " << weight << std::endl;
+    for(unsigned int i=0; i<ncoeffs_; i++) {
+      targetdist_averages[i] += weight*coeffsgrads_values[i];
+    }
+  }
+  // mycomm_.Sum(targetdist_averages);
+  // the overall constant;
+  // targetdist_averages[0] = 1.0;
+  // for (auto i : targetdist_averages) {
+    // std::cout << i << std::endl;
+  // }
+  // std::cout<<targetdist_averages.size()<<std::endl;
+  return targetdist_averages;
+}
+
+
 VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS_INIT(ao),
                                                               nargs_(getNumberOfArguments()),
                                                               //basisf_pntrs_(0),
@@ -257,46 +298,9 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
   //
 
   std::vector<Value *> args_pntrs = getArguments();
-  // check arguments and basis functions
-  // this is done to avoid some issues with integration of target distribution
-  // and periodic CVs, needs to be fixed later on.
-  /*for(unsigned int i=0; i<args_pntrs.size(); i++) {
-    if(args_pntrs[i]->isPeriodic() && !(basisf_pntrs_[i]->arePeriodic()) ) {
-      plumed_merror("argument "+args_pntrs[i]->getName()+" is periodic while the basis functions " + basisf_pntrs_[i]->getLabel()+ " are not. You need to use the COMBINE action to remove the periodicity of the argument if you want to use these basis functions");
-    }
-    else if(!(args_pntrs[i]->isPeriodic()) && basisf_pntrs_[i]->arePeriodic() ) {
-      log.printf("  warning: argument %s is not periodic while the basis functions %s used for it are periodic\n",args_pntrs[i]->getName().c_str(),basisf_pntrs_[i]->getLabel().c_str());
-    }
-  }*/
-  // std::vector<std::string> dimension_labels{"weights"};
-  // std::vector<unsigned int> indices_shape{100};
-  // addCoeffsSet(args_pntrs,basisf_pntrs_);
-  // addCoeffsSet(dimension_labels, indices_shape);
-  // ncoeffs_ = numberOfCoeffs();
-
-  checkThatTemperatureIsGiven();
-  // bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),getBeta(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
-  // bias_expansion_pntr_->linkVesBias(this);
-  // bias_expansion_pntr_->setGridBins(this->getGridBins());
-  //
-
-  // if(getNumberOfTargetDistributionPntrs()==0) {
-  //   log.printf("  using an uniform target distribution: \n");
-  //   bias_expansion_pntr_->setupUniformTargetDistribution();
-  // }
-  // else if(getNumberOfTargetDistributionPntrs()==1) {
-  //   if(biasCutoffActive()) {getTargetDistributionPntrs()[0]->setupBiasCutoff();}
-  //   bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionPntrs()[0]);
-  //   log.printf("  using target distribution of type %s with label %s \n",getTargetDistributionPntrs()[0]->getName().c_str(),getTargetDistributionPntrs()[0]->getLabel().c_str());
-  // }
-  // else {
-  //   plumed_merror("problem with the TARGET_DISTRIBUTION keyword, either give no keyword or just one keyword");
-  // }
-  // setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
-
+  
   // initiallize the neural network
-
-  std::vector<int> layer_shape{10, 1};
+  std::vector<int> layer_shape{40, 10, 1};
   net_ = createMLP(layer_shape);
   
   Context ctx = Context::cpu();
@@ -307,7 +311,7 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
 
   ncoeffs_ = 0;
 
-  auto initializer = Uniform(0.01);
+  auto initializer = Uniform(1);
   for (auto& coeff : coeffs_) {
     // coeff.first is parameter name, and coeff.second is the value
     initializer(coeff.first, &coeff.second);
@@ -334,6 +338,23 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
   //   std::cout << coeff_names_[i] << " " << coeffs_[coeff_names_[i]] << " " << coeff_grads_[coeff_names_[i]] << std::endl;    
   // }
 
+  // check arguments and basis functions
+  // this is done to avoid some issues with integration of target distribution
+  // and periodic CVs, needs to be fixed later on.
+  /*for(unsigned int i=0; i<args_pntrs.size(); i++) {
+    if(args_pntrs[i]->isPeriodic() && !(basisf_pntrs_[i]->arePeriodic()) ) {
+      plumed_merror("argument "+args_pntrs[i]->getName()+" is periodic while the basis functions " + basisf_pntrs_[i]->getLabel()+ " are not. You need to use the COMBINE action to remove the periodicity of the argument if you want to use these basis functions");
+    }
+    else if(!(args_pntrs[i]->isPeriodic()) && basisf_pntrs_[i]->arePeriodic() ) {
+      log.printf("  warning: argument %s is not periodic while the basis functions %s used for it are periodic\n",args_pntrs[i]->getName().c_str(),basisf_pntrs_[i]->getLabel().c_str());
+    }
+  }*/
+  // std::vector<std::string> dimension_labels{"weights"};
+  // std::vector<unsigned int> indices_shape{100};
+  // addCoeffsSet(args_pntrs,basisf_pntrs_);
+  // addCoeffsSet(dimension_labels, indices_shape);
+  // ncoeffs_ = numberOfCoeffs();
+
   std::vector<std::string> dimension_labels{"all"};
   std::vector<unsigned int> indices_shape{ncoeffs_};
   addCoeffsSet(dimension_labels, indices_shape);
@@ -344,11 +365,37 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
   // std::cout<<temp_coeffs.size()<<std::endl;
   getCoeffsPntr()->setValues(temp_coeffs);
 
+  checkThatTemperatureIsGiven();
+  // bias_expansion_pntr_ = new LinearBasisSetExpansion(getLabel(),getBeta(),comm,args_pntrs,basisf_pntrs_,getCoeffsPntr());
+  // bias_expansion_pntr_->linkVesBias(this);
+  // bias_expansion_pntr_->setGridBins(this->getGridBins());
+  //
 
+  // if(getNumberOfTargetDistributionPntrs()==0) {
+  //   log.printf("  using an uniform target distribution: \n");
+  //   bias_expansion_pntr_->setupUniformTargetDistribution();
+  // }
+  // else if(getNumberOfTargetDistributionPntrs()==1) {
+  //   if(biasCutoffActive()) {getTargetDistributionPntrs()[0]->setupBiasCutoff();}
+  //   bias_expansion_pntr_->setupTargetDistribution(getTargetDistributionPntrs()[0]);
+  //   log.printf("  using target distribution of type %s with label %s \n",getTargetDistributionPntrs()[0]->getName().c_str(),getTargetDistributionPntrs()[0]->getLabel().c_str());
+  // }
+  // else {
+  //   plumed_merror("problem with the TARGET_DISTRIBUTION keyword, either give no keyword or just one keyword");
+  // }
+  // setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
+  enableDynamicTargetDistribution();
+  targetdist_pntr_ = getTargetDistributionPntrs()[0];
+  std::vector<std::string> grid_min {"0.23"};
+  std::vector<std::string> grid_max {"0.70"};
+  std::vector<unsigned int> grid_bins {100};  
+  targetdist_pntr_->setupGrids(args_pntrs,grid_min,grid_max,grid_bins);
+  targetdist_pntr_->updateTargetDist();
+  targetdist_grid_pntr_ = targetdist_pntr_->getTargetDistGridPntr();
 
   bool coeffs_read = readCoeffsFromFiles();
   
-  std::vector<double> targetdist_averages(ncoeffs_, 0);
+  std::vector<double> targetdist_averages = calculateTargetDistAveragesFromGrid(targetdist_pntr_->getTargetDistGridPntr());
   setTargetDistAverages(targetdist_averages);
   //
   if (coeffs_read && biasCutoffActive())
@@ -442,6 +489,7 @@ void VesNeuralNetwork::updateTargetDistributions()
 {
   // bias_expansion_pntr_->updateTargetDistribution();
   // setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
+  setTargetDistAverages(calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_));
 }
 
 void VesNeuralNetwork::restartTargetDistributions()
@@ -449,6 +497,7 @@ void VesNeuralNetwork::restartTargetDistributions()
   // bias_expansion_pntr_->readInRestartTargetDistribution(getCurrentTargetDistOutputFilename());
   // bias_expansion_pntr_->restartTargetDistribution();
   // setTargetDistAverages(bias_expansion_pntr_->TargetDistAverages());
+  setTargetDistAverages(calculateTargetDistAveragesFromGrid(targetdist_grid_pntr_));
 }
 
 void VesNeuralNetwork::setupBiasFileOutput()
