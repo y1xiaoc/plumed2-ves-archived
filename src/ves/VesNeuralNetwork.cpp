@@ -272,7 +272,7 @@ std::vector<double> VesNeuralNetwork::calculateTargetDistAveragesFromGrid(const 
   // the overall constant;
   // targetdist_averages[0] = 1.0;
   // for (auto i : targetdist_averages) {
-    // std::cout << i << std::endl;
+  //   std::cout << i << " ";
   // }
   // std::cout<<targetdist_averages.size()<<std::endl;
   return targetdist_averages;
@@ -300,7 +300,7 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
   std::vector<Value *> args_pntrs = getArguments();
   
   // initiallize the neural network
-  std::vector<int> layer_shape{40, 10, 1};
+  std::vector<int> layer_shape{10, 1};
   net_ = createMLP(layer_shape);
   
   Context ctx = Context::cpu();
@@ -311,7 +311,7 @@ VesNeuralNetwork::VesNeuralNetwork(const ActionOptions &ao) : PLUMED_VES_VESBIAS
 
   ncoeffs_ = 0;
 
-  auto initializer = Uniform(1);
+  auto initializer = Uniform(0.1);
   for (auto& coeff : coeffs_) {
     // coeff.first is parameter name, and coeff.second is the value
     initializer(coeff.first, &coeff.second);
@@ -454,7 +454,7 @@ void VesNeuralNetwork::calculate()
   // for (auto i : coeffsderivs_values) {
   //   std::cout << i << " ";
   // }
-  // std::cout << std::endl;
+  // std::cout << coeffsderivs_values.size() << std::endl;
   //auto toc = std::chrono::system_clock::now();
   //log.printf("bias: %f, tic-tac: %f, tac-toc: %f\n", bias, std::chrono::duration_cast<std::chrono::milliseconds>(tac - tic).count() / 1000.0, std::chrono::duration_cast<std::chrono::milliseconds>(toc - tac).count() / 1000.0);
   // double bias = 0;
